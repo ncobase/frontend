@@ -1,0 +1,29 @@
+{
+  "name": "@ncobase/utils",
+  "version": "0.0.1",
+  "private": true,
+  "description": "utils library",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react",
+    "lint": "eslint src/**/* --ext .js,.jsx.ts,.tsx"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "jsencrypt": "^3.3.2",
+    "nanoid": "^3.3.7",
+    "tailwind-merge": "^2.3.0"
+  },
+  "devDependencies": {
+    "@ncobase/tsconfig": "workspace:*",
+    "@types/node": "^20.12.11",
+    "tsup": "^8.0.2"
+  }
+}

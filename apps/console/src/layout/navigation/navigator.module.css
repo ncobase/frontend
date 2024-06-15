@@ -1,0 +1,10 @@
+.link {
+  @apply py-2 px-3 mr-4 rounded-none hover:bg-transparent border-b-2 border-transparent text-white hover:opacity-85 cursor-pointer inline-flex items-center;
+}
+
+.linkActive {
+  @apply border-white;
+}
+.linkLabel {
+  @apply mr-3;
+}

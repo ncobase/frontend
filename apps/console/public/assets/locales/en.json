@@ -1,0 +1,650 @@
+{
+  "application_title": "Ncobase - Next-Gen Modular Framework",
+  "login_hint": "<strong>{{name}}</strong> environment, you can log in using <anchor>{{credentials}}</anchor>",
+  "date_ago": {
+    "format": "dddd, DD MMMM YYYY, hh:mm a"
+  },
+  "actions_button": {
+    "label": "Execute"
+  },
+  "confirm_menu_item": {
+    "confirm_text": "Confirm"
+  },
+  "confirm_popover": {
+    "confirm_text": "Confirm",
+    "heading": "Are you sure?"
+  },
+  "errors": {
+    "403": {
+      "title": "Access Denied",
+      "description": "You do not have permission to access this page. This may be because you are unauthorized, your login session has expired, or you are restricted from accessing it for other reasons. If you believe this is an error, please contact our technical support team for assistance."
+    },
+    "404": {
+      "title": "Page Not Found",
+      "description": "The page you are looking for does not exist. This could be because you entered an incorrect address or the page has been moved to another URL. Please check your input and try again."
+    },
+    "500": {
+      "title": "Server Error",
+      "description": "There was a problem with the server that prevented the page from being displayed. We have logged this issue and will fix it as soon as possible. Please try again later or contact our technical support team for assistance."
+    },
+    "unknown": {
+      "label": "Unknown Error",
+      "description": "An unknown error occurred. Please try again later or contact our technical support team for assistance."
+    },
+    "boundary": {
+      "label": "An unexpected error occurred",
+      "description": "An unexpected error occurred. Please try again later or contact our technical support team for assistance."
+    },
+    "request": {
+      "label": "Request Error",
+      "description": "An error occurred while processing your request. Please try again later or contact our technical support team for assistance."
+    },
+    "response": {
+      "label": "Response Error",
+      "description": "An error occurred while processing your response. Please try again later or contact our technical support team for assistance."
+    }
+  },
+  "forms": {
+    "required": "Field is required",
+    "input_required": "Field is required",
+    "select_required": "Field is required",
+    "not_valid": "Field is not valid",
+    "not_allowed": "Field is not allowed",
+    "required_with_field": "{{field}} field is required",
+    "input_required_with_field": "{{field}} field is required",
+    "select_required_with_field": "{{field}} field is required",
+    "not_valid_with_field": "{{field}} field is not valid",
+    "not_allowed_with_field": "{{field}} field is not allowed"
+  },
+  "fields": {
+    "username": {
+      "label": "Username",
+      "placeholder": "Enter username",
+      "required": "Please enter username",
+      "invalid": "Invalid username",
+      "too_short": "Username is too short (minimum {{count}} characters)",
+      "too_long": "Username is too long (maximum {{count}} characters)"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "Enter email",
+      "required": "Please enter email",
+      "invalid": "Invalid email"
+    },
+    "username_or_email": {
+      "label": "Username / Email",
+      "placeholder": "Enter username / email",
+      "required": "Please enter username / email",
+      "invalid": "Invalid username / email",
+      "too_short": "Username / email is too short (minimum {{count}} characters)",
+      "too_long": "Username / email is too long (maximum {{count}} characters)"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter password",
+      "required": "Please enter password",
+      "too_short": "Password is too short (minimum {{count}} characters)",
+      "too_long": "Password is too long (maximum {{count}} characters)",
+      "missing_uppercase": "Password is missing uppercase letters",
+      "missing_lowercase": "Password is missing lowercase letters",
+      "missing_number": "Password is missing numbers",
+      "missing_symbol": "Password is missing special characters"
+    },
+    "confirm_password": {
+      "label": "Confirm Password",
+      "placeholder": "Enter confirm password",
+      "required": "Please enter confirm password",
+      "mismatch": "Passwords do not match, please check"
+    },
+    "remember": {
+      "label": "Remember me"
+    },
+    "terms": {
+      "label": "I accept the terms and conditions",
+      "required": "Please accept the terms and conditions"
+    }
+  },
+  "search_input": {
+    "placeholder": "Search...",
+    "clear": "Clear search"
+  },
+  "field_day_picker": {
+    "invalid_message": "Invalid date"
+  },
+  "field_repeater": {
+    "invalid_message": "At least one element is invalid"
+  },
+  "field_multi_select": {
+    "no_option": "No option selected"
+  },
+  "sort": {
+    "sort_ascending": "Ascending",
+    "sort_descending": "Descending",
+    "sort_by": "Sort by",
+    "order": "Order"
+  },
+  "icon_selector": {
+    "title": "Select Icon",
+    "search_placeholder": "Search...",
+    "outline": "Outline",
+    "filled": "Filled"
+  },
+  "tenant_switcher": {
+    "title": "Switch Tenant"
+  },
+  "filter": {
+    "search": "Search",
+    "clear": "Clear",
+    "select_all": "Select All",
+    "deselect_all": "Deselect All",
+    "apply": "Apply",
+    "reset": "Reset",
+    "filter": "Filter",
+    "sort_by": "Sort By",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "contains": "Contains",
+    "does_not_contain": "Does Not Contain",
+    "starts_with": "Starts With",
+    "ends_with": "Ends With",
+    "is_equal_to": "Is Equal To",
+    "is_not_equal_to": "Is Not Equal To",
+    "greater_than": "Greater Than",
+    "less_than": "Less Than",
+    "between": "Between",
+    "clear_filters": "Clear Filters",
+    "apply_filters": "Apply Filters",
+    "date": "Date",
+    "realtime": "Real-Time Data",
+    "last_5_minutes": "Last 5 Minutes",
+    "last_10_minutes": "Last 10 Minutes",
+    "last_15_minutes": "Last 15 Minutes",
+    "last_30_minutes": "Last 30 Minutes",
+    "last_1_hour": "Last 1 Hour",
+    "last_2_hours": "Last 2 Hours",
+    "last_3_hours": "Last 3 Hours",
+    "last_6_hours": "Last 6 Hours",
+    "last_9_hours": "Last 9 Hours",
+    "last_12_hours": "Last 12 Hours",
+    "last_24_hours": "Last 24 Hours",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last_7_days": "Last 7 Days",
+    "last_30_days": "Last 30 Days",
+    "last_60_days": "Last 60 Days",
+    "last_90_days": "Last 90 Days",
+    "last_180_days": "Last 180 Days",
+    "last_365_days": "Last 365 Days",
+    "this_week": "This Week",
+    "last_week": "Last Week",
+    "last_2_weeks": "Last 2 Weeks",
+    "last_3_weeks": "Last 3 Weeks",
+    "last_6_weeks": "Last 6 Weeks",
+    "last_9_weeks": "Last 9 Weeks",
+    "last_12_weeks": "Last 12 Weeks",
+    "this_month": "This Month",
+    "last_month": "Last Month",
+    "last_3_months": "Last 3 Months",
+    "last_6_months": "Last 6 Months",
+    "last_9_months": "Last 9 Months",
+    "last_12_months": "Last 12 Months",
+    "this_quarter": "This Quarter",
+    "last_quarter": "Last Quarter",
+    "last_3_quarters": "Last 3 Quarters",
+    "last_6_quarters": "Last 6 Quarters",
+    "last_9_quarters": "Last 9 Quarters",
+    "last_12_quarters": "Last 12 Quarters",
+    "this_year": "This Year",
+    "last_year": "Last Year",
+    "last_3_years": "Last 3 Years",
+    "last_5_years": "Last 5 Years",
+    "last_10_years": "Last 10 Years",
+    "clear_range": "Clear Range",
+    "clear_date": "Clear Date",
+    "clear_time": "Clear Time",
+    "custom": "Custom",
+    "date_range": "Date Range",
+    "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deleted": "Deleted"
+  },
+  "actions": {
+    "go_to_login": "Go to Login",
+    "already_have_an_account": "Already have an account?",
+    "forgot_password": "Forgot Password?",
+    "login": "Login",
+    "need_account": "Need an account?",
+    "register": "Register",
+    "activate": "Activate",
+    "cancel": "Cancel",
+    "deactivate": "Deactivate",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "create": "Create",
+    "update": "Update",
+    "edit": "Edit",
+    "view": "View",
+    "submit": "Submit",
+    "copied": "Copied successfully",
+    "copy": "Copy",
+    "save": "Save",
+    "shared": "Shared",
+    "disable": "Disable",
+    "expand": "View details",
+    "close": "Close",
+    "go_back": "Go back",
+    "go_home": "Go home",
+    "more": "More",
+    "mark_as_unread": "Mark as Unread",
+    "mark_all_as_unread": "Mark all as Unread",
+    "mark_as_read": "Mark as Read",
+    "mark_all_as_read": "Mark all as Read"
+  },
+  "query": {
+    "loading": "Loading...",
+    "search": "Search",
+    "reset": "Reset"
+  },
+  "pagination": {
+    "first_page": "First Page",
+    "previous_page": "Previous Page",
+    "next_page": "Next Page",
+    "last_page": "Last Page",
+    "total_text": "Total",
+    "of_text": "of",
+    "go_to_text": "Go to",
+    "displaying_text": "Displaying",
+    "to_text": "to",
+    "items_text": "items",
+    "page_text": "Page",
+    "per_page_text": "Per Page"
+  },
+  "empty": {
+    "no_data": "No data available",
+    "no_more_data": "No more data available",
+    "no_results": "No results found"
+  },
+  "table": {
+    "layout": {
+      "card": "Card",
+      "board": "Board",
+      "table": "Table",
+      "fullscreen": "Fullscreen"
+    }
+  },
+  "units": {
+    "kilogram": "kg",
+    "gram": "g",
+    "ounce": "oz",
+    "pound": "lb",
+    "milliliter": "ml",
+    "liter": "l",
+    "meter": "m",
+    "inch": "in",
+    "centimeter": "cm",
+    "feet": "ft",
+    "yard": "yd",
+    "mile": "mi",
+    "millimeter": "mm",
+    "cup": "c",
+    "pint": "pt",
+    "quart": "qt",
+    "tablespoon": "tbsp",
+    "teaspoon": "tsp"
+  },
+  "currencies": {
+    "usd": "USD",
+    "eur": "EUR",
+    "jpy": "JPY",
+    "gbp": "GBP",
+    "aud": "AUD",
+    "cad": "CAD",
+    "chf": "CHF",
+    "cny": "CNY",
+    "rmb": "RMB",
+    "hkd": "HKD",
+    "nzd": "NZD",
+    "sgd": "SGD",
+    "krw": "KRW",
+    "inr": "INR",
+    "rub": "RUB",
+    "brl": "BRL",
+    "zar": "ZAR",
+    "sek": "SEK",
+    "nok": "NOK",
+    "dkk": "DKK",
+    "pln": "PLN",
+    "mxn": "MXN",
+    "idr": "IDR",
+    "thb": "THB",
+    "myr": "MYR",
+    "php": "PHP",
+    "vnd": "VND",
+    "twd": "TWD",
+    "sar": "SAR",
+    "aed": "AED",
+    "try": "TRY",
+    "egp": "EGP",
+    "ngn": "NGN",
+    "czk": "CZK",
+    "huf": "HUF",
+    "ils": "ILS"
+  },
+  "currency_units": {
+    "thousand": "K",
+    "million": "M",
+    "billion": "B",
+    "trillion": "T",
+    "ten_thousand": "Ten Thousand",
+    "hundred_million": "Hundred Million"
+  },
+  "datetime": {
+    "a_moment_ago": "A moment ago",
+    "minutes_ago": "minutes ago",
+    "minutes_ago_with_value": "{{minutes}} minutes ago",
+    "hours_ago": "hours ago",
+    "hours_ago_with_value": "{{hours}} hours ago",
+    "days_ago": "days ago",
+    "days_ago_with_value": "{{days}} days ago",
+    "weeks_ago": "weeks ago",
+    "weeks_ago_with_value": "{{weeks}} weeks ago",
+    "months_ago": "months ago",
+    "months_ago_with_value": "{{months}} months ago",
+    "years_ago": "years ago",
+    "years_ago_with_value": "{{years}} years ago",
+    "now": "Now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "last_week": "Last week",
+    "last_month": "Last month",
+    "last_year": "Last year",
+    "this_week": "This week",
+    "this_month": "This month",
+    "this_year": "This Year",
+    "next_week": "Next week",
+    "next_month": "Next month",
+    "next_year": "Next year",
+    "this_quarter": "This Quarter",
+    "last_quarter": "Last Quarter"
+  },
+  "dashboard": {
+    "navigation": "Dashboard"
+  },
+  "content": {
+    "navigation": "Content",
+    "topic": {
+      "title": "Topics / Content Management",
+      "navigation": "Topics"
+    },
+    "taxonomy": {
+      "title": "Taxonomy Management",
+      "navigation": "Categories"
+    },
+    "comment": {
+      "title": "Comment Management",
+      "navigation": "Comments"
+    },
+    "trash": {
+      "title": "Trash",
+      "navigation": "Trash"
+    },
+    "approval": {
+      "title": "Content Approval",
+      "navigation": "Approval"
+    },
+    "component": {
+      "title": "Component Management",
+      "navigation": "Components"
+    }
+  },
+  "sale": {
+    "navigation": "Sales"
+  },
+  "purchase": {
+    "navigation": "Purchase"
+  },
+  "finance": {
+    "navigation": "Finance"
+  },
+  "warehouse": {
+    "navigation": "Warehouse"
+  },
+  "customer": {
+    "navigation": "Customers"
+  },
+  "analytics": {
+    "navigation": "Analytics"
+  },
+  "hr": {
+    "navigation": "Human Resources"
+  },
+  "asset": {
+    "navigation": "Assets"
+  },
+  "system": {
+    "navigation": "System",
+    "tenant": {
+      "title": "Tenant Management",
+      "navigation": "Tenants"
+    },
+    "group": {
+      "title": "Organizational Structure",
+      "navigation": "Organizations"
+    },
+    "role": {
+      "title": "Job Roles",
+      "navigation": "Roles"
+    },
+    "menu": {
+      "title": "Menu Management",
+      "navigation": "Menus"
+    },
+    "permission": {
+      "title": "Permission Management",
+      "navigation": "Permissions"
+    },
+    "dictionary": {
+      "title": "Dictionary / Enum Management",
+      "navigation": "Dictionaries"
+    },
+    "application": {
+      "title": "Application List",
+      "navigation": "Applications"
+    },
+    "user": {
+      "title": "System Users",
+      "navigation": "Users"
+    },
+    "basic": {
+      "title": "System Configuration",
+      "navigation": "System Configuration",
+      "setting": {
+        "title": "System Configuration",
+        "navigation": "System Configuration"
+      }
+    }
+  },
+  "dropdowns": {
+    "tenant": {
+      "label": "Tenant",
+      "admin": {
+        "label": "Manage Tenants"
+      },
+      "switch": {
+        "label": "Switch Tenant"
+      }
+    },
+    "account": {
+      "label": "Account",
+      "system": {
+        "label": "System Management"
+      },
+      "switch_dark": {
+        "label": "Switch to Dark Mode"
+      },
+      "switch_light": {
+        "label": "Switch to Light Mode"
+      },
+      "profile": {
+        "label": "My Account"
+      },
+      "logout": {
+        "label": "Logout"
+      }
+    }
+  },
+  "interceptor": {
+    "account": {
+      "title": "Please log in to continue..."
+    }
+  },
+  "account": {
+    "register": {
+      "feedbacks": {
+        "registration_error": {
+          "title": "Registration Failed"
+        },
+        "registration_success": {
+          "title": "Account Created Successfully!",
+          "description": "Please check your email inbox at <strong>{{email}}</strong> to activate your account."
+        }
+      },
+      "title": "Register"
+    },
+    "login": {
+      "title": "Login",
+      "feedbacks": {
+        "login_error": {
+          "title": "Login Failed"
+        }
+      }
+    },
+    "forget_password": {
+      "title": "Forgot Password"
+    },
+    "reset_password": {
+      "title": "Reset Password",
+      "actions": {
+        "cancel": "Cancel",
+        "send": "Send",
+        "go_to_login": "Go to Login",
+        "reset": "Reset Password"
+      },
+      "feedbacks": {
+        "init_success": {
+          "title": "Reset Password Email Sent Successfully!",
+          "description": "If there is an account associated with <strong>{{email}}</strong>, you should have received an email."
+        },
+        "init_error": {
+          "title": "Reset Password Failed"
+        },
+        "confirm_success": {
+          "title": "Your password has been reset",
+          "description": "You can now proceed to login"
+        },
+        "confirm_error": {
+          "title": "Reset Password Failed"
+        }
+      }
+    },
+    "logout": {
+      "title": "Logout"
+    }
+  },
+  "notification": {
+    "title": "Notifications",
+    "push_setting": "Notification push settings",
+    "have_no_notification": "No messages",
+    "have_new_notification": "There are new messages",
+    "you_have_unread_notification": "You have unread messages",
+    "you_have_unread_notification_plural": "You have {{count}} unread messages",
+    "you_have_no_unread_notification": "You have no unread messages"
+  },
+  "example": {
+    "navigation": "Examples",
+    "card": {
+      "title": "Card / Submenu View",
+      "navigation": "Card / Submenu",
+      "model": {
+        "title": "",
+        "navigation": "Model",
+        "user": {
+          "title": "",
+          "navigation": "User"
+        },
+        "role": {
+          "title": "",
+          "navigation": "Role"
+        },
+        "permission": {
+          "title": "",
+          "navigation": "Permission"
+        }
+      },
+      "component": {
+        "title": "",
+        "navigation": "Component",
+        "element": {
+          "title": "",
+          "navigation": "Element"
+        },
+        "form": {
+          "title": "",
+          "navigation": "Form"
+        },
+        "layout": {
+          "title": "",
+          "navigation": "Layout"
+        },
+        "template": {
+          "title": "",
+          "navigation": "Template"
+        }
+      },
+      "efficiency": {
+        "title": "",
+        "navigation": "Efficiency",
+        "log": {
+          "title": "",
+          "navigation": "Log"
+        },
+        "report": {
+          "title": "",
+          "navigation": "Report"
+        },
+        "workflow": {
+          "title": "",
+          "navigation": "Workflow"
+        },
+        "task": {
+          "title": "",
+          "navigation": "Task"
+        }
+      }
+    },
+    "list1": {
+      "title": "Sales List",
+      "navigation": "List"
+    },
+    "list2": {
+      "title": "Menu Management",
+      "navigation": "List"
+    },
+    "analyze": {
+      "title": "Analysis List",
+      "navigation": "Analysis",
+      "sales": {
+        "title": "Sales Amount"
+      }
+    },
+    "ui": {
+      "title": "UI / Form Elements",
+      "navigation": "UI / Form"
+    },
+    "masonry": {
+      "title": "Masonry List",
+      "navigation": "Masonry"
+    }
+  }
+}

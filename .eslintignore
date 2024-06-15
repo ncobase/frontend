@@ -1,0 +1,9 @@
+**/node_modules/
+.DS_Store
+dist
+dist-ssr
+dev-dist
+*.local
+cypress*
+vite.config.mts
+stats.html

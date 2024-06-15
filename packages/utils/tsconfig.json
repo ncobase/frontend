@@ -1,0 +1,14 @@
+{
+  "extends": "@ncobase/tsconfig/base.json",
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+  },
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

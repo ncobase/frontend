@@ -1,0 +1,10 @@
+{
+  "extends": "@ncobase/tsconfig/react.json",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

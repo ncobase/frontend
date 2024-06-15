@@ -1,0 +1,22 @@
+component: website
+name: tonecloud
+stage: prod
+inputs:
+  src:
+    dist: './dist'
+    hook: npm run build
+    index: index.html
+    error: index.html
+  region: ap-beijing
+  bucket: tonecloud
+  replace: true
+  protocol: https
+  hosts:
+    - host: console.tonecloud.uasse.com
+      https:
+        switch: on
+        http2: on
+        autoRefresh: true #开启自动 CDN 刷新，用于快速更新和同步加速域名中展示的站点内容
+        onlyRefresh: true #建议首次部署后，将此参数配置为 true，即忽略其他 CDN 配置，只进行刷新操作
+        certInfo:
+          certId: '0kZ2sRXY'

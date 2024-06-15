@@ -1,0 +1,58 @@
+{
+  "private": true,
+  "description": "Ncobase frontend project",
+  "repository": "git@github.com:stocms/frontend.git",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "plugins/*"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "clean": "npx rimraf --glob '**/{node_modules,.next,dist,.turbo,.eslintcache}'",
+    "dev": "turbo run dev",
+    "dev:console": "pnpm dev --filter=@ncobase/console --filter='./packages/*'",
+    "lint": "turbo run lint",
+    "lint:fix": "pnpm lint -- --fix && pnpm prettier --write",
+    "prettier": "prettier \"**/*.{vue,js,jsx,ts,tsx,md,css,scss,yaml,yml}\"",
+    "build": "turbo run build --filter=!./apps/*"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@types/node": "^20.12.11",
+    "eslint": "^8",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.34.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "rimraf": "^5.0.6",
+    "turbo": "^1.13.3",
+    "typescript": "5.4.5"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "pnpm lint:fix"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
