@@ -4,6 +4,9 @@ export interface User {
   email?: string;
   phone?: string;
   status?: number;
+  is_certified: true;
+  is_admin: true;
+  profile?: UserProfile;
   created_by?: string;
   created_at?: string;
   updated_by?: string;
@@ -21,9 +24,4 @@ export interface UserProfile {
   language?: string;
   links?: ExplicitAny[];
   extra?: object;
-}
-
-export interface Users {
-  content: User[];
-  total: number;
 }

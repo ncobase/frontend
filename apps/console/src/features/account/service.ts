@@ -1,27 +1,17 @@
-import {
-  AnyObject,
-  ExplicitAny,
-  LoginProps,
-  LoginReply,
-  RegisterProps,
-  Tenant,
-  Tenants
-} from '@ncobase/types';
+import { Account, AnyObject, LoginProps, LoginReply, RegisterProps, Tenant } from '@ncobase/types';
 import { UseMutationOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
-import { getCurrentUser } from '@/apis/account/account';
+import { getAccountTenant, getAccountTenants, getCurrentUser } from '@/apis/account/account';
 import { loginAccount, registerAccount } from '@/apis/account/authorize';
-import { getUserTenant, getUserTenants } from '@/apis/account/tenant';
 import { useAuthContext } from '@/features/account/context';
-import { paginateByCursor } from '@/helpers/pagination';
 
 interface AccountKeys {
   login: ['accountService', 'login'];
   register: ['accountService', 'register'];
   account: ['accountService', 'currentUser'];
   tenants: (options?: AnyObject) => ['accountService', 'tenants', AnyObject];
-  tenant: (options?: { id?: string }) => ['accountService', 'tenant', { id?: string }];
+  tenant: (options?: AnyObject) => ['accountService', 'tenant', AnyObject];
 }
 
 export const accountKeys: AccountKeys = {
@@ -29,7 +19,7 @@ export const accountKeys: AccountKeys = {
   register: ['accountService', 'register'],
   account: ['accountService', 'currentUser'],
   tenants: (queryKey = {}) => ['accountService', 'tenants', queryKey],
-  tenant: ({ id } = {}) => ['accountService', 'tenant', { id }]
+  tenant: (queryKey = {}) => ['accountService', 'tenant', queryKey]
 };
 
 const useMutationWithTokens = <TVariables>(
@@ -58,32 +48,24 @@ export const useRegisterAccount = (
 export const useAccount = () => {
   const { data: account, ...rest } = useQuery({
     queryKey: accountKeys.account,
-    queryFn: getCurrentUser
+    queryFn: (): Promise<Account> => getCurrentUser()
   });
-  const isAdministered = true; // !!account?.authorities?.includes('ADMIN') || account?.administered;
-  return { ...account, isAdministered, ...rest };
+  const isAdministered = account?.is_admin || false;
+  return { account, isAdministered, ...rest };
 };
 
-export const useUserTenants = (queryKey: AnyObject = {}) => {
-  const { data, ...rest } = useQuery({
-    queryKey: accountKeys.tenants(queryKey),
-    queryFn: (): Promise<Tenants> => getUserTenants(queryKey)
-  });
-  const { content: tenants = [] } = data || {};
-  const { cursor, limit } = queryKey;
-  const { rs, hasNextPage, nextCursor } =
-    (tenants && paginateByCursor(tenants, cursor as string, limit as number)) ||
-    ({} as ExplicitAny);
-  return { tenants: rs, hasNextPage, nextCursor, ...rest };
-};
-
-export const useUserTenant = (id?: string) => {
-  if (!id) {
-    return { tenant: undefined };
-  }
+export const useAccountTenant = () => {
   const { data: tenant, ...rest } = useQuery({
-    queryKey: accountKeys.tenant({ id }),
-    queryFn: (): Promise<Tenant> => getUserTenant(id)
+    queryKey: accountKeys.tenant(),
+    queryFn: (): Promise<Tenant> => getAccountTenant()
   });
   return { tenant, ...rest };
+};
+
+export const useAccountTenants = (queryKey: AnyObject = {}) => {
+  const { data: tenants, ...rest } = useQuery({
+    queryKey: accountKeys.tenants(queryKey),
+    queryFn: (): Promise<Tenant[]> => getAccountTenants()
+  });
+  return { tenants, ...rest };
 };

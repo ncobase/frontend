@@ -55,7 +55,7 @@ export const Header = ({ ...rest }) => {
       {...rest}
     >
       <div className='inline-flex items-center justify-start'>
-        <Logo className='w-14 h-14 bg-slate-900' type='min' height='3rem' color='white' />
+        <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
         {headerMenus.length ? <MainNavigation menus={headerMenus} /> : null}
       </div>
       <div className='inline-flex items-center px-4 gap-x-3'>

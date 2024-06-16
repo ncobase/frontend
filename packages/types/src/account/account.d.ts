@@ -1,6 +1,3 @@
-import { User, UserProfile } from '../core/user';
+import { User } from '../core/user';
 
-export interface Account {
-  user: User;
-  profile: UserProfile;
-}
+export interface Account extends User {}

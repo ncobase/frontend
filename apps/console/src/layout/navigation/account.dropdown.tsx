@@ -12,24 +12,23 @@ import { useAccount } from '@/features/account/service';
 import { useListMenus } from '@/features/system/menu/service';
 import { useCopyToClipboard } from '@/hooks/use_copy_to_clipboard';
 
-// const AdminMenu = ({ isAdmin = false }) => {
-//  const { t } = useTranslation();
-//  const navigate = useNavigate();
-//
-//  if (!isAdmin) return null;
-//
-//  return (
-//   <>
-//    <Menu.Item
-//     // icon={<Icons name='IconSettings' />}
-//     onClick={() => navigate('/system/tenant')}
-//    >
-//     {t('account.system.label')}
-//    </Menu.Item>
-//    <Menu.Divider maw='90%' mx='auto' />
-//   </>
-//  );
-// };
+const AdminMenu = ({ isAdmin = false }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  if (!isAdmin) return null;
+
+  return (
+    <>
+      <DropdownItem
+        // icon={<Icons name='IconSettings' />}
+        onClick={() => navigate('/system/tenant')}
+      >
+        {t('account.system.label')}
+      </DropdownItem>
+    </>
+  );
+};
 
 const AppVersion = () => {
   const { t } = useTranslation();
@@ -57,7 +56,7 @@ const AppVersion = () => {
 export const AccountDropdown = ({ ...rest }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, profile, isLoading } = useAccount();
+  const { account, isAdministered, isLoading } = useAccount();
   const { menus = [] } = useListMenus({ type: 'account' });
 
   const renderMenuDropdown = (menuItems: MenuTree[]) => {
@@ -65,7 +64,7 @@ export const AccountDropdown = ({ ...rest }) => {
     if (!visibleItems.length) return null;
     return (
       <DropdownContent align='end' alignOffset={-16}>
-        {/* <Menu.Button>{t('account.label')}</Menu.Button> */}
+        <AdminMenu isAdmin={isAdministered} />
         {visibleItems.map(renderLink)}
         <AppVersion />
       </DropdownContent>
@@ -86,9 +85,9 @@ export const AccountDropdown = ({ ...rest }) => {
       <DropdownTrigger>
         <AvatarButton
           isLoading={isLoading}
-          src={profile?.thumbnail}
-          title={profile?.display_name || user?.username || ''}
-          alt={profile?.display_name || user?.username || ''}
+          src={account?.profile?.thumbnail}
+          title={account?.profile?.display_name || account?.username || ''}
+          alt={account?.profile?.display_name || account?.username || ''}
         />
       </DropdownTrigger>
       {renderMenuDropdown(menus)}

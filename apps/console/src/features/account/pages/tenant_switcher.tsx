@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import { Modal } from '@/components/modal/modal';
 import { useAuthContext } from '@/features/account/context';
-import { useUserTenants } from '@/features/account/service';
 import { useTenantContext } from '@/features/system/tenant/context';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
@@ -47,16 +46,17 @@ const TenantOption = React.memo(
 
 export const TenantSwitcher = ({
   opened = false,
+  tenants = [],
   onVisible
 }: {
   opened?: boolean;
+  tenants?: Tenant[];
   onVisible?: (visible: boolean) => void;
 }) => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthContext();
   const { hasTenant, tenant_id, updateTenant } = useTenantContext();
   const redirect = useRedirectFromUrl();
-  const { tenants } = useUserTenants();
 
   const onSelect = useCallback(
     (id: string) => {
@@ -75,7 +75,7 @@ export const TenantSwitcher = ({
     } else if (isAuthenticated && !hasTenant && tenants.length === 1) {
       onSelect(tenants[0].id);
     }
-  }, [isAuthenticated, hasTenant, tenants.length, onSelect]);
+  }, [isAuthenticated, hasTenant, tenants, onSelect]);
 
   if (!tenants.length || !isAuthenticated) return null;
 

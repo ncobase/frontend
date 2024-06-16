@@ -1,4 +1,4 @@
-import { Account } from '@ncobase/types';
+import { Account, Tenant } from '@ncobase/types';
 
 import { request } from '../request';
 
@@ -7,4 +7,14 @@ const ENDPOINT = '/v1/account';
 // current user
 export const getCurrentUser = async (): Promise<Account> => {
   return request.get(`${ENDPOINT}`);
+};
+
+// get user owned tenant
+export const getAccountTenant = async (): Promise<Tenant> => {
+  return request.get(`${ENDPOINT}/tenant`);
+};
+
+// get user belonged tenants or related tenants
+export const getAccountTenants = async (): Promise<Tenant[]> => {
+  return request.get(`${ENDPOINT}/tenants`);
 };

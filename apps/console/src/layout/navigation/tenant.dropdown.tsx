@@ -14,16 +14,16 @@ import { useNavigate } from 'react-router-dom';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { TenantSwitcher } from '@/features/account/pages/tenant_switcher';
-import { useUserTenant, useUserTenants } from '@/features/account/service';
+import { useAccountTenants } from '@/features/account/service';
 import { useListMenus } from '@/features/system/menu/service';
 import { useTenantContext } from '@/features/system/tenant/context';
 
 export const TenantDropdown = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { hasTenant, tenant_id } = useTenantContext();
-  const { tenants } = useUserTenants();
-  const { tenant } = useUserTenant(tenant_id);
+  const { hasTenant } = useTenantContext();
+  const { tenants: accountTenants } = useAccountTenants();
+
   const [opened, setOpened] = useState(false);
   const { menus } = useListMenus({ type: 'tenant' });
 
@@ -71,11 +71,11 @@ export const TenantDropdown = () => {
   const MenuList = React.memo(() => (
     <Dropdown>
       <DropdownTrigger asChild>
-        {tenant?.logo ? (
-          <AvatarButton src={tenant?.logo} alt={tenant?.name} />
+        {accountTenants?.[0].logo ? (
+          <AvatarButton src={accountTenants?.[0].logo} alt={accountTenants?.[0].name} />
         ) : (
           <Button variant='unstyle' className='p-0 text-slate-400/70 [&>svg]:stroke-slate-400/70'>
-            <Icons name='IconBuildingCommunity' /> {tenant?.name}
+            <Icons name='IconBuildingCommunity' /> {accountTenants?.[0].name}
           </Button>
         )}
       </DropdownTrigger>
@@ -86,8 +86,8 @@ export const TenantDropdown = () => {
 
   return (
     <>
-      {hasTenant && tenants.length > 1 && <MenuList />}
-      <TenantSwitcher opened={opened} onVisible={setOpened} />
+      {hasTenant && accountTenants?.length > 1 && <MenuList />}
+      <TenantSwitcher opened={opened} onVisible={setOpened} tenants={accountTenants} />
     </>
   );
 };
