@@ -1,34 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Button, ShellSubmenu } from '@ncobase/react';
+import { Menu } from '@ncobase/types';
 import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useSidebarMenus } from './page.context';
-import { isGroup, pathSplit } from './page.helper';
-
-import { useListMenus } from '@/features/system/menu/service';
+import { useMenus } from './page.context';
+import { findMenuByParentId, getMenuByUrl, isGroup, pathSplit } from './page.helper';
 
 export const Submenu = ({ ...rest }) => {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const { t } = useTranslation();
+  const menus = useMenus();
+  const currentHeaderMenu = getMenuByUrl(menus, pathname);
+  console.log(currentHeaderMenu);
 
+  const [submenus, setSubmenus] = useState<Menu[]>([]);
+  const sidebarMenusData = findMenuByParentId(menus, currentHeaderMenu?.id || '', 'sidebar') || [];
   const [firstPart, secondPart] = pathSplit(pathname);
-  const sidebarMenu =
-    useSidebarMenus()?.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {};
-  // TODO: 当前页面刷新时，没有菜单数据
-  const visibleSubmenus =
-    useListMenus({
-      type: 'submenu',
-      parent: sidebarMenu?.id
-    })?.menus?.filter(menu => !menu.hidden || !menu.disabled) ?? [];
+
+  const currentSidebarMenu =
+    sidebarMenusData?.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {};
+
+  useEffect(() => {
+    if (currentSidebarMenu) {
+      const filteredMenus = currentSidebarMenu?.children?.filter(
+        (menu: Menu) => !menu.hidden && !menu.disabled
+      );
+      setSubmenus(filteredMenus);
+    }
+  }, [currentSidebarMenu]);
+
+  if (!currentSidebarMenu || !submenus) {
+    return null;
+  }
 
   return (
     <ShellSubmenu className='p-5 overflow-auto text-slate-600 font-normal' {...rest}>
-      {visibleSubmenus.map(link =>
+      {submenus.map(link =>
         isGroup(link) ? (
           <div
             className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'
@@ -39,7 +51,7 @@ export const Submenu = ({ ...rest }) => {
               variant='unstyle'
               size='ratio'
               className='float-right text-primary-600 p-1'
-              // onClick={() => console.log('add events')}
+              onClick={() => console.log('add events')}
               // appendIcon={<Icons name='IconPlus' />}
             />
           </div>

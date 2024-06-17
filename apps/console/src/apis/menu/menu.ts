@@ -1,4 +1,4 @@
-import { ExplicitAny, Menu, Menus, MenuTrees } from '@ncobase/types';
+import { ExplicitAny, Menu, Menus } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '../request';
@@ -32,7 +32,7 @@ export const getMenus = async (params: ExplicitAny): Promise<Menus> => {
 };
 
 // get menu tree
-export const getMenuTree = async (menu: string, type?: string): Promise<MenuTrees> => {
-  const queryParams = buildQueryString({ menu, type });
-  return request.get(`/trees/menus?${queryParams}`);
+export const getMenuTree = async (params: ExplicitAny): Promise<Menu[]> => {
+  const queryString = buildQueryString(params);
+  return request.get(`${ENDPOINT}?${queryString}`);
 };

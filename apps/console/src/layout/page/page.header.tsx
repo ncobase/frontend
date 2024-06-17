@@ -22,17 +22,14 @@ import { useTranslation } from 'react-i18next';
 
 import { MainNavigation, TenantDropdown, AccountDropdown } from '../navigation';
 
-import { setHeaderMenus } from './page.context';
+import { useMenus } from './page.context';
 
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
-import { useListMenus } from '@/features/system/menu/service';
 
 export const Header = ({ ...rest }) => {
   const { t } = useTranslation();
-  // get header menus
-  const { menus: headerMenus = [] } = useListMenus({ type: 'header' });
-  setHeaderMenus(headerMenus);
+  const headerMenus = useMenus().filter(menu => menu.type === 'header');
 
   const notifications = [
     {

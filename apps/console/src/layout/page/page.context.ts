@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 
 import { Menu } from '@ncobase/types';
 
@@ -24,34 +24,32 @@ interface PageContextValue {
   topbar?: React.ReactNode | React.ReactElement;
   /**
    * set page show sidebar or not
-   * @param sidebar {React.ReactNode | React.ReactElement}
+   * @param sidebar {React.ReactNode | React.ReactElement | null}
    */
-  sidebar?: React.ReactNode | React.ReactElement;
+  sidebar?: React.ReactNode | React.ReactElement | null;
   /**
-   * set page show submenu or not
-   * @param submenu {React.ReactNode | React.ReactElement}
-   */
-  submenu?: React.ReactNode | React.ReactElement;
-  /**
-   * header menus
+   * set page menus
    * @param menus {Menu[]}
    */
-  headerMenus?: Menu[];
+  menus: Menu[];
   /**
-   * set header menus
+   * set page menus
    * @param menus {Menu[]}
    */
-  setHeaderMenus?: (menus: Menu[]) => void;
-  sidebarMenus?: Menu[];
-  setSidebarMenus?: (menus: Menu[]) => void;
-  submenus?: Menu[];
-  setSubmenus?: (menus: Menu[]) => void;
+  setMenus: (menus: Menu[]) => void;
 }
 
 /**
  * @see Page
  */
-export const PageContext = createContext<PageContextValue>({});
+export const PageContext = createContext<PageContextValue>({
+  layout: true,
+  header: true,
+  topbar: null,
+  sidebar: null,
+  menus: [],
+  setMenus: () => {}
+});
 
 /**
  * @see Page
@@ -60,144 +58,55 @@ export const PageContext = createContext<PageContextValue>({});
 export const usePageContext = (): PageContextValue => useContext(PageContext);
 
 /**
- * set page layout or not
- * @param layout {boolean}
- */
-export const setLayout = (layout: boolean) => {
-  const pageContext = usePageContext();
-  pageContext.layout = layout;
-};
-
-/**
  * get page is used layout or not
  * @returns {boolean}
  */
 export const useLayout = (): boolean => {
-  const pageContext = usePageContext();
-  return pageContext.layout || false;
+  const { layout } = usePageContext();
+  return layout;
 };
 
-/**
- * set page header or not
- * @param header {boolean}
- */
-export const setHeader = (header: boolean) => {
-  const pageContext = usePageContext();
-  pageContext.header = header;
-};
 /**
  * get page is used header or not
  * @returns {boolean}
  */
 export const useHeader = (): boolean => {
-  const pageContext = usePageContext();
-  return pageContext.header || false;
-};
-
-/**
- * set page topbar or not
- * @param topbar {React.ReactNode | React.ReactElement}
- */
-export const setTopbar = (topbar: React.ReactNode | React.ReactElement) => {
-  const pageContext = usePageContext();
-  pageContext.topbar = topbar;
+  const { header } = usePageContext();
+  return header;
 };
 
 /**
  * get page is used topbar or not
- * @returns {React.ReactNode | React.ReactElement}
+ * @returns {React.ReactNode | React.ReactElement | null}
  */
-export const useTopbar = (): React.ReactNode | React.ReactElement => {
-  const pageContext = usePageContext();
-  return pageContext.topbar;
-};
-
-/**
- * set page sidebar or not
- * @param sidebar {React.ReactNode | React.ReactElement}
- */
-export const setSidebar = (sidebar: React.ReactNode | React.ReactElement) => {
-  const pageContext = usePageContext();
-  pageContext.sidebar = sidebar;
+export const useTopbar = (): React.ReactNode | React.ReactElement | null => {
+  const { topbar } = usePageContext();
+  return topbar;
 };
 
 /**
  * get page is used sidebar or not
- * @returns {React.ReactNode | React.ReactElement}
+ * @returns {React.ReactNode | React.ReactElement | null}
  */
-export const useSidebar = (): React.ReactNode | React.ReactElement => {
-  const pageContext = usePageContext();
-  return pageContext.sidebar;
+export const useSidebar = (): React.ReactNode | React.ReactElement | null => {
+  const { sidebar } = usePageContext();
+  return sidebar;
 };
 
 /**
- * set page submenu or not
- * @param submenu {React.ReactNode | React.ReactElement}
- */
-export const setSubmenu = (submenu: React.ReactNode | React.ReactElement) => {
-  const pageContext = usePageContext();
-  pageContext.submenu = submenu;
-};
-
-/**
- * get page is used submenu or not
- * @returns {React.ReactNode | React.ReactElement}
- */
-export const useSubmenu = (): React.ReactNode | React.ReactElement => {
-  const pageContext = usePageContext();
-  return pageContext.submenu;
-};
-
-/**
- * set page header menus
+ * set page menus
  * @param menus {Menu[]}
  */
-export const setHeaderMenus = (menus: Menu[]) => {
-  const pageContext = usePageContext();
-  pageContext.headerMenus = menus;
+export const setMenus = (menus: Menu[]) => {
+  const { setMenus } = usePageContext();
+  setMenus(menus);
 };
 
 /**
- * get page header menus
+ * get page menus
  * @returns {Menu[]}
  */
-export const useHeaderMenus = (): Menu[] => {
-  const pageContext = usePageContext();
-  return pageContext.headerMenus || [];
-};
-
-/**
- * set page sidebar menus
- * @param menus {Menu[]}
- */
-export const setSidebarMenus = (menus: Menu[]) => {
-  const pageContext = usePageContext();
-  pageContext.sidebarMenus = menus;
-};
-
-/**
- * get page sidebar menus
- * @returns {Menu[]}
- */
-export const useSidebarMenus = (): Menu[] => {
-  const pageContext = usePageContext();
-  return pageContext.sidebarMenus || [];
-};
-
-/**
- * set page submenu menus
- * @param menus {Menu[]}
- */
-export const setSubmenus = (menus: Menu[]) => {
-  const pageContext = usePageContext();
-  pageContext.submenus = menus;
-};
-
-/**
- * get page submenu menus
- * @returns {Menu[]}
- */
-export const useSubmenuMenus = (): Menu[] => {
-  const pageContext = usePageContext();
-  return pageContext.submenus || [];
+export const useMenus = (): Menu[] => {
+  const { menus } = usePageContext();
+  return menus;
 };

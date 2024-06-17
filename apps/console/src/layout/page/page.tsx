@@ -1,15 +1,18 @@
-import React, { HtmlHTMLAttributes, useMemo } from 'react';
+import React, { HtmlHTMLAttributes, useEffect, useMemo, useState } from 'react';
 
 import { Shell } from '@ncobase/react';
+import { Menu } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import { PageContainer } from './page.container';
 import { PageContext } from './page.context';
 import { Header } from './page.header';
+import { sortMenus } from './page.helper';
 import { Sidebar } from './page.sidebar';
+import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
 
-import { Submenu, useFocusMode } from '@/layout';
+import { useQueryMenuTreeData } from '@/features/system/menu/service';
 
 export interface PageProps extends React.PropsWithChildren<HtmlHTMLAttributes<HTMLDivElement>> {
   header?: boolean;
@@ -30,12 +33,28 @@ export const Page: React.FC<PageProps> = ({
   ...rest
 }): JSX.Element => {
   const { t } = useTranslation();
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header', children: true });
 
-  useFocusMode();
+  useEffect(() => {
+    if (menusData?.length) {
+      // sort menus
+      const sortedMenus = sortMenus(menusData, 'order', 'desc');
+      setMenus(sortedMenus);
+    }
+  }, [menusData]);
 
   const pageContextValue = useMemo(
-    () => ({ layout, header, topbar, sidebar, submenu }),
-    [layout, header, topbar, sidebar, submenu]
+    () => ({
+      layout,
+      header,
+      topbar,
+      sidebar,
+      submenu,
+      menus,
+      setMenus
+    }),
+    [layout, header, topbar, sidebar, submenu, menus]
   );
 
   const renderContent = () => <PageContainer {...rest} />;

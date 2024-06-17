@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Button,
@@ -14,34 +14,36 @@ import { cn, getInitials, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { setSidebarMenus, useHeaderMenus } from './page.context';
-import { isDividerLink, pathSplit } from './page.helper';
-
-import { useListMenus } from '@/features/system/menu/service';
+import { useMenus } from './page.context';
+import { getMenuByUrl, isDividerLink } from './page.helper';
 
 interface SidebarProps {
   activeLabel?: string;
   onLinkClick?: (label: string) => void;
 }
 
-export const Sidebar = ({ activeLabel = '', onLinkClick }: SidebarProps) => {
-  const [active, setActive] = useState(activeLabel);
-
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
-
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeLabel = '',
+  onLinkClick
+}: SidebarProps) => {
   const { t } = useTranslation();
-
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [active, setActive] = useState(activeLabel);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
-  const headerMenu = useHeaderMenus()?.find(menu => menu.slug === pathSplit(pathname)[0]) || {};
+  const menus = useMenus();
+  const [sidebarMenus, setSidebarMenus] = useState<Menu[]>([]);
+  const currentHeaderMenu = getMenuByUrl(menus, pathname);
 
-  const visibleSidebarMenus =
-    (useListMenus({ type: 'sidebar', parent: headerMenu.id }).menus ?? []).filter(
-      (menu: Menu) => !menu.hidden || !menu.disabled
-    ) ?? [];
-
-  setSidebarMenus(visibleSidebarMenus);
+  useEffect(() => {
+    if (currentHeaderMenu && currentHeaderMenu?.children) {
+      const filteredMenus = currentHeaderMenu?.children?.filter(
+        (menu: Menu) => !menu.hidden && !menu.disabled
+      );
+      setSidebarMenus(filteredMenus);
+    }
+  }, [currentHeaderMenu]);
 
   const isActive = (to: string) => {
     return isPathMatching(to, pathname, 2);
@@ -76,7 +78,7 @@ export const Sidebar = ({ activeLabel = '', onLinkClick }: SidebarProps) => {
     </Tooltip>
   );
 
-  const links = useListMenus({ type: 'sidebar', parent: headerMenu.id }).menus.map((link: Menu) => {
+  const links = sidebarMenus.map((link: Menu) => {
     if (link.hidden || link.disabled) return null;
     if (isDividerLink(link))
       return <div className='h-[0.03125rem] w-1/2 !mx-auto bg-slate-200' key={link.id} />;

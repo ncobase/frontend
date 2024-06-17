@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, ExplicitAny, Menu } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/menu/menu';
 import { paginateByCursor } from '@/helpers/pagination';
@@ -25,16 +25,16 @@ export const menuKeys: MenuKeys = {
 
 const useMenuMutation = (mutationFn: MenuMutationFn) => useMutation({ mutationFn });
 
-const useQueryMenuData = <T>(queryKey: unknown[], queryFn: MenuQueryFn<T>) => {
-  const { data, ...rest } = useQuery<T>({ queryKey, queryFn });
+const useQueryMenuData = <T>(queryKey: unknown[], queryFn: MenuQueryFn<T>, options?: AnyObject) => {
+  const { data, ...rest } = useQuery<T>({ queryKey, queryFn, ...options });
   return { data, ...rest };
 };
 
 export const useQueryMenu = (menu: string) =>
   useQueryMenuData(menuKeys.get({ menu }), () => getMenu(menu));
 
-export const useQueryMenuTreeData = (menu: string, type?: string) =>
-  useQueryMenuData(menuKeys.tree({ menu, type }), () => getMenuTree(menu, type));
+export const useQueryMenuTreeData = (queryKey: AnyObject = {}) =>
+  useQueryMenuData(menuKeys.tree(queryKey), () => getMenuTree(queryKey), { staleTime: Infinity });
 
 export const useCreateMenu = () => useMenuMutation(payload => createMenu(payload));
 export const useUpdateMenu = () => useMenuMutation(payload => updateMenu(payload));
