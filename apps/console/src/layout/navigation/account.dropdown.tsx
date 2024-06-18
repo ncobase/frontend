@@ -12,23 +12,21 @@ import { useAccount } from '@/features/account/service';
 import { useListMenus } from '@/features/system/menu/service';
 import { useCopyToClipboard } from '@/hooks/use_copy_to_clipboard';
 
-const AdminMenu = ({ isAdmin = false }) => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+// const AdminMenu = ({ isAdmin = false }) => {
+//   const { t } = useTranslation();
+//   const navigate = useNavigate();
 
-  if (!isAdmin) return null;
+//   if (!isAdmin) return null;
 
-  return (
-    <>
-      <DropdownItem
-        // icon={<Icons name='IconSettings' />}
-        onClick={() => navigate('/system/tenant')}
-      >
-        {t('account.system.label')}
-      </DropdownItem>
-    </>
-  );
-};
+//   return (
+//     <>
+//       <DropdownItem onClick={() => navigate('/system/tenant')}>
+//         <Icons name='IconBuilding' className='-ml-0.5 mr-2.5' />
+//         {t('system.navigation')}
+//       </DropdownItem>
+//     </>
+//   );
+// };
 
 const AppVersion = () => {
   const { t } = useTranslation();
@@ -56,7 +54,7 @@ const AppVersion = () => {
 export const AccountDropdown = ({ ...rest }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, profile, isAdministered, isLoading } = useAccount();
+  const { user, profile, isLoading } = useAccount();
 
   const [accountMenus, setAccountMenus] = React.useState<MenuTree[]>([]);
   const { menus = [] } = useListMenus({ type: 'account' });
@@ -70,7 +68,7 @@ export const AccountDropdown = ({ ...rest }) => {
     if (!visibleItems.length) return null;
     return (
       <DropdownContent align='end' alignOffset={-16}>
-        <AdminMenu isAdmin={isAdministered} />
+        {/* <AdminMenu isAdmin={isAdministered} /> */}
         {visibleItems.map(renderLink)}
         <AppVersion />
       </DropdownContent>
