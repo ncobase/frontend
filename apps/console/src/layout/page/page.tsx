@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { PageContainer } from './page.container';
 import { PageContext } from './page.context';
 import { Header } from './page.header';
-import { sortMenus } from './page.helper';
 import { Sidebar } from './page.sidebar';
 import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
@@ -38,9 +37,7 @@ export const Page: React.FC<PageProps> = ({
 
   useEffect(() => {
     if (menusData?.length) {
-      // sort menus
-      const sortedMenus = sortMenus(menusData, 'order', 'desc');
-      setMenus(sortedMenus);
+      setMenus(menusData);
     }
   }, [menusData]);
 

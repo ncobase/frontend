@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/menu/menu';
 import { paginateByCursor } from '@/helpers/pagination';
+import { sortMenus } from '@/layout/page/page.helper';
 
 type MenuMutationFn = (payload: Pick<Menu, keyof Menu>) => Promise<Menu>;
 type MenuQueryFn<T> = () => Promise<T>;
@@ -37,8 +38,11 @@ export const useQueryMenuTreeData = (queryKey: AnyObject = {}) => {
   const { data, ...rest } = useQueryMenuData(menuKeys.tree(queryKey), () =>
     getMenuTree({ ...queryKey, children: true })
   );
-  const { content: menuTree = [] } = data || {};
-  return { data: menuTree, ...rest };
+  const { content = [] } = data || {};
+  // sort
+  const sortedTree = sortMenus(content, 'order', 'desc');
+
+  return { data: sortedTree, ...rest };
 };
 
 export const useCreateMenu = () => useMenuMutation(payload => createMenu(payload));
@@ -49,9 +53,10 @@ export const useListMenus = (queryKey: AnyObject = {}) => {
     queryKey: menuKeys.list(queryKey),
     queryFn: () => getMenus(queryKey)
   });
-  const { content: menus = [] } = data || {};
+  const { content = [] } = data || {};
+  // paginate
   const { cursor, limit } = queryKey;
-  const paginatedResult = usePaginatedData(menus, cursor as string, limit as number);
+  const paginatedResult = usePaginatedData(content, cursor as string, limit as number);
 
   return { menus: paginatedResult.data, ...paginatedResult, ...rest };
 };
