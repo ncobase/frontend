@@ -25,8 +25,8 @@ export const menuKeys: MenuKeys = {
 
 const useMenuMutation = (mutationFn: MenuMutationFn) => useMutation({ mutationFn });
 
-const useQueryMenuData = <T>(queryKey: unknown[], queryFn: MenuQueryFn<T>, options?: AnyObject) => {
-  const { data, ...rest } = useQuery<T>({ queryKey, queryFn, ...options });
+const useQueryMenuData = <T>(queryKey: unknown[], queryFn: MenuQueryFn<T>) => {
+  const { data, ...rest } = useQuery<T>({ queryKey, queryFn });
   return { data, ...rest };
 };
 
@@ -34,7 +34,7 @@ export const useQueryMenu = (menu: string) =>
   useQueryMenuData(menuKeys.get({ menu }), () => getMenu(menu));
 
 export const useQueryMenuTreeData = (queryKey: AnyObject = {}) =>
-  useQueryMenuData(menuKeys.tree(queryKey), () => getMenuTree(queryKey), { staleTime: Infinity });
+  useQueryMenuData(menuKeys.tree(queryKey), () => getMenuTree(queryKey));
 
 export const useCreateMenu = () => useMenuMutation(payload => createMenu(payload));
 export const useUpdateMenu = () => useMenuMutation(payload => updateMenu(payload));

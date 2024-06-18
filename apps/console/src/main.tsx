@@ -15,7 +15,10 @@ import { Router } from '@/router';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false
+      gcTime: 1000 * 60 * 15, // cache for 15 minutes
+      refetchOnWindowFocus: false,
+      retry: false,
+      staleTime: Infinity
     }
   }
 });
