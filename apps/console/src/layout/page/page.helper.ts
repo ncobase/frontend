@@ -1,4 +1,4 @@
-import { Menu } from '@ncobase/types';
+import { Menu, MenuTree } from '@ncobase/types';
 
 /**
  * check if menu is divider
@@ -27,9 +27,9 @@ export const pathSplit = (path: string): string[] =>
  * Finds a menu item by its slug recursively.
  * @param menu List of menus to search through.
  * @param slug Slug of the menu item to find.
- * @returns {Menu | null}
+ * @returns {MenuTree | null}
  */
-export function findMenuBySlug(menu: Menu[], slug: string): Menu | null {
+export function findMenuBySlug(menu: MenuTree[], slug: string): MenuTree | null {
   if (!menu || !Array.isArray(menu) || menu.length === 0) {
     return null;
   }
@@ -52,13 +52,13 @@ export function findMenuBySlug(menu: Menu[], slug: string): Menu | null {
  * @param menu List of menus to search through.
  * @param parentId Parent ID of the menus to find.
  * @param type Menu type to filter by.
- * @returns {Menu[]}
+ * @returns {MenuTree[]}
  */
-export function findMenuByParentId(menu: Menu[], parentId: string, type: string): Menu[] {
+export function findMenuByParentId(menu: MenuTree[], parentId: string, type: string): MenuTree[] {
   if (!menu || !Array.isArray(menu) || menu.length === 0) {
     return [];
   }
-  const recursiveSearch = (items: Menu[], parentId: string): Menu[] => {
+  const recursiveSearch = (items: MenuTree[], parentId: string): MenuTree[] => {
     return items.flatMap(item =>
       item.id === parentId && item.children && Array.isArray(item.children)
         ? item.children.filter(child => child.type === type)
@@ -107,9 +107,9 @@ export function findMenuByParentId(menu: Menu[], parentId: string, type: string)
  * console.log(getMenuByUrl(menu, '/products/clothing', 1)); // should return { slug: 'clothing' }
  * console.log(getMenuByUrl(menu, '/products')); // should return { slug: 'products' }
  *
- * @returns {Menu | null}
+ * @returns {MenuTree | null}
  */
-export function getMenuByUrl(menus: Menu[], url: string, depth: number = 0): Menu | null {
+export function getMenuByUrl(menus: MenuTree[], url: string, depth: number = 0): MenuTree | null {
   if (!menus || !Array.isArray(menus) || menus.length === 0 || !url) {
     return null;
   }
@@ -160,7 +160,7 @@ export function compareMenus(key: string, order: 'asc' | 'desc') {
  * @param order Sorting order ('asc' or 'desc').
  * @returns Sorted menus.
  */
-export function sortMenus(menus: Menu[], key: string, order: 'asc' | 'desc'): Menu[] {
+export function sortMenus(menus: MenuTree[], key: string, order: 'asc' | 'desc'): MenuTree[] {
   const sortedMenus = [...menus]; // Create a copy of menus array
   sortedMenus.sort(compareMenus(key, order));
 

@@ -22,7 +22,7 @@ interface SidebarProps {
   onLinkClick?: (label: string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
+const SidebarComponent: React.FC<SidebarProps> = ({
   activeLabel = '',
   onLinkClick
 }: SidebarProps) => {
@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [active, setActive] = useState(activeLabel);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
-  const menus = useMenus();
+  const [menus] = useMenus();
   const [sidebarMenus, setSidebarMenus] = useState<Menu[]>([]);
   const currentHeaderMenu = getMenuByUrl(menus, pathname, 0);
 
@@ -104,3 +104,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </ShellSidebar>
   );
 };
+
+export const Sidebar = React.memo(SidebarComponent);

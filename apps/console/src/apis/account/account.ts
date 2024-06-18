@@ -1,4 +1,4 @@
-import { Account, Tenant } from '@ncobase/types';
+import { Account, Tenant, Tenants } from '@ncobase/types';
 
 import { request } from '../request';
 
@@ -15,6 +15,6 @@ export const getAccountTenant = async (): Promise<Tenant> => {
 };
 
 // get user belonged tenants or related tenants
-export const getAccountTenants = async (): Promise<Tenant[]> => {
+export const getAccountTenants = async (): Promise<Tenants> => {
   return request.get(`${ENDPOINT}/tenants`);
 };

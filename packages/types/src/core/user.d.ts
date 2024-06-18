@@ -6,7 +6,6 @@ export interface User {
   status?: number;
   is_certified: true;
   is_admin: true;
-  profile?: UserProfile;
   created_by?: string;
   created_at?: string;
   updated_by?: string;
@@ -22,6 +21,11 @@ export interface UserProfile {
   about?: string;
   thumbnail?: string;
   language?: string;
-  links?: ExplicitAny[];
+  links?: any[];
   extra?: object;
+}
+
+export interface Users {
+  content: User[];
+  total: number;
 }

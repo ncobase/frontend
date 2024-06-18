@@ -9,12 +9,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useMenus } from './page.context';
 import { findMenuByParentId, getMenuByUrl, isGroup, pathSplit } from './page.helper';
 
-export const Submenu = ({ ...rest }) => {
+const SubmenuComponent = ({ ...rest }) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const menus = useMenus();
+  const [menus] = useMenus();
   const currentHeaderMenu = getMenuByUrl(menus, pathname);
 
   const [submenus, setSubmenus] = useState<Menu[]>([]);
@@ -72,3 +72,5 @@ export const Submenu = ({ ...rest }) => {
     </ShellSubmenu>
   );
 };
+
+export const Submenu = React.memo(SubmenuComponent);

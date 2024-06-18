@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import {
   Button,
@@ -8,7 +8,7 @@ import {
   DropdownTrigger,
   Icons
 } from '@ncobase/react';
-import { MenuTree } from '@ncobase/types';
+import { MenuTree, Tenant } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,10 +22,24 @@ export const TenantDropdown = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { hasTenant } = useTenantContext();
-  const { tenants: accountTenants } = useAccountTenants();
+  const [relatedTenants, setRelatedTenants] = useState<Tenant[]>([]);
+  const [currentTenant, setCurrentTenant] = useState<Tenant>();
+  const { tenants } = useAccountTenants();
+
+  useEffect(() => {
+    if (!tenants.length) return;
+    setRelatedTenants(tenants);
+    setCurrentTenant(tenants[0]);
+  }, [tenants]);
 
   const [opened, setOpened] = useState(false);
+
+  const [tenantMenus, setTenantMenus] = useState<MenuTree[]>([]);
   const { menus } = useListMenus({ type: 'tenant' });
+  useEffect(() => {
+    if (!menus.length) return;
+    setTenantMenus(menus);
+  }, [menus]);
 
   const renderLink = useCallback(
     (menu: MenuTree) => {
@@ -71,23 +85,23 @@ export const TenantDropdown = () => {
   const MenuList = React.memo(() => (
     <Dropdown>
       <DropdownTrigger asChild>
-        {accountTenants?.[0].logo ? (
-          <AvatarButton src={accountTenants?.[0].logo} alt={accountTenants?.[0].name} />
+        {currentTenant?.logo ? (
+          <AvatarButton src={currentTenant?.logo} alt={currentTenant?.name} />
         ) : (
           <Button variant='unstyle' className='p-0 text-slate-400/70 [&>svg]:stroke-slate-400/70'>
-            <Icons name='IconBuildingCommunity' /> {accountTenants?.[0].name}
+            <Icons name='IconBuildingCommunity' /> {currentTenant?.name}
           </Button>
         )}
       </DropdownTrigger>
 
-      {renderMenuDropdown(menus)}
+      {renderMenuDropdown(tenantMenus)}
     </Dropdown>
   ));
 
   return (
     <>
-      {hasTenant && accountTenants?.length > 1 && <MenuList />}
-      <TenantSwitcher opened={opened} onVisible={setOpened} tenants={accountTenants} />
+      {hasTenant && relatedTenants?.length > 1 && <MenuList />}
+      <TenantSwitcher opened={opened} onVisible={setOpened} tenants={relatedTenants} />
     </>
   );
 };

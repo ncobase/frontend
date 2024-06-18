@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 
 import { Menu } from '@ncobase/types';
 
@@ -28,28 +28,26 @@ interface PageContextValue {
    */
   sidebar?: React.ReactNode | React.ReactElement | null;
   /**
-   * set page menus
-   * @param menus {Menu[]}
+   * set page show submenu or not
+   * @param submenu {boolean}
    */
-  menus: Menu[];
+  submenu?: boolean;
   /**
    * set page menus
    * @param menus {Menu[]}
    */
-  setMenus: (menus: Menu[]) => void;
+  menus?: Menu[];
+  /**
+   * set page menus
+   * @param menus {Menu[]}
+   */
+  setMenus?: (menus: Menu[]) => void;
 }
 
 /**
  * @see Page
  */
-export const PageContext = createContext<PageContextValue>({
-  layout: true,
-  header: true,
-  topbar: null,
-  sidebar: null,
-  menus: [],
-  setMenus: () => {}
-});
+export const PageContext = createContext<PageContextValue>({});
 
 /**
  * @see Page
@@ -94,19 +92,13 @@ export const useSidebar = (): React.ReactNode | React.ReactElement | null => {
 };
 
 /**
- * set page menus
- * @param menus {Menu[]}
+ * get page is used submenu or not
+ *
  */
-export const setMenus = (menus: Menu[]) => {
-  const { setMenus } = usePageContext();
-  setMenus(menus);
-};
-
-/**
- * get page menus
- * @returns {Menu[]}
- */
-export const useMenus = (): Menu[] => {
-  const { menus } = usePageContext();
-  return menus;
+export const useMenus = (): [Menu[], (menus: Menu[]) => void] => {
+  const { menus, setMenus } = usePageContext();
+  if (!setMenus) {
+    throw new Error('setMenus function is not provided');
+  }
+  return [menus, setMenus];
 };

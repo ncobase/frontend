@@ -18,7 +18,6 @@ export interface Menu {
   created_at?: string;
   updated_by?: string;
   updated_at?: string;
-  children?: Menu[];
 }
 
 export interface MenuTree extends Menu {

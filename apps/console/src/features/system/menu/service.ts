@@ -40,9 +40,9 @@ export const useQueryMenuTreeData = (queryKey: AnyObject = {}) => {
   );
   const { content = [] } = data || {};
   // sort
-  const sortedTree = sortMenus(content, 'order', 'desc');
+  const sorted = sortMenus(content, 'order', 'desc');
 
-  return { data: sortedTree, ...rest };
+  return { data: sorted, ...rest };
 };
 
 export const useCreateMenu = () => useMenuMutation(payload => createMenu(payload));

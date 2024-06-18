@@ -1,4 +1,4 @@
-import React, { HtmlHTMLAttributes, useEffect, useMemo, useState } from 'react';
+import React, { HtmlHTMLAttributes, useMemo, useState } from 'react';
 
 import { Shell } from '@ncobase/react';
 import { Menu } from '@ncobase/types';
@@ -10,8 +10,6 @@ import { Header } from './page.header';
 import { Sidebar } from './page.sidebar';
 import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
-
-import { useQueryMenuTreeData } from '@/features/system/menu/service';
 
 export interface PageProps extends React.PropsWithChildren<HtmlHTMLAttributes<HTMLDivElement>> {
   header?: boolean;
@@ -33,14 +31,6 @@ export const Page: React.FC<PageProps> = ({
 }): JSX.Element => {
   const { t } = useTranslation();
   const [menus, setMenus] = useState<Menu[]>([]);
-  const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header' });
-
-  useEffect(() => {
-    if (menusData?.length) {
-      setMenus(menusData);
-    }
-  }, [menusData]);
-
   const pageContextValue = useMemo(
     () => ({
       layout,

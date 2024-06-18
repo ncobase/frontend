@@ -26,7 +26,7 @@ const TopbarWrapper: React.FC<TopbarProps> = ({ children, className }) => {
   );
 };
 
-export const Topbar: React.FC<TopbarProps> = ({
+const TopbarComponent: React.FC<TopbarProps> = ({
   title,
   left = [],
   right = [],
@@ -61,3 +61,5 @@ export const Topbar: React.FC<TopbarProps> = ({
     </TopbarWrapper>
   );
 };
+
+export const Topbar = React.memo(TopbarComponent);

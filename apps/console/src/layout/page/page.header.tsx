@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Badge,
@@ -18,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@ncobase/react';
+import { Menu } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import { MainNavigation, TenantDropdown, AccountDropdown } from '../navigation';
@@ -26,10 +27,20 @@ import { useMenus } from './page.context';
 
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
+import { useQueryMenuTreeData } from '@/features/system/menu/service';
 
-export const Header = ({ ...rest }) => {
+const HeaderComponent = ({ ...rest }) => {
   const { t } = useTranslation();
-  const headerMenus = useMenus().filter(menu => menu.type === 'header');
+  const [, setMenus] = useMenus();
+
+  const [headerMenus, setHeaderMenus] = useState<Menu[]>([]);
+  const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header' });
+
+  useEffect(() => {
+    if (!menusData?.length) return;
+    setMenus(menusData);
+    setHeaderMenus(menusData.filter(menu => menu.type === 'header'));
+  }, [menusData.length, setMenus]);
 
   const notifications = [
     {
@@ -118,3 +129,4 @@ export const Header = ({ ...rest }) => {
     </ShellHeader>
   );
 };
+export const Header = React.memo(HeaderComponent);

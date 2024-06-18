@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger, Icons } from '@ncobase/react';
 import { MenuTree } from '@ncobase/types';
@@ -56,8 +56,14 @@ const AppVersion = () => {
 export const AccountDropdown = ({ ...rest }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { account, isAdministered, isLoading } = useAccount();
+  const { user, profile, isAdministered, isLoading } = useAccount();
+
+  const [accountMenus, setAccountMenus] = React.useState<MenuTree[]>([]);
   const { menus = [] } = useListMenus({ type: 'account' });
+  useEffect(() => {
+    if (!menus.length) return;
+    setAccountMenus(menus);
+  }, [menus]);
 
   const renderMenuDropdown = (menuItems: MenuTree[]) => {
     const visibleItems = menuItems.filter(item => !item.hidden || item.disabled);
@@ -85,12 +91,12 @@ export const AccountDropdown = ({ ...rest }) => {
       <DropdownTrigger>
         <AvatarButton
           isLoading={isLoading}
-          src={account?.profile?.thumbnail}
-          title={account?.profile?.display_name || account?.username || ''}
-          alt={account?.profile?.display_name || account?.username || ''}
+          src={profile?.thumbnail}
+          title={profile?.display_name || user?.username || ''}
+          alt={profile?.display_name || user?.username || ''}
         />
       </DropdownTrigger>
-      {renderMenuDropdown(menus)}
+      {renderMenuDropdown(accountMenus)}
     </Dropdown>
   );
 };

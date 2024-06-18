@@ -1,10 +1,20 @@
-import { Account, AnyObject, LoginProps, LoginReply, RegisterProps, Tenant } from '@ncobase/types';
+import {
+  Account,
+  AnyObject,
+  ExplicitAny,
+  LoginProps,
+  LoginReply,
+  RegisterProps,
+  Tenant,
+  Tenants
+} from '@ncobase/types';
 import { UseMutationOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
 import { getAccountTenant, getAccountTenants, getCurrentUser } from '@/apis/account/account';
 import { loginAccount, registerAccount } from '@/apis/account/authorize';
 import { useAuthContext } from '@/features/account/context';
+import { paginateByCursor } from '@/helpers/pagination';
 
 interface AccountKeys {
   login: ['accountService', 'login'];
@@ -46,12 +56,12 @@ export const useRegisterAccount = (
 ) => useMutationWithTokens(payload => registerAccount(payload), options);
 
 export const useAccount = () => {
-  const { data: account, ...rest } = useQuery({
+  const { data, ...rest } = useQuery({
     queryKey: accountKeys.account,
     queryFn: (): Promise<Account> => getCurrentUser()
   });
-  const isAdministered = account?.is_admin || false;
-  return { account, isAdministered, ...rest };
+  const isAdministered = data?.user?.is_admin || false;
+  return { ...data, isAdministered, ...rest };
 };
 
 export const useAccountTenant = () => {
@@ -63,9 +73,19 @@ export const useAccountTenant = () => {
 };
 
 export const useAccountTenants = (queryKey: AnyObject = {}) => {
-  const { data: tenants, ...rest } = useQuery({
+  const { data, ...rest } = useQuery({
     queryKey: accountKeys.tenants(queryKey),
-    queryFn: (): Promise<Tenant[]> => getAccountTenants()
+    queryFn: (): Promise<Tenants> => getAccountTenants()
   });
-  return { tenants, ...rest };
+  const { content: tenants = [] } = data || {};
+  const { cursor, limit } = queryKey;
+  const paginatedResult = usePaginatedData(tenants, cursor as string, limit as number);
+
+  return { tenants: paginatedResult.data, ...paginatedResult, ...rest };
+};
+
+const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
+  const { rs, hasNextPage, nextCursor } =
+    (data && paginateByCursor(data, cursor, limit)) || ({} as ExplicitAny);
+  return { data: rs, hasNextPage, nextCursor };
 };
