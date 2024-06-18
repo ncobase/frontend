@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   Button,
@@ -33,21 +33,34 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   const [menus] = useMenus();
-  const [sidebarMenus, setSidebarMenus] = useState<Menu[]>([]);
+  const [sidebarMenus, setSidebarMenus] = useState([]);
+
   const currentHeaderMenu = getMenuByUrl(menus, pathname, 0);
 
   useEffect(() => {
     if (currentHeaderMenu && currentHeaderMenu?.children) {
       const filteredMenus = currentHeaderMenu?.children?.filter(
-        (menu: Menu) => !menu.hidden && !menu.disabled
+        menu => !menu.hidden && !menu.disabled
       );
       setSidebarMenus(filteredMenus);
     }
-  }, [currentHeaderMenu]);
+  }, [currentHeaderMenu, pathname]);
 
-  const isActive = (to: string) => {
-    return isPathMatching(to, pathname, 2);
-  };
+  const isActive = useMemo(
+    () => (to: string) => {
+      return isPathMatching(to, pathname, 2);
+    },
+    [pathname]
+  );
+
+  const handleLinkClick = useCallback(
+    (link: Menu) => {
+      setActive(link.label);
+      navigate(link.path);
+      if (onLinkClick) onLinkClick(link.label);
+    },
+    [navigate, onLinkClick]
+  );
 
   const tooltipLink = (link: Menu) => (
     <Tooltip key={link.id}>
@@ -59,11 +72,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
             'bg-slate-100/90 [&>svg]:stroke-slate-400/90':
               isActive(link.path) || active === link.label
           })}
-          onClick={() => {
-            setActive(link.label);
-            navigate(link.path);
-            if (onLinkClick) onLinkClick(link.label);
-          }}
+          onClick={() => handleLinkClick(link)}
         >
           {link.icon ? (
             <Icons size={18} name={link.icon} />
@@ -78,12 +87,14 @@ const SidebarComponent: React.FC<SidebarProps> = ({
     </Tooltip>
   );
 
-  const links = sidebarMenus.map((link: Menu) => {
-    if (link.hidden || link.disabled) return null;
-    if (isDividerLink(link))
-      return <div className='h-[0.03125rem] w-1/2 !mx-auto bg-slate-200' key={link.id} />;
-    return tooltipLink(link);
-  });
+  const links = useMemo(() => {
+    return sidebarMenus.map((link: Menu) => {
+      if (link.hidden || link.disabled) return null;
+      if (isDividerLink(link))
+        return <div className='h-[0.03125rem] w-1/2 !mx-auto bg-slate-200' key={link.id} />;
+      return tooltipLink(link);
+    });
+  }, [sidebarMenus, tooltipLink]);
 
   return (
     <ShellSidebar className='flex flex-col'>

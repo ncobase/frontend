@@ -1,4 +1,4 @@
-import React, { HtmlHTMLAttributes, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { Shell } from '@ncobase/react';
 import { Menu } from '@ncobase/types';
@@ -11,7 +11,7 @@ import { Sidebar } from './page.sidebar';
 import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
 
-export interface PageProps extends React.PropsWithChildren<HtmlHTMLAttributes<HTMLDivElement>> {
+export interface PageProps {
   header?: boolean;
   sidebar?: boolean;
   topbar?: React.ReactElement | React.ReactNode;
@@ -22,8 +22,8 @@ export interface PageProps extends React.PropsWithChildren<HtmlHTMLAttributes<HT
 
 export const Page: React.FC<PageProps> = ({
   header = true,
-  topbar,
   sidebar,
+  topbar,
   submenu,
   title,
   layout = true,
@@ -31,6 +31,7 @@ export const Page: React.FC<PageProps> = ({
 }): JSX.Element => {
   const { t } = useTranslation();
   const [menus, setMenus] = useState<Menu[]>([]);
+
   const pageContextValue = useMemo(
     () => ({
       layout,
@@ -41,7 +42,7 @@ export const Page: React.FC<PageProps> = ({
       menus,
       setMenus
     }),
-    [layout, header, topbar, sidebar, submenu, menus]
+    [layout, header, topbar, sidebar, submenu, menus, setMenus]
   );
 
   const renderContent = () => <PageContainer {...rest} />;

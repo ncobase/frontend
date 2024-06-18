@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 
 import {
   Badge,
@@ -18,7 +18,6 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import { MainNavigation, TenantDropdown, AccountDropdown } from '../navigation';
@@ -31,16 +30,16 @@ import { useQueryMenuTreeData } from '@/features/system/menu/service';
 
 const HeaderComponent = ({ ...rest }) => {
   const { t } = useTranslation();
-  const [, setMenus] = useMenus();
-
-  const [headerMenus, setHeaderMenus] = useState<Menu[]>([]);
+  const [menus, setMenus] = useMenus();
   const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header' });
 
   useEffect(() => {
-    if (!menusData?.length) return;
-    setMenus(menusData);
-    setHeaderMenus(menusData.filter(menu => menu.type === 'header'));
-  }, [menusData.length, setMenus]);
+    if (menusData?.length) {
+      setMenus(menusData);
+    }
+  }, [menusData]);
+
+  const headerMenus = useMemo(() => menus.filter(menu => menu.type === 'header'), [menus]);
 
   const notifications = [
     {
@@ -57,6 +56,10 @@ const HeaderComponent = ({ ...rest }) => {
     }
   ];
 
+  const handleMarkAllAsRead = useCallback(() => {
+    // Implement mark all as read functionality
+  }, []);
+
   return (
     <ShellHeader
       className='flex items-center justify-between bg-gradient-to-r border-b-0 from-slate-800 via-slate-700 via-20% to-slate-800'
@@ -64,7 +67,7 @@ const HeaderComponent = ({ ...rest }) => {
     >
       <div className='inline-flex items-center justify-start'>
         <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
-        {headerMenus.length ? <MainNavigation menus={headerMenus} /> : null}
+        {headerMenus.length > 0 && <MainNavigation menus={headerMenus} />}
       </div>
       <div className='inline-flex items-center px-4 gap-x-3'>
         <LanguageSwitcher />
@@ -75,9 +78,7 @@ const HeaderComponent = ({ ...rest }) => {
               size='xs'
               className='relative text-slate-400/70 [&>svg]:stroke-slate-400/70'
             >
-              <Badge className='absolute -top-1 -right-1 text-[9px] !px-1' size='xs'>
-                3
-              </Badge>
+              <Badge className='absolute -top-1 -right-1 text-[9px] !px-1'>3</Badge>
               <Icons name='IconBell' className='stroke-slate-500/85' />
             </Button>
           </HoverCardTrigger>
@@ -86,7 +87,9 @@ const HeaderComponent = ({ ...rest }) => {
               <div className='inline-flex flex-col space-y-1.5'>
                 <CardTitle>{t('notification.title')}</CardTitle>
                 <CardDescription>
-                  {t('notification.you_have_unread_notification_plural', { count: 3 })}
+                  {t('notification.you_have_unread_notification_plural', {
+                    count: notifications.length
+                  })}
                 </CardDescription>
               </div>
               <Tooltip>
@@ -96,7 +99,7 @@ const HeaderComponent = ({ ...rest }) => {
                 <TooltipContent side='bottom'>{t('notification.push_setting')}</TooltipContent>
               </Tooltip>
             </CardHeader>
-            <CardContent className='grid gap-4 max-h-[7.5rem] mb-6 !overflow-auto'>
+            <CardContent className='grid gap-4 max-h-[7.5rem] mb-6 overflow-auto'>
               {notifications.map((notification, index) => (
                 <div
                   key={index}
@@ -117,7 +120,7 @@ const HeaderComponent = ({ ...rest }) => {
               ))}
             </CardContent>
             <CardFooter>
-              <Button className='w-full'>
+              <Button className='w-full' onClick={handleMarkAllAsRead}>
                 <Icons name='IconCheck' /> {t('actions.mark_all_as_read')}
               </Button>
             </CardFooter>
@@ -129,4 +132,5 @@ const HeaderComponent = ({ ...rest }) => {
     </ShellHeader>
   );
 };
+
 export const Header = React.memo(HeaderComponent);

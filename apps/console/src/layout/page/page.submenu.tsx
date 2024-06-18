@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 
 import { Button, ShellSubmenu } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
 import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,21 +16,25 @@ const SubmenuComponent = ({ ...rest }) => {
   const [menus] = useMenus();
   const currentHeaderMenu = getMenuByUrl(menus, pathname);
 
-  const [submenus, setSubmenus] = useState<Menu[]>([]);
+  const [submenus, setSubmenus] = useState([]);
   const sidebarMenusData = findMenuByParentId(menus, currentHeaderMenu?.id || '', 'sidebar') || [];
   const [firstPart, secondPart] = pathSplit(pathname);
 
-  const currentSidebarMenu =
-    sidebarMenusData?.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {};
+  const currentSidebarMenu = useMemo(
+    () => sidebarMenusData?.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {},
+    [sidebarMenusData, firstPart, secondPart]
+  );
 
   useEffect(() => {
     if (currentSidebarMenu) {
       const filteredMenus = currentSidebarMenu?.children?.filter(
-        (menu: Menu) => !menu.hidden && !menu.disabled
+        menu => !menu.hidden && !menu.disabled
       );
       setSubmenus(filteredMenus);
     }
   }, [currentSidebarMenu]);
+
+  const isActive = (to: string) => isPathMatching(to, pathname, 3);
 
   if (!currentSidebarMenu || !submenus) {
     return null;
@@ -60,7 +63,7 @@ const SubmenuComponent = ({ ...rest }) => {
             variant='link'
             className={cn(
               'justify-start my-1 text-wrap text-left text-slate-500 hover:text-slate-600 hover:bg-slate-50',
-              isPathMatching(link.path, pathname, 3) &&
+              isActive(link.path) &&
                 'text-primary-500 bg-primary-50/65 hover:bg-primary-50/65 hover:text-primary-500'
             )}
             onClick={() => navigate(link.path)}
