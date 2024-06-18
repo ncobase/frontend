@@ -16,7 +16,6 @@ export const Submenu = ({ ...rest }) => {
 
   const menus = useMenus();
   const currentHeaderMenu = getMenuByUrl(menus, pathname);
-  console.log(currentHeaderMenu);
 
   const [submenus, setSubmenus] = useState<Menu[]>([]);
   const sidebarMenusData = findMenuByParentId(menus, currentHeaderMenu?.id || '', 'sidebar') || [];

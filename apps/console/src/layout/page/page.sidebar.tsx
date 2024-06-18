@@ -34,7 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const menus = useMenus();
   const [sidebarMenus, setSidebarMenus] = useState<Menu[]>([]);
-  const currentHeaderMenu = getMenuByUrl(menus, pathname);
+  const currentHeaderMenu = getMenuByUrl(menus, pathname, 0);
 
   useEffect(() => {
     if (currentHeaderMenu && currentHeaderMenu?.children) {

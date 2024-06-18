@@ -72,28 +72,64 @@ export function findMenuByParentId(menu: Menu[], parentId: string, type: string)
 
 /**
  * Finds a menu item by its URL path.
- * @param menu List of menus to search through.
+ * @param menus List of menus to search through, is a tree structure.
  * @param url Current location URL path.
+ * @param depth Current depth in the URL path. e.g. if the URL path is /a/b/c, the depth is 2.
+ * @example
+ * const menu = [
+ *  {
+ *    slug: 'home',
+ *    children: [
+ *      { slug: 'about' },
+ *      { slug: 'contact' },
+ *    ],
+ *  },
+ *  {
+ *    slug: 'products',
+ *    children: [
+ *      {
+ *        slug: 'electronics',
+ *        children: [
+ *          { slug: 'phones' },
+ *          { slug: 'laptops' },
+ *        ],
+ *      },
+ *      { slug: 'clothing' },
+ *    ],
+ *  },
+ * ];
+ *
+ * console.log(getMenuByUrl(menu, '/home')); // should return { slug: 'home', children: [...] }
+ * console.log(getMenuByUrl(menu, '/products/electronics', 0)); // should return { slug: 'products' }
+ * console.log(getMenuByUrl(menu, '/products/electronics/phones', 1)); // should return { slug: 'electronics' }
+ * console.log(getMenuByUrl(menu, '/products/electronics/phones', 2)); // should return { slug: 'phone' }
+ * console.log(getMenuByUrl(menu, '/products/clothing')); // should return { slug: 'products' }
+ * console.log(getMenuByUrl(menu, '/products/clothing', 1)); // should return { slug: 'clothing' }
+ * console.log(getMenuByUrl(menu, '/products')); // should return { slug: 'products' }
+ *
  * @returns {Menu | null}
  */
-export function getMenuByUrl(menu: Menu[], url: string): Menu | null {
-  if (!menu || !Array.isArray(menu) || menu.length === 0 || !url) {
+export function getMenuByUrl(menus: Menu[], url: string, depth: number = 0): Menu | null {
+  if (!menus || !Array.isArray(menus) || menus.length === 0 || !url) {
     return null;
   }
   const urlSegments = url.split('/').filter(segment => segment);
-  const targetDepth = urlSegments.length - 2;
-  let currentMenu = [...menu];
-  for (let depth = 0; depth < targetDepth; depth++) {
-    const segment = urlSegments[depth];
-    const currentItem = findMenuBySlug(currentMenu, segment);
-    if (!currentItem || !currentItem.children) {
-      return null;
-    }
-    currentMenu = currentItem.children;
+  if (urlSegments.length <= depth) {
+    return null;
   }
-  const lastSegment = urlSegments[targetDepth];
-  const targetItem = findMenuBySlug(currentMenu, lastSegment);
-  return targetItem || null;
+  const currentSegment = urlSegments[depth];
+  for (const item of menus) {
+    if (item.slug === currentSegment) {
+      return item;
+    }
+    if (item.children) {
+      const found = getMenuByUrl(item.children, url, depth);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
 }
 
 /**
