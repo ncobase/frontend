@@ -4,8 +4,8 @@ export interface User {
   email?: string;
   phone?: string;
   status?: number;
-  is_certified: true;
-  is_admin: true;
+  is_certified?: true;
+  is_admin?: true;
   created_by?: string;
   created_at?: string;
   updated_by?: string;
