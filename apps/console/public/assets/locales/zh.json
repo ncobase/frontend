@@ -398,30 +398,6 @@
       "navigation": "组件"
     }
   },
-  "sale": {
-    "navigation": "销售"
-  },
-  "purchase": {
-    "navigation": "采购"
-  },
-  "finance": {
-    "navigation": "财务"
-  },
-  "warehouse": {
-    "navigation": "仓储"
-  },
-  "customer": {
-    "navigation": "客户"
-  },
-  "analytics": {
-    "navigation": "分析"
-  },
-  "hr": {
-    "navigation": "人力资源"
-  },
-  "asset": {
-    "navigation": "资产"
-  },
   "system": {
     "navigation": "系统",
     "tenant": {

@@ -398,30 +398,6 @@
       "navigation": "Components"
     }
   },
-  "sale": {
-    "navigation": "Sales"
-  },
-  "purchase": {
-    "navigation": "Purchase"
-  },
-  "finance": {
-    "navigation": "Finance"
-  },
-  "warehouse": {
-    "navigation": "Warehouse"
-  },
-  "customer": {
-    "navigation": "Customers"
-  },
-  "analytics": {
-    "navigation": "Analytics"
-  },
-  "hr": {
-    "navigation": "Human Resources"
-  },
-  "asset": {
-    "navigation": "Assets"
-  },
   "system": {
     "navigation": "System",
     "tenant": {

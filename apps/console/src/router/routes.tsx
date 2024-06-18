@@ -15,15 +15,9 @@ import { Register } from '@/features/account/pages/register';
 //  - Question 2: 有没有更好的方法？主要目的是分割代码
 import { AccountRoutes } from '@/features/account/routes';
 import { ContentRoutes } from '@/features/content/routes';
-import { CustomerRoutes } from '@/features/customer/routes';
 import { DashRoutes } from '@/features/dash/routes';
 import { ExampleRoutes } from '@/features/example/routes';
-import { FinanceRoutes } from '@/features/finance/routes';
-import { HrRoutes } from '@/features/hr/routes';
-import { PurchaseRoutes } from '@/features/purchase/routes';
-import { SaleRoutes } from '@/features/sale/routes';
 import { SystemRoutes } from '@/features/system/routes';
-import { WarehouseRoutes } from '@/features/warehouse/routes';
 
 const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
@@ -34,12 +28,6 @@ const routes = [
   { path: '/dash/*', element: <AuthenticatedGuard children={<DashRoutes />} /> },
   { path: '/account/*', element: <AuthenticatedGuard children={<AccountRoutes />} /> },
   { path: '/content/*', element: <AuthenticatedGuard children={<ContentRoutes />} /> },
-  { path: '/sale/*', element: <AuthenticatedGuard children={<SaleRoutes />} /> },
-  { path: '/purchase/*', element: <AuthenticatedGuard children={<PurchaseRoutes />} /> },
-  { path: '/finance/*', element: <AuthenticatedGuard children={<FinanceRoutes />} /> },
-  { path: '/warehouse/*', element: <AuthenticatedGuard children={<WarehouseRoutes />} /> },
-  { path: '/customer/*', element: <AuthenticatedGuard children={<CustomerRoutes />} /> },
-  { path: '/hr/*', element: <AuthenticatedGuard children={<HrRoutes />} /> },
   { path: '/system/*', element: <AdminGuard children={<SystemRoutes />} /> },
   { path: '/example/*', element: <AuthenticatedGuard children={<ExampleRoutes />} /> }
 ];
