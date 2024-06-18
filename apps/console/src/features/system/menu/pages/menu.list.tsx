@@ -18,8 +18,7 @@ import { CurdView } from '@/components/curd';
 export const MenuListPage = () => {
   const { t } = useTranslation();
   const { menus } = useListMenus({
-    type: 'header',
-    children: true
+    type: 'header'
   });
 
   const {

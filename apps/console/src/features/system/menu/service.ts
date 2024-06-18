@@ -33,8 +33,13 @@ const useQueryMenuData = <T>(queryKey: unknown[], queryFn: MenuQueryFn<T>) => {
 export const useQueryMenu = (menu: string) =>
   useQueryMenuData(menuKeys.get({ menu }), () => getMenu(menu));
 
-export const useQueryMenuTreeData = (queryKey: AnyObject = {}) =>
-  useQueryMenuData(menuKeys.tree(queryKey), () => getMenuTree(queryKey));
+export const useQueryMenuTreeData = (queryKey: AnyObject = {}) => {
+  const { data, ...rest } = useQueryMenuData(menuKeys.tree(queryKey), () =>
+    getMenuTree({ ...queryKey, children: true })
+  );
+  const { content: menuTree = [] } = data || {};
+  return { data: menuTree, ...rest };
+};
 
 export const useCreateMenu = () => useMenuMutation(payload => createMenu(payload));
 export const useUpdateMenu = () => useMenuMutation(payload => updateMenu(payload));

@@ -34,7 +34,7 @@ export const Page: React.FC<PageProps> = ({
 }): JSX.Element => {
   const { t } = useTranslation();
   const [menus, setMenus] = useState<Menu[]>([]);
-  const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header', children: true });
+  const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header' });
 
   useEffect(() => {
     if (menusData?.length) {

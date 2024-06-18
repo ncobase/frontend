@@ -18,8 +18,7 @@ import { CurdView } from '@/components/curd';
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();
   const { taxonomies } = useListTaxonomies({
-    type: 'header',
-    children: true
+    type: 'header'
   });
 
   const {
