@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import {
   Account,
   AnyObject,
@@ -12,7 +14,7 @@ import { UseMutationOptions, useMutation, useQuery } from '@tanstack/react-query
 import { FetchError } from 'ofetch';
 
 import { getAccountTenant, getAccountTenants, getCurrentUser } from '@/apis/account/account';
-import { loginAccount, registerAccount } from '@/apis/account/authorize';
+import { loginAccount, logoutAccount, registerAccount } from '@/apis/account/authorize';
 import { useAuthContext } from '@/features/account/context';
 import { paginateByCursor } from '@/helpers/pagination';
 
@@ -88,4 +90,20 @@ const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) 
   const { rs, hasNextPage, nextCursor } =
     (data && paginateByCursor(data, cursor, limit)) || ({} as ExplicitAny);
   return { data: rs, hasNextPage, nextCursor };
+};
+
+export const useLogout = async () => {
+  const { updateTokens } = useAuthContext();
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await logoutAccount(); // Assuming logoutAccount is an asynchronous function
+      updateTokens(null, null); // Clear tokens
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Handle logout failure if needed
+    }
+  }, [updateTokens]);
+
+  return handleLogout;
 };

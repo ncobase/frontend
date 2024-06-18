@@ -4,52 +4,51 @@ import { isBrowser, locals } from '@ncobase/utils';
 
 import { TenantProvider } from '@/features/system/tenant/context';
 
+// Define the shape of authentication context value
 interface AuthContextValue {
   isAuthenticated: boolean;
-  accessToken?: string;
-  refreshToken?: string;
-
   updateTokens(accessToken?: string, refreshToken?: string): void;
 }
 
+// Keys for local storage
 export const ACCESS_TOKEN_KEY = '_AK';
 export const REFRESH_TOKEN_KEY = '_RK';
 
+// Create authentication context with initial default values
 const AuthContext = React.createContext<AuthContextValue>({
   isAuthenticated: false,
   updateTokens: () => undefined
 });
 
+// Function to update tokens in local storage
 const updateTokens = (accessToken?: string, refreshToken?: string) => {
-  if (!isBrowser) {
-    return () => undefined;
-  }
-  if (!accessToken) {
-    locals.remove(ACCESS_TOKEN_KEY);
-  } else {
+  if (!isBrowser) return; // Skip if not in browser environment
+  if (accessToken) {
     locals.set(ACCESS_TOKEN_KEY, accessToken);
-  }
-  if (!refreshToken) {
-    locals.remove(REFRESH_TOKEN_KEY);
   } else {
+    locals.remove(ACCESS_TOKEN_KEY);
+  }
+  if (refreshToken) {
     locals.set(REFRESH_TOKEN_KEY, refreshToken);
+  } else {
+    locals.remove(REFRESH_TOKEN_KEY);
   }
 };
 
-export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
+// Authentication provider component
+export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | undefined>(
-    (isBrowser && locals.get(ACCESS_TOKEN_KEY)) ?? undefined
+    isBrowser ? locals.get(ACCESS_TOKEN_KEY) : undefined
   );
 
-  const handleTokens = useCallback(
-    (accessToken?: string, refreshToken?: string) => {
-      setAccessToken(accessToken);
-      updateTokens(accessToken, refreshToken);
-    },
-    [setAccessToken]
-  );
+  // Callback to handle token updates
+  const handleTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
+    setAccessToken(newAccessToken);
+    updateTokens(newAccessToken, newRefreshToken);
+  }, []);
 
-  const value = useMemo(
+  // Memoize the context value to avoid unnecessary re-renders
+  const authContextValue = useMemo<AuthContextValue>(
     () => ({
       isAuthenticated: !!accessToken,
       updateTokens: handleTokens
@@ -58,10 +57,11 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   );
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={authContextValue}>
       <TenantProvider>{children}</TenantProvider>
     </AuthContext.Provider>
   );
 };
 
-export const useAuthContext = () => useContext(AuthContext);
+// Custom hook to access authentication context
+export const useAuthContext = (): AuthContextValue => useContext(AuthContext);

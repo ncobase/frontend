@@ -11,9 +11,21 @@ import { eventEmitter } from '@/helpers/events';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 import { publicRoutes } from '@/router/routes';
 
-const LoginInterceptorContext = createContext({});
+interface LoginInterceptorContextValue {
+  opened: boolean;
+  open: () => void;
+  close: () => void;
+}
 
-export const useLoginInterceptor = () => useContext(LoginInterceptorContext);
+const LoginInterceptorContext = createContext<LoginInterceptorContextValue | undefined>(undefined);
+
+export const useLoginInterceptor = (): LoginInterceptorContextValue => {
+  const context = useContext(LoginInterceptorContext);
+  if (!context) {
+    throw new Error('useLoginInterceptor must be used within a LoginInterceptorProvider');
+  }
+  return context;
+};
 
 export const LoginInterceptorProvider = () => {
   const { t } = useTranslation();
@@ -27,15 +39,18 @@ export const LoginInterceptorProvider = () => {
     setOpened(true);
     queryClient.cancelQueries({ type: 'all' }, { revert: true, silent: true });
   };
+
   const close = () => setOpened(false);
 
   useEffect(() => {
     const handleUnauthenticated = () => {
       open();
     };
+
     if (!publicRoutes.includes(location.pathname)) {
       eventEmitter.on('unauthorized', handleUnauthenticated);
     }
+
     return () => {
       eventEmitter.off('unauthorized', handleUnauthenticated);
     };
