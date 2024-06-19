@@ -424,10 +424,6 @@
       "title": "字典 / 枚举管理",
       "navigation": "字典"
     },
-    "application": {
-      "title": "应用列表",
-      "navigation": "应用"
-    },
     "user": {
       "title": "系统用户",
       "navigation": "用户"

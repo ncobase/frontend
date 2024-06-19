@@ -1,6 +1,6 @@
 import { Account, Tenant, Tenants } from '@ncobase/types';
 
-import { request } from '../request';
+import { request } from '@/apis/request';
 
 const ENDPOINT = '/v1/account';
 

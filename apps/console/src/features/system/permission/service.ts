@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, ExplicitAny, Permission } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   createPermission,
@@ -7,7 +7,7 @@ import {
   getPermissions,
   getPermissionTree,
   updatePermission
-} from '@/apis/permission/permission';
+} from '@/apis/system/permission';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type PermissionMutationFn = (payload: Pick<Permission, keyof Permission>) => Promise<Permission>;

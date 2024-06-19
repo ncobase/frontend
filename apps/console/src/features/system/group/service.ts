@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, ExplicitAny, Group } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createGroup, getGroup, getGroups, getGroupTree, updateGroup } from '@/apis/group/group';
+import { createGroup, getGroup, getGroups, getGroupTree, updateGroup } from '@/apis/system/group';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type GroupMutationFn = (payload: Pick<Group, keyof Group>) => Promise<Group>;

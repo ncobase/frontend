@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, ExplicitAny, Tenant } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   createTenant,
@@ -7,7 +7,7 @@ import {
   getTenants,
   getTenantTree,
   updateTenant
-} from '@/apis/tenant/tenant';
+} from '@/apis/system/tenant';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type TenantMutationFn = (payload: Pick<Tenant, keyof Tenant>) => Promise<Tenant>;

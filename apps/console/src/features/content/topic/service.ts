@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, ExplicitAny, Topic } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createTopic, getTopic, getTopics, updateTopic } from '@/apis/topic/topic';
+import { createTopic, getTopic, getTopics, updateTopic } from '@/apis/content/topic';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type TopicMutationFn = (payload: Pick<Topic, keyof Topic>) => Promise<Topic>;

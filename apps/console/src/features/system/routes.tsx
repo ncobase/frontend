@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { ApplicationRoutes } from './application/routes';
 import { BasicRoutes } from './basic/routes';
 import { DictionaryRoutes } from './dictionary/routes';
 import { GroupRoutes } from './group/routes';
@@ -14,7 +13,6 @@ import { renderRoutes } from '@/router';
 
 export const SystemRoutes = () => {
   const routes = [
-    { path: 'application/*', element: <ApplicationRoutes /> },
     { path: 'dictionary/*', element: <DictionaryRoutes /> },
     { path: 'group/*', element: <GroupRoutes /> },
     { path: 'user/*', element: <UserRoutes /> },

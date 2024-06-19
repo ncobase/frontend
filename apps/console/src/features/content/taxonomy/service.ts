@@ -6,7 +6,7 @@ import {
   getTaxonomy,
   getTaxonomies,
   updateTaxonomy
-} from '@/apis/taxonomy/taxonomy';
+} from '@/apis/content/taxonomy';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type TaxonomyMutationFn = (payload: Pick<Taxonomy, keyof Taxonomy>) => Promise<Taxonomy>;

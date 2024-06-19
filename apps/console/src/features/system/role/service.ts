@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, ExplicitAny, Role } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createRole, getRole, getRoles, getRoleTree, updateRole } from '@/apis/role/role';
+import { createRole, getRole, getRoles, getRoleTree, updateRole } from '@/apis/system/role';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type RoleMutationFn = (payload: Pick<Role, keyof Role>) => Promise<Role>;

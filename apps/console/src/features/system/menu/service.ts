@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { AnyObject, ExplicitAny, Menu } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/menu/menu';
+import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/system/menu';
 import { paginateByCursor } from '@/helpers/pagination';
 import { sortMenus } from '@/layout/page/page.helper';
 

@@ -1,7 +1,7 @@
 import { ExplicitAny, Menu, MenuTrees, Menus } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
-import { request } from '../request';
+import { request } from '@/apis/request';
 
 const ENDPOINT = '/v1/menus';
 

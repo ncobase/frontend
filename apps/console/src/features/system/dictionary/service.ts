@@ -1,5 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { AnyObject, Dictionary, ExplicitAny } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   createDictionary,
@@ -7,7 +7,7 @@ import {
   getDictionaries,
   getDictionaryTree,
   updateDictionary
-} from '@/apis/dictionary/dictionary';
+} from '@/apis/system/dictionary';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type DictionaryMutationFn = (payload: Pick<Dictionary, keyof Dictionary>) => Promise<Dictionary>;

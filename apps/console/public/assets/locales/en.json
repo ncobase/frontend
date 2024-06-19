@@ -424,10 +424,6 @@
       "title": "Dictionary / Enum Management",
       "navigation": "Dictionaries"
     },
-    "application": {
-      "title": "Application List",
-      "navigation": "Applications"
-    },
     "user": {
       "title": "System Users",
       "navigation": "Users"

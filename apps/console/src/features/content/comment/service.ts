@@ -1,7 +1,7 @@
 import { AnyObject, Comment, ExplicitAny } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createComment, getComment, getComments, updateComment } from '@/apis/comment/comment';
+import { createComment, getComment, getComments, updateComment } from '@/apis/content/comment';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type CommentMutationFn = (payload: Pick<Comment, keyof Comment>) => Promise<Comment>;

@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { Account, AnyObject, ExplicitAny } from '@ncobase/types';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createUser, getUser, getUsers, updateUser } from '@/apis/user/user';
+import { createUser, getUser, getUsers, updateUser } from '@/apis/system/user';
 import { paginateByCursor } from '@/helpers/pagination';
 
 type UserMutationFn = (payload: Pick<Account, keyof Account>) => Promise<Account>;
