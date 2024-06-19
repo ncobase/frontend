@@ -1,13 +1,12 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
-import { AnyObject, ExplicitAny, LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
+import { AnyObject, LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
 import { useMutation, useQuery, UseMutationOptions } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
-import { getAccountTenant, getAccountTenants, getCurrentUser } from '@/apis/account/account';
+import { getCurrentUser } from '@/apis/account/account';
 import { loginAccount, logoutAccount, registerAccount } from '@/apis/account/authorize';
 import { useAuthContext } from '@/features/account/context';
-import { paginateByCursor } from '@/helpers/pagination';
 
 interface AccountKeys {
   login: ['accountService', 'login'];
@@ -61,38 +60,39 @@ export const useAccount = () => {
   return { ...data, isAdministered, ...rest };
 };
 
-// Hook to get the current tenant
-export const useAccountTenant = () => {
-  const { data: tenant, ...rest } = useQuery({
-    queryKey: accountKeys.tenant(),
-    queryFn: getAccountTenant
-  });
-  return { tenant, ...rest };
-};
+// Account related tenant request merged to useAccount hook
+// // Hook to get the current tenant
+// export const useAccountTenant = () => {
+//   const { data: tenant, ...rest } = useQuery({
+//     queryKey: accountKeys.tenant(),
+//     queryFn: getAccountTenant
+//   });
+//   return { tenant, ...rest };
+// };
 
-// Hook to get the list of tenants with pagination
-export const useAccountTenants = (queryKey: AnyObject = {}) => {
-  const { data, ...rest } = useQuery({
-    queryKey: accountKeys.tenants(queryKey),
-    queryFn: getAccountTenants
-  });
-  const tenants = useMemo(() => data?.content || [], [data]);
-  const paginatedResult = usePaginatedData(
-    tenants,
-    queryKey?.cursor as string,
-    queryKey?.limit as number
-  );
-  return { tenants: paginatedResult.data, ...paginatedResult, ...rest };
-};
+// // Hook to get the list of tenants with pagination
+// export const useAccountTenants = (queryKey: AnyObject = {}) => {
+//   const { data, ...rest } = useQuery({
+//     queryKey: accountKeys.tenants(queryKey),
+//     queryFn: getAccountTenants
+//   });
+//   const tenants = useMemo(() => data?.content || [], [data]);
+//   const paginatedResult = usePaginatedData(
+//     tenants,
+//     queryKey?.cursor as string,
+//     queryKey?.limit as number
+//   );
+//   return { tenants: paginatedResult.data, ...paginatedResult, ...rest };
+// };
 
-// Helper hook for paginated data
-const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } = useMemo(
-    () => paginateByCursor(data, cursor, limit) || ({} as ExplicitAny),
-    [data, cursor, limit]
-  );
-  return { data: rs, hasNextPage, nextCursor };
-};
+// // Helper hook for paginated data
+// const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
+//   const { rs, hasNextPage, nextCursor } = useMemo(
+//     () => paginateByCursor(data, cursor, limit) || ({} as ExplicitAny),
+//     [data, cursor, limit]
+//   );
+//   return { data: rs, hasNextPage, nextCursor };
+// };
 
 // Hook for user logout
 export const useLogout = () => {

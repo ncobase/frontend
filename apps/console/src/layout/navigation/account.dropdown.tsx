@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useMemo } from 'react';
 
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger, Icons } from '@ncobase/react';
 import { MenuTree } from '@ncobase/types';
@@ -6,10 +6,11 @@ import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { useMenus } from '../page/page.context';
+
 import versionInfo from '@/../version.json';
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { useAccount } from '@/features/account/service';
-import { useListMenus } from '@/features/system/menu/service';
 import { useCopyToClipboard } from '@/hooks/use_copy_to_clipboard';
 
 // const AdminMenu = ({ isAdmin = false }) => {
@@ -56,12 +57,8 @@ export const AccountDropdown = ({ ...rest }) => {
   const navigate = useNavigate();
   const { user, profile, isLoading } = useAccount();
 
-  const [accountMenus, setAccountMenus] = React.useState<MenuTree[]>([]);
-  const { menus = [] } = useListMenus({ type: 'account' });
-  useEffect(() => {
-    if (!menus.length) return;
-    setAccountMenus(menus);
-  }, [menus]);
+  const [menus] = useMenus();
+  const accountMenus = useMemo(() => menus.filter(menu => menu.type === 'account'), [menus]);
 
   const renderMenuDropdown = (menuItems: MenuTree[]) => {
     const visibleItems = menuItems.filter(item => !item.hidden || item.disabled);

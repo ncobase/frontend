@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   Button,
@@ -12,10 +12,11 @@ import { MenuTree, Tenant } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { useMenus } from '../page/page.context';
+
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { TenantSwitcher } from '@/features/account/pages/tenant_switcher';
-import { useAccountTenants } from '@/features/account/service';
-import { useListMenus } from '@/features/system/menu/service';
+import { useAccount } from '@/features/account/service';
 import { useTenantContext } from '@/features/system/tenant/context';
 
 export const TenantDropdown = () => {
@@ -24,7 +25,7 @@ export const TenantDropdown = () => {
   const { hasTenant } = useTenantContext();
   const [relatedTenants, setRelatedTenants] = useState<Tenant[]>([]);
   const [currentTenant, setCurrentTenant] = useState<Tenant>();
-  const { tenants } = useAccountTenants();
+  const { tenants = [] } = useAccount();
 
   useEffect(() => {
     if (!tenants.length) return;
@@ -34,12 +35,8 @@ export const TenantDropdown = () => {
 
   const [opened, setOpened] = useState(false);
 
-  const [tenantMenus, setTenantMenus] = useState<MenuTree[]>([]);
-  const { menus } = useListMenus({ type: 'tenant' });
-  useEffect(() => {
-    if (!menus.length) return;
-    setTenantMenus(menus);
-  }, [menus]);
+  const [menus] = useMenus();
+  const tenantMenus = useMemo(() => menus.filter(menu => menu.type === 'tenant'), [menus]);
 
   const renderLink = useCallback(
     (menu: MenuTree) => {

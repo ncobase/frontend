@@ -31,7 +31,7 @@ import { useQueryMenuTreeData } from '@/features/system/menu/service';
 const HeaderComponent = ({ ...rest }) => {
   const { t } = useTranslation();
   const [menus, setMenus] = useMenus();
-  const queryKey = useMemo(() => ({ type: 'header' }), []);
+  const queryKey = useMemo(() => ({}), []);
   const { data: menusData = [] } = useQueryMenuTreeData(queryKey);
 
   useEffect(() => {
