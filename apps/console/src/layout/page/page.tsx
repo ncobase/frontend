@@ -11,7 +11,7 @@ import { Sidebar } from './page.sidebar';
 import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
 
-export interface PageProps {
+export interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: boolean;
   sidebar?: boolean;
   topbar?: React.ReactElement | React.ReactNode;
