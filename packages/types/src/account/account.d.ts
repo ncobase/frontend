@@ -1,10 +1,3 @@
-import { User, UserProfile } from '../core/user';
-import { Role } from '../system/role';
-import { Tenant } from '../system/tenant';
+import { UserMeshes } from '../system/user';
 
-export interface Account {
-  user: User;
-  profile?: UserProfile;
-  roles?: Role[];
-  tenants?: Tenant[];
-}
+export interface Account extends UserMeshes {}

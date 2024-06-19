@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import {
   Badge,
@@ -20,7 +20,7 @@ import {
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { MainNavigation, TenantDropdown, AccountDropdown } from '../navigation';
+import { AccountDropdown, MainNavigation, TenantDropdown } from '../navigation';
 
 import { useMenus } from './page.context';
 

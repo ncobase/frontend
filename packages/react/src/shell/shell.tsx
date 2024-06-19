@@ -1,4 +1,4 @@
-import React, { ReactNode, memo } from 'react';
+import React, { memo, ReactNode } from 'react';
 
 import { cn } from '@ncobase/utils';
 

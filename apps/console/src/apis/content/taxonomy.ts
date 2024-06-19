@@ -1,4 +1,4 @@
-import { ExplicitAny, Taxonomy, Taxonomies } from '@ncobase/types';
+import { ExplicitAny, Taxonomies, Taxonomy } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';

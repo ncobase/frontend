@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Role } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 
-import { QueryFormData, queryFields } from './config/query';
+import { queryFields, QueryFormData } from './config/query';
 import { tableColumns } from './config/table';
 import { topbarLeftSection, topbarRightSection } from './config/topbar';
 import { CreatePage } from './create';
@@ -11,7 +11,7 @@ import { EditorPage } from './editor';
 import { ViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useListRoles, useUpdateRole, useCreateRole } from '@/features/system/role/service';
+import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/role/service';
 
 export const ListPage = () => {
   const { roles } = useListRoles();

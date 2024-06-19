@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 
 interface PageTitleProps {

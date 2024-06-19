@@ -3,8 +3,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   createTaxonomy,
-  getTaxonomy,
   getTaxonomies,
+  getTaxonomy,
   updateTaxonomy
 } from '@/apis/content/taxonomy';
 import { paginateByCursor } from '@/helpers/pagination';

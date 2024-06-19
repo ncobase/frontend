@@ -1,10 +1,10 @@
-import { AnyObject, ExplicitAny, Dictionary } from '@ncobase/types';
+import { AnyObject, Dictionary, ExplicitAny } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   createDictionary,
-  getDictionary,
   getDictionaries,
+  getDictionary,
   updateDictionary
 } from '@/apis/system/dictionary';
 import { paginateByCursor } from '@/helpers/pagination';

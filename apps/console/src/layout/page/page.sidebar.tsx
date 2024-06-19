@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   Button,
-  ShellSidebar,
+  Divider,
   Icons,
+  ShellSidebar,
   Tooltip,
-  TooltipTrigger,
   TooltipContent,
-  Divider
+  TooltipTrigger
 } from '@ncobase/react';
 import { Menu } from '@ncobase/types';
 import { cn, getInitials, isPathMatching } from '@ncobase/utils';

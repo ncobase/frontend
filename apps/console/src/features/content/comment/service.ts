@@ -1,4 +1,4 @@
-import { AnyObject, ExplicitAny, Comment } from '@ncobase/types';
+import { AnyObject, Comment, ExplicitAny } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createComment, getComment, getComments, updateComment } from '@/apis/content/comment';

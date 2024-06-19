@@ -39,16 +39,16 @@ export const TenantViewerPage = ({ record }: { record: Tenant }) => {
       <FieldViewer title='创建时间'>{formatDateTime(data.created_at)}</FieldViewer>
       <FieldViewer title='更新时间'>{formatDateTime(data.updated_at)}</FieldViewer>
       {/* {data?.extra && (
-        <>
-          <div className='flex items-center text-slate-800 font-medium col-span-full border-b border-slate-100 pb-4 mb-4'>
-            <span className='bg-orange-500 w-1 mr-2 h-full inline-block' />
-            扩展信息
-          </div>
-          <FieldViewer title='扩展信息' className='col-span-full'>
-            {JSON.stringify(profile.extra)}
-          </FieldViewer>
-        </>
-      )} */}
+       <>
+       <div className='flex items-center text-slate-800 font-medium col-span-full border-b border-slate-100 pb-4 mb-4'>
+       <span className='bg-orange-500 w-1 mr-2 h-full inline-block' />
+       扩展信息
+       </div>
+       <FieldViewer title='扩展信息' className='col-span-full'>
+       {JSON.stringify(profile.extra)}
+       </FieldViewer>
+       </>
+       )} */}
     </div>
   );
 };

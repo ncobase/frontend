@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container, Dialog, Button, CodeHighlighter } from '@ncobase/react';
+import { Button, CodeHighlighter, Container, Dialog } from '@ncobase/react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Route, Navigate } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 
-import { PublicGuard, AuthenticatedGuard, AdminGuard, renderRoutes } from './helpers';
+import { AdminGuard, AuthenticatedGuard, PublicGuard, renderRoutes } from './helpers';
 
 import { AnimatedSwitch } from '@/components/animate/switch';
 import { ErrorPage } from '@/components/errors';

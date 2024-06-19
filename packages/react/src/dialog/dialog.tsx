@@ -6,13 +6,13 @@ import { Button } from '../button';
 import { ScrollView } from '../views';
 
 import {
-  DialogTrigger,
   DialogContent,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogRoot
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger
 } from './dialog.elements';
 
 interface DialogViewProps {

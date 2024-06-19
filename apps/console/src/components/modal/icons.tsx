@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Button,
-  TablerIconsNamespace,
   Icons,
   Input,
+  TablerIconsNamespace,
   Tabs,
-  TabsTrigger,
   TabsContent,
-  TabsList
+  TabsList,
+  TabsTrigger
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 

@@ -1,12 +1,12 @@
 import React from 'react';
 
 import {
+  Icons,
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
-  Icons
+  SelectTrigger,
+  SelectValue
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 

@@ -25,6 +25,13 @@ export interface UserProfile {
   extra?: object;
 }
 
+export interface UserMeshes {
+  user: User;
+  profile?: UserProfile;
+  roles?: Role[];
+  tenants?: Tenant[];
+}
+
 export interface Users {
   content: User[];
   total: number;

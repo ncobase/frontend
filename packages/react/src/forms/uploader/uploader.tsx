@@ -4,8 +4,8 @@ import React from 'react';
 import { Icons } from '../../icon';
 
 import {
-  FileUploader,
   FileInput,
+  FileUploader,
   FileUploaderContent,
   FileUploaderItem,
   FileUploaderProps

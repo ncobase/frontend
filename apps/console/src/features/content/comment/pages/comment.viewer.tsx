@@ -23,16 +23,16 @@ export const CommentViewerPage = ({ record }: { record: Comment }) => {
       </FieldViewer>
 
       {/* {data?.extras && (
-        <>
-          <div className='flex items-center text-slate-800 font-medium col-span-full border-b border-slate-100 pb-4 mb-4'>
-            <span className='bg-orange-500 w-1 mr-2 h-full inline-block' />
-            扩展信息
-          </div>
-          <FieldViewer title='扩展信息' className='col-span-full'>
-            {JSON.stringify(data.extras)}
-          </FieldViewer>
-        </>
-      )} */}
+       <>
+       <div className='flex items-center text-slate-800 font-medium col-span-full border-b border-slate-100 pb-4 mb-4'>
+       <span className='bg-orange-500 w-1 mr-2 h-full inline-block' />
+       扩展信息
+       </div>
+       <FieldViewer title='扩展信息' className='col-span-full'>
+       {JSON.stringify(data.extras)}
+       </FieldViewer>
+       </>
+       )} */}
     </div>
   );
 };

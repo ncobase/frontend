@@ -6,7 +6,7 @@ import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { FullscreenView, FullscreenViewProps } from './fullscreen';
-import { ModalViewProps, ModalView } from './modal';
+import { ModalView, ModalViewProps } from './modal';
 
 import { Page, Topbar, useLayoutContext } from '@/layout';
 

@@ -5,6 +5,7 @@
 .linkActive {
   @apply border-white;
 }
+
 .linkLabel {
   @apply mr-3;
 }

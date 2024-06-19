@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, Icons } from '@ncobase/react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, Icons } from '@ncobase/react';
 import { randomId } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 

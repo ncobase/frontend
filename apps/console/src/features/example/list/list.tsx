@@ -21,8 +21,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useListMenus } from '@/features/system/menu/service';
 import { parseStatus } from '@/helpers/status';
-import { Page, TopbarProps } from '@/layout';
-import { Topbar } from '@/layout';
+import { Page, Topbar, TopbarProps } from '@/layout';
 
 const QueryBar = () => {
   return (

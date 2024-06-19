@@ -1,4 +1,4 @@
-import { AnyObject, ExplicitAny, User } from '@ncobase/types';
+import { UserMeshes, AnyObject, ExplicitAny } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createUser, getUser, getUsers, updateUser } from '@/apis/system/user';
@@ -24,11 +24,11 @@ export const useQueryUser = (user: string) =>
 
 // Hook for create user mutation
 export const useCreateUser = () =>
-  useMutation({ mutationFn: (payload: Pick<User, keyof User>) => createUser(payload) });
+  useMutation({ mutationFn: (payload: Pick<UserMeshes, keyof UserMeshes>) => createUser(payload) });
 
 // Hook for update user mutation
 export const useUpdateUser = () =>
-  useMutation({ mutationFn: (payload: Pick<User, keyof User>) => updateUser(payload) });
+  useMutation({ mutationFn: (payload: Pick<UserMeshes, keyof UserMeshes>) => updateUser(payload) });
 
 // Hook to list users with pagination
 export const useListUsers = (queryKey: AnyObject = {}) => {

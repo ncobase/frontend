@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
 
-import { LOWERCASE, NUMBER, UPPERCASE, SYMBOL } from '../consts/char';
+import { LOWERCASE, NUMBER, SYMBOL, UPPERCASE } from '../consts/char';
 
 class Generator {
   private static readonly alphabet: string = NUMBER + LOWERCASE + UPPERCASE;

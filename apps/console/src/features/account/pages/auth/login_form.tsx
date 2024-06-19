@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import { Button, CheckboxField, Form, InputField } from '@ncobase/react';
 import { ExplicitAny, LoginProps } from '@ncobase/types';
 import { cn, upperFirst } from '@ncobase/utils';
-import { Controller, UseFormSetValue, useForm } from 'react-hook-form';
+import { Controller, useForm, UseFormSetValue } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

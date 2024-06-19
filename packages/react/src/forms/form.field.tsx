@@ -1,4 +1,4 @@
-import React, { HTMLInputTypeAttribute, forwardRef, memo } from 'react';
+import React, { forwardRef, HTMLInputTypeAttribute, memo } from 'react';
 
 import { cn, getValueByPath } from '@ncobase/utils';
 import { FieldError, FieldValues, RegisterOptions } from 'react-hook-form';
@@ -12,7 +12,7 @@ import { Checkbox } from './checkbox';
 import { Input } from './input';
 import { Label } from './label';
 import { RadioGroup, RadioGroupItem } from './radio';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { Textarea } from './textarea';
 
 interface FieldConfigProps extends React.ComponentProps<any> {

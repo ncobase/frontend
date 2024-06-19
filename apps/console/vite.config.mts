@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
-import { ConfigEnv, UserConfig, loadEnv } from 'vite';
+import { ConfigEnv, loadEnv, UserConfig } from 'vite';
 
 import pkg from './package.json';
 
@@ -8,7 +8,7 @@ function pathResolve(dir: string) {
   return resolve(process.cwd(), '.', dir);
 }
 
-const setupPlugins = ({ }: ImportMetaEnv) => ([
+const setupPlugins = ({}: ImportMetaEnv) => ([
   react()
 ]);
 
@@ -56,19 +56,19 @@ export default (({ mode }: ConfigEnv): UserConfig => {
               return 'assets/css/[name].[hash][extname]';
             }
             return 'assets/[name].[hash][extname]';
-          },
-        },
+          }
+        }
       },
       reportCompressedSize: false
     },
     optimizeDeps: {
       esbuildOptions: {
-        target: 'es2020',
+        target: 'es2020'
       }
     },
     server: {
       port: +ENV.VITE_PORT,
-      proxy,
+      proxy
     }
   };
 });

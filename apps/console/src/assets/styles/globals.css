@@ -101,10 +101,12 @@ body {
 
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 via-purple-500 to-sky-400;
+
   &:hover {
     @apply hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r hover:from-purple-600 hover:via-sky-500 hover:to-primary-400;
   }
 }
+
 .text-gradient-hover {
   @apply hover:bg-clip-text hover:text-transparent hover:bg-gradient-to-r hover:from-purple-600 hover:via-sky-500 hover:to-primary-400;
 }

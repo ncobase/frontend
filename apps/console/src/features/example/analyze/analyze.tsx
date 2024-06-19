@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { PieChart, BarChart, AreaChart, RadarChart, LineChart } from '@ncobase/react';
 import {
+  AreaChart,
+  BarChart,
   Button,
   Card,
   CardContent,
@@ -15,6 +16,9 @@ import {
   DropdownTrigger,
   Icons,
   Label,
+  LineChart,
+  PieChart,
+  RadarChart,
   Select,
   SelectContent,
   SelectItem,

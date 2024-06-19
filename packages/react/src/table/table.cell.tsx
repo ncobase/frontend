@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { cn, isString, isNumber, isBoolean } from '@ncobase/utils';
+import { cn, isBoolean, isNumber, isString } from '@ncobase/utils';
 
 import { Icons } from '../icon';
 

@@ -5,7 +5,7 @@ import { Permission } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { QueryFormData, queryFields } from '../config/query';
+import { queryFields, QueryFormData } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection } from '../config/topbar';
 import { useCreatePermission, useListPermissions, useUpdatePermission } from '../service';

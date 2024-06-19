@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { AnyObject, LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
-import { useMutation, useQuery, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
 import { getCurrentUser } from '@/apis/account/account';

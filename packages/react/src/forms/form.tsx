@@ -11,6 +11,7 @@ interface FormViewProps extends React.FormHTMLAttributes<HTMLFormElement> {
   children?: React.ReactNode;
   fields?: FieldConfigProps[];
 }
+
 export const Form = React.forwardRef<HTMLFormElement, FormViewProps>(
   ({ id, children, className, onSubmit, fields, control, ...props }, ref) => {
     if (!fields && !children) return null;

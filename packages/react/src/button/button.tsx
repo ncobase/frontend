@@ -2,7 +2,7 @@ import React from 'react';
 
 import { cn } from '@ncobase/utils';
 
-import { TButtonVariant, TButtonSizes, getButtonStyling, getIconStyling } from './styles';
+import { getButtonStyling, getIconStyling, TButtonSizes, TButtonVariant } from './styles';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: TButtonVariant;

@@ -1,7 +1,7 @@
 import tailwindTypography from '@tailwindcss/typography';
 import tailwindAnimate from 'tailwindcss-animate';
 
-import { brand, primary, secondary, success, warning, danger } from './colors.mjs';
+import { brand, danger, primary, secondary, success, warning } from './colors.mjs';
 
 /** @type {import('tailwindcss').Config} */
 export default {

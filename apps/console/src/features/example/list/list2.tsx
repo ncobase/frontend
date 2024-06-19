@@ -21,8 +21,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useListMenus } from '@/features/system/menu/service';
 import { parseStatus } from '@/helpers/status';
-import { Page } from '@/layout';
-import { Topbar } from '@/layout';
+import { Page, Topbar } from '@/layout';
 
 const QueryBar = () => {
   const { t } = useTranslation();

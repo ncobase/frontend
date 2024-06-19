@@ -1,7 +1,7 @@
 import React, {
+  createContext,
   Dispatch,
   SetStateAction,
-  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 
 import { cn } from '@ncobase/utils';
-import { useDropzone, DropzoneState, FileRejection, DropzoneOptions, Accept } from 'react-dropzone';
+import { Accept, DropzoneOptions, DropzoneState, FileRejection, useDropzone } from 'react-dropzone';
 import { toast } from 'sonner';
 
 import { Button } from '../../button';
