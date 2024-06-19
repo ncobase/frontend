@@ -28,5 +28,5 @@ export const deleteTenant = async (id: string): Promise<Tenant> => {
 // list
 export const getTenants = async (params: ExplicitAny): Promise<Tenants> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

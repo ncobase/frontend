@@ -28,5 +28,5 @@ export const deleteUser = async (id: string): Promise<ExplicitAny> => {
 // list
 export const getUsers = async (params: ExplicitAny): Promise<Users> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

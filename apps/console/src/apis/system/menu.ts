@@ -28,11 +28,11 @@ export const deleteMenu = async (id: string): Promise<Menu> => {
 // list
 export const getMenus = async (params: ExplicitAny): Promise<Menus> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };
 
 // get menu tree
 export const getMenuTree = async (params: ExplicitAny): Promise<MenuTrees> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

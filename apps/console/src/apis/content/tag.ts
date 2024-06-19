@@ -28,5 +28,5 @@ export const deleteTag = async (id: string): Promise<Tag> => {
 // list
 export const getTags = async (params: ExplicitAny): Promise<Tags> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

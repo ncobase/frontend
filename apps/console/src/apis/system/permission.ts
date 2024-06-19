@@ -28,5 +28,5 @@ export const deletePermission = async (id: string): Promise<Permission> => {
 // list
 export const getPermissions = async (params: ExplicitAny): Promise<Permissions> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

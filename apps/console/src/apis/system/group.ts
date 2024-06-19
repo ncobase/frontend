@@ -28,5 +28,5 @@ export const deleteGroup = async (id: string): Promise<Group> => {
 // list
 export const getGroups = async (params: ExplicitAny): Promise<Groups> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

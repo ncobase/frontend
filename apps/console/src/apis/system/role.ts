@@ -28,5 +28,5 @@ export const deleteRole = async (id: string): Promise<Role> => {
 // list
 export const getRoles = async (params: ExplicitAny): Promise<Roles> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

@@ -28,5 +28,5 @@ export const deleteDictionary = async (id: string): Promise<Dictionary> => {
 // list
 export const getDictionaries = async (params: ExplicitAny): Promise<Dictionaries> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

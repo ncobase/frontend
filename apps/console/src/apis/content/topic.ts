@@ -28,5 +28,5 @@ export const deleteTopic = async (id: string): Promise<Topic> => {
 // list
 export const getTopics = async (params: ExplicitAny): Promise<Topics> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

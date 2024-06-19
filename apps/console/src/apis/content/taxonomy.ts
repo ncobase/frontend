@@ -28,5 +28,5 @@ export const deleteTaxonomy = async (id: string): Promise<Taxonomy> => {
 // list
 export const getTaxonomies = async (params: ExplicitAny): Promise<Taxonomies> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

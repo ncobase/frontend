@@ -28,5 +28,5 @@ export const deleteComment = async (id: string): Promise<Comment> => {
 // list
 export const getComments = async (params: ExplicitAny): Promise<Comments> => {
   const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}?${queryString}`);
+  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };
