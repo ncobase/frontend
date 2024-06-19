@@ -1,4 +1,4 @@
-import { Account, ExplicitAny, Users } from '@ncobase/types';
+import { ExplicitAny, User, Users } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
@@ -6,17 +6,17 @@ import { request } from '@/apis/request';
 const ENDPOINT = '/v1/users';
 
 // create
-export const createUser = async (payload: Account): Promise<Account> => {
+export const createUser = async (payload: User): Promise<User> => {
   return request.post(ENDPOINT, { ...payload });
 };
 
 // get
-export const getUser = async (id: string): Promise<Account> => {
+export const getUser = async (id: string): Promise<User> => {
   return request.get(`${ENDPOINT}/${id}`);
 };
 
 // update
-export const updateUser = async (payload: Account): Promise<Account> => {
+export const updateUser = async (payload: User): Promise<User> => {
   return request.put(ENDPOINT, { ...payload });
 };
 

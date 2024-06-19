@@ -1,16 +1,12 @@
 import { AnyObject, ExplicitAny, Role } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createRole, getRole, getRoles, getRoleTree, updateRole } from '@/apis/system/role';
+import { createRole, getRole, getRoles, updateRole } from '@/apis/system/role';
 import { paginateByCursor } from '@/helpers/pagination';
-
-type RoleMutationFn = (payload: Pick<Role, keyof Role>) => Promise<Role>;
-type RoleQueryFn<T> = () => Promise<T>;
 
 interface RoleKeys {
   create: ['roleService', 'create'];
   get: (options?: { role?: string }) => ['roleService', 'role', { role?: string }];
-  tree: (options?: AnyObject) => ['roleService', 'tree', AnyObject];
   update: ['roleService', 'update'];
   list: (options?: AnyObject) => ['roleService', 'roles', AnyObject];
 }
@@ -18,41 +14,38 @@ interface RoleKeys {
 export const roleKeys: RoleKeys = {
   create: ['roleService', 'create'],
   get: ({ role } = {}) => ['roleService', 'role', { role }],
-  tree: (queryKey = {}) => ['roleService', 'tree', queryKey],
   update: ['roleService', 'update'],
   list: (queryKey = {}) => ['roleService', 'roles', queryKey]
 };
 
-const useRoleMutation = (mutationFn: RoleMutationFn) => useMutation({ mutationFn });
-
-const useQueryRoleData = <T>(queryKey: unknown[], queryFn: RoleQueryFn<T>) => {
-  const { data, ...rest } = useQuery<T>({ queryKey, queryFn });
-  return { data, ...rest };
-};
-
+// Hook to query a specific role by ID or Slug
 export const useQueryRole = (role: string) =>
-  useQueryRoleData(roleKeys.get({ role }), () => getRole(role));
+  useQuery({ queryKey: roleKeys.get({ role }), queryFn: () => getRole(role) });
 
-export const useQueryRoleTreeData = (role: string, type?: string) =>
-  useQueryRoleData(roleKeys.tree({ role, type }), () => getRoleTree(role, type));
+// Hook for create role mutation
+export const useCreateRole = () =>
+  useMutation({ mutationFn: (payload: Pick<Role, keyof Role>) => createRole(payload) });
 
-export const useCreateRole = () => useRoleMutation(payload => createRole(payload));
-export const useUpdateRole = () => useRoleMutation(payload => updateRole(payload));
+// Hook for update role mutation
+export const useUpdateRole = () =>
+  useMutation({ mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload) });
 
+// Hook to list roles with pagination
 export const useListRoles = (queryKey: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: roleKeys.list(queryKey),
     queryFn: () => getRoles(queryKey)
   });
-  const { content: roles = [] } = data || {};
-  const { cursor, limit } = queryKey;
-  const paginatedResult = usePaginatedData(roles, cursor as string, limit as number);
-
+  const paginatedResult = usePaginatedData(
+    data?.content || [],
+    queryKey?.cursor as string,
+    queryKey?.limit as number
+  );
   return { roles: paginatedResult.data, ...paginatedResult, ...rest };
 };
 
+// Helper hook for paginated data
 const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } =
-    (data && paginateByCursor(data, cursor, limit)) || ({} as ExplicitAny);
+  const { rs, hasNextPage, nextCursor } = paginateByCursor(data, cursor, limit) || {};
   return { data: rs, hasNextPage, nextCursor };
 };

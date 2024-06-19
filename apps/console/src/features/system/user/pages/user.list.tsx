@@ -18,6 +18,7 @@ import { CurdView } from '@/components/curd';
 export const UserListPage = () => {
   const { t } = useTranslation();
   const { users } = useListUsers();
+
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,

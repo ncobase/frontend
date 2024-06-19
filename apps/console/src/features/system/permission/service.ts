@@ -5,13 +5,9 @@ import {
   createPermission,
   getPermission,
   getPermissions,
-  getPermissionTree,
   updatePermission
 } from '@/apis/system/permission';
 import { paginateByCursor } from '@/helpers/pagination';
-
-type PermissionMutationFn = (payload: Pick<Permission, keyof Permission>) => Promise<Permission>;
-type PermissionQueryFn<T> = () => Promise<T>;
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];
@@ -31,40 +27,41 @@ export const permissionKeys: PermissionKeys = {
   list: (queryKey = {}) => ['permissionService', 'permissions', queryKey]
 };
 
-const usePermissionMutation = (mutationFn: PermissionMutationFn) => useMutation({ mutationFn });
-
-const useQueryPermissionData = <T>(queryKey: unknown[], queryFn: PermissionQueryFn<T>) => {
-  const { data, ...rest } = useQuery<T>({ queryKey, queryFn });
-  return { data, ...rest };
-};
-
+// Hook to query a specific permission by ID or Slug
 export const useQueryPermission = (permission: string) =>
-  useQueryPermissionData(permissionKeys.get({ permission }), () => getPermission(permission));
+  useQuery({
+    queryKey: permissionKeys.get({ permission }),
+    queryFn: () => getPermission(permission)
+  });
 
-export const useQueryPermissionTreeData = (permission: string, type?: string) =>
-  useQueryPermissionData(permissionKeys.tree({ permission, type }), () =>
-    getPermissionTree(permission, type)
-  );
-
+// Hook for create permission mutation
 export const useCreatePermission = () =>
-  usePermissionMutation(payload => createPermission(payload));
-export const useUpdatePermission = () =>
-  usePermissionMutation(payload => updatePermission(payload));
+  useMutation({
+    mutationFn: (payload: Pick<Permission, keyof Permission>) => createPermission(payload)
+  });
 
+// Hook for update permission mutation
+export const useUpdatePermission = () =>
+  useMutation({
+    mutationFn: (payload: Pick<Permission, keyof Permission>) => updatePermission(payload)
+  });
+
+// Hook to list permissions with pagination
 export const useListPermissions = (queryKey: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: permissionKeys.list(queryKey),
     queryFn: () => getPermissions(queryKey)
   });
-  const { content: permissions = [] } = data || {};
-  const { cursor, limit } = queryKey;
-  const paginatedResult = usePaginatedData(permissions, cursor as string, limit as number);
-
+  const paginatedResult = usePaginatedData(
+    data?.content || [],
+    queryKey?.cursor as string,
+    queryKey?.limit as number
+  );
   return { permissions: paginatedResult.data, ...paginatedResult, ...rest };
 };
 
+// Helper hook for paginated data
 const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } =
-    (data && paginateByCursor(data, cursor, limit)) || ({} as ExplicitAny);
+  const { rs, hasNextPage, nextCursor } = paginateByCursor(data, cursor, limit) || {};
   return { data: rs, hasNextPage, nextCursor };
 };

@@ -1,4 +1,4 @@
-import { ExplicitAny, Role, Roles, RoleTrees } from '@ncobase/types';
+import { ExplicitAny, Role, Roles } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
@@ -29,10 +29,4 @@ export const deleteRole = async (id: string): Promise<Role> => {
 export const getRoles = async (params: ExplicitAny): Promise<Roles> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}?${queryString}`);
-};
-
-// get role tree
-export const getRoleTree = async (role: string, type?: string): Promise<RoleTrees> => {
-  const queryParams = buildQueryString({ role, type });
-  return request.get(`/trees/roles?${queryParams}`);
 };

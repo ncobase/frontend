@@ -11,7 +11,7 @@ import { useAuthContext } from '@/features/account/context';
 interface AccountKeys {
   login: ['accountService', 'login'];
   register: ['accountService', 'register'];
-  account: ['accountService', 'currentUser'];
+  currentUser: ['accountService', 'currentUser'];
   tenants: (options?: AnyObject) => ['accountService', 'tenants', AnyObject];
   tenant: (options?: AnyObject) => ['accountService', 'tenant', AnyObject];
 }
@@ -19,7 +19,7 @@ interface AccountKeys {
 export const accountKeys: AccountKeys = {
   login: ['accountService', 'login'],
   register: ['accountService', 'register'],
-  account: ['accountService', 'currentUser'],
+  currentUser: ['accountService', 'currentUser'],
   tenants: (queryKey = {}) => ['accountService', 'tenants', queryKey],
   tenant: (queryKey = {}) => ['accountService', 'tenant', queryKey]
 };
@@ -53,7 +53,7 @@ export const useRegisterAccount = (
 // Hook to get the current account data
 export const useAccount = () => {
   const { data, ...rest } = useQuery({
-    queryKey: accountKeys.account,
+    queryKey: accountKeys.currentUser,
     queryFn: getCurrentUser
   });
   const isAdministered = data?.user?.is_admin || false;

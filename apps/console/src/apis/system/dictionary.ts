@@ -1,4 +1,4 @@
-import { ExplicitAny, Dictionary, Dictionaries, DictionaryTrees } from '@ncobase/types';
+import { ExplicitAny, Dictionary, Dictionaries } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
@@ -29,13 +29,4 @@ export const deleteDictionary = async (id: string): Promise<Dictionary> => {
 export const getDictionaries = async (params: ExplicitAny): Promise<Dictionaries> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}?${queryString}`);
-};
-
-// get dictionary tree
-export const getDictionaryTree = async (
-  dictionary: string,
-  type?: string
-): Promise<DictionaryTrees> => {
-  const queryParams = buildQueryString({ dictionary, type });
-  return request.get(`/trees/dictionaries?${queryParams}`);
 };

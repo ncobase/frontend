@@ -16,14 +16,6 @@ export interface Permission {
   updated_at?: string;
 }
 
-export interface PermissionTree extends Permission {
-  children?: Permission[];
-}
-
-export interface PermissionTrees {
-  content: PermissionTree[];
-}
-
 export interface Permissions {
   content: Permission[];
   total: number;

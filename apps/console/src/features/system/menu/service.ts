@@ -7,9 +7,6 @@ import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/s
 import { paginateByCursor } from '@/helpers/pagination';
 import { sortMenus } from '@/layout/page/page.helper';
 
-type MenuMutationFn = (payload: Pick<Menu, keyof Menu>) => Promise<Menu>;
-type MenuQueryFn<T> = () => Promise<T>;
-
 interface MenuKeys {
   create: ['menuService', 'create'];
   get: (options?: { menu?: string }) => ['menuService', 'menu', { menu?: string }];
@@ -26,31 +23,29 @@ export const menuKeys: MenuKeys = {
   list: (queryKey = {}) => ['menuService', 'menus', queryKey]
 };
 
-// Custom hook for mutation operations
-const useMenuMutation = (mutationFn: MenuMutationFn) => useMutation({ mutationFn });
-
-// Custom hook for query operations
-const useQueryMenuData = <T>(queryKey: unknown[], queryFn: MenuQueryFn<T>) => {
-  const { data, ...rest } = useQuery({ queryKey, queryFn });
-  return { data, ...rest };
-};
-
-// Hook to query a specific menu by ID
+// Hook to query a specific menu by ID or Slug
 export const useQueryMenu = (menu: string) =>
-  useQueryMenuData(menuKeys.get({ menu }), () => getMenu(menu));
+  useQuery({ queryKey: menuKeys.get({ menu }), queryFn: () => getMenu(menu) });
 
-// Hook to query menu tree data with sorting
+// Hook to query menu tree
 export const useQueryMenuTreeData = (queryKey = {}) => {
-  const { data, ...rest } = useQueryMenuData(menuKeys.tree(queryKey), () =>
-    getMenuTree({ ...queryKey, children: true })
-  );
-  const sorted = useMemo(() => sortMenus(data?.content || [], 'order', 'desc'), [data]);
-  return { data: sorted, ...rest };
+  const { data, ...rest } = useQuery({
+    queryKey: menuKeys.tree(queryKey),
+    queryFn: () => getMenuTree({ ...queryKey, children: true })
+  });
+
+  const sortedData = useMemo(() => sortMenus(data?.content || [], 'order', 'desc'), [data]);
+
+  return { data: sortedData, ...rest };
 };
 
-// Hooks for create and update menu mutations
-export const useCreateMenu = () => useMenuMutation(createMenu);
-export const useUpdateMenu = () => useMenuMutation(updateMenu);
+// Hook for create menu mutation
+export const useCreateMenu = () =>
+  useMutation({ mutationFn: (payload: Pick<Menu, keyof Menu>) => createMenu(payload) });
+
+// Hook for update menu mutation
+export const useUpdateMenu = () =>
+  useMutation({ mutationFn: (payload: Pick<Menu, keyof Menu>) => updateMenu(payload) });
 
 // Hook to list menus with pagination
 export const useListMenus = (queryKey: AnyObject = {}) => {

@@ -1,16 +1,12 @@
 import { AnyObject, ExplicitAny, Group } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { createGroup, getGroup, getGroups, getGroupTree, updateGroup } from '@/apis/system/group';
+import { createGroup, getGroup, getGroups, updateGroup } from '@/apis/system/group';
 import { paginateByCursor } from '@/helpers/pagination';
-
-type GroupMutationFn = (payload: Pick<Group, keyof Group>) => Promise<Group>;
-type GroupQueryFn<T> = () => Promise<T>;
 
 interface GroupKeys {
   create: ['groupService', 'create'];
   get: (options?: { group?: string }) => ['groupService', 'group', { group?: string }];
-  tree: (options?: AnyObject) => ['groupService', 'tree', AnyObject];
   update: ['groupService', 'update'];
   list: (options?: AnyObject) => ['groupService', 'groups', AnyObject];
 }
@@ -18,41 +14,38 @@ interface GroupKeys {
 export const groupKeys: GroupKeys = {
   create: ['groupService', 'create'],
   get: ({ group } = {}) => ['groupService', 'group', { group }],
-  tree: (queryKey = {}) => ['groupService', 'tree', queryKey],
   update: ['groupService', 'update'],
   list: (queryKey = {}) => ['groupService', 'groups', queryKey]
 };
 
-const useGroupMutation = (mutationFn: GroupMutationFn) => useMutation({ mutationFn });
-
-const useQueryGroupData = <T>(queryKey: unknown[], queryFn: GroupQueryFn<T>) => {
-  const { data, ...rest } = useQuery<T>({ queryKey, queryFn });
-  return { data, ...rest };
-};
-
+// Hook to query a specific group by ID or Slug
 export const useQueryGroup = (group: string) =>
-  useQueryGroupData(groupKeys.get({ group }), () => getGroup(group));
+  useQuery({ queryKey: groupKeys.get({ group }), queryFn: () => getGroup(group) });
 
-export const useQueryGroupTreeData = (group: string, type?: string) =>
-  useQueryGroupData(groupKeys.tree({ group, type }), () => getGroupTree(group, type));
+// Hook for create group mutation
+export const useCreateGroup = () =>
+  useMutation({ mutationFn: (payload: Pick<Group, keyof Group>) => createGroup(payload) });
 
-export const useCreateGroup = () => useGroupMutation(payload => createGroup(payload));
-export const useUpdateGroup = () => useGroupMutation(payload => updateGroup(payload));
+// Hook for update group mutation
+export const useUpdateGroup = () =>
+  useMutation({ mutationFn: (payload: Pick<Group, keyof Group>) => updateGroup(payload) });
 
+// Hook to list groups with pagination
 export const useListGroups = (queryKey: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: groupKeys.list(queryKey),
     queryFn: () => getGroups(queryKey)
   });
-  const { content: groups = [] } = data || {};
-  const { cursor, limit } = queryKey;
-  const paginatedResult = usePaginatedData(groups, cursor as string, limit as number);
-
+  const paginatedResult = usePaginatedData(
+    data?.content || [],
+    queryKey?.cursor as string,
+    queryKey?.limit as number
+  );
   return { groups: paginatedResult.data, ...paginatedResult, ...rest };
 };
 
+// Helper hook for paginated data
 const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } =
-    (data && paginateByCursor(data, cursor, limit)) || ({} as ExplicitAny);
+  const { rs, hasNextPage, nextCursor } = paginateByCursor(data, cursor, limit) || {};
   return { data: rs, hasNextPage, nextCursor };
 };

@@ -13,14 +13,6 @@ export interface Group {
   updated_at?: string;
 }
 
-export interface GroupTree extends Group {
-  children?: Group[];
-}
-
-export interface GroupTrees {
-  content: GroupTree[];
-}
-
 export interface Groups {
   content: Group[];
   total: number;

@@ -18,14 +18,6 @@ export interface Tenant {
   updated_at?: string;
 }
 
-export interface TenantTree extends Tenant {
-  children?: Tenant[];
-}
-
-export interface TenantTrees {
-  content: TenantTree[];
-}
-
 export interface Tenants {
   content: Tenant[];
   total: number;

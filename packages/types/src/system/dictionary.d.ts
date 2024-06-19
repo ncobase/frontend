@@ -12,14 +12,6 @@ export interface Dictionary {
   updated_at?: string;
 }
 
-export interface DictionaryTree extends Dictionary {
-  children?: Dictionary[];
-}
-
-export interface DictionaryTrees {
-  content: DictionaryTree[];
-}
-
 export interface Dictionaries {
   content: Dictionary[];
   total: number;

@@ -1,4 +1,4 @@
-import { ExplicitAny, Permission, Permissions, PermissionTrees } from '@ncobase/types';
+import { ExplicitAny, Permission, Permissions } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
@@ -29,13 +29,4 @@ export const deletePermission = async (id: string): Promise<Permission> => {
 export const getPermissions = async (params: ExplicitAny): Promise<Permissions> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}?${queryString}`);
-};
-
-// get permission tree
-export const getPermissionTree = async (
-  permission: string,
-  type?: string
-): Promise<PermissionTrees> => {
-  const queryParams = buildQueryString({ permission, type });
-  return request.get(`/trees/permissions?${queryParams}`);
 };

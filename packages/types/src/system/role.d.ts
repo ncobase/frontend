@@ -14,14 +14,6 @@ export interface Role {
   updated_at?: string;
 }
 
-export interface RoleTree extends Role {
-  children?: Role[];
-}
-
-export interface RoleTrees {
-  content: RoleTree[];
-}
-
 export interface Roles {
   content: Role[];
   total: number;

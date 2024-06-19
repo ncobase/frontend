@@ -1,4 +1,4 @@
-import { ExplicitAny, Group, Groups, GroupTrees } from '@ncobase/types';
+import { ExplicitAny, Group, Groups } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
@@ -29,10 +29,4 @@ export const deleteGroup = async (id: string): Promise<Group> => {
 export const getGroups = async (params: ExplicitAny): Promise<Groups> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}?${queryString}`);
-};
-
-// get group tree
-export const getGroupTree = async (group: string, type?: string): Promise<GroupTrees> => {
-  const queryParams = buildQueryString({ group, type });
-  return request.get(`/trees/groups?${queryParams}`);
 };

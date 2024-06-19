@@ -1,4 +1,4 @@
-import { ExplicitAny, Tenant, Tenants, TenantTrees } from '@ncobase/types';
+import { ExplicitAny, Tenant, Tenants } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
@@ -29,10 +29,4 @@ export const deleteTenant = async (id: string): Promise<Tenant> => {
 export const getTenants = async (params: ExplicitAny): Promise<Tenants> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}?${queryString}`);
-};
-
-// get tenant tree
-export const getTenantTree = async (tenant: string, type?: string): Promise<TenantTrees> => {
-  const queryParams = buildQueryString({ tenant, type });
-  return request.get(`/trees/tenants?${queryParams}`);
 };

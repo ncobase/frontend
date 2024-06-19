@@ -17,9 +17,7 @@ import { CurdView } from '@/components/curd';
 
 export const CommentListPage = () => {
   const { t } = useTranslation();
-  const { comments } = useListComments({
-    type: 'header'
-  });
+  const { comments } = useListComments();
 
   const {
     handleSubmit: handleQuerySubmit,
