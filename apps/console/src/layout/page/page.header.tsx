@@ -31,13 +31,14 @@ import { useQueryMenuTreeData } from '@/features/system/menu/service';
 const HeaderComponent = ({ ...rest }) => {
   const { t } = useTranslation();
   const [menus, setMenus] = useMenus();
-  const { data: menusData = [] } = useQueryMenuTreeData({ type: 'header' });
+  const queryKey = useMemo(() => ({ type: 'header' }), []);
+  const { data: menusData = [] } = useQueryMenuTreeData(queryKey);
 
   useEffect(() => {
     if (menusData?.length) {
       setMenus(menusData);
     }
-  }, [menusData]);
+  }, [menusData.length, setMenus]);
 
   const headerMenus = useMemo(() => menus.filter(menu => menu.type === 'header'), [menus]);
 

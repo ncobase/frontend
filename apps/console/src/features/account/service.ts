@@ -1,16 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import {
-  Account,
-  AnyObject,
-  ExplicitAny,
-  LoginProps,
-  LoginReply,
-  RegisterProps,
-  Tenant,
-  Tenants
-} from '@ncobase/types';
-import { UseMutationOptions, useMutation, useQuery } from '@tanstack/react-query';
+import { AnyObject, ExplicitAny, LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
+import { useMutation, useQuery, UseMutationOptions } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
 import { getAccountTenant, getAccountTenants, getCurrentUser } from '@/apis/account/account';
@@ -34,6 +25,7 @@ export const accountKeys: AccountKeys = {
   tenant: (queryKey = {}) => ['accountService', 'tenant', queryKey]
 };
 
+// Custom hook for mutations that involve token updates
 const useMutationWithTokens = <TVariables>(
   mutationFn: (variables: TVariables) => Promise<LoginReply>,
   options?: Partial<UseMutationOptions<LoginReply, FetchError, TVariables>>
@@ -49,59 +41,69 @@ const useMutationWithTokens = <TVariables>(
   });
 };
 
+// Hook for user login
 export const useLogin = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, LoginProps>>
-) => useMutationWithTokens(payload => loginAccount(payload), options);
+) => useMutationWithTokens(loginAccount, options);
 
+// Hook for user registration
 export const useRegisterAccount = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, RegisterProps>>
-) => useMutationWithTokens(payload => registerAccount(payload), options);
+) => useMutationWithTokens(registerAccount, options);
 
+// Hook to get the current account data
 export const useAccount = () => {
   const { data, ...rest } = useQuery({
     queryKey: accountKeys.account,
-    queryFn: (): Promise<Account> => getCurrentUser()
+    queryFn: getCurrentUser
   });
   const isAdministered = data?.user?.is_admin || false;
   return { ...data, isAdministered, ...rest };
 };
 
+// Hook to get the current tenant
 export const useAccountTenant = () => {
   const { data: tenant, ...rest } = useQuery({
     queryKey: accountKeys.tenant(),
-    queryFn: (): Promise<Tenant> => getAccountTenant()
+    queryFn: getAccountTenant
   });
   return { tenant, ...rest };
 };
 
+// Hook to get the list of tenants with pagination
 export const useAccountTenants = (queryKey: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: accountKeys.tenants(queryKey),
-    queryFn: (): Promise<Tenants> => getAccountTenants()
+    queryFn: getAccountTenants
   });
-  const { content: tenants = [] } = data || {};
-  const { cursor, limit } = queryKey;
-  const paginatedResult = usePaginatedData(tenants, cursor as string, limit as number);
-
+  const tenants = useMemo(() => data?.content || [], [data]);
+  const paginatedResult = usePaginatedData(
+    tenants,
+    queryKey?.cursor as string,
+    queryKey?.limit as number
+  );
   return { tenants: paginatedResult.data, ...paginatedResult, ...rest };
 };
 
+// Helper hook for paginated data
 const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } =
-    (data && paginateByCursor(data, cursor, limit)) || ({} as ExplicitAny);
+  const { rs, hasNextPage, nextCursor } = useMemo(
+    () => paginateByCursor(data, cursor, limit) || ({} as ExplicitAny),
+    [data, cursor, limit]
+  );
   return { data: rs, hasNextPage, nextCursor };
 };
 
-export const useLogout = async () => {
+// Hook for user logout
+export const useLogout = () => {
   const { updateTokens } = useAuthContext();
 
   const handleLogout = useCallback(async () => {
     try {
-      await logoutAccount(); // Assuming logoutAccount is an asynchronous function
-      updateTokens(null, null); // Clear tokens
+      await logoutAccount();
+      updateTokens(null, null);
     } catch (error) {
       console.error('Logout failed:', error);
-      // Handle logout failure if needed
     }
   }, [updateTokens]);
 
