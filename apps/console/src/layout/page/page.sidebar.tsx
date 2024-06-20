@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import {
   Button,
@@ -33,25 +33,15 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   const [menus] = useMenus();
-  const [sidebarMenus, setSidebarMenus] = useState([]);
-
-  const currentHeaderMenu = getMenuByUrl(menus, pathname, 0);
-
-  useEffect(() => {
+  const currentHeaderMenu = useMemo(() => getMenuByUrl(menus, pathname, 0), [menus, pathname]);
+  const sidebarMenus = useMemo(() => {
     if (currentHeaderMenu && currentHeaderMenu?.children) {
-      const filteredMenus = currentHeaderMenu?.children?.filter(
-        menu => !menu.hidden && !menu.disabled
-      );
-      setSidebarMenus(filteredMenus);
+      return currentHeaderMenu.children.filter(menu => !menu.hidden && !menu.disabled);
     }
-  }, [currentHeaderMenu, pathname]);
+    return [];
+  }, [currentHeaderMenu]);
 
-  const isActive = useMemo(
-    () => (to: string) => {
-      return isPathMatching(to, pathname, 2);
-    },
-    [pathname]
-  );
+  const isActive = useCallback((to: string) => isPathMatching(to, pathname, 2), [pathname]);
 
   const handleLinkClick = useCallback(
     (link: Menu) => {
@@ -62,46 +52,45 @@ const SidebarComponent: React.FC<SidebarProps> = ({
     [navigate, onLinkClick]
   );
 
-  const tooltipLink = (link: Menu) => (
-    <Tooltip key={link.id}>
-      <TooltipTrigger asChild>
-        <Button
-          variant='unstyle'
-          size='ratio'
-          className={cn('my-2.5 hover:bg-slate-100/85', {
-            'bg-slate-100/90 [&>svg]:stroke-slate-400/90':
-              isActive(link.path) || active === link.label
-          })}
-          onClick={() => handleLinkClick(link)}
-        >
-          {link.icon ? (
-            <Icons size={18} name={link.icon} />
-          ) : (
-            <Button variant='unstyle' size='xs'>
-              {getInitials(link.name || link.label || link.id)}
-            </Button>
-          )}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side='right'>{t(link.label)}</TooltipContent>
-    </Tooltip>
-  );
-
-  const links = useMemo(() => {
-    return sidebarMenus.map((link: Menu) => {
-      if (link.hidden || link.disabled) return null;
-      if (isDividerLink(link))
-        return <div className='h-[0.03125rem] w-1/2 !mx-auto bg-slate-200' key={link.id} />;
-      return tooltipLink(link);
-    });
-  }, [sidebarMenus, tooltipLink]);
+  const renderLink = (link: Menu) => {
+    if (link.hidden || link.disabled) return null;
+    if (isDividerLink(link)) {
+      return <div className='h-[0.03125rem] w-1/2 !mx-auto bg-slate-200' key={link.id} />;
+    }
+    return (
+      <Tooltip key={link.id}>
+        <TooltipTrigger asChild>
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className={cn('my-2.5 hover:bg-slate-100/85', {
+              'bg-slate-100/90 [&>svg]:stroke-slate-400/90':
+                isActive(link.path) || active === link.label
+            })}
+            onClick={() => handleLinkClick(link)}
+          >
+            {link.icon ? (
+              <Icons size={18} name={link.icon} />
+            ) : (
+              <Button variant='unstyle' size='xs'>
+                {getInitials(link.name || link.label || link.id)}
+              </Button>
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side='right'>{t(link.label)}</TooltipContent>
+      </Tooltip>
+    );
+  };
 
   return (
     <ShellSidebar className='flex flex-col'>
       {/* Reserving */}
       {/* <Logo className='min-h-12 shadow-[0_1px_2px_0_rgba(0,0,0,0.03)]' type='min' /> */}
       {/* Top warpper */}
-      <div className='flex-1 flex flex-col items-center'>{links}</div>
+      <div className='flex-1 flex flex-col items-center'>
+        {(sidebarMenus || [])?.map((link: Menu) => renderLink(link))}
+      </div>
       {/* Bottom wrapper */}
       <div className='flex flex-col items-center justify-center pb-3 gap-y-2'>
         <Divider className='w-[80%] pb-1' color='slate' />

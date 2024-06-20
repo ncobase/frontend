@@ -1,5 +1,3 @@
-import { useMemo, useRef } from 'react';
-
 import { AnyObject, ExplicitAny, Menu } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
@@ -29,19 +27,17 @@ export const useQueryMenu = (menu: string) =>
 
 // Hook to query menu tree
 export const useQueryMenuTreeData = (queryKey = {}) => {
-  const { data, ...rest } = useQuery({
+  return useQuery({
     queryKey: menuKeys.tree(queryKey),
-    queryFn: () => getMenuTree({ ...queryKey, children: true })
+    queryFn: async () => {
+      const result = await getMenuTree({ ...queryKey, children: true });
+      return sortMenus(result?.content || [], 'order', 'desc');
+    },
+    select: data => data,
+    gcTime: Infinity,
+    staleTime: Infinity
   });
-
-  const sortedData = useMemo(
-    () => sortMenus(data?.content || [], 'order', 'desc'),
-    [data?.content]
-  );
-
-  return { data: sortedData, ...rest };
 };
-
 // Hook for create menu mutation
 export const useCreateMenu = () =>
   useMutation({ mutationFn: (payload: Pick<Menu, keyof Menu>) => createMenu(payload) });
