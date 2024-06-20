@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ExplicitAny } from '@ncobase/types';
 
-import { Spinner } from '@/components/spinner';
+import { Spinner } from '@/components/loading/spinner';
 
 export const loadComp = (Com: React.LazyExoticComponent<ExplicitAny>) => {
   return class LoadComp extends React.Component<ExplicitAny, ExplicitAny> {

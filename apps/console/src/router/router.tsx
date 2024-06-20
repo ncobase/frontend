@@ -2,13 +2,10 @@ import React, { Suspense } from 'react';
 
 import { BrowserRouter } from 'react-router-dom';
 
-import preloadRoutes from './preload';
 import { Routes } from './routes';
 
-import { Spinner } from '@/components/spinner';
+import { Spinner } from '@/components/loading/spinner';
 import { Layout } from '@/layout';
-
-preloadRoutes();
 
 export const Router = () => {
   return (
