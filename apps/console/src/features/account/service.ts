@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { AnyObject, LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
 import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
@@ -54,10 +54,14 @@ export const useRegisterAccount = (
 export const useAccount = () => {
   const { data, ...rest } = useQuery({
     queryKey: accountKeys.currentUser,
-    queryFn: getCurrentUser
+    queryFn: getCurrentUser,
+    staleTime: 1000 * 60 * 15 // 15 minutes
   });
 
-  const isAdministered = data?.user?.is_admin || false;
+  const isAdministered = useMemo(() => {
+    return data?.roles?.some(role => ['admin', 'super-admin'].includes(role.slug));
+  }, [data?.roles]);
+
   return { ...data, isAdministered, ...rest };
 };
 
