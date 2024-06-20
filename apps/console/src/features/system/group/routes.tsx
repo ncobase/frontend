@@ -8,3 +8,5 @@ export const GroupRoutes = () => {
   const routes = [{ path: '/', element: <GroupListPage /> }];
   return renderRoutes(routes);
 };
+
+export default GroupRoutes;

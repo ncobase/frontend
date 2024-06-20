@@ -8,3 +8,5 @@ export const AccountRoutes = () => {
   const routes = [{ path: '/profile', element: <Profile /> }];
   return renderRoutes(routes);
 };
+
+export default AccountRoutes;

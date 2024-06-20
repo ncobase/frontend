@@ -38,7 +38,7 @@ const HeaderComponent = ({ ...rest }) => {
     if (menusData?.length) {
       setMenus(menusData);
     }
-  }, [menusData.length, setMenus]);
+  }, [menusData?.length, setMenus]);
 
   const headerMenus = useMemo(() => menus.filter(menu => menu.type === 'header'), [menus]);
 

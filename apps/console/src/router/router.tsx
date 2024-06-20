@@ -2,16 +2,19 @@ import React, { Suspense } from 'react';
 
 import { BrowserRouter } from 'react-router-dom';
 
-import { SuspenseFallback } from './loadable';
+import preloadRoutes from './preload';
 import { Routes } from './routes';
 
+import { Spinner } from '@/components/spinner';
 import { Layout } from '@/layout';
+
+preloadRoutes();
 
 export const Router = () => {
   return (
     <BrowserRouter>
       <Layout>
-        <Suspense fallback={<SuspenseFallback />}>
+        <Suspense fallback={<Spinner />}>
           <Routes />
         </Suspense>
       </Layout>

@@ -8,3 +8,5 @@ export const DictionaryRoutes = () => {
   const routes = [{ path: '/', element: <DictionaryListPage /> }];
   return renderRoutes(routes);
 };
+
+export default DictionaryRoutes;

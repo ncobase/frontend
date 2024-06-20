@@ -8,3 +8,5 @@ export const TenantRoutes = () => {
   const routes = [{ path: '/', element: <TenantListPage /> }];
   return renderRoutes(routes);
 };
+
+export default TenantRoutes;

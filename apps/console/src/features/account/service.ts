@@ -56,6 +56,7 @@ export const useAccount = () => {
     queryKey: accountKeys.currentUser,
     queryFn: getCurrentUser
   });
+
   const isAdministered = data?.user?.is_admin || false;
   return { ...data, isAdministered, ...rest };
 };

@@ -8,3 +8,5 @@ export const TopicRoutes = () => {
   const routes = [{ path: '/', element: <TopicListPage /> }];
   return renderRoutes(routes);
 };
+
+export default TopicRoutes;

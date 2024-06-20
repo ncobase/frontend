@@ -8,3 +8,5 @@ export const PermissionRoutes = () => {
   const routes = [{ path: '/', element: <PermissionListPage /> }];
   return renderRoutes(routes);
 };
+
+export default PermissionRoutes;

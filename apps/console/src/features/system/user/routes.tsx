@@ -8,3 +8,5 @@ export const UserRoutes = () => {
   const routes = [{ path: '/', element: <UserListPage /> }];
   return renderRoutes(routes);
 };
+
+export default UserRoutes;

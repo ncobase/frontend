@@ -17,3 +17,5 @@ export const ContentRoutes = () => {
   ];
   return renderRoutes(routes);
 };
+
+export default ContentRoutes;

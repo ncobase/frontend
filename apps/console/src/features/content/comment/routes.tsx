@@ -8,3 +8,5 @@ export const CommentRoutes = () => {
   const routes = [{ path: '/', element: <CommentListPage /> }];
   return renderRoutes(routes);
 };
+
+export default CommentRoutes;

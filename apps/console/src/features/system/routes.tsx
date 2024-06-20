@@ -24,3 +24,5 @@ export const SystemRoutes = () => {
   ];
   return renderRoutes(routes);
 };
+
+export default SystemRoutes;

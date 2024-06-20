@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { AnyObject, ExplicitAny, Menu } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -34,7 +34,10 @@ export const useQueryMenuTreeData = (queryKey = {}) => {
     queryFn: () => getMenuTree({ ...queryKey, children: true })
   });
 
-  const sortedData = useMemo(() => sortMenus(data?.content || [], 'order', 'desc'), [data]);
+  const sortedData = useMemo(
+    () => sortMenus(data?.content || [], 'order', 'desc'),
+    [data?.content]
+  );
 
   return { data: sortedData, ...rest };
 };

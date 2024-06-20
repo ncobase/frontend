@@ -8,3 +8,5 @@ export const TaxonomyRoutes = () => {
   const routes = [{ path: '/', element: <TaxonomyListPage /> }];
   return renderRoutes(routes);
 };
+
+export default TaxonomyRoutes;

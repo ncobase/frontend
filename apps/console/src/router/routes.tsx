@@ -13,6 +13,11 @@ import { Register } from '@/features/account/pages/register';
 // TODO: use react lazy loading
 //  - Question 1: 是否有必要？存在页面刷新的问题，导致切换不流畅
 //  - Question 2: 有没有更好的方法？主要目的是分割代码
+// const AccountRoutes = lazy(() => import('@/features/account/routes'));
+// const ContentRoutes = lazy(() => import('@/features/content/routes'));
+// const DashRoutes = lazy(() => import('@/features/dash/routes'));
+// const ExampleRoutes = lazy(() => import('@/features/example/routes'));
+// const SystemRoutes = lazy(() => import('@/features/system/routes'));
 import { AccountRoutes } from '@/features/account/routes';
 import { ContentRoutes } from '@/features/content/routes';
 import { DashRoutes } from '@/features/dash/routes';
