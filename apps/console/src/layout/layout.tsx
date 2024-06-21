@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import { Menu } from '@ncobase/types';
 
 import { LayoutContext, LayoutContextValue } from './layout.context';
 
@@ -12,10 +14,13 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isFocusMode, setIsFocusMode] = React.useState<LayoutContextValue['isFocusMode']>(false);
   const [vmode, setVmode] = React.useState<LayoutContextValue['vmode']>('default');
+  const [menus, setMenus] = useState<Menu[]>([]);
 
   const layoutContextValue = {
     vmode,
     setVmode,
+    menus,
+    setMenus,
     isFocusMode,
     setIsFocusMode
   };

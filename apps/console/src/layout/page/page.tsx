@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { Shell } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
+
+import { useFocusMode } from '../layout.hooks';
 
 import { PageContainer } from './page.container';
 import { PageContext } from './page.context';
@@ -29,20 +30,12 @@ export const Page: React.FC<PageProps> = ({
   layout = true,
   ...rest
 }): JSX.Element => {
+  useFocusMode();
   const { t } = useTranslation();
-  const [menus, setMenus] = useState<Menu[]>([]);
 
   const pageContextValue = useMemo(
-    () => ({
-      layout,
-      header,
-      topbar,
-      sidebar,
-      submenu,
-      menus,
-      setMenus
-    }),
-    [layout, header, topbar, sidebar, submenu, menus, setMenus]
+    () => ({ layout, header, topbar, sidebar, submenu }),
+    [layout, header, topbar, sidebar, submenu]
   );
 
   const renderContent = () => <PageContainer {...rest} />;

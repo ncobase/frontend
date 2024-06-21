@@ -12,7 +12,7 @@ import { MenuTree, Tenant } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useMenus } from '../page/page.context';
+import { useMenus } from '../layout.hooks';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { TenantSwitcher } from '@/features/account/pages/tenant_switcher';

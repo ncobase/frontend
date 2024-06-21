@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { Button, ShellSubmenu } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
+import { Menu, MenuTree } from '@ncobase/types';
 import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useMenus } from './page.context';
-import { findMenuByParentId, getMenuByUrl, isGroup, pathSplit } from './page.helper';
+import { useMenus } from '../layout.hooks';
+
+import { getMenuByUrl, isGroup, pathSplit } from './page.helper';
 
 const SubmenuComponent = ({ ...rest }) => {
   const { t } = useTranslation();
@@ -17,30 +18,23 @@ const SubmenuComponent = ({ ...rest }) => {
   const [menus] = useMenus();
   const currentHeaderMenu = useMemo(() => getMenuByUrl(menus, pathname), [menus, pathname]);
 
-  const [submenus, setSubmenus] = useState([]);
-  const sidebarMenusData = useMemo(
-    () => findMenuByParentId(menus, currentHeaderMenu?.id || '', 'sidebar') || [],
-    [menus, currentHeaderMenu]
-  );
+  const sidebarMenus: MenuTree[] = useMemo(() => {
+    if (currentHeaderMenu?.children) {
+      return currentHeaderMenu.children.filter(menu => !menu.hidden && !menu.disabled);
+    }
+    return [];
+  }, [currentHeaderMenu]);
+
   const [firstPart, secondPart] = pathSplit(pathname);
 
-  const currentSidebarMenu = useMemo(
-    () => sidebarMenusData?.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {},
-    [sidebarMenusData, firstPart, secondPart]
-  );
-
-  useEffect(() => {
-    if (currentSidebarMenu) {
-      const filteredMenus = currentSidebarMenu?.children?.filter(
-        menu => !menu.hidden && !menu.disabled
-      );
-      setSubmenus(filteredMenus);
-    }
-  }, [currentSidebarMenu]);
+  const submenus = useMemo(() => {
+    const items = sidebarMenus.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {};
+    return items.children || [];
+  }, [sidebarMenus, firstPart, secondPart]);
 
   const isActive = useCallback((to: string) => isPathMatching(to, pathname, 3), [pathname]);
 
-  if (!currentSidebarMenu || !submenus) {
+  if (!sidebarMenus.length || !submenus.length) {
     return null;
   }
 

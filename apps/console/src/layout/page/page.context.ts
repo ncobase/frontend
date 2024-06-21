@@ -1,7 +1,5 @@
 import React, { createContext, useContext } from 'react';
 
-import { Menu } from '@ncobase/types';
-
 /**
  * @see Page
  * @see PageProps
@@ -24,24 +22,14 @@ interface PageContextValue {
   topbar?: React.ReactNode | React.ReactElement;
   /**
    * set page show sidebar or not
-   * @param sidebar {React.ReactNode | React.ReactElement | null}
+   * @param sidebar {React.ReactNode | React.ReactElement}
    */
-  sidebar?: React.ReactNode | React.ReactElement | null;
+  sidebar?: React.ReactNode | React.ReactElement;
   /**
    * set page show submenu or not
-   * @param submenu {boolean}
+   * @param submenu {React.ReactNode | React.ReactElement}
    */
-  submenu?: boolean;
-  /**
-   * set page menus
-   * @param menus {Menu[]}
-   */
-  menus?: Menu[];
-  /**
-   * set page menus
-   * @param menus {Menu[]}
-   */
-  setMenus?: (menus: Menu[]) => void;
+  submenu?: React.ReactNode | React.ReactElement;
 }
 
 /**
@@ -75,30 +63,27 @@ export const useHeader = (): boolean => {
 
 /**
  * get page is used topbar or not
- * @returns {React.ReactNode | React.ReactElement | null}
+ * @returns {React.ReactNode | React.ReactElement}
  */
-export const useTopbar = (): React.ReactNode | React.ReactElement | null => {
+export const useTopbar = (): React.ReactNode | React.ReactElement => {
   const { topbar } = usePageContext();
   return topbar;
 };
 
 /**
  * get page is used sidebar or not
- * @returns {React.ReactNode | React.ReactElement | null}
+ * @returns {React.ReactNode | React.ReactElement}
  */
-export const useSidebar = (): React.ReactNode | React.ReactElement | null => {
+export const useSidebar = (): React.ReactNode | React.ReactElement => {
   const { sidebar } = usePageContext();
   return sidebar;
 };
 
 /**
  * get page is used submenu or not
- *
+ * @returns {React.ReactNode | React.ReactElement}
  */
-export const useMenus = (): [Menu[], (menus: Menu[]) => void] => {
-  const { menus, setMenus } = usePageContext();
-  if (!setMenus) {
-    throw new Error('setMenus function is not provided');
-  }
-  return [menus, setMenus];
+export const useSubmenu = (): React.ReactNode | React.ReactElement => {
+  const { submenu } = usePageContext();
+  return submenu;
 };

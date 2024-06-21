@@ -20,9 +20,8 @@ import {
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
+import { useMenus } from '../layout.hooks';
 import { AccountDropdown, MainNavigation, TenantDropdown } from '../navigation';
-
-import { useMenus } from './page.context';
 
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
@@ -90,11 +89,10 @@ const Notifications = ({ notifications, onMarkAllAsRead }) => {
 const HeaderComponent = ({ ...rest }) => {
   const { t } = useTranslation();
   const [menus, setMenus] = useMenus();
-  const queryKey = useMemo(() => ({}), []);
-  const { data = [] } = useQueryMenuTreeData(queryKey);
+  const { data = [] } = useQueryMenuTreeData({});
 
   useEffect(() => {
-    if (data.length) {
+    if (data?.length) {
       setMenus(data);
     }
   }, [data, setMenus]);

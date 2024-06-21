@@ -14,7 +14,8 @@ import { cn, getInitials, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { useMenus } from './page.context';
+import { useMenus } from '../layout.hooks';
+
 import { getMenuByUrl, isDividerLink } from './page.helper';
 
 interface SidebarProps {
@@ -33,13 +34,13 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   const [menus] = useMenus();
-  const currentHeaderMenu = useMemo(() => getMenuByUrl(menus, pathname, 0), [menus, pathname]);
+  const currentHeaderMenu = useMemo(() => getMenuByUrl(menus, pathname), [menus, pathname]);
   const sidebarMenus = useMemo(() => {
     if (currentHeaderMenu && currentHeaderMenu?.children) {
       return currentHeaderMenu.children.filter(menu => !menu.hidden && !menu.disabled);
     }
     return [];
-  }, [currentHeaderMenu]);
+  }, [menus, currentHeaderMenu]);
 
   const isActive = useCallback((to: string) => isPathMatching(to, pathname, 2), [pathname]);
 

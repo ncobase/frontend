@@ -6,7 +6,7 @@ import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useMenus } from '../page/page.context';
+import { useMenus } from '../layout.hooks';
 
 import versionInfo from '@/../version.json';
 import { AvatarButton } from '@/components/avatar/avatar_button';
