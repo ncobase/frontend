@@ -93,7 +93,7 @@ export interface ITableHeaderCellProps extends ITableCellBaseProps {
 
 const TableHeaderCell: React.FC<ITableHeaderCellProps> = ({
   visible,
-  filter = 'sort', // TODO: implement filter
+  filter = 'sort', // TODO: implement filter, toggle, date, date-range
   title,
   code,
   icon,

@@ -40,29 +40,26 @@ export const SortFilter: React.FC<{
       <DropdownItem
         onClick={() => handleSort('asc')}
         className={cn(
-          'flex items-center gap-x-1',
+          'flex items-center gap-x-1 px-3.5',
           filterState?.config[code]?.sortOrder === 'asc' &&
             'bg-slate-50 text-slate-800 [&>svg]:stroke-slate-800'
         )}
       >
         <Icons name='IconSortAZ' className='stroke-slate-400' />
-        升序
       </DropdownItem>
       <DropdownItem
         onClick={() => handleSort('desc')}
         className={cn(
-          'flex items-center gap-x-1',
+          'flex items-center gap-x-1 px-3.5',
           filterState?.config[code]?.sortOrder === 'desc' &&
             'bg-slate-50 text-slate-800 [&>svg]:stroke-slate-800'
         )}
       >
         <Icons name='IconSortZA' className='stroke-slate-400' />
-        降序
       </DropdownItem>
       {filterState?.config[code]?.sortOrder && (
-        <DropdownItem onClick={() => handleSort(null)} className='flex items-center gap-x-1'>
+        <DropdownItem onClick={() => handleSort(null)} className='flex items-center gap-x-1 px-3.5'>
           <Icons name='IconRestore' className='stroke-slate-400' />
-          重置
         </DropdownItem>
       )}
     </DropdownWrapper>
