@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { CodeHighlighter, FieldViewer } from '@ncobase/react';
-import { Dictionary } from '@ncobase/types';
 import { formatDateTime } from '@ncobase/utils';
 
 import { useQueryDictionary } from '../service';
+
+import { Dictionary } from '@/types';
 
 export const DictionaryViewerPage = ({ record }: { record: Dictionary }) => {
   const { data = {} } = useQueryDictionary(record.id);

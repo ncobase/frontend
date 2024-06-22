@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Account, User } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorUserPage } from './editor.user';
 import { UserViewerPage } from './user.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Account, User } from '@/types';
 
 export const UserListPage = () => {
   const { t } = useTranslation();

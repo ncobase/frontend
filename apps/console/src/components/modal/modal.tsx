@@ -1,7 +1,8 @@
 import React, { memo, ReactNode, useCallback } from 'react';
 
 import { Dialog } from '@ncobase/react';
-import { ExplicitAny } from '@ncobase/types';
+
+import { ExplicitAny } from '@/types';
 
 export interface ModalProps<T extends object> {
   title?: string;

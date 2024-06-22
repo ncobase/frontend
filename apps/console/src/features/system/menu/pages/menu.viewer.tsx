@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { FieldViewer } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
 
 import { useQueryMenu } from '../service';
 
 import { parseStatus } from '@/helpers/status';
+import { Menu } from '@/types';
 
 export const MenuViewerPage = ({ record }: { record: Menu }) => {
   const { data = {} } = useQueryMenu(record.id);

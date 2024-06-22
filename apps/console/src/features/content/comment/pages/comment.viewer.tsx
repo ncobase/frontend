@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { FieldViewer } from '@ncobase/react';
-import { Comment } from '@ncobase/types';
 
 import { useQueryComment } from '../service';
+
+import { Comment } from '@/types';
 
 export const CommentViewerPage = ({ record }: { record: Comment }) => {
   const { data = {} } = useQueryComment(record.id);

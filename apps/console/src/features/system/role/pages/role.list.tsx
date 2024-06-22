@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Role } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorRolePage } from './editor.role';
 import { RoleViewerPage } from './role.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Role } from '@/types';
 
 export const RoleListPage = () => {
   const { t } = useTranslation();

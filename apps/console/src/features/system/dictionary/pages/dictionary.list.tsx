@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Dictionary } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { DictionaryViewerPage } from './dictionary.viewer';
 import { EditorDictionaryPage } from './editor.dictionary';
 
 import { CurdView } from '@/components/curd';
+import { Dictionary } from '@/types';
 
 export const DictionaryListPage = () => {
   const { t } = useTranslation();

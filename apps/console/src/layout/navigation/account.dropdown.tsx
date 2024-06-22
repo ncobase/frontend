@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger, Icons } from '@ncobase/react';
-import { MenuTree } from '@ncobase/types';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +11,7 @@ import versionInfo from '@/../version.json';
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { useAccount } from '@/features/account/service';
 import { useCopyToClipboard } from '@/hooks/use_copy_to_clipboard';
+import { MenuTree } from '@/types';
 
 // const AdminMenu = ({ isAdmin = false }) => {
 //   const { t } = useTranslation();

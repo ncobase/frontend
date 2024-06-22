@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Comment } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { CreateCommentPage } from './create.comment';
 import { EditorCommentPage } from './editor.comment';
 
 import { CurdView } from '@/components/curd';
+import { Comment } from '@/types';
 
 export const CommentListPage = () => {
   const { t } = useTranslation();

@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { FieldViewer } from '@ncobase/react';
-import { Tenant } from '@ncobase/types';
 import { formatDateTime } from '@ncobase/utils';
 
 import { useQueryTenant } from '../service';
 
 import { parseStatus } from '@/helpers/status';
+import { Tenant } from '@/types';
 
 export const TenantViewerPage = ({ record }: { record: Tenant }) => {
   const { data = {} } = useQueryTenant(record.id);

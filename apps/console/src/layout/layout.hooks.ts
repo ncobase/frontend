@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
-import { Menu } from '@ncobase/types';
-
 import { useLayoutContext } from './layout.context';
+
+import { Menu } from '@/types';
 
 /**
  * set focus mode

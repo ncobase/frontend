@@ -14,7 +14,7 @@
     "dev:console": "pnpm dev --filter=@ncobase/console --filter='./packages/*'",
     "lint": "turbo run lint",
     "lint:fix": "pnpm lint -- --fix && pnpm prettier --write",
-    "prettier": "prettier \"**/*.{vue,js,jsx,ts,tsx,md,css,scss,yaml,yml}\"",
+    "prettier": "prettier \"**/*.{js,jsx,ts,tsx}\"",
     "build": "turbo run build --filter=!./apps/*"
   },
   "devDependencies": {

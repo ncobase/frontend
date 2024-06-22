@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 
 import { Button } from '@ncobase/react';
-import { Tenant } from '@ncobase/types';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +8,7 @@ import { Modal } from '@/components/modal/modal';
 import { useAuthContext } from '@/features/account/context';
 import { useTenantContext } from '@/features/system/tenant/context';
 import { useRedirectFromUrl } from '@/router/router.hooks';
+import { Tenant } from '@/types';
 
 interface TenantOptionProps extends Tenant {
   isSelected: boolean;

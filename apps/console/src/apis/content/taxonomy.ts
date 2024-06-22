@@ -1,7 +1,7 @@
-import { ExplicitAny, Taxonomies, Taxonomy } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { ExplicitAny, Taxonomies, Taxonomy } from '@/types';
 
 const ENDPOINT = '/v1/taxonomies';
 

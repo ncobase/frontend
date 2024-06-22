@@ -1,8 +1,8 @@
-import { UserMeshes, AnyObject, ExplicitAny } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createUser, getUser, getUsers, updateUser } from '@/apis/system/user';
 import { paginateByCursor } from '@/helpers/pagination';
+import { UserMeshes, AnyObject, ExplicitAny } from '@/types';
 
 interface UserKeys {
   create: ['userService', 'create'];

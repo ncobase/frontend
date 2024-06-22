@@ -1,8 +1,9 @@
 import React from 'react';
 
 import { DateField, InputField, SelectField } from '@ncobase/react';
-import { ExplicitAny } from '@ncobase/types';
 import { Control, Controller } from 'react-hook-form';
+
+import { ExplicitAny } from '@/types';
 
 export type QueryFormData = {
   code?: string;

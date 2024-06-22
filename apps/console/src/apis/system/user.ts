@@ -1,7 +1,7 @@
-import { UserMeshes, ExplicitAny, Users } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { UserMeshes, ExplicitAny, Users } from '@/types';
 
 const ENDPOINT = '/v1/users';
 

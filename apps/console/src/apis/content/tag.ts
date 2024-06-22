@@ -1,7 +1,7 @@
-import { ExplicitAny, Tag, Tags } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { ExplicitAny, Tag, Tags } from '@/types';
 
 const ENDPOINT = '/v1/tags';
 

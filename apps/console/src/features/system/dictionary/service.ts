@@ -1,4 +1,3 @@
-import { AnyObject, Dictionary, ExplicitAny } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
@@ -8,6 +7,7 @@ import {
   updateDictionary
 } from '@/apis/system/dictionary';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, Dictionary, ExplicitAny } from '@/types';
 
 interface DictionaryKeys {
   create: ['dictionaryService', 'create'];

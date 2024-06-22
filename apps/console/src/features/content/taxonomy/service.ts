@@ -1,4 +1,3 @@
-import { AnyObject, ExplicitAny, Taxonomy } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
@@ -8,6 +7,7 @@ import {
   updateTaxonomy
 } from '@/apis/content/taxonomy';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, ExplicitAny, Taxonomy } from '@/types';
 
 interface TaxonomyKeys {
   create: ['taxonomyService', 'create'];

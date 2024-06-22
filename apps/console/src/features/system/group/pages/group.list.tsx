@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Group } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorGroupPage } from './editor.group';
 import { GroupViewerPage } from './group.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Group } from '@/types';
 
 export const GroupListPage = () => {
   const { t } = useTranslation();

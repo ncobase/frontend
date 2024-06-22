@@ -1,7 +1,7 @@
-import { ExplicitAny, Tenant, Tenants } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { ExplicitAny, Tenant, Tenants } from '@/types';
 
 const ENDPOINT = '/v1/tenants';
 

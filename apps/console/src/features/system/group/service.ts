@@ -1,8 +1,8 @@
-import { AnyObject, ExplicitAny, Group } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createGroup, getGroup, getGroups, updateGroup } from '@/apis/system/group';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, ExplicitAny, Group } from '@/types';
 
 interface GroupKeys {
   create: ['groupService', 'create'];

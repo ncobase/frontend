@@ -1,4 +1,3 @@
-import { AnyObject, ExplicitAny, Permission } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
@@ -8,6 +7,7 @@ import {
   updatePermission
 } from '@/apis/system/permission';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, ExplicitAny, Permission } from '@/types';
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];

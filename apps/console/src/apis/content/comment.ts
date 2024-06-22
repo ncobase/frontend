@@ -1,7 +1,7 @@
-import { Comment, Comments, ExplicitAny } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { Comment, Comments, ExplicitAny } from '@/types';
 
 const ENDPOINT = '/v1/comments';
 

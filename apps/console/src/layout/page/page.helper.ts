@@ -1,4 +1,4 @@
-import { Menu, MenuTree } from '@ncobase/types';
+import { Menu, MenuTree } from '@/types';
 
 /**
  * check if menu is divider

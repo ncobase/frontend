@@ -1,7 +1,7 @@
-import { ExplicitAny, Role, Roles } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { ExplicitAny, Role, Roles } from '@/types';
 
 const ENDPOINT = '/v1/roles';
 

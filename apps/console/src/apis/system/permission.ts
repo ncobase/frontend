@@ -1,7 +1,7 @@
-import { ExplicitAny, Permission, Permissions } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { ExplicitAny, Permission, Permissions } from '@/types';
 
 const ENDPOINT = '/v1/permissions';
 

@@ -9,7 +9,6 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
 import { cn, getInitials, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,6 +16,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useMenus } from '../layout.hooks';
 
 import { getMenuByUrl, isDividerLink } from './page.helper';
+
+import { Menu } from '@/types';
 
 interface SidebarProps {
   activeLabel?: string;

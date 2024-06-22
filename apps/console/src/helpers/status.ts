@@ -1,4 +1,4 @@
-import { ExplicitAny } from '@ncobase/types';
+import { ExplicitAny } from '@/types';
 
 type StatusType = '正常' | '禁用' | '未知' | unknown;
 type ProcessStatusType =

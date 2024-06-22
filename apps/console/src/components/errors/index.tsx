@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { ExplicitAny } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import { Error403 } from '@/components/errors/403';
@@ -8,6 +7,7 @@ import { Error404 } from '@/components/errors/404';
 import { Error500 } from '@/components/errors/500';
 import { useAuthContext } from '@/features/account/context';
 import { Page } from '@/layout';
+import { ExplicitAny } from '@/types';
 
 const ERROR_COMPONENTS: ExplicitAny = {
   403: Error403,

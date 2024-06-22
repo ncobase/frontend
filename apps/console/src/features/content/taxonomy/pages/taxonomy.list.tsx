@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Taxonomy } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorTaxonomyPage } from './editor.taxonomy';
 import { TaxonomyViewerPage } from './taxonomy.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Taxonomy } from '@/types';
 
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();

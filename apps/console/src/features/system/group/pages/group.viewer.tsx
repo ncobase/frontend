@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { FieldViewer } from '@ncobase/react';
-import { Group } from '@ncobase/types';
 
 import { useQueryGroup } from '../service';
 
 import { parseStatus } from '@/helpers/status';
+import { Group } from '@/types';
 
 export const GroupViewerPage = ({ record }: { record: Group }) => {
   const { data = {} } = useQueryGroup(record.id);

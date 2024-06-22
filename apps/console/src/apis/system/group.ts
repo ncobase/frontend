@@ -1,7 +1,7 @@
-import { ExplicitAny, Group, Groups } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { ExplicitAny, Group, Groups } from '@/types';
 
 const ENDPOINT = '/v1/groups';
 

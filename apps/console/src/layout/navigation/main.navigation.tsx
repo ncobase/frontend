@@ -8,7 +8,6 @@ import {
   DropdownTrigger,
   Icons
 } from '@ncobase/react';
-import { MenuTree } from '@ncobase/types';
 import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,6 +15,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { isDividerLink } from '../page/page.helper';
 
 import classes from './navigator.module.css';
+
+import { MenuTree } from '@/types';
 
 interface MainNavigationProps {
   menus?: MenuTree[];

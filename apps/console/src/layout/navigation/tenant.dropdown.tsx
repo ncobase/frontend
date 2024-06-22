@@ -8,7 +8,6 @@ import {
   DropdownTrigger,
   Icons
 } from '@ncobase/react';
-import { MenuTree, Tenant } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,6 +17,7 @@ import { AvatarButton } from '@/components/avatar/avatar_button';
 import { TenantSwitcher } from '@/features/account/pages/tenant_switcher';
 import { useAccount } from '@/features/account/service';
 import { useTenantContext } from '@/features/system/tenant/context';
+import { MenuTree, Tenant } from '@/types';
 
 export const TenantDropdown = () => {
   const { t } = useTranslation();

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Tenant } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorTenantPage } from './editor.tenant';
 import { TenantViewerPage } from './tenant.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Tenant } from '@/types';
 
 export const TenantListPage = () => {
   const { t } = useTranslation();

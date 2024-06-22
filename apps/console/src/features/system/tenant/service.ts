@@ -1,8 +1,8 @@
-import { AnyObject, ExplicitAny, Tenant } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createTenant, getTenant, getTenants, updateTenant } from '@/apis/system/tenant';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, ExplicitAny, Tenant } from '@/types';
 
 interface TenantKeys {
   create: ['tenantService', 'create'];

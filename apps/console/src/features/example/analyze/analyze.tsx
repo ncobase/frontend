@@ -25,12 +25,12 @@ import {
   SelectTrigger,
   SelectValue
 } from '@ncobase/react';
-import { ExplicitAny } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import dataSeries from '@/assets/datas/ids.mjs';
 import { filterDays, filterQuarters } from '@/helpers/enums/filter';
 import { Page, Topbar } from '@/layout';
+import { ExplicitAny } from '@/types';
 
 export const FilterBar = ({ ...rest }) => {
   const { t } = useTranslation();

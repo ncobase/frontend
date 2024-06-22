@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Role } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 
 import { queryFields, QueryFormData } from './config/query';
@@ -12,6 +11,7 @@ import { ViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/role/service';
+import { Role } from '@/types';
 
 export const ListPage = () => {
   const { roles } = useListRoles();

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Button, Form, TableView, TableViewProps } from '@ncobase/react';
-import { ExplicitAny } from '@ncobase/types';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +8,7 @@ import { FullscreenView, FullscreenViewProps } from './fullscreen';
 import { ModalView, ModalViewProps } from './modal';
 
 import { Page, Topbar, useLayoutContext } from '@/layout';
+import { ExplicitAny } from '@/types';
 
 export interface CommonProps<T extends object> {
   title?: string;

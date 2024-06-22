@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 import { Button, Icons, Tooltip, TooltipContent, TooltipTrigger } from '@ncobase/react';
-import { Permission } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -15,6 +14,7 @@ import { EditorPermissionPage } from './editor.permission';
 import { PermissionViewerPage } from './permission.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();

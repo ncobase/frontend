@@ -1,9 +1,9 @@
-import { AnyObject, ExplicitAny, Menu } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/system/menu';
 import { paginateByCursor } from '@/helpers/pagination';
 import { sortMenus } from '@/layout/page/page.helper';
+import { AnyObject, ExplicitAny, Menu } from '@/types';
 
 interface MenuKeys {
   create: ['menuService', 'create'];

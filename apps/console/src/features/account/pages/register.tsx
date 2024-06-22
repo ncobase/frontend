@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 
 import { Button, CheckboxField, Form, InputField } from '@ncobase/react';
-import { ExplicitAny, RegisterProps } from '@ncobase/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +12,7 @@ import { Logo } from '@/components/logo';
 import { useRegisterAccount } from '@/features/account/service';
 import { Page } from '@/layout';
 import { useRedirectFromUrl } from '@/router';
+import { ExplicitAny, RegisterProps } from '@/types';
 
 export const Register = () => {
   const { t } = useTranslation();

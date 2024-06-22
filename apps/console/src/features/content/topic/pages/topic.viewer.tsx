@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { FieldViewer } from '@ncobase/react';
-import { Topic } from '@ncobase/types';
 
 import { useQueryTopic } from '../service';
+
+import { Topic } from '@/types';
 
 export const TopicViewerPage = ({ record }: { record: Topic }) => {
   const { data = {} } = useQueryTopic(record.id);

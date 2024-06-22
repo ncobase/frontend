@@ -1,8 +1,8 @@
-import { AnyObject, ExplicitAny, Topic } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createTopic, getTopic, getTopics, updateTopic } from '@/apis/content/topic';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, ExplicitAny, Topic } from '@/types';
 
 interface TopicKeys {
   create: ['topicService', 'create'];

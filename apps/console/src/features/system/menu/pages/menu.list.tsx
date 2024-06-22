@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Menu } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorMenuPage } from './editor.menu';
 import { MenuViewerPage } from './menu.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Menu } from '@/types';
 
 export const MenuListPage = () => {
   const { t } = useTranslation();

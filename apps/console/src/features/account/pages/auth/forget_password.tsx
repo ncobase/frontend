@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { Button, Form, InputField } from '@ncobase/react';
-import { ForgetPasswordProps } from '@ncobase/types';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +9,7 @@ import { Footer } from '@/components/footer/footer';
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
 import { Page } from '@/layout';
+import { ForgetPasswordProps } from '@/types';
 
 export const ForgetPassword = () => {
   const { t } = useTranslation();

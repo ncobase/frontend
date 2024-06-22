@@ -12,7 +12,7 @@
     "vite.config.mts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "../../packages/types/src/utilities.d.ts", "../../packages/types/src/env.d.ts"  ],
   "exclude": [
     "node_modules",
     "dist"

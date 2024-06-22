@@ -1,7 +1,7 @@
-import { Dictionaries, Dictionary, ExplicitAny } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
+import { Dictionaries, Dictionary, ExplicitAny } from '@/types';
 
 const ENDPOINT = '/v1/dictionaries';
 

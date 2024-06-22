@@ -1,8 +1,8 @@
-import { AnyObject, ExplicitAny, Role } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createRole, getRole, getRoles, updateRole } from '@/apis/system/role';
 import { paginateByCursor } from '@/helpers/pagination';
+import { AnyObject, ExplicitAny, Role } from '@/types';
 
 interface RoleKeys {
   create: ['roleService', 'create'];

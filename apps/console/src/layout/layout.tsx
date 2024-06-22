@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 
-import { Menu } from '@ncobase/types';
-
 import { LayoutContext, LayoutContextValue } from './layout.context';
 
 import { Viewport } from '@/components/viewport';
 import { LoginInterceptorProvider } from '@/features/account/pages/auth/login_interceptor';
+import { Menu } from '@/types';
 
 interface LayoutProps {
   children: React.ReactNode;

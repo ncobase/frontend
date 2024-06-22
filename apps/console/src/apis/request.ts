@@ -1,4 +1,3 @@
-import { ExplicitAny } from '@ncobase/types';
 import { isBrowser, locals } from '@ncobase/utils';
 import { t } from 'i18next';
 import { $Fetch, $fetch, FetchOptions } from 'ofetch';
@@ -7,6 +6,7 @@ import { ACCESS_TOKEN_KEY } from '@/features/account/context';
 import { TENANT_KEY } from '@/features/system/tenant/context';
 import { BearerKey, XMdTenantKey } from '@/helpers/constants';
 import { eventEmitter } from '@/helpers/events';
+import { ExplicitAny } from '@/types';
 
 export class Request {
   private readonly $fetch: $Fetch;

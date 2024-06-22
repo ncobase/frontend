@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { Topic } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -14,6 +13,7 @@ import { EditorTopicPage } from './editor.topic';
 import { TopicViewerPage } from './topic.viewer';
 
 import { CurdView } from '@/components/curd';
+import { Topic } from '@/types';
 
 export const TopicListPage = () => {
   const { t } = useTranslation();

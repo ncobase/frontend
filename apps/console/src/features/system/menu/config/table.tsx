@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { Button, Icons, TableViewProps } from '@ncobase/react';
-import { Menu } from '@ncobase/types';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { parseStatus } from '@/helpers/status';
+import { Menu } from '@/types';
 
 export const tableColumns = (handleDialogView: Function): TableViewProps['header'] => {
   const { t } = useTranslation();

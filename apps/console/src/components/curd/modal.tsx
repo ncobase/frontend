@@ -1,9 +1,10 @@
 import React, { memo } from 'react';
 
-import { ExplicitAny } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import { Modal, ModalProps } from '../modal/modal';
+
+import { ExplicitAny } from '@/types';
 
 export interface ModalViewProps<T extends object> extends ModalProps<T> {
   dialogType?: 'create' | 'view' | 'edit';

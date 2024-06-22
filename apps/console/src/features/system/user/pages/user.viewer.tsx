@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { Button, FieldViewer } from '@ncobase/react';
-import { User } from '@ncobase/types';
 import { joinName, randomId } from '@ncobase/utils';
 
 import { useQueryUser } from '../service';
+
+import { User } from '@/types';
 
 export const UserViewerPage = ({ record }: { record: User }) => {
   const { data } = useQueryUser(record.id);

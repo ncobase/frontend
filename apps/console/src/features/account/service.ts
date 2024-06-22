@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
 
-import { AnyObject, LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
 import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
 import { getCurrentUser } from '@/apis/account/account';
 import { loginAccount, logoutAccount, registerAccount } from '@/apis/account/authorize';
 import { useAuthContext } from '@/features/account/context';
+import { AnyObject, LoginProps, LoginReply, RegisterProps } from '@/types';
 
 interface AccountKeys {
   login: ['accountService', 'login'];

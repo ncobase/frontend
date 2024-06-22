@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 
-import { Menu } from '@ncobase/types';
+import { Menu } from '@/types';
 
 export interface LayoutContextValue {
   /**

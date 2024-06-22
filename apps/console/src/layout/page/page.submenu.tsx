@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
 import { Button, ShellSubmenu } from '@ncobase/react';
-import { Menu, MenuTree } from '@ncobase/types';
 import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,6 +8,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useMenus } from '../layout.hooks';
 
 import { getMenuByUrl, isGroup, pathSplit } from './page.helper';
+
+import { Menu, MenuTree } from '@/types';
 
 const SubmenuComponent = ({ ...rest }) => {
   const { t } = useTranslation();

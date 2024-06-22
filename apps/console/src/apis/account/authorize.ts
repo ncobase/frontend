@@ -1,6 +1,5 @@
-import { LoginProps, LoginReply, RegisterProps } from '@ncobase/types';
-
 import { request } from '@/apis/request';
+import { LoginProps, LoginReply, RegisterProps } from '@/types';
 
 const ENDPOINT = '/v1';
 

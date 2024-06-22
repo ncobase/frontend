@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { FieldViewer } from '@ncobase/react';
-import { Taxonomy } from '@ncobase/types';
 
 import { useQueryTaxonomy } from '../service';
+
+import { Taxonomy } from '@/types';
 
 export const TaxonomyViewerPage = ({ record }: { record: Taxonomy }) => {
   const { data = {} } = useQueryTaxonomy(record.id);
