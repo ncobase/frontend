@@ -1,17 +1,9 @@
 import React, { FC, useEffect } from 'react';
 
 import { isBrowser } from '@ncobase/utils';
-import { useIsFetching } from '@tanstack/react-query';
 import { useLocation, useNavigationType } from 'react-router-dom';
 
-import { Spinner } from '../loading/spinner';
-
 interface ViewportProps extends React.PropsWithChildren {}
-
-const GlobalLoadingIndicator = () => {
-  const isFetching = useIsFetching();
-  return isFetching > 0 ? <Spinner /> : null;
-};
 
 const useScrollToTop = (): void => {
   const { pathname } = useLocation();
@@ -46,6 +38,6 @@ const useFixViewport = (): void => {
 export const Viewport: FC<ViewportProps> = ({ children }) => {
   useScrollToTop();
   useFixViewport();
-  GlobalLoadingIndicator();
+
   return <>{children}</>;
 };
