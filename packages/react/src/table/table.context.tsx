@@ -7,6 +7,9 @@ import { IPaginationProps } from './table.pagination';
 
 export interface ITableContext<T = any> {
   data: T[];
+  setData?: (data: T[]) => void;
+  originalData?: T[];
+  setOriginalData?: (data: T[]) => void;
   header?: ITableHeaderCellProps[];
   columns?: ITableHeaderCellProps[];
   setColumns?: (header: ITableHeaderCellProps[]) => void;
@@ -52,17 +55,6 @@ export const TableProvider: React.FC<{ value: ITableContext; children: React.Rea
   const [selectedRows, setSelectedRows] = useState<any[]>(defaultTableContext.selectedRows);
   const [filter, setFilter] = useState<ITableContext['filter']>(defaultTableContext.filter);
 
-  const toggleColumn = (key: string) => {
-    const newHeader = columns.map(column =>
-      // column visible is a undefined value, set it to false
-      // reason: if not set, visible will be undefined, and the default value will be true
-      column.code === key
-        ? { ...column, visible: isUndefined(column.visible) ? false : !column.visible }
-        : column
-    );
-    setColumns(newHeader || []);
-  };
-
   useEffect(() => {
     if (value.header && value.header.length > 0) {
       setColumns(value.header);
@@ -75,7 +67,16 @@ export const TableProvider: React.FC<{ value: ITableContext; children: React.Rea
     columns,
     setColumns,
     selectedRows,
-    toggleColumn,
+    toggleColumn: (key: string) => {
+      const newHeader = columns.map(column =>
+        // column visible is a undefined value, set it to false
+        // reason: if not set, visible will be undefined, and the default value will be true
+        column.code === key
+          ? { ...column, visible: isUndefined(column.visible) ? false : !column.visible }
+          : column
+      );
+      setColumns(newHeader || []);
+    },
     filter,
     setFilter,
     onSelectRow: (row: any) => {

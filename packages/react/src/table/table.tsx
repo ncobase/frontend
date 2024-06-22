@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { cn } from '@ncobase/utils';
 
@@ -31,7 +31,7 @@ export interface TableViewProps extends ITableContext {}
 
 export const TableView: React.FC<TableViewProps> = ({
   header,
-  data,
+  data: initialData,
   selected,
   paginated,
   pageSize,
@@ -44,6 +44,14 @@ export const TableView: React.FC<TableViewProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(pageSize);
+  const [data, setData] = useState(initialData);
+  // TODO: remove this, use remote data instead
+  const [originalData, setOriginalData] = useState(initialData);
+
+  useEffect(() => {
+    setData(initialData);
+    setOriginalData(initialData);
+  }, [initialData]);
 
   const filteredData = useMemo(() => {
     if (!filter?.enabled || !filter?.config) {
@@ -62,6 +70,9 @@ export const TableView: React.FC<TableViewProps> = ({
     () => ({
       header,
       data: filteredData,
+      setData,
+      originalData,
+      setOriginalData,
       selected,
       paginated,
       pageSize: currentPageSize,
@@ -74,6 +85,8 @@ export const TableView: React.FC<TableViewProps> = ({
     [
       header,
       filteredData,
+      setData,
+      originalData,
       selected,
       paginated,
       currentPageSize,

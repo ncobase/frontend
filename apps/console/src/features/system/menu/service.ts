@@ -1,8 +1,8 @@
+import { sortTree } from '@ncobase/utils';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/system/menu';
 import { paginateByCursor } from '@/helpers/pagination';
-import { sortMenus } from '@/layout/page/page.helper';
 import { AnyObject, ExplicitAny, Menu } from '@/types';
 
 interface MenuKeys {
@@ -31,7 +31,7 @@ export const useQueryMenuTreeData = (queryKey = {}) => {
     queryKey: menuKeys.tree(queryKey),
     queryFn: async () => {
       const result = await getMenuTree({ ...queryKey, children: true });
-      return sortMenus(result?.content || [], 'order', 'desc');
+      return sortTree(result?.content || [], 'order', 'desc');
     },
     select: data => data,
     gcTime: Infinity,

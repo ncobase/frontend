@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@ncobase/utils';
+import { cn, sortTree } from '@ncobase/utils';
 
 import { DropdownItem } from '../../dropdown';
 import { Input } from '../../forms';
@@ -14,7 +14,18 @@ export const SortFilter: React.FC<{
   handleFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSortChange: (order: 'asc' | 'desc' | null) => void;
 }> = ({ code, filterValue, handleFilterChange, handleSortChange }) => {
-  const { filter: filterState } = useTable();
+  const { filter: filterState, data, setData, originalData } = useTable();
+
+  const handleSort = (order: 'asc' | 'desc' | null) => {
+    handleSortChange(order);
+    if (order && setData) {
+      const sortedData = sortTree(data, code as keyof (typeof data)[0], order);
+      setData(sortedData);
+    } else {
+      setData(originalData);
+    }
+  };
+
   return (
     <DropdownWrapper icon='IconChevronDown'>
       <DropdownItem onSelect={event => event.preventDefault()} className='hover:bg-white hidden'>
@@ -27,10 +38,10 @@ export const SortFilter: React.FC<{
         />
       </DropdownItem>
       <DropdownItem
-        onClick={() => handleSortChange('asc')}
+        onClick={() => handleSort('asc')}
         className={cn(
           'flex items-center gap-x-1',
-          filterState.config[code]?.sortOrder === 'asc' &&
+          filterState?.config[code]?.sortOrder === 'asc' &&
             'bg-slate-50 text-slate-800 [&>svg]:stroke-slate-800'
         )}
       >
@@ -38,18 +49,18 @@ export const SortFilter: React.FC<{
         升序
       </DropdownItem>
       <DropdownItem
-        onClick={() => handleSortChange('desc')}
+        onClick={() => handleSort('desc')}
         className={cn(
           'flex items-center gap-x-1',
-          filterState.config[code]?.sortOrder === 'desc' &&
+          filterState?.config[code]?.sortOrder === 'desc' &&
             'bg-slate-50 text-slate-800 [&>svg]:stroke-slate-800'
         )}
       >
         <Icons name='IconSortZA' className='stroke-slate-400' />
         降序
       </DropdownItem>
-      {filterState.config[code]?.sortOrder && (
-        <DropdownItem onClick={() => handleSortChange(null)} className='flex items-center gap-x-1'>
+      {filterState?.config[code]?.sortOrder && (
+        <DropdownItem onClick={() => handleSort(null)} className='flex items-center gap-x-1'>
           <Icons name='IconRestore' className='stroke-slate-400' />
           重置
         </DropdownItem>
