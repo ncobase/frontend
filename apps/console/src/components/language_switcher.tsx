@@ -27,7 +27,7 @@ export const LanguageSwitcher = () => {
           ) : (
             <Icons name='IconWorld' />
           )}
-          {language.name}
+          {/* {language.name} */}
         </Button>
       </DropdownTrigger>
       <DropdownContent align='end' alignOffset={-16}>
