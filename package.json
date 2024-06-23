@@ -3,9 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "description": "Ncobase frontend project",
-  "repository": "git@github.com:stocms/frontend.git",
+  "repository": "git@github.com:ncobase/frontend.git",
   "workspaces": [
     "apps/*",
+    "packages/*",
     "plugins/*"
   ],
   "scripts": {
