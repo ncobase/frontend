@@ -6,10 +6,9 @@ import { formatDateTime } from '@ncobase/utils';
 import { useQueryTenant } from '../service';
 
 import { parseStatus } from '@/helpers/status';
-import { Tenant } from '@/types';
 
-export const TenantViewerPage = ({ record }: { record: Tenant }) => {
-  const { data = {} } = useQueryTenant(record.id);
+export const TenantViewerPage = record => {
+  const { data = {} } = useQueryTenant(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

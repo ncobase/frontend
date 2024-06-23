@@ -6,13 +6,13 @@ export interface LayoutContextValue {
   /**
    * page view mode
    */
-  vmode?: 'default' | 'modal' | 'side' | 'fullscreen';
+  vmode?: 'modal' | 'flatten';
   /**
    * set page view mode
    * @param vmode page view mode
    * @returns {void}
    */
-  setVmode?: (vmode: 'default' | 'modal' | 'side' | 'fullscreen') => void;
+  setVmode?: (vmode: 'modal' | 'flatten') => void;
   /**
    * set page menus
    * @param menus {Menu[]}

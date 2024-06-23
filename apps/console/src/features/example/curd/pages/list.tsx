@@ -31,16 +31,16 @@ export const ListPage = () => {
   };
 
   const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
-  const [dialogType, setDialogType] = useState<'create' | 'view' | 'edit'>(undefined);
+  const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
   const handleDialogView = (record: Role | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
-    setDialogType(type);
+    setViewType(type);
   };
 
   const handleDialogClose = () => {
     setSelectedRecord(null);
-    setDialogType(undefined);
+    setViewType(undefined);
     formReset();
   };
 
@@ -73,7 +73,7 @@ export const ListPage = () => {
     return {
       create: handleCreate,
       edit: handleUpdate
-    }[dialogType](data);
+    }[viewType](data);
   });
 
   return (
@@ -99,7 +99,7 @@ export const ListPage = () => {
           errors={formErrors}
         />
       )}
-      dialogType={dialogType}
+      type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
       onCancel={handleDialogClose}

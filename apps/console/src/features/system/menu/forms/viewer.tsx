@@ -5,10 +5,9 @@ import { FieldViewer } from '@ncobase/react';
 import { useQueryMenu } from '../service';
 
 import { parseStatus } from '@/helpers/status';
-import { Menu } from '@/types';
 
-export const MenuViewerPage = ({ record }: { record: Menu }) => {
-  const { data = {} } = useQueryMenu(record.id);
+export const MenuViewerForms = ({ record }) => {
+  const { data = {} } = useQueryMenu(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

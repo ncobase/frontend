@@ -12,7 +12,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isFocusMode, setIsFocusMode] = React.useState<LayoutContextValue['isFocusMode']>(false);
-  const [vmode, setVmode] = React.useState<LayoutContextValue['vmode']>('default');
+  const [vmode, setVmode] = React.useState<LayoutContextValue['vmode']>('modal');
   const [menus, setMenus] = useState<Menu[]>([]);
 
   const layoutContextValue = {

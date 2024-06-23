@@ -38,6 +38,7 @@ export const useQueryMenuTreeData = (queryKey = {}) => {
     staleTime: Infinity
   });
 };
+
 // Hook for create menu mutation
 export const useCreateMenu = () =>
   useMutation({ mutationFn: (payload: Pick<Menu, keyof Menu>) => createMenu(payload) });

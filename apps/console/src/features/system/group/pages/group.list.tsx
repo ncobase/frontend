@@ -34,16 +34,16 @@ export const GroupListPage = () => {
   };
 
   const [selectedRecord, setSelectedRecord] = useState<Group | null>(null);
-  const [dialogType, setDialogType] = useState<'create' | 'view' | 'edit'>(undefined);
+  const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
   const handleDialogView = (record: Group | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
-    setDialogType(type);
+    setViewType(type);
   };
 
   const handleDialogClose = () => {
     setSelectedRecord(null);
-    setDialogType(undefined);
+    setViewType(undefined);
     formReset();
   };
 
@@ -76,7 +76,7 @@ export const GroupListPage = () => {
     return {
       create: handleCreate,
       edit: handleUpdate
-    }[dialogType](data);
+    }[viewType](data);
   });
 
   return (
@@ -102,7 +102,7 @@ export const GroupListPage = () => {
           errors={formErrors}
         />
       )}
-      dialogType={dialogType}
+      type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
       onCancel={handleDialogClose}

@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { queryFields, QueryFormData } from '../config/query';
-import { tableColumns } from '../config/table';
-import { topbarLeftSection, topbarRightSection } from '../config/topbar';
-import { useCreateMenu, useListMenus, useUpdateMenu } from '../service';
-
-import { CreateMenuPage } from './create.menu';
-import { EditorMenuPage } from './editor.menu';
-import { MenuViewerPage } from './menu.viewer';
+import { QueryFormData, queryFields } from './config/query';
+import { tableColumns } from './config/table';
+import { topbarLeftSection, topbarRightSection } from './config/topbar';
+import { CreateMenuPage } from './pages/create';
+import { EditorMenuPage } from './pages/editor';
+import { MenuViewerPage } from './pages/viewer';
+import { useCreateMenu, useListMenus, useUpdateMenu } from './service';
 
 import { CurdView } from '@/components/curd';
 import { Menu } from '@/types';
 
-export const MenuListPage = () => {
+export const MenuPage = () => {
   const { t } = useTranslation();
   const { menus } = useListMenus({});
+  const { mode, slug } = useParams<{ mode: string; slug: string }>();
+  const navigate = useNavigate();
+
+  // manually set the view type, the vmode in the layout context should be used by default.
+  const vmode = 'flatten' as 'flatten' | 'modal';
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -34,17 +39,37 @@ export const MenuListPage = () => {
   };
 
   const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
-  const [dialogType, setDialogType] = useState<'create' | 'view' | 'edit'>(undefined);
+  const [viewType, setViewType] = useState<'view' | 'edit' | 'create'>();
+
+  useEffect(() => {
+    if (slug) {
+      const record = menus.find(menu => menu.id === slug || menu.slug === slug) || null;
+      setSelectedRecord(record);
+      setViewType(mode as 'view' | 'edit');
+    } else if (mode === 'create') {
+      setSelectedRecord(null);
+      setViewType('create');
+    } else {
+      setSelectedRecord(null);
+      setViewType(undefined);
+    }
+  }, [mode, slug]);
 
   const handleDialogView = (record: Menu | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
-    setDialogType(type);
+    setViewType(type);
+    if (vmode === 'flatten') {
+      navigate(`${type}${record ? `/${record.id}` : ''}`);
+    }
   };
 
   const handleDialogClose = () => {
     setSelectedRecord(null);
-    setDialogType(undefined);
+    setViewType(undefined);
     formReset();
+    if (vmode === 'flatten') {
+      navigate('');
+    }
   };
 
   const {
@@ -76,11 +101,12 @@ export const MenuListPage = () => {
     return {
       create: handleCreate,
       edit: handleUpdate
-    }[dialogType](data);
+    }[viewType](data);
   });
 
   return (
     <CurdView
+      viewMode={vmode}
       title={t('system.menu.title')}
       topbarLeft={topbarLeftSection(handleDialogView)}
       topbarRight={topbarRightSection}
@@ -91,19 +117,25 @@ export const MenuListPage = () => {
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
-        <CreateMenuPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
+        <CreateMenuPage
+          viewMode={vmode}
+          onSubmit={handleConfirm}
+          control={formControl}
+          errors={formErrors}
+        />
       }
-      viewComponent={record => <MenuViewerPage record={record} />}
+      viewComponent={record => <MenuViewerPage viewMode={vmode} record={record?.id} />}
       editComponent={record => (
         <EditorMenuPage
-          record={record}
+          viewMode={vmode}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
           errors={formErrors}
         />
       )}
-      dialogType={dialogType}
+      type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
       onCancel={handleDialogClose}

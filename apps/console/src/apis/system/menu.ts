@@ -17,7 +17,7 @@ export const getMenu = async (id: string): Promise<Menu> => {
 
 // update
 export const updateMenu = async (payload: Menu): Promise<Menu> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

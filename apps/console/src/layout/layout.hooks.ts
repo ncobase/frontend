@@ -19,13 +19,13 @@ export const useFocusMode = (enabled = true) => {
 
 /**
  * set page view mode
- * @param vmode {('default' | 'modal' | 'side' | 'fullscreen')}
+ * @param vmode {('modal' | 'flatten')}
  */
-export const useVmode = (vmode: 'default' | 'modal' | 'side' | 'fullscreen') => {
+export const useVmode = (vmode: 'modal' | 'flatten') => {
   const { setVmode = () => {} } = useLayoutContext();
   useEffect(() => {
     setVmode(vmode);
-    return () => setVmode('default');
+    return () => setVmode('flatten');
   }, [setVmode, vmode]);
 };
 

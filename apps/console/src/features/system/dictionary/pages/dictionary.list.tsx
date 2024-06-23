@@ -34,16 +34,16 @@ export const DictionaryListPage = () => {
   };
 
   const [selectedRecord, setSelectedRecord] = useState<Dictionary | null>(null);
-  const [dialogType, setDialogType] = useState<'create' | 'view' | 'edit'>(undefined);
+  const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
   const handleDialogView = (record: Dictionary | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
-    setDialogType(type);
+    setViewType(type);
   };
 
   const handleDialogClose = () => {
     setSelectedRecord(null);
-    setDialogType(undefined);
+    setViewType(undefined);
     formReset();
   };
 
@@ -76,7 +76,7 @@ export const DictionaryListPage = () => {
     return {
       create: handleCreate,
       edit: handleUpdate
-    }[dialogType](data);
+    }[viewType](data);
   });
 
   return (
@@ -102,7 +102,7 @@ export const DictionaryListPage = () => {
           errors={formErrors}
         />
       )}
-      dialogType={dialogType}
+      type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
       onCancel={handleDialogClose}

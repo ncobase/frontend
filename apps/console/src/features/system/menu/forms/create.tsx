@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { FieldConfigProps, Form } from '@ncobase/react';
-import { formatDateTime } from '@ncobase/utils';
+import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useQueryMenu } from '../service';
+import { useTenantContext } from '../../tenant/context';
 
+import { FieldConfigProps } from '@/components/form';
 import { IconSelector } from '@/components/modal/icons';
 
-export const EditorMenuPage = ({ record, onSubmit, control, setValue, errors }) => {
+export const CreateMenuForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryMenu(record.id);
+  const { tenant_id } = useTenantContext();
   const [isSelectIcon, setIsSelectIcon] = useState(false);
 
   const fields: FieldConfigProps[] = [
@@ -39,6 +39,7 @@ export const EditorMenuPage = ({ record, onSubmit, control, setValue, errors }) 
       defaultValue: '',
       type: 'text'
     },
+
     {
       title: '图标',
       name: 'icon',
@@ -88,46 +89,17 @@ export const EditorMenuPage = ({ record, onSubmit, control, setValue, errors }) 
       elementClassName: 'my-3'
     },
     {
-      title: '创建时间',
-      name: 'created_at',
-      defaultValue: '',
-      type: 'text',
-      disabled: true
-    },
-    {
-      title: '更新时间',
-      name: 'updated_at',
-      defaultValue: '',
-      type: 'text',
-      disabled: true
-    },
-    {
-      title: '扩展字段',
-      name: 'extras',
-      defaultValue: [],
+      title: '所属租户',
+      name: 'tenant',
+      defaultValue: tenant_id,
       type: 'hidden'
     }
+    // {
+    //   title: '扩展字段',
+    //   name: 'extras',
+    //   defaultValue: []
+    // }
   ];
-
-  useEffect(() => {
-    if (!data) return;
-    setValue('id', data?.id);
-    setValue('name', data?.name);
-    setValue('parent', data?.parent);
-    setValue('label', data?.label);
-    setValue('icon', data?.icon);
-    setValue('slug', data?.slug);
-    setValue('path', data?.path);
-    setValue('type', data?.type);
-    setValue('target', data?.target);
-    setValue('perms', data?.perms);
-    setValue('hidden', data?.hidden);
-    setValue('order', data?.order);
-    setValue('disabled', data?.disabled);
-    setValue('extras', data?.extras);
-    setValue('created_at', formatDateTime(data?.created_at));
-    setValue('updated_at', formatDateTime(data?.updated_at));
-  }, [setValue, data]);
 
   return (
     <Form

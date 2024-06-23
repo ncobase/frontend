@@ -7,7 +7,7 @@ import { Modal, ModalProps } from '../modal/modal';
 import { ExplicitAny } from '@/types';
 
 export interface ModalViewProps<T extends object> extends ModalProps<T> {
-  dialogType?: 'create' | 'view' | 'edit';
+  type?: 'create' | 'view' | 'edit';
   createComponent?: React.ReactNode;
   viewComponent?: (record: object | T | null) => React.ReactNode;
   editComponent?: (record: object | T | null) => React.ReactNode;
@@ -18,36 +18,37 @@ const isEditType = (type: string): type is 'edit' => type === 'edit';
 
 const ViewComponent = memo<{
   record: ExplicitAny;
-  dialogType: ModalViewProps<any>['dialogType'];
+  type: ModalViewProps<any>['type'];
   createComponent: ModalViewProps<any>['createComponent'];
   viewComponent: ModalViewProps<any>['viewComponent'];
   editComponent: ModalViewProps<any>['editComponent'];
-}>(({ record, dialogType, createComponent, viewComponent, editComponent }) => {
+}>(({ record, type, createComponent, viewComponent, editComponent }) => {
   const components = {
     create: createComponent,
     view: viewComponent?.(record as ExplicitAny),
     edit: editComponent?.(record as ExplicitAny)
   };
 
-  return components[dialogType] || null;
+  return components[type] || null;
 });
 
 export const ModalView = memo(
   <T extends object>({
-    dialogType,
+    type,
     createComponent,
     viewComponent,
     editComponent,
     ...rest
   }: ModalViewProps<T>) => {
     const { t } = useTranslation();
+
     const getTitle = () => {
       const titles = {
         create: t('actions.create'),
         view: t('actions.view'),
         edit: t('actions.edit')
       };
-      return titles[dialogType] || '';
+      return titles[type] || '';
     };
 
     const getConfirmText = () => {
@@ -55,7 +56,7 @@ export const ModalView = memo(
         create: t('actions.create'),
         edit: t('actions.update')
       };
-      return isCreateType(dialogType) || isEditType(dialogType) ? confirmTexts[dialogType] : null;
+      return isCreateType(type) || isEditType(type) ? confirmTexts[type] : null;
     };
 
     return (
@@ -63,12 +64,12 @@ export const ModalView = memo(
         title={getTitle()}
         confirmText={getConfirmText()}
         cancelText={t('actions.cancel')}
-        isOpen={!!dialogType}
+        isOpen={!!type}
         {...rest}
       >
         <ViewComponent
           record={rest.record}
-          dialogType={dialogType}
+          type={type}
           createComponent={createComponent}
           viewComponent={viewComponent}
           editComponent={editComponent}
