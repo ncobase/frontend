@@ -1,8 +1,6 @@
 import React from 'react';
 
 import {
-  AreaChart,
-  BarChart,
   Button,
   Card,
   CardContent,
@@ -16,9 +14,6 @@ import {
   DropdownTrigger,
   Icons,
   Label,
-  LineChart,
-  PieChart,
-  RadarChart,
   Select,
   SelectContent,
   SelectItem,
@@ -28,6 +23,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import dataSeries from '@/assets/datas/ids.mjs';
+import { AreaChart, BarChart, LineChart, PieChart, RadarChart } from '@/components/charts';
 import { filterDays, filterQuarters } from '@/helpers/enums/filter';
 import { Page, Topbar } from '@/layout';
 import { ExplicitAny } from '@/types';

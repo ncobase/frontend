@@ -1,4 +1,5 @@
 import '@/assets/styles/globals.css';
+import '@ncobase/react/dist/index.css';
 
 /** Tailwind's Preflight Style Override */
 const naiveStyleOverride = () => {
