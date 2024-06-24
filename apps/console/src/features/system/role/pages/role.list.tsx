@@ -17,7 +17,7 @@ import { Role } from '@/types';
 
 export const RoleListPage = () => {
   const { t } = useTranslation();
-  const { roles } = useListRoles();
+  const { roles, refetch } = useListRoles();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const RoleListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Role | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Role | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const RoleListPage = () => {
   const createRoleMutation = useCreateRole();
   const updateRoleMutation = useUpdateRole();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Role) => {
@@ -82,20 +83,20 @@ export const RoleListPage = () => {
   return (
     <CurdView
       title={t('system.role.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={roles}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateRolePage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <RoleViewerPage record={record} />}
+      viewComponent={record => <RoleViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorRolePage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const RoleListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

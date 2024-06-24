@@ -8,7 +8,7 @@ import { parseStatus } from '@/helpers/status';
 import { Permission } from '@/types';
 
 export const PermissionViewerPage = ({ record }: { record: Permission }) => {
-  const { data = {} } = useQueryPermission(record.id);
+  const { data = {} } = useQueryPermission(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

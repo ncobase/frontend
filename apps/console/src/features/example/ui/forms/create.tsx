@@ -32,7 +32,7 @@ import { ExplicitAny } from '@/types';
 export const CreatePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus } = useListMenus();
+  const { menus, refetch } = useListMenus();
 
   const fields: FieldConfigProps[] = [
     {

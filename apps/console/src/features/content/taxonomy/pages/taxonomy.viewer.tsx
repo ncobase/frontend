@@ -7,7 +7,7 @@ import { useQueryTaxonomy } from '../service';
 import { Taxonomy } from '@/types';
 
 export const TaxonomyViewerPage = ({ record }: { record: Taxonomy }) => {
-  const { data = {} } = useQueryTaxonomy(record.id);
+  const { data = {} } = useQueryTaxonomy(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

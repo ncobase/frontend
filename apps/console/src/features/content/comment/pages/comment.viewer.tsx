@@ -7,7 +7,7 @@ import { useQueryComment } from '../service';
 import { Comment } from '@/types';
 
 export const CommentViewerPage = ({ record }: { record: Comment }) => {
-  const { data = {} } = useQueryComment(record.id);
+  const { data = {} } = useQueryComment(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

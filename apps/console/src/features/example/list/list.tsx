@@ -129,7 +129,7 @@ const QueryBar = () => {
 export const ListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus: records } = useListMenus();
+  const { menus: records, refetch } = useListMenus();
 
   const topbarElement: TopbarProps = {
     title: t('example.list1.title'),

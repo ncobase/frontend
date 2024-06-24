@@ -17,7 +17,7 @@ export const getTag = async (id: string): Promise<Tag> => {
 
 // update
 export const updateTag = async (payload: Tag): Promise<Tag> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

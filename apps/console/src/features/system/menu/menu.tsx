@@ -10,14 +10,15 @@ import { topbarLeftSection, topbarRightSection } from './config/topbar';
 import { CreateMenuPage } from './pages/create';
 import { EditorMenuPage } from './pages/editor';
 import { MenuViewerPage } from './pages/viewer';
-import { useCreateMenu, useListMenus, useUpdateMenu } from './service';
+import { useCreateMenu, useDeleteMenu, useListMenus, useUpdateMenu } from './service';
 
 import { CurdView } from '@/components/curd';
 import { Menu } from '@/types';
 
 export const MenuPage = () => {
   const { t } = useTranslation();
-  const { menus } = useListMenus({});
+  const { menus, refetch } = useListMenus();
+
   const { mode, slug } = useParams<{ mode: string; slug: string }>();
   const navigate = useNavigate();
 
@@ -55,7 +56,7 @@ export const MenuPage = () => {
     }
   }, [mode, slug]);
 
-  const handleDialogView = (record: Menu | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Menu | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
     if (vmode === 'flatten') {
@@ -63,12 +64,13 @@ export const MenuPage = () => {
     }
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
-    if (vmode === 'flatten') {
-      navigate('');
+    refetch();
+    if (vmode === 'flatten' && viewType.length > 0) {
+      navigate(-1);
     }
   };
 
@@ -82,8 +84,9 @@ export const MenuPage = () => {
 
   const createMenuMutation = useCreateMenu();
   const updateMenuMutation = useUpdateMenu();
+  const deleteMenuMutation = useDeleteMenu();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Menu) => {
@@ -93,6 +96,12 @@ export const MenuPage = () => {
   };
   const handleUpdate = (data: Menu) => {
     updateMenuMutation.mutate(data, {
+      onSuccess
+    });
+  };
+
+  const handleDelete = (record: Menu) => {
+    deleteMenuMutation.mutate(record.id, {
       onSuccess
     });
   };
@@ -108,12 +117,12 @@ export const MenuPage = () => {
     <CurdView
       viewMode={vmode}
       title={t('system.menu.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       data={menus}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns({ handleView, handleDelete })}
       selected
-      queryFields={queryFields(queryControl)}
+      queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
@@ -138,7 +147,7 @@ export const MenuPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

@@ -8,7 +8,7 @@ import { useQueryGroup } from '../service';
 
 export const EditorGroupPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryGroup(record.id);
+  const { data = {} } = useQueryGroup(record);
 
   const fields: FieldConfigProps[] = [
     {

@@ -17,7 +17,7 @@ export const getTenant = async (id: string): Promise<Tenant> => {
 
 // update
 export const updateTenant = async (payload: Tenant): Promise<Tenant> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

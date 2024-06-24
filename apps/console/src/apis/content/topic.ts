@@ -17,7 +17,7 @@ export const getTopic = async (id: string): Promise<Topic> => {
 
 // update
 export const updateTopic = async (payload: Topic): Promise<Topic> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

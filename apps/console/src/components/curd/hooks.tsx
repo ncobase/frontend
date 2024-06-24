@@ -111,6 +111,7 @@
 //     setSelectedItem(null);
 //     setViewType(undefined);
 //     formReset();
+refetch();
 //     navigate('');
 //   }, [formReset, navigate]);
 

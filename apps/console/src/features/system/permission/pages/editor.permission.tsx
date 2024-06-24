@@ -8,7 +8,7 @@ import { useQueryPermission } from '../service';
 
 export const EditorPermissionPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryPermission(record.id);
+  const { data = {} } = useQueryPermission(record);
 
   const fields: FieldConfigProps[] = [
     {

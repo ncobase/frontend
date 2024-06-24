@@ -17,7 +17,7 @@ import { Group } from '@/types';
 
 export const GroupListPage = () => {
   const { t } = useTranslation();
-  const { groups } = useListGroups();
+  const { groups, refetch } = useListGroups();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const GroupListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Group | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Group | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Group | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const GroupListPage = () => {
   const createGroupMutation = useCreateGroup();
   const updateGroupMutation = useUpdateGroup();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Group) => {
@@ -82,20 +83,20 @@ export const GroupListPage = () => {
   return (
     <CurdView
       title={t('system.group.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={groups}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateGroupPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <GroupViewerPage record={record} />}
+      viewComponent={record => <GroupViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorGroupPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const GroupListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

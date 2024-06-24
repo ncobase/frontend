@@ -8,7 +8,7 @@ import { parseStatus } from '@/helpers/status';
 import { Group } from '@/types';
 
 export const GroupViewerPage = ({ record }: { record: Group }) => {
-  const { data = {} } = useQueryGroup(record.id);
+  const { data = {} } = useQueryGroup(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

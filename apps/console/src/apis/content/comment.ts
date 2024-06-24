@@ -17,7 +17,7 @@ export const getComment = async (id: string): Promise<Comment> => {
 
 // update
 export const updateComment = async (payload: Comment): Promise<Comment> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

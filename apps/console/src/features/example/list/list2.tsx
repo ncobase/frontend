@@ -76,7 +76,7 @@ const QueryBar = () => {
 export const ListPage2 = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus: records } = useListMenus();
+  const { menus: records, refetch } = useListMenus();
 
   const topbarElement = {
     title: t('example.list2.title'),

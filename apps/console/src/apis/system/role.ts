@@ -17,7 +17,7 @@ export const getRole = async (id: string): Promise<Role> => {
 
 // update
 export const updateRole = async (payload: Role): Promise<Role> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

@@ -17,7 +17,7 @@ export const getDictionary = async (id: string): Promise<Dictionary> => {
 
 // update
 export const updateDictionary = async (payload: Dictionary): Promise<Dictionary> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

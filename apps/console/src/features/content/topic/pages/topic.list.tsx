@@ -17,7 +17,7 @@ import { Topic } from '@/types';
 
 export const TopicListPage = () => {
   const { t } = useTranslation();
-  const { topics } = useListTopics();
+  const { topics, refetch } = useListTopics();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const TopicListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Topic | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Topic | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Topic | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const TopicListPage = () => {
   const createTopicMutation = useCreateTopic();
   const updateTopicMutation = useUpdateTopic();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Topic) => {
@@ -82,20 +83,20 @@ export const TopicListPage = () => {
   return (
     <CurdView
       title={t('content.topic.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={topics}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateTopicPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <TopicViewerPage record={record} />}
+      viewComponent={record => <TopicViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorTopicPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const TopicListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

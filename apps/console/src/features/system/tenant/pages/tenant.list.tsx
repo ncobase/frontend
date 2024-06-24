@@ -17,7 +17,7 @@ import { Tenant } from '@/types';
 
 export const TenantListPage = () => {
   const { t } = useTranslation();
-  const { tenants } = useListTenants();
+  const { tenants, refetch } = useListTenants();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const TenantListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Tenant | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Tenant | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Tenant | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const TenantListPage = () => {
   const createTenantMutation = useCreateTenant();
   const updateTenantMutation = useUpdateTenant();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Tenant) => {
@@ -82,10 +83,10 @@ export const TenantListPage = () => {
   return (
     <CurdView
       title={t('system.tenant.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={tenants}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
@@ -105,7 +106,7 @@ export const TenantListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

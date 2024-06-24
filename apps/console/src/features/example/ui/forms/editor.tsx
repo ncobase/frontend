@@ -32,7 +32,7 @@ import { Page } from '@/layout';
 export const EditorPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus } = useListMenus();
+  const { menus, refetch } = useListMenus();
 
   const { currentTime } = useCurrentTime();
 

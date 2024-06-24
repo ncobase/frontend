@@ -5,7 +5,7 @@ import { FieldConfigProps, Form } from '@ncobase/react';
 import { useQueryRole } from '@/features/system/role/service';
 
 export const EditorPage = ({ record, onSubmit, control, setValue, errors }) => {
-  const { data = {} } = useQueryRole(record.id);
+  const { data = {} } = useQueryRole(record);
 
   const fields: FieldConfigProps[] = [
     {

@@ -17,7 +17,7 @@ import { Comment } from '@/types';
 
 export const CommentListPage = () => {
   const { t } = useTranslation();
-  const { comments } = useListComments();
+  const { comments, refetch } = useListComments();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const CommentListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Comment | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Comment | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Comment | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const CommentListPage = () => {
   const createCommentMutation = useCreateComment();
   const updateCommentMutation = useUpdateComment();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Comment) => {
@@ -82,20 +83,20 @@ export const CommentListPage = () => {
   return (
     <CurdView
       title={t('content:comment.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={comments}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateCommentPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <CommentViewerPage record={record} />}
+      viewComponent={record => <CommentViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorCommentPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const CommentListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

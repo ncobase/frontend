@@ -17,7 +17,7 @@ import { Dictionary } from '@/types';
 
 export const DictionaryListPage = () => {
   const { t } = useTranslation();
-  const { dictionaries } = useListDictionaries();
+  const { dictionaries, refetch } = useListDictionaries();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const DictionaryListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Dictionary | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Dictionary | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Dictionary | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const DictionaryListPage = () => {
   const createDictionaryMutation = useCreateDictionary();
   const updateDictionaryMutation = useUpdateDictionary();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Dictionary) => {
@@ -82,20 +83,20 @@ export const DictionaryListPage = () => {
   return (
     <CurdView
       title={t('system.dictionary.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={dictionaries}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateDictionaryPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <DictionaryViewerPage record={record} />}
+      viewComponent={record => <DictionaryViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorDictionaryPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const DictionaryListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

@@ -8,7 +8,7 @@ import { useQueryDictionary } from '../service';
 import { Dictionary } from '@/types';
 
 export const DictionaryViewerPage = ({ record }: { record: Dictionary }) => {
-  const { data = {} } = useQueryDictionary(record.id);
+  const { data = {} } = useQueryDictionary(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

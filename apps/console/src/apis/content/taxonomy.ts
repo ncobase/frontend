@@ -17,7 +17,7 @@ export const getTaxonomy = async (id: string): Promise<Taxonomy> => {
 
 // update
 export const updateTaxonomy = async (payload: Taxonomy): Promise<Taxonomy> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

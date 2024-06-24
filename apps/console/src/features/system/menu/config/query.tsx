@@ -11,7 +11,11 @@ export type QueryFormData = {
   status?: string;
 };
 
-export const queryFields = (queryControl: Control<QueryFormData, ExplicitAny>) => [
+export const queryFields = ({
+  queryControl
+}: {
+  queryControl: Control<QueryFormData, ExplicitAny>;
+}) => [
   {
     name: 'code',
     label: '编号',

@@ -17,7 +17,7 @@ export const getGroup = async (id: string): Promise<Group> => {
 
 // update
 export const updateGroup = async (payload: Group): Promise<Group> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

@@ -8,7 +8,7 @@ import { useQueryUser } from '../service';
 
 export const EditorUserPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data } = useQueryUser(record.id);
+  const { data } = useQueryUser(record);
   const { user, profile } = data || {};
 
   const fields: FieldConfigProps[] = [

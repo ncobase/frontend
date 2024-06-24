@@ -6,14 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 import { Dictionary } from '@/types';
 
-export const tableColumns = (handleDialogView: Function): TableViewProps['header'] => {
+export const tableColumns = (handleView: Function): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
       title: '编号',
       code: 'id',
       parser: (value: string) => (
-        <Button variant='link' size='sm' onClick={() => handleDialogView({ id: value }, 'view')}>
+        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
       ),
@@ -56,7 +56,7 @@ export const tableColumns = (handleDialogView: Function): TableViewProps['header
         {
           title: t('actions.edit'),
           icon: 'IconPencil',
-          onClick: (record: Dictionary) => handleDialogView(record, 'edit')
+          onClick: (record: Dictionary) => handleView(record, 'edit')
         },
         {
           title: t('actions.duplicate'),

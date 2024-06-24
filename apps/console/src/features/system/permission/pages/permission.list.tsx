@@ -18,7 +18,7 @@ import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();
-  const { permissions } = useListPermissions();
+  const { permissions, refetch } = useListPermissions();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -37,15 +37,16 @@ export const PermissionListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Permission | null>();
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Permission | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Permission | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -59,7 +60,7 @@ export const PermissionListPage = () => {
   const createPermissionMutation = useCreatePermission();
   const updatePermissionMutation = useUpdatePermission();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Permission) => {
@@ -130,20 +131,20 @@ export const PermissionListPage = () => {
   return (
     <CurdView
       title={t('system.permission.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={permissions}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreatePermissionPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <PermissionViewerPage record={record} />}
+      viewComponent={record => <PermissionViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorPermissionPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -153,7 +154,7 @@ export const PermissionListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

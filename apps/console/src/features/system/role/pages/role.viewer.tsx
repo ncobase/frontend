@@ -8,7 +8,7 @@ import { parseStatus } from '@/helpers/status';
 import { Role } from '@/types';
 
 export const RoleViewerPage = ({ record }: { record: Role }) => {
-  const { data = {} } = useQueryRole(record.id);
+  const { data = {} } = useQueryRole(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

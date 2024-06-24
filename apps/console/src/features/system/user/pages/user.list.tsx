@@ -17,7 +17,7 @@ import { Account, User } from '@/types';
 
 export const UserListPage = () => {
   const { t } = useTranslation();
-  const { users } = useListUsers();
+  const { users, refetch } = useListUsers();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const UserListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<User | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: User | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: User | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const UserListPage = () => {
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Account) => {
@@ -82,20 +83,20 @@ export const UserListPage = () => {
   return (
     <CurdView
       title={t('system.user.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={users}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateUserPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <UserViewerPage record={record} />}
+      viewComponent={record => <UserViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorUserPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const UserListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

@@ -8,7 +8,7 @@ import { useQueryUser } from '../service';
 import { User } from '@/types';
 
 export const UserViewerPage = ({ record }: { record: User }) => {
-  const { data } = useQueryUser(record.id);
+  const { data } = useQueryUser(record);
 
   const { user, profile } = data || {};
 

@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { Container, ScrollView } from '@ncobase/react';
+import { Button, Container, Icons, ScrollView } from '@ncobase/react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { CreateMenuForms } from '../forms/create';
 
@@ -12,11 +14,31 @@ export const CreateMenuPage = ({ viewMode, onSubmit, control, errors }) => {
   if (mode === 'modal') {
     return <CreateMenuForms onSubmit={onSubmit} control={control} errors={errors} />;
   }
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
-    <ScrollView>
-      <Container className='bg-white'>
-        <CreateMenuForms onSubmit={onSubmit} control={control} errors={errors} />
-      </Container>
-    </ScrollView>
+    <>
+      <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-x-4'>
+            <Button variant='outline-slate' onClick={() => navigate(-1)}>
+              <Icons name='IconArrowLeft' />
+            </Button>
+            <div className='text-slate-600 font-medium'>创建表单</div>
+          </div>
+          <div className='flex gap-x-4'>
+            <Button variant='outline-slate' onClick={() => navigate(-1)}>
+              {t('actions.cancel')}
+            </Button>
+            <Button onClick={onSubmit}>{t('actions.submit')}</Button>
+          </div>
+        </div>
+      </div>
+      <ScrollView className='bg-white'>
+        <Container>
+          <CreateMenuForms onSubmit={onSubmit} control={control} errors={errors} />
+        </Container>
+      </ScrollView>
+    </>
   );
 };

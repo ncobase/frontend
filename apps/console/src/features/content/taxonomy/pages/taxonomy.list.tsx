@@ -17,7 +17,7 @@ import { Taxonomy } from '@/types';
 
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();
-  const { taxonomies } = useListTaxonomies();
+  const { taxonomies, refetch } = useListTaxonomies();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -36,15 +36,16 @@ export const TaxonomyListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Taxonomy | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
 
-  const handleDialogView = (record: Taxonomy | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Taxonomy | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
     setViewType(type);
   };
 
-  const handleDialogClose = () => {
+  const handleClose = () => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+    refetch();
   };
 
   const {
@@ -58,7 +59,7 @@ export const TaxonomyListPage = () => {
   const createTaxonomyMutation = useCreateTaxonomy();
   const updateTaxonomyMutation = useUpdateTaxonomy();
   const onSuccess = () => {
-    handleDialogClose();
+    handleClose();
   };
 
   const handleCreate = (data: Taxonomy) => {
@@ -82,20 +83,20 @@ export const TaxonomyListPage = () => {
   return (
     <CurdView
       title={t('content.taxonomy.title')}
-      topbarLeft={topbarLeftSection(handleDialogView)}
+      topbarLeft={topbarLeftSection(handleView)}
       topbarRight={topbarRightSection}
       data={taxonomies}
-      columns={tableColumns(handleDialogView)}
+      columns={tableColumns(handleView)}
       queryFields={queryFields(queryControl)}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={
         <CreateTaxonomyPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <TaxonomyViewerPage record={record} />}
+      viewComponent={record => <TaxonomyViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorTaxonomyPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}
@@ -105,7 +106,7 @@ export const TaxonomyListPage = () => {
       type={viewType}
       record={selectedRecord}
       onConfirm={handleConfirm}
-      onCancel={handleDialogClose}
+      onCancel={handleClose}
     />
   );
 };

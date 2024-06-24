@@ -8,7 +8,7 @@ import { useQueryTaxonomy } from '../service';
 
 export const EditorTaxonomyPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryTaxonomy(record.id);
+  const { data = {} } = useQueryTaxonomy(record);
 
   const fields: FieldConfigProps[] = [
     {

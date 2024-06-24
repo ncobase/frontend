@@ -8,7 +8,7 @@ import { useQueryComment } from '../service';
 
 export const EditorCommentPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryComment(record.id);
+  const { data = {} } = useQueryComment(record);
 
   const fields: FieldConfigProps[] = [
     {

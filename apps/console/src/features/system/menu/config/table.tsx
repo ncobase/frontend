@@ -7,14 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { parseStatus } from '@/helpers/status';
 import { Menu } from '@/types';
 
-export const tableColumns = (handleDialogView: Function): TableViewProps['header'] => {
+export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
       title: '编号',
       code: 'id',
       parser: (value: string) => (
-        <Button variant='link' size='sm' onClick={() => handleDialogView({ id: value }, 'view')}>
+        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
       ),
@@ -59,7 +59,7 @@ export const tableColumns = (handleDialogView: Function): TableViewProps['header
         {
           title: t('actions.edit'),
           icon: 'IconPencil',
-          onClick: (record: Menu) => handleDialogView(record, 'edit')
+          onClick: (record: Menu) => handleView(record, 'edit')
         },
         {
           title: t('actions.duplicate'),
@@ -79,7 +79,9 @@ export const tableColumns = (handleDialogView: Function): TableViewProps['header
         {
           title: t('actions.delete'),
           icon: 'IconTrash',
-          onClick: () => console.log('delete events')
+          onClick: (record: Menu) => {
+            handleDelete(record, 'delete');
+          }
         }
       ]
     }

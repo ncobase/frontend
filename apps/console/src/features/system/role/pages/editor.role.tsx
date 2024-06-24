@@ -7,7 +7,7 @@ import { useQueryRole } from '../service';
 
 export const EditorRolePage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryRole(record.id);
+  const { data = {} } = useQueryRole(record);
 
   const fields: FieldConfigProps[] = [
     {

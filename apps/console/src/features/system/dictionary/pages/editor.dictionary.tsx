@@ -8,7 +8,7 @@ import { useQueryDictionary } from '../service';
 
 export const EditorDictionaryPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryDictionary(record.id);
+  const { data = {} } = useQueryDictionary(record);
 
   const fields: FieldConfigProps[] = [
     {

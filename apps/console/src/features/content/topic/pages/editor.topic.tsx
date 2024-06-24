@@ -8,7 +8,7 @@ import { useQueryTopic } from '../service';
 
 export const EditorTopicPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryTopic(record.id);
+  const { data = {} } = useQueryTopic(record);
 
   const fields: FieldConfigProps[] = [
     {

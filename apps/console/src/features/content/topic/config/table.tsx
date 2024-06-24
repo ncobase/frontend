@@ -7,14 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { parseStatus } from '@/helpers/status';
 import { Topic } from '@/types';
 
-export const tableColumns = (handleDialogView: Function): TableViewProps['header'] => {
+export const tableColumns = (handleView: Function): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
       title: '编号',
       code: 'id',
       parser: (value: string) => (
-        <Button variant='link' size='sm' onClick={() => handleDialogView({ id: value }, 'view')}>
+        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
       ),
@@ -59,7 +59,7 @@ export const tableColumns = (handleDialogView: Function): TableViewProps['header
         {
           title: t('actions.edit'),
           icon: 'IconPencil',
-          onClick: (record: Topic) => handleDialogView(record, 'edit')
+          onClick: (record: Topic) => handleView(record, 'edit')
         },
         {
           title: t('actions.duplicate'),

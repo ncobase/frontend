@@ -17,7 +17,7 @@ export const getPermission = async (id: string): Promise<Permission> => {
 
 // update
 export const updatePermission = async (payload: Permission): Promise<Permission> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

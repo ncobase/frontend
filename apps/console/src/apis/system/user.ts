@@ -17,7 +17,7 @@ export const getUser = async (id: string): Promise<UserMeshes> => {
 
 // update
 export const updateUser = async (payload: UserMeshes): Promise<UserMeshes> => {
-  return request.put(ENDPOINT, { ...payload });
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete

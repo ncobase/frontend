@@ -7,7 +7,7 @@ import { useQueryTopic } from '../service';
 import { Topic } from '@/types';
 
 export const TopicViewerPage = ({ record }: { record: Topic }) => {
-  const { data = {} } = useQueryTopic(record.id);
+  const { data = {} } = useQueryTopic(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>
