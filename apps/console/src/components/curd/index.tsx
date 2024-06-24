@@ -8,7 +8,6 @@ import { FlattenView, FlattenViewProps } from './flatten';
 import { ModalView, ModalViewProps } from './modal';
 
 import { Page, Topbar, useLayoutContext } from '@/layout';
-import { ExplicitAny } from '@/types';
 
 export interface CommonProps<T extends object> {
   viewMode?: 'modal' | 'flatten';
@@ -28,7 +27,7 @@ export interface CommonProps<T extends object> {
     label: string;
     component: React.ReactNode;
   }[];
-  onQuery?: (query: ExplicitAny) => void;
+  onQuery?: (query: any) => void;
   onResetQuery?: () => void;
 }
 
@@ -46,7 +45,7 @@ const QueryBar = ({
     label: string;
     component: React.ReactNode;
   }[];
-  onQuery?: (query: ExplicitAny) => void;
+  onQuery?: (query: any) => void;
   onResetQuery?: () => void;
   t: any;
 }) => {
@@ -145,7 +144,7 @@ const renderQueryBar = (mode: string, queryFieldsLength: number, type: string | 
 const renderTableView = (mode: string, type: string | undefined) =>
   mode === 'modal' || (mode === 'flatten' && !type);
 
-export const CurdView = <T extends object>({
+const CurdView = <T extends object>({
   viewMode,
   type,
   title,
@@ -202,3 +201,5 @@ export const CurdView = <T extends object>({
     </Page>
   );
 };
+
+export { CurdView };

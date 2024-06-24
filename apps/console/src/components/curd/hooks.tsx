@@ -1,108 +1,176 @@
-// import { useEffect, useState } from 'react';
+// import { useState, useEffect, useCallback, useMemo } from 'react';
 
-// import { useForm, UseFormReturn } from 'react-hook-form';
-// import { useParams, useNavigate } from 'react-router-dom';
+// import { isUndefined } from '@ncobase/utils';
+// import {
+//   useForm,
+//   Control,
+//   FieldErrors,
+//   UseFormHandleSubmit,
+//   UseFormSetValue,
+//   UseFormReset
+// } from 'react-hook-form';
+// import { useNavigate, useParams } from 'react-router-dom';
 
-// interface CrudService<T> {
-//   list: () => T[];
-//   create: (data: T) => void;
-//   update: (data: T) => void;
-// }
+// type CrudParams<T> = {
+//   fetchList: (query?: { [key: string]: any }) => Promise<T[]>;
+//   fetchItem: (id: string) => Promise<T>;
+//   createItem: (data: T) => Promise<void>;
+//   updateItem: (id: string, data: T) => Promise<void>;
+//   deleteItem: (id: string) => Promise<void>;
+// };
 
-// interface QueryFields<T> {
-//   (control: UseFormReturn<T>): JSX.Element[];
-// }
+// type CrudHooks<T, Q> = {
+//   items: T[];
+//   selectedItem: T | null;
+//   viewType: 'view' | 'edit' | 'create' | undefined;
+//   handleDialogView: (record: T | null, type: 'view' | 'edit' | 'create') => void;
+//   handleDialogClose: () => void;
+//   handleCreate: (data: T) => void;
+//   handleUpdate: (data: T) => void;
+//   handleDelete: (id: string) => void;
+//   queryControl: Control<Q>;
+//   queryErrors: FieldErrors<Q>;
+//   handleQuerySubmit: UseFormHandleSubmit<Q>;
+//   queryReset: UseFormReset<Q>;
+//   formControl: Control<T>;
+//   formErrors: FieldErrors<T>;
+//   handleConfirm: () => void;
+//   setFormValue: UseFormSetValue<T>;
+// };
 
-// export const useCrudPage = <T extends object>(
-//   services: CrudService<T>,
-//   queryFields: QueryFields<T>
-// ) => {
-//   const { mode, slug } = useParams<{ mode: string; slug: string }>();
-//   const navigate = useNavigate();
+// export function useCrud<T, Q>({
+//   fetchList,
+//   fetchItem,
+//   createItem,
+//   updateItem,
+//   deleteItem
+// }: CrudParams<T>): CrudHooks<T, Q> {
+//   const [items, setItems] = useState<T[]>([]);
+//   const [selectedItem, setSelectedItem] = useState<T | null>(null);
+//   const [viewType, setViewType] = useState<'view' | 'edit' | 'create'>();
+
+//   const {
+//     handleSubmit: handleFormSubmit,
+//     control: formControl,
+//     formState: { errors: formErrors },
+//     reset: formReset,
+//     setValue: setFormValue
+//   } = useForm<T>();
 
 //   const {
 //     handleSubmit: handleQuerySubmit,
 //     control: queryControl,
+//     formState: { errors: queryErrors },
 //     reset: queryReset
-//   } = useForm<any>({});
+//   } = useForm<Q>();
 
-//   const onQuery = handleQuerySubmit(data => {
-//     console.log(data);
-//   });
+//   const { mode, slug } = useParams<{ mode: string; slug: string }>();
+//   const navigate = useNavigate();
 
-//   const onResetQuery = () => {
-//     queryReset();
-//   };
-
-//   const [selectedRecord, setSelectedRecord] = useState<T | null>(null);
-//   const [viewType, setViewType] = useState<'view' | 'edit' | 'create'>();
+//   const fetchData = useCallback(async () => {
+//     const fetchedItems = await fetchList();
+//     setItems(fetchedItems);
+//   }, [fetchList]);
 
 //   useEffect(() => {
-//     if (slug) {
-//       const record = services.list().find(item => item.id === slug) || null;
-//       setSelectedRecord(record);
-//       setViewType(mode as 'view' | 'edit');
-//     } else if (mode === 'create') {
-//       setSelectedRecord(null);
-//       setViewType('create');
-//     } else {
-//       setSelectedRecord(null);
-//       setViewType(undefined);
-//     }
-//   }, [mode, slug]);
+//     fetchData();
+//   }, [fetchData]);
 
-//   const handleDialogView = (record: T | null, type: 'view' | 'edit' | 'create') => {
-//     setSelectedRecord(record);
-//     setViewType(type);
-//     navigate(`${type}${record ? `/${record.id}` : ''}`);
-//   };
+//   useEffect(() => {
+//     const fetchItemData = async () => {
+//       if (!isUndefined(slug) && !isUndefined(mode) && !selectedItem) {
+//         const record = await fetchItem(slug);
+//         setSelectedItem(record);
+//         setViewType(mode as 'view' | 'edit');
+//         if (record) {
+//           for (const key in record) {
+//             setFormValue(key as any, (record as any)[key]);
+//           }
+//         }
+//       } else if (mode === 'create') {
+//         setSelectedItem(null);
+//         setViewType('create');
+//       } else if (isUndefined(mode) && isUndefined(slug)) {
+//         setSelectedItem(null);
+//         setViewType(undefined);
+//       }
+//     };
+//     fetchItemData();
+//   }, [mode, slug, selectedItem, fetchItem, setFormValue]);
 
-//   const handleDialogClose = () => {
-//     setSelectedRecord(null);
+//   const handleDialogView = useCallback(
+//     (record: T | null, type: 'view' | 'edit' | 'create') => {
+//       setSelectedItem(record);
+//       setViewType(type);
+//       navigate(`${type}${record ? `/${(record as any).id}` : ''}`);
+//     },
+//     [navigate]
+//   );
+
+//   const handleDialogClose = useCallback(() => {
+//     setSelectedItem(null);
 //     setViewType(undefined);
 //     formReset();
 //     navigate('');
-//   };
+//   }, [formReset, navigate]);
 
-//   const {
-//     control: formControl,
-//     formState: { errors: formErrors },
-//     reset: formReset,
-//     setValue: setFormValue,
-//     handleSubmit: handleFormSubmit
-//   } = useForm<T>({});
+//   const handleCreate = useCallback(
+//     async (data: T) => {
+//       await createItem(data);
+//       handleDialogClose();
+//       fetchData();
+//     },
+//     [createItem, handleDialogClose, fetchData]
+//   );
 
-//   const handleCreate = (data: T) => {
-//     services.create(data);
-//     handleDialogClose();
-//   };
+//   const handleUpdate = useCallback(
+//     async (data: T) => {
+//       if (selectedItem && (selectedItem as any).id) {
+//         await updateItem((selectedItem as any).id, data);
+//         handleDialogClose();
+//         fetchData();
+//       }
+//     },
+//     [selectedItem, updateItem, handleDialogClose, fetchData]
+//   );
 
-//   const handleUpdate = (data: T) => {
-//     services.update(data);
-//     handleDialogClose();
-//   };
+//   const handleDelete = useCallback(
+//     async (id: string) => {
+//       await deleteItem(id);
+//       fetchData();
+//     },
+//     [deleteItem, fetchData]
+//   );
 
-//   const handleConfirm = handleFormSubmit((data: T) => {
-//     return {
-//       create: handleCreate,
-//       edit: handleUpdate
-//     }[viewType](data);
-//   });
-
-//   const items = services.list();
+//   const handleConfirm = useMemo(
+//     () =>
+//       handleFormSubmit((data: T) => {
+//         switch (viewType) {
+//           case 'edit':
+//             return handleUpdate(data);
+//           case 'create':
+//             return handleCreate(data);
+//         }
+//       }),
+//     [handleFormSubmit, viewType, handleUpdate, handleCreate]
+//   );
 
 //   return {
 //     items,
+//     selectedItem,
 //     viewType,
-//     selectedRecord,
-//     formControl,
-//     formErrors,
-//     queryControl,
-//     queryFields: queryFields(queryControl),
-//     onQuery,
-//     onResetQuery,
 //     handleDialogView,
 //     handleDialogClose,
-//     handleConfirm
+//     handleCreate,
+//     handleUpdate,
+//     handleDelete,
+//     queryControl,
+//     queryErrors,
+//     handleQuerySubmit,
+//     queryReset,
+//     formControl,
+//     formErrors,
+//     handleConfirm,
+//     setFormValue
 //   };
-// };
+// }

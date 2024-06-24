@@ -7,7 +7,7 @@ import { useQueryTenant } from '../service';
 
 import { parseStatus } from '@/helpers/status';
 
-export const TenantViewerPage = record => {
+export const TenantViewerPage = ({ record }) => {
   const { data = {} } = useQueryTenant(record);
 
   return (

@@ -35,7 +35,6 @@ export interface LayoutContextValue {
 }
 
 const defaultValue: LayoutContextValue = {
-  vmode: 'default',
   isFocusMode: false,
   setIsFocusMode: undefined
 };

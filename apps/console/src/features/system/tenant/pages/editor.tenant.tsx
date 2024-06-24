@@ -7,7 +7,7 @@ import { useQueryTenant } from '../service';
 
 export const EditorTenantPage = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryTenant(record.id);
+  const { data = {} } = useQueryTenant(record);
 
   const fields: FieldConfigProps[] = [
     {

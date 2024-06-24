@@ -1,15 +1,23 @@
 import { sortTree } from '@ncobase/utils';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
-import { createMenu, getMenu, getMenus, getMenuTree, updateMenu } from '@/apis/system/menu';
+import {
+  getMenu,
+  getMenuTree,
+  createMenu,
+  updateMenu,
+  deleteMenu,
+  getMenus
+} from '@/apis/system/menu';
 import { paginateByCursor } from '@/helpers/pagination';
-import { AnyObject, ExplicitAny, Menu } from '@/types';
+import { AnyObject, Menu } from '@/types';
 
 interface MenuKeys {
   create: ['menuService', 'create'];
   get: (options?: { menu?: string }) => ['menuService', 'menu', { menu?: string }];
   tree: (options?: AnyObject) => ['menuService', 'tree', AnyObject];
   update: ['menuService', 'update'];
+  delete: (options?: { menu?: string }) => ['menuService', 'delete', { menu?: string }];
   list: (options?: AnyObject) => ['menuService', 'menus', AnyObject];
 }
 
@@ -18,6 +26,7 @@ export const menuKeys: MenuKeys = {
   get: ({ menu } = {}) => ['menuService', 'menu', { menu }],
   tree: (queryKey = {}) => ['menuService', 'tree', queryKey],
   update: ['menuService', 'update'],
+  delete: ({ menu } = {}) => ['menuService', 'delete', { menu }],
   list: (queryKey = {}) => ['menuService', 'menus', queryKey]
 };
 
@@ -45,7 +54,12 @@ export const useCreateMenu = () =>
 
 // Hook for update menu mutation
 export const useUpdateMenu = () =>
-  useMutation({ mutationFn: (payload: Pick<Menu, keyof Menu>) => updateMenu(payload) });
+  useMutation({
+    mutationFn: (payload: Pick<Menu, keyof Menu>) => updateMenu(payload)
+  });
+
+// Hook for delete menu mutation
+export const useDeleteMenu = () => useMutation({ mutationFn: (id: string) => deleteMenu(id) });
 
 // Hook to list menus with pagination
 export const useListMenus = (queryKey: AnyObject = {}) => {
@@ -62,7 +76,7 @@ export const useListMenus = (queryKey: AnyObject = {}) => {
 };
 
 // Helper hook for paginated data
-const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } = paginateByCursor(data, cursor, limit) || {};
+const usePaginatedData = <T>(data: T[], cursor?: string, limit?: number) => {
+  const { rs, hasNextPage, nextCursor } = paginateByCursor<T>(data, cursor, limit) || {};
   return { data: rs, hasNextPage, nextCursor };
 };

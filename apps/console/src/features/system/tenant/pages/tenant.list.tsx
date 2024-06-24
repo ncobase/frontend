@@ -92,10 +92,10 @@ export const TenantListPage = () => {
       createComponent={
         <CreateTenantPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }
-      viewComponent={record => <TenantViewerPage record={record} />}
+      viewComponent={record => <TenantViewerPage record={record?.id} />}
       editComponent={record => (
         <EditorTenantPage
-          record={record}
+          record={record?.id}
           onSubmit={handleConfirm}
           control={formControl}
           setValue={setFormValue}

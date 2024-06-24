@@ -25,7 +25,7 @@ export const useVmode = (vmode: 'modal' | 'flatten') => {
   const { setVmode = () => {} } = useLayoutContext();
   useEffect(() => {
     setVmode(vmode);
-    return () => setVmode('flatten');
+    return () => setVmode('modal');
   }, [setVmode, vmode]);
 };
 
