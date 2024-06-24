@@ -5,9 +5,7 @@ import { formatDateTime } from '@ncobase/utils';
 
 import { useQueryDictionary } from '../service';
 
-import { Dictionary } from '@/types';
-
-export const DictionaryViewerPage = ({ record }: { record: Dictionary }) => {
+export const DictionaryViewerPage = ({ record }) => {
   const { data = {} } = useQueryDictionary(record);
 
   return (

@@ -5,7 +5,7 @@ import { Control, Controller } from 'react-hook-form';
 
 import { ExplicitAny } from '@/types';
 
-export type QueryFormData = {
+export type QueryFormParams = {
   code?: string;
   title?: string;
   status?: string;
@@ -14,7 +14,7 @@ export type QueryFormData = {
 export const queryFields = ({
   queryControl
 }: {
-  queryControl: Control<QueryFormData, ExplicitAny>;
+  queryControl: Control<QueryFormParams, ExplicitAny>;
 }) => [
   {
     name: 'code',

@@ -4,7 +4,7 @@ import { Button, Icons, Tooltip, TooltipContent, TooltipTrigger } from '@ncobase
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { queryFields, QueryFormData } from '../config/query';
+import { queryFields, QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection } from '../config/topbar';
 import { useCreatePermission, useListPermissions, useUpdatePermission } from '../service';
@@ -18,16 +18,17 @@ import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();
-  const { permissions, refetch } = useListPermissions();
+  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
+  const { permissions, refetch } = useListPermissions(queryKey);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
-  } = useForm<QueryFormData>();
+  } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    console.log(data);
+    setQueryKey(data);
   });
 
   const onResetQuery = () => {

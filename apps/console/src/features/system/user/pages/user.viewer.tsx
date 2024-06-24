@@ -5,9 +5,7 @@ import { joinName, randomId } from '@ncobase/utils';
 
 import { useQueryUser } from '../service';
 
-import { User } from '@/types';
-
-export const UserViewerPage = ({ record }: { record: User }) => {
+export const UserViewerPage = ({ record }) => {
   const { data } = useQueryUser(record);
 
   const { user, profile } = data || {};

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   Button,
@@ -32,7 +32,8 @@ import { ExplicitAny } from '@/types';
 export const CreatePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus, refetch } = useListMenus();
+  const [queryKey] = useState({});
+  const { menus } = useListMenus(queryKey);
 
   const fields: FieldConfigProps[] = [
     {

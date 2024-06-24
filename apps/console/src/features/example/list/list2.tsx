@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   Button,
@@ -76,7 +76,8 @@ const QueryBar = () => {
 export const ListPage2 = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus: records, refetch } = useListMenus();
+  const [queryKey] = useState({});
+  const { menus: records } = useListMenus(queryKey);
 
   const topbarElement = {
     title: t('example.list2.title'),

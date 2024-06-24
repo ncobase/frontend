@@ -4,9 +4,7 @@ import { FieldViewer } from '@ncobase/react';
 
 import { useQueryTopic } from '../service';
 
-import { Topic } from '@/types';
-
-export const TopicViewerPage = ({ record }: { record: Topic }) => {
+export const TopicViewerPage = ({ record }) => {
   const { data = {} } = useQueryTopic(record);
 
   return (

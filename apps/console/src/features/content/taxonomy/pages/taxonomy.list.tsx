@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { queryFields, QueryFormData } from '../config/query';
+import { queryFields, QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateTaxonomy, useListTaxonomies, useUpdateTaxonomy } from '../service';
@@ -17,16 +17,17 @@ import { Taxonomy } from '@/types';
 
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();
-  const { taxonomies, refetch } = useListTaxonomies();
+  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
+  const { taxonomies, refetch } = useListTaxonomies(queryKey);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
-  } = useForm<QueryFormData>();
+  } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    console.log(data);
+    setQueryKey(data);
   });
 
   const onResetQuery = () => {

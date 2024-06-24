@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { queryFields, QueryFormData } from './config/query';
+import { queryFields, QueryFormParams } from './config/query';
 import { tableColumns } from './config/table';
 import { topbarLeftSection, topbarRightSection } from './config/topbar';
 import { CreatePage } from './create';
@@ -14,16 +14,17 @@ import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/ro
 import { Role } from '@/types';
 
 export const ListPage = () => {
-  const { roles, refetch } = useListRoles();
+  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
+  const { roles, refetch } = useListRoles(queryKey);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
-  } = useForm<QueryFormData>();
+  } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    console.log(data);
+    setQueryKey(data);
   });
 
   const onResetQuery = () => {

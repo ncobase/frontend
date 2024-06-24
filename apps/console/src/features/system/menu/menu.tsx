@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { QueryFormData, queryFields } from './config/query';
+import { QueryFormParams, queryFields } from './config/query';
 import { tableColumns } from './config/table';
 import { topbarLeftSection, topbarRightSection } from './config/topbar';
 import { CreateMenuPage } from './pages/create';
@@ -17,10 +17,12 @@ import { Menu } from '@/types';
 
 export const MenuPage = () => {
   const { t } = useTranslation();
-  const { menus, refetch } = useListMenus();
+  const navigate = useNavigate();
+
+  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
+  const { menus, refetch } = useListMenus(queryKey);
 
   const { mode, slug } = useParams<{ mode: string; slug: string }>();
-  const navigate = useNavigate();
 
   // manually set the view type, the vmode in the layout context should be used by default.
   const vmode = 'flatten' as 'flatten' | 'modal';
@@ -29,10 +31,10 @@ export const MenuPage = () => {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
-  } = useForm<QueryFormData>();
+  } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    console.log(data);
+    setQueryKey(data);
   });
 
   const onResetQuery = () => {
@@ -54,7 +56,7 @@ export const MenuPage = () => {
       setSelectedRecord(null);
       setViewType(undefined);
     }
-  }, [mode, slug]);
+  }, [mode, slug, menus]);
 
   const handleView = (record: Menu | null, type: 'view' | 'edit' | 'create') => {
     setSelectedRecord(record);
@@ -69,7 +71,7 @@ export const MenuPage = () => {
     setViewType(undefined);
     formReset();
     refetch();
-    if (vmode === 'flatten' && viewType.length > 0) {
+    if (vmode === 'flatten' && viewType) {
       navigate(-1);
     }
   };

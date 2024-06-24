@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { queryFields, QueryFormData } from '../config/query';
+import { queryFields, QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateDictionary, useListDictionaries, useUpdateDictionary } from '../service';
@@ -17,16 +17,18 @@ import { Dictionary } from '@/types';
 
 export const DictionaryListPage = () => {
   const { t } = useTranslation();
-  const { dictionaries, refetch } = useListDictionaries();
+
+  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
+  const { dictionaries, refetch } = useListDictionaries(queryKey);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
-  } = useForm<QueryFormData>();
+  } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    console.log(data);
+    setQueryKey(data);
   });
 
   const onResetQuery = () => {

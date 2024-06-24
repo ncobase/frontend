@@ -5,14 +5,14 @@ import { Control, Controller } from 'react-hook-form';
 
 import { ExplicitAny } from '@/types';
 
-export type QueryFormData = {
+export type QueryFormParams = {
   code?: string;
   title?: string;
   status?: string;
   expired_at?: string;
 };
 
-export const queryFields = (queryControl: Control<QueryFormData, ExplicitAny>) => [
+export const queryFields = (queryControl: Control<QueryFormParams, ExplicitAny>) => [
   {
     name: 'code',
     label: '编号',

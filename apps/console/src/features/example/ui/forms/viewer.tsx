@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   Button,
@@ -23,7 +23,8 @@ import { Page } from '@/layout';
 export const ViewerPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { menus, refetch } = useListMenus();
+  const [queryKey] = useState({});
+  const { menus } = useListMenus(queryKey);
 
   return (
     <Page layout={false}>
