@@ -110,7 +110,8 @@ const RenderTableView = ({
   pageSizes,
   selected,
   visibleControl,
-  columns
+  columns,
+  className
 }: {
   t: any;
   data: any[];
@@ -120,9 +121,10 @@ const RenderTableView = ({
   selected: any;
   visibleControl: boolean;
   columns: any;
+  className?: string;
 }) => (
   <TableView
-    className='mt-4'
+    className={className}
     data={data}
     paginated={paginated}
     pageSize={pageSize}
@@ -194,7 +196,17 @@ const CurdView = <T extends object>({
       )}
       {renderTableView(mode, type) && (
         <RenderTableView
-          {...{ t, data, paginated, pageSize, pageSizes, selected, visibleControl, columns }}
+          {...{
+            t,
+            data,
+            paginated,
+            pageSize,
+            pageSizes,
+            selected,
+            visibleControl,
+            columns,
+            className: cn(queryFields.length && 'mt-4')
+          }}
         />
       )}
       {renderMode(mode)}

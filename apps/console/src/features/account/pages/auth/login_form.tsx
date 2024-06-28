@@ -121,6 +121,7 @@ export const LoginForm = ({
         defaultValue=''
         render={({ field }) => (
           <InputField
+            type='password'
             error={errors.password}
             label={t('fields.password.label')}
             placeholder={t('fields.password.placeholder')}
