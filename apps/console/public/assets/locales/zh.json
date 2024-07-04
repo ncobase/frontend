@@ -239,7 +239,9 @@
     "mark_as_unread": "标记为未读",
     "mark_all_as_unread": "全部标记为未读",
     "mark_as_read": "标记为已读",
-    "mark_all_as_read": "全部标记为已读"
+    "mark_all_as_read": "全部标记为已读",
+    "sidebar_collapse": "收起侧边栏",
+    "sidebar_expand": "展开侧边栏"
   },
   "query": {
     "loading": "加载中...",

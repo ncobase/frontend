@@ -4,18 +4,19 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { QueryFormParams, queryFields } from './config/query';
-import { tableColumns } from './config/table';
-import { topbarLeftSection, topbarRightSection } from './config/topbar';
-import { CreateMenuPage } from './pages/create';
-import { EditorMenuPage } from './pages/editor';
-import { MenuViewerPage } from './pages/viewer';
-import { useCreateMenu, useDeleteMenu, useListMenus, useUpdateMenu } from './service';
+import { QueryFormParams, queryFields } from '../config/query';
+import { tableColumns } from '../config/table';
+import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { useCreateMenu, useDeleteMenu, useListMenus, useUpdateMenu } from '../service';
+
+import { CreateMenuPage } from './create';
+import { EditorMenuPage } from './editor';
+import { MenuViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { Menu } from '@/types';
 
-export const MenuPage = () => {
+export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 

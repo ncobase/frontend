@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { queryFields, QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateTenant, useListTenants, useUpdateTenant } from '../service';
@@ -17,22 +16,8 @@ import { Tenant } from '@/types';
 
 export const TenantListPage = () => {
   const { t } = useTranslation();
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
+  const [queryKey] = useState({});
   const { tenants, refetch } = useListTenants(queryKey);
-
-  const {
-    handleSubmit: handleQuerySubmit,
-    control: queryControl,
-    reset: queryReset
-  } = useForm<QueryFormParams>();
-
-  const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
-  });
-
-  const onResetQuery = () => {
-    queryReset();
-  };
 
   const [selectedRecord, setSelectedRecord] = useState<Tenant | null>(null);
   const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
@@ -88,9 +73,6 @@ export const TenantListPage = () => {
       topbarRight={topbarRightSection}
       data={tenants}
       columns={tableColumns(handleView)}
-      queryFields={queryFields(queryControl)}
-      onQuery={onQuery}
-      onResetQuery={onResetQuery}
       createComponent={
         <CreateTenantPage onSubmit={handleConfirm} control={formControl} errors={formErrors} />
       }

@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 
 import { Shell } from '@ncobase/react';
+import { locals } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useFocusMode } from '../layout.hooks';
@@ -32,6 +33,14 @@ export const Page: React.FC<PageProps> = ({
 }): JSX.Element => {
   useFocusMode();
   const { t } = useTranslation();
+  const [sidebarExpanded, setSidebarExpanded] = useState(() => {
+    const savedState = locals.get('sidebarExpanded');
+    return savedState ? JSON.parse(savedState) : false;
+  });
+
+  useEffect(() => {
+    locals.set('sidebarExpanded', JSON.stringify(sidebarExpanded));
+  }, [sidebarExpanded]);
 
   const pageContextValue = useMemo(
     () => ({ layout, header, topbar, sidebar, submenu }),
@@ -46,9 +55,12 @@ export const Page: React.FC<PageProps> = ({
       {layout ? (
         <Shell
           header={header && <Header />}
-          sidebar={sidebar && <Sidebar />}
+          sidebar={
+            sidebar && <Sidebar expanded={sidebarExpanded} setExpanded={setSidebarExpanded} />
+          }
           topbar={topbar}
           submenu={submenu && <Submenu />}
+          sidebarExpanded={sidebarExpanded}
         >
           {renderContent()}
         </Shell>

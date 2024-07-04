@@ -69,24 +69,9 @@ export const tableColumns = (handleView: Function): TableViewProps['header'] => 
           onClick: (record: Tenant) => handleView(record, 'edit')
         },
         {
-          title: t('actions.duplicate'),
-          icon: 'IconCopy',
-          onClick: () => console.log('duplicate events')
-        },
-        {
-          title: t('actions.shared'),
-          icon: 'IconShare2',
-          onClick: () => console.log('share events')
-        },
-        {
           title: t('actions.disable'),
           icon: 'IconCircleMinus',
           onClick: () => console.log('disable events')
-        },
-        {
-          title: t('actions.delete'),
-          icon: 'IconTrash',
-          onClick: () => console.log('delete events')
         }
       ]
     }

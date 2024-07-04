@@ -54,7 +54,11 @@ export const EditorTenantPage = ({ record, onSubmit, control, setValue, errors }
       title: 'Logo',
       name: 'logo',
       defaultValue: '',
-      type: 'file'
+      className: 'col-span-full',
+      type: 'uploader',
+      onChange: value => {
+        console.log(value);
+      }
     },
     {
       title: 'Logo 标题',
@@ -98,7 +102,7 @@ export const EditorTenantPage = ({ record, onSubmit, control, setValue, errors }
     },
     {
       title: '到期时间',
-      name: 'expires_at',
+      name: 'expired_at',
       defaultValue: '',
       type: 'date'
     }
@@ -118,7 +122,7 @@ export const EditorTenantPage = ({ record, onSubmit, control, setValue, errors }
     setValue('keywords', data?.keywords);
     setValue('copyright', data?.copyright);
     setValue('disabled', data?.disabled);
-    setValue('expires_at', data?.expired_at);
+    setValue('expired_at', data?.expired_at);
   }, [setValue, data]);
 
   return (

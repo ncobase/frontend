@@ -57,8 +57,8 @@ importers:
   apps/console:
     dependencies:
       '@ncobase/react':
-        specifier: latest
-        version: 0.0.1-alpha.5(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)
+        specifier: 0.0.1-alpha.8
+        version: 0.0.1-alpha.8(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)
       '@ncobase/types':
         specifier: latest
         version: 0.0.1-alpha.0
@@ -587,8 +587,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@ncobase/react@0.0.1-alpha.5':
-    resolution: {integrity: sha512-CPBUTjJGzqMlUM1Rr/GZZ0oYdPqHtA13HtQuD/n8FZTx9zDwkaqBSWEwoz6FOb0tyT1BQJO8hEKCS9xOWb1S9g==}
+  '@ncobase/react@0.0.1-alpha.8':
+    resolution: {integrity: sha512-QoTvJu4+Xvn9PSDzo2budRamMcJQhu2TnWNYyjW+0wKRua+t8zI809Y4PNTXkfRaCOHjg24aqGP0pViEMWh8Bg==}
 
   '@ncobase/tailwind@0.0.1-alpha.0':
     resolution: {integrity: sha512-4xr+vZnjFKTWl92s5+Qdy+WxL/A6uagTdRZYldDvU3/73rHJZyhPbpEgNq6ns4jHblzOz02fxKDi+qjB3J3aHQ==}
@@ -605,8 +605,8 @@ packages:
   '@ncobase/utils@0.0.1-alpha.0':
     resolution: {integrity: sha512-lDyvrmkm3axL8ftC/rXpPLfe5iEHG7RXJIiDG1IpS1L3PhyBXMzOJX2Oyise1sM3LEfj6LhPwgaeR8yYGFDhyQ==}
 
-  '@ncobase/utils@0.0.1-alpha.1':
-    resolution: {integrity: sha512-MRxORGcM7PDJfnS/gHBAXQ7kOdUE0UCw1kbMXHX3KQLtLRd3OcWzsVU3WoMj2XHyHqDyQ5+zrkqDZFA1bzYWSg==}
+  '@ncobase/utils@0.0.1-alpha.2':
+    resolution: {integrity: sha512-Tl83h/suHYuLXWx97wdCamx7QHPXrEERGlVwqR4NBEybq/Bw1PWV4vEN0Z0fE7rXbb6XIiCz8nAGzoUPnJ6Rhw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -4324,10 +4324,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@ncobase/react@0.0.1-alpha.5(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)':
+  '@ncobase/react@0.0.1-alpha.8(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)':
     dependencies:
       '@ncobase/tailwind': 0.0.1-alpha.1
-      '@ncobase/utils': 0.0.1-alpha.1
+      '@ncobase/utils': 0.0.1-alpha.2
       '@radix-ui/react-accordion': 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox': 1.0.4(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog': 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4400,7 +4400,7 @@ snapshots:
       nanoid: 3.3.7
       tailwind-merge: 2.3.0
 
-  '@ncobase/utils@0.0.1-alpha.1':
+  '@ncobase/utils@0.0.1-alpha.2':
     dependencies:
       clsx: 2.1.1
       date-fns: 3.6.0

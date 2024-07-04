@@ -10,7 +10,9 @@ export interface Tenant {
   keywords?: string;
   copyright?: string;
   description?: string;
+  order?: number;
   disabled?: boolean;
+  extras?: object;
   expired_at?: string;
   created_by?: string;
   created_at?: string;

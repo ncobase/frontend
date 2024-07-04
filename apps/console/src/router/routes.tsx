@@ -33,7 +33,10 @@ const routes = [
   { path: '/dash/*', element: <AuthenticatedGuard children={<DashRoutes />} /> },
   { path: '/account/*', element: <AuthenticatedGuard children={<AccountRoutes />} /> },
   { path: '/content/*', element: <AuthenticatedGuard children={<ContentRoutes />} /> },
-  { path: '/system/*', element: <AdminGuard children={<SystemRoutes />} /> },
+  {
+    path: '/system/*',
+    element: <AuthenticatedGuard children={<AdminGuard children={<SystemRoutes />} />} />
+  },
   { path: '/example/*', element: <AuthenticatedGuard children={<ExampleRoutes />} /> }
 ];
 

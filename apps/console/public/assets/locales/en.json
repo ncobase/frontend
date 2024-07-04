@@ -239,7 +239,9 @@
     "mark_as_unread": "Mark as Unread",
     "mark_all_as_unread": "Mark all as Unread",
     "mark_as_read": "Mark as Read",
-    "mark_all_as_read": "Mark all as Read"
+    "mark_all_as_read": "Mark all as Read",
+    "sidebar_collapse": "Collapse Sidebar",
+    "sidebar_expand": "Expand Sidebar"
   },
   "query": {
     "loading": "Loading...",

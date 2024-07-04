@@ -18,7 +18,7 @@ export const CreateTenantPage = ({ onSubmit, control, errors }) => {
     },
     {
       title: '租户类型',
-      name: 'private',
+      name: 'type',
       defaultValue: '',
       type: 'select',
       options: [
@@ -90,7 +90,7 @@ export const CreateTenantPage = ({ onSubmit, control, errors }) => {
     },
     {
       title: '到期时间',
-      name: 'expires_at',
+      name: 'expired_at',
       defaultValue: '',
       type: 'date'
     }

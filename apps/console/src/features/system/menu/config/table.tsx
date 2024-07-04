@@ -62,16 +62,6 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
           onClick: (record: Menu) => handleView(record, 'edit')
         },
         {
-          title: t('actions.duplicate'),
-          icon: 'IconCopy',
-          onClick: () => console.log('duplicate events')
-        },
-        {
-          title: t('actions.shared'),
-          icon: 'IconShare2',
-          onClick: () => console.log('share events')
-        },
-        {
           title: t('actions.disable'),
           icon: 'IconCircleMinus',
           onClick: () => console.log('disable events')

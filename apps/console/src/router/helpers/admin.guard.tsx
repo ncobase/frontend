@@ -15,7 +15,7 @@ export const AdminGuard: React.FC<React.PropsWithChildren> = ({ children }) => {
     return <Spinner />;
   }
   if (!isAdministered) {
-    return <Error403 to='/logout' />;
+    return <Error403 />;
   }
   return <ErrorBoundary>{children}</ErrorBoundary>;
 };

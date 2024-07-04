@@ -135,7 +135,7 @@ export const Elements = ({ ...rest }) => {
 
   const [files, setFiles] = useState<File[] | null>([]);
 
-  const handleValueChange = (value: File[] | null) => {
+  const handleValueChange = value => {
     setFiles(value);
   };
 

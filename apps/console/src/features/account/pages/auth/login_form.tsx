@@ -22,8 +22,8 @@ const LoginHint = ({ setValue }: LoginHintProps) => {
     return null;
   }
 
-  const username = 'admin';
-  const password = 'adminn';
+  const username = 'super';
+  const password = 'Ac123456';
 
   const handleLoginHintClick = () => {
     setValue('username', username);
