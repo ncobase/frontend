@@ -57,8 +57,8 @@ importers:
   apps/console:
     dependencies:
       '@ncobase/react':
-        specifier: 0.0.1-alpha.8
-        version: 0.0.1-alpha.8(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)
+        specifier: 0.0.1-alpha.9
+        version: 0.0.1-alpha.9(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)
       '@ncobase/types':
         specifier: latest
         version: 0.0.1-alpha.0
@@ -587,8 +587,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@ncobase/react@0.0.1-alpha.8':
-    resolution: {integrity: sha512-QoTvJu4+Xvn9PSDzo2budRamMcJQhu2TnWNYyjW+0wKRua+t8zI809Y4PNTXkfRaCOHjg24aqGP0pViEMWh8Bg==}
+  '@ncobase/react@0.0.1-alpha.9':
+    resolution: {integrity: sha512-5D/WlStTSE6j3CXSg3qfrbwSQ+Pr70nnc6sK496EGvRAg5NRLgmp+04ouuyWOEHuDMy91tVYJ5XZ3W81IpVSSQ==}
 
   '@ncobase/tailwind@0.0.1-alpha.0':
     resolution: {integrity: sha512-4xr+vZnjFKTWl92s5+Qdy+WxL/A6uagTdRZYldDvU3/73rHJZyhPbpEgNq6ns4jHblzOz02fxKDi+qjB3J3aHQ==}
@@ -4324,7 +4324,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@ncobase/react@0.0.1-alpha.8(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)':
+  '@ncobase/react@0.0.1-alpha.9(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)':
     dependencies:
       '@ncobase/tailwind': 0.0.1-alpha.1
       '@ncobase/utils': 0.0.1-alpha.2

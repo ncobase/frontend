@@ -59,7 +59,7 @@ export const Page: React.FC<PageProps> = ({
             sidebar && <Sidebar expanded={sidebarExpanded} setExpanded={setSidebarExpanded} />
           }
           topbar={topbar}
-          submenu={submenu && <Submenu />}
+          submenu={submenu && !sidebarExpanded && <Submenu />}
           sidebarExpanded={sidebarExpanded}
         >
           {renderContent()}
