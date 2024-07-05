@@ -57,7 +57,7 @@ importers:
   apps/console:
     dependencies:
       '@ncobase/react':
-        specifier: 0.0.1-alpha.9
+        specifier: latest
         version: 0.0.1-alpha.9(@types/react-dom@18.3.0)(@types/react@18.3.2)(react@18.3.1)
       '@ncobase/types':
         specifier: latest

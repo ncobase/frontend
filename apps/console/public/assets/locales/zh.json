@@ -1,5 +1,5 @@
 {
-  "application_title": "Ncobase - 新一代模块化框架",
+  "application_title": "Ncobase - 新一代插件化框架",
   "login_hint": "数据环境为 <strong>{{name}}</strong>，您可以使用 <anchor>{{credentials}}</anchor> 登录",
   "date_ago": {
     "format": "dddd, DD MMMM YYYY, hh:mm a"
