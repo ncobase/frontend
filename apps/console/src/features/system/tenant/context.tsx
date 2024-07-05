@@ -9,7 +9,7 @@ interface TenantContextValue {
   updateTenant(id?: string | null): void;
 }
 
-export const TENANT_KEY = '_TEN';
+export const TENANT_KEY = 'app.tenant.id';
 
 const TenantContext = React.createContext<TenantContextValue>({
   tenant_id: '',

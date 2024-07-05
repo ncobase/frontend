@@ -19,7 +19,7 @@ export const XMdDomainKey = 'x-md-did';
 export const XMdTotalKey = 'x-md-total';
 
 // --- i18n
-export const STORAGE_LANGUAGE_KEY = '_LOCALE';
+export const STORAGE_LANGUAGE_KEY = 'app.language';
 
 interface Language {
   key: string;

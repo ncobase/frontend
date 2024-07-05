@@ -13,6 +13,8 @@ import { Sidebar } from './page.sidebar';
 import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
 
+const SIDEBAR_EXPANDED_KEY = 'app.sidebar.expanded';
+
 export interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: boolean;
   sidebar?: boolean;
@@ -34,12 +36,12 @@ export const Page: React.FC<PageProps> = ({
   useFocusMode();
   const { t } = useTranslation();
   const [sidebarExpanded, setSidebarExpanded] = useState(() => {
-    const savedState = locals.get('sidebarExpanded');
+    const savedState = locals.get(SIDEBAR_EXPANDED_KEY);
     return savedState ? JSON.parse(savedState) : false;
   });
 
   useEffect(() => {
-    locals.set('sidebarExpanded', JSON.stringify(sidebarExpanded));
+    locals.set(SIDEBAR_EXPANDED_KEY, JSON.stringify(sidebarExpanded));
   }, [sidebarExpanded]);
 
   const pageContextValue = useMemo(

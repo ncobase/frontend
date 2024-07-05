@@ -12,8 +12,8 @@ interface AuthContextValue {
 }
 
 // Keys for local storage
-export const ACCESS_TOKEN_KEY = '_AK';
-export const REFRESH_TOKEN_KEY = '_RK';
+export const ACCESS_TOKEN_KEY = 'app.access.token';
+export const REFRESH_TOKEN_KEY = 'app.access.refresh';
 
 // Create authentication context with initial default values
 const AuthContext = React.createContext<AuthContextValue>({
