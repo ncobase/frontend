@@ -6,6 +6,9 @@ import { useLayoutContext } from '@/layout';
 
 export const MenuViewerPage = ({ viewMode, record }) => {
   const { vmode } = useLayoutContext();
+  if (!record) {
+    return null;
+  }
   const mode = viewMode || vmode || 'flatten';
   if (mode === 'modal') {
     return <MenuViewerForms record={record} />;
