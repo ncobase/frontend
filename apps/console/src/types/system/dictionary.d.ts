@@ -13,6 +13,8 @@ export interface Dictionary {
 }
 
 export interface Dictionaries {
-  content: Dictionary[];
+  items: Dictionary[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

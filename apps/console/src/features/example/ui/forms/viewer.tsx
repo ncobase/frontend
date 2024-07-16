@@ -23,8 +23,8 @@ import { Page } from '@/layout';
 export const ViewerPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryKey] = useState({});
-  const { menus } = useListMenus(queryKey);
+  const [queryParams] = useState({});
+  const { menus } = useListMenus(queryParams);
 
   return (
     <Page layout={false}>

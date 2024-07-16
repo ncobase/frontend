@@ -18,8 +18,10 @@ import { Group } from '@/types';
 export const GroupListPage = () => {
   const { t } = useTranslation();
 
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { groups, refetch } = useListGroups(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: groups, refetch } = useListGroups(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -28,7 +30,7 @@ export const GroupListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

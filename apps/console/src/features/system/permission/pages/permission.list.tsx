@@ -18,8 +18,10 @@ import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { permissions, refetch } = useListPermissions(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: permissions, refetch } = useListPermissions(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -28,7 +30,7 @@ export const PermissionListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

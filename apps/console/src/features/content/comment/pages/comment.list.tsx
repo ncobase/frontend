@@ -17,8 +17,10 @@ import { Comment } from '@/types';
 
 export const CommentListPage = () => {
   const { t } = useTranslation();
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { comments, refetch } = useListComments(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: comments, refetch } = useListComments(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -27,7 +29,7 @@ export const CommentListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

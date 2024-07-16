@@ -49,6 +49,12 @@ export class Request {
       console.error(`${t('errors.response.label')} [${method} ${url}]: ${status} ${statusText}`);
       if (status === 401) {
         eventEmitter.emit('unauthorized');
+      } else if (status === 403) {
+        eventEmitter.emit('forbidden');
+      } else if (status === 500) {
+        eventEmitter.emit('server-error');
+      } else if (status === 503) {
+        eventEmitter.emit('server-unavailable');
       }
     }
     throw err;

@@ -19,6 +19,8 @@ export interface Topic {
 }
 
 export interface Topics {
-  content: Topic[];
+  items: Topic[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

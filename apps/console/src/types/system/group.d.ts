@@ -14,6 +14,8 @@ export interface Group {
 }
 
 export interface Groups {
-  content: Group[];
+  items: Group[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

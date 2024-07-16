@@ -17,8 +17,8 @@ import { Taxonomy } from '@/types';
 
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({ type: 'all' });
-  const { taxonomies, refetch } = useListTaxonomies(queryKey);
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ type: 'all' });
+  const { items: taxonomies, refetch } = useListTaxonomies(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -27,7 +27,7 @@ export const TaxonomyListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

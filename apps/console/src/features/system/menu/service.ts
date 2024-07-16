@@ -9,7 +9,7 @@ import {
   deleteMenu,
   getMenus
 } from '@/apis/system/menu';
-import { paginateByCursor } from '@/helpers/pagination';
+import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
 import { AnyObject, Menu } from '@/types';
 
 interface MenuKeys {
@@ -24,10 +24,10 @@ interface MenuKeys {
 export const menuKeys: MenuKeys = {
   create: ['menuService', 'create'],
   get: ({ menu } = {}) => ['menuService', 'menu', { menu }],
-  tree: (queryKey = {}) => ['menuService', 'tree', queryKey],
+  tree: (queryParams = {}) => ['menuService', 'tree', queryParams],
   update: ['menuService', 'update'],
   delete: ({ menu } = {}) => ['menuService', 'delete', { menu }],
-  list: (queryKey = {}) => ['menuService', 'menus', queryKey]
+  list: (queryParams = {}) => ['menuService', 'menus', queryParams]
 };
 
 // Hook to query a specific menu by ID or Slug
@@ -35,12 +35,12 @@ export const useQueryMenu = (menu: string) =>
   useQuery({ queryKey: menuKeys.get({ menu }), queryFn: () => getMenu(menu) });
 
 // Hook to query menu tree
-export const useQueryMenuTreeData = (queryKey = {}) => {
+export const useQueryMenuTreeData = (queryParams = {}) => {
   return useQuery({
-    queryKey: menuKeys.tree(queryKey),
+    queryKey: menuKeys.tree(queryParams),
     queryFn: async () => {
-      const result = await getMenuTree({ ...queryKey, children: true });
-      return sortTree(result?.content || [], 'order', 'desc');
+      const result = await getMenuTree({ ...queryParams, children: true });
+      return sortTree(result?.items || [], 'order', 'desc');
     },
     select: data => data,
     gcTime: Infinity,
@@ -62,21 +62,32 @@ export const useUpdateMenu = () =>
 export const useDeleteMenu = () => useMutation({ mutationFn: (id: string) => deleteMenu(id) });
 
 // Hook to list menus with pagination
-export const useListMenus = (queryKey: AnyObject = {}) => {
+export const useListMenus = (queryParams: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
-    queryKey: menuKeys.list(queryKey),
-    queryFn: () => getMenus(queryKey)
+    queryKey: menuKeys.list(queryParams),
+    queryFn: () => getMenus(queryParams)
   });
-  const paginatedResult = usePaginatedData(
-    data?.content || [],
-    queryKey?.cursor as string,
-    queryKey?.limit as number
+
+  const paginatedResult = usePaginatedData<Menu>(
+    data || { items: [], total: 0, has_next: false },
+    queryParams?.cursor as string,
+    queryParams?.limit as number
   );
-  return { menus: paginatedResult.data, ...paginatedResult, ...rest };
+
+  return { ...paginatedResult, ...rest };
 };
 
 // Helper hook for paginated data
-const usePaginatedData = <T>(data: T[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } = paginateByCursor<T>(data, cursor, limit) || {};
-  return { data: rs, hasNextPage, nextCursor };
+const usePaginatedData = <T>(
+  data: { items: T[]; total: number; has_next: boolean; next?: string },
+  cursor?: string,
+  limit: number = 10
+): PaginationResult<T> => {
+  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
+    items: [],
+    has_next: data.has_next,
+    next: data.next
+  };
+
+  return { items, total: data.total, next, has_next };
 };

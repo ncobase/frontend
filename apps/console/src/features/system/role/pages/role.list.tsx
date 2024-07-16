@@ -18,8 +18,10 @@ import { Role } from '@/types';
 export const RoleListPage = () => {
   const { t } = useTranslation();
 
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { roles, refetch } = useListRoles(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: roles, refetch } = useListRoles(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -28,7 +30,7 @@ export const RoleListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

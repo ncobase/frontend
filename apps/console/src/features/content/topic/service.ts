@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { createTopic, getTopic, getTopics, updateTopic } from '@/apis/content/topic';
-import { paginateByCursor } from '@/helpers/pagination';
-import { AnyObject, ExplicitAny, Topic } from '@/types';
+import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
+import { AnyObject, Topic } from '@/types';
 
 interface TopicKeys {
   create: ['topicService', 'create'];
@@ -15,7 +15,7 @@ export const topicKeys: TopicKeys = {
   create: ['topicService', 'create'],
   get: ({ topic } = {}) => ['topicService', 'topic', { topic }],
   update: ['topicService', 'update'],
-  list: (queryKey = {}) => ['topicService', 'topics', queryKey]
+  list: (queryParams = {}) => ['topicService', 'topics', queryParams]
 };
 
 // Hook to query a specific topic by ID or Slug
@@ -31,21 +31,32 @@ export const useUpdateTopic = () =>
   useMutation({ mutationFn: (payload: Pick<Topic, keyof Topic>) => updateTopic(payload) });
 
 // Hook to list topics with pagination
-export const useListTopics = (queryKey: AnyObject = {}) => {
+export const useListTopics = (queryParams: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
-    queryKey: topicKeys.list(queryKey),
-    queryFn: () => getTopics(queryKey)
+    queryKey: topicKeys.list(queryParams),
+    queryFn: () => getTopics(queryParams)
   });
-  const paginatedResult = usePaginatedData(
-    data?.content || [],
-    queryKey?.cursor as string,
-    queryKey?.limit as number
+
+  const paginatedResult = usePaginatedData<Topic>(
+    data || { items: [], total: 0, has_next: false },
+    queryParams?.cursor as string,
+    queryParams?.limit as number
   );
-  return { topics: paginatedResult.data, ...paginatedResult, ...rest };
+
+  return { ...paginatedResult, ...rest };
 };
 
 // Helper hook for paginated data
-const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } = paginateByCursor(data, cursor, limit) || {};
-  return { data: rs, hasNextPage, nextCursor };
+const usePaginatedData = <T>(
+  data: { items: T[]; total: number; has_next: boolean; next?: string },
+  cursor?: string,
+  limit: number = 10
+): PaginationResult<T> => {
+  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
+    items: [],
+    has_next: data.has_next,
+    next: data.next
+  };
+
+  return { items, total: data.total, next, has_next };
 };

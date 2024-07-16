@@ -21,6 +21,8 @@ export interface Taxonomy {
 }
 
 export interface Taxonomies {
-  content: Taxonomy[];
+  items: Taxonomy[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

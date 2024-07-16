@@ -33,6 +33,8 @@ export interface UserMeshes {
 }
 
 export interface Users {
-  content: User[];
+  items: User[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

@@ -6,8 +6,8 @@ import {
   getPermissions,
   updatePermission
 } from '@/apis/system/permission';
-import { paginateByCursor } from '@/helpers/pagination';
-import { AnyObject, ExplicitAny, Permission } from '@/types';
+import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
+import { AnyObject, Permission } from '@/types';
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];
@@ -22,9 +22,9 @@ interface PermissionKeys {
 export const permissionKeys: PermissionKeys = {
   create: ['permissionService', 'create'],
   get: ({ permission } = {}) => ['permissionService', 'permission', { permission }],
-  tree: (queryKey = {}) => ['permissionService', 'tree', queryKey],
+  tree: (queryParams = {}) => ['permissionService', 'tree', queryParams],
   update: ['permissionService', 'update'],
-  list: (queryKey = {}) => ['permissionService', 'permissions', queryKey]
+  list: (queryParams = {}) => ['permissionService', 'permissions', queryParams]
 };
 
 // Hook to query a specific permission by ID or Slug
@@ -47,21 +47,32 @@ export const useUpdatePermission = () =>
   });
 
 // Hook to list permissions with pagination
-export const useListPermissions = (queryKey: AnyObject = {}) => {
+export const useListPermissions = (queryParams: AnyObject = {}) => {
   const { data, ...rest } = useQuery({
-    queryKey: permissionKeys.list(queryKey),
-    queryFn: () => getPermissions(queryKey)
+    queryKey: permissionKeys.list(queryParams),
+    queryFn: () => getPermissions(queryParams)
   });
-  const paginatedResult = usePaginatedData(
-    data?.content || [],
-    queryKey?.cursor as string,
-    queryKey?.limit as number
+
+  const paginatedResult = usePaginatedData<Permission>(
+    data || { items: [], total: 0, has_next: false },
+    queryParams?.cursor as string,
+    queryParams?.limit as number
   );
-  return { permissions: paginatedResult.data, ...paginatedResult, ...rest };
+
+  return { ...paginatedResult, ...rest };
 };
 
 // Helper hook for paginated data
-const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-  const { rs, hasNextPage, nextCursor } = paginateByCursor(data, cursor, limit) || {};
-  return { data: rs, hasNextPage, nextCursor };
+const usePaginatedData = <T>(
+  data: { items: T[]; total: number; has_next: boolean; next?: string },
+  cursor?: string,
+  limit: number = 10
+): PaginationResult<T> => {
+  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
+    items: [],
+    has_next: data.has_next,
+    next: data.next
+  };
+
+  return { items, total: data.total, next, has_next };
 };

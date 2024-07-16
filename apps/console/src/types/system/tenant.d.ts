@@ -21,6 +21,8 @@ export interface Tenant {
 }
 
 export interface Tenants {
-  content: Tenant[];
+  items: Tenant[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

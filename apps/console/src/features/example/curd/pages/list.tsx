@@ -14,8 +14,10 @@ import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/ro
 import { Role } from '@/types';
 
 export const ListPage = () => {
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { roles, refetch } = useListRoles(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: roles, refetch } = useListRoles(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -24,7 +26,7 @@ export const ListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

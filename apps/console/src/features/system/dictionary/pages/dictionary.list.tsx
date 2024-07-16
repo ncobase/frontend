@@ -18,8 +18,10 @@ import { Dictionary } from '@/types';
 export const DictionaryListPage = () => {
   const { t } = useTranslation();
 
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { dictionaries, refetch } = useListDictionaries(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: dictionaries, refetch } = useListDictionaries(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -28,7 +30,7 @@ export const DictionaryListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

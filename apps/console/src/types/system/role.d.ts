@@ -15,6 +15,8 @@ export interface Role {
 }
 
 export interface Roles {
-  content: Role[];
+  items: Role[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

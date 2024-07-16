@@ -15,6 +15,8 @@ export interface Comment {
 }
 
 export interface Comments {
-  content: Comment[];
+  items: Comment[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

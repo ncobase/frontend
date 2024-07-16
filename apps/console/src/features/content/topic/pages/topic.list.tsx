@@ -17,8 +17,10 @@ import { Topic } from '@/types';
 
 export const TopicListPage = () => {
   const { t } = useTranslation();
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { topics, refetch } = useListTopics(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: topics, refetch } = useListTopics(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -27,7 +29,7 @@ export const TopicListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

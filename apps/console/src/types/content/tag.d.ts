@@ -5,6 +5,8 @@ export interface Tag {
 }
 
 export interface Tags {
-  content: Tag[];
+  items: Tag[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

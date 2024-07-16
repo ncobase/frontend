@@ -20,8 +20,8 @@ export const accountKeys: AccountKeys = {
   login: ['accountService', 'login'],
   register: ['accountService', 'register'],
   currentUser: ['accountService', 'currentUser'],
-  tenants: (queryKey = {}) => ['accountService', 'tenants', queryKey],
-  tenant: (queryKey = {}) => ['accountService', 'tenant', queryKey]
+  tenants: (queryParams = {}) => ['accountService', 'tenants', queryParams],
+  tenant: (queryParams = {}) => ['accountService', 'tenant', queryParams]
 };
 
 // Custom hook for mutations that involve token updates
@@ -65,7 +65,7 @@ export const useAccount = () => {
   return { ...data, isAdministered, ...rest };
 };
 
-// Account related tenant request merged to useAccount hook
+// // Account related tenant request merged to useAccount hook
 // // Hook to get the current tenant
 // export const useAccountTenant = () => {
 //   const { data: tenant, ...rest } = useQuery({
@@ -76,27 +76,34 @@ export const useAccount = () => {
 // };
 
 // // Hook to get the list of tenants with pagination
-// export const useAccountTenants = (queryKey: AnyObject = {}) => {
+// export const useAccountTenants = (queryParams: AnyObject = {}) => {
 //   const { data, ...rest } = useQuery({
-//     queryKey: accountKeys.tenants(queryKey),
+//     queryKey: accountKeys.tenants(queryParams),
 //     queryFn: getAccountTenants
 //   });
-//   const tenants = useMemo(() => data?.content || [], [data]);
-//   const paginatedResult = usePaginatedData(
-//     tenants,
-//     queryKey?.cursor as string,
-//     queryKey?.limit as number
+
+//   const paginatedResult = usePaginatedData<Tenant>(
+//     data || { items: [], total: 0, has_next: false },
+//     queryParams?.cursor as string,
+//     queryParams?.limit as number
 //   );
-//   return { tenants: paginatedResult.data, ...paginatedResult, ...rest };
+
+//   return { ...paginatedResult, ...rest };
 // };
 
 // // Helper hook for paginated data
-// const usePaginatedData = (data: ExplicitAny[], cursor?: string, limit?: number) => {
-//   const { rs, hasNextPage, nextCursor } = useMemo(
-//     () => paginateByCursor(data, cursor, limit) || ({} as ExplicitAny),
-//     [data, cursor, limit]
-//   );
-//   return { data: rs, hasNextPage, nextCursor };
+// const usePaginatedData = <T>(
+//   data: { items: T[]; total: number; has_next: boolean; next?: string },
+//   cursor?: string,
+//   limit: number = 10
+// ): PaginationResult<T> => {
+//   const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
+//     items: [],
+//     has_next: data.has_next,
+//     next: data.next
+//   };
+
+//   return { items, total: data.total, next, has_next };
 // };
 
 // Hook for user logout

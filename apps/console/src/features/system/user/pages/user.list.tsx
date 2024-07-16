@@ -17,8 +17,10 @@ import { Account, User } from '@/types';
 
 export const UserListPage = () => {
   const { t } = useTranslation();
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { users, refetch } = useListUsers(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: users, refetch } = useListUsers(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -27,7 +29,7 @@ export const UserListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

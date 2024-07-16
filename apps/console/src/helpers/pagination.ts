@@ -1,22 +1,30 @@
 export interface PaginationResult<T> {
-  rs: T[];
-  hasNextPage: boolean;
-  nextCursor?: string;
+  items: T[];
+  total: number;
+  has_next: boolean;
+  next?: string;
 }
 
-export function paginateByCursor<T extends { id?: string }>(
-  content: T[],
-  cursor: string,
-  limit: number
-): PaginationResult<T> {
-  const startIndex = content.findIndex(item => item.id === cursor);
-  const endIndex = Math.min(startIndex + limit, content.length);
-  const rs = content; // .slice(startIndex, endIndex);
-  const hasNextPage = endIndex < content.length;
-  const nextCursor = hasNextPage ? content[endIndex - 1]?.id : undefined;
-  return {
-    rs,
-    hasNextPage,
-    nextCursor
-  };
-}
+export const paginateByCursor = <T extends { id?: string }>(
+  items: T[],
+  total: number,
+  cursor?: string,
+  limit: number = 10
+): PaginationResult<T> | undefined => {
+  if (!items || items.length === 0) {
+    return { items: [], total: 0, has_next: false };
+  }
+
+  const startIndex = cursor ? items.findIndex(item => item.id === cursor) + 1 : 0;
+  const endIndex = Math.min(startIndex + limit, items.length);
+
+  if (startIndex >= 0 && startIndex < items.length) {
+    const paginatedItems = items.slice(startIndex, endIndex);
+    const hasNext = endIndex < items.length;
+    const next = hasNext ? items[endIndex]?.id : undefined;
+
+    return { items: paginatedItems, total: total, next, has_next: hasNext };
+  }
+
+  return { items: [], total: 0, has_next: false };
+};

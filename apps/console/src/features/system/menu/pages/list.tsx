@@ -20,8 +20,10 @@ export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const [queryKey, setQueryKey] = useState<QueryFormParams>({});
-  const { menus, refetch } = useListMenus(queryKey);
+  const [queryParams, setQueryParams] = useState<
+    QueryFormParams & { cursor?: string; limit?: number }
+  >({});
+  const { items: menus, refetch } = useListMenus(queryParams);
 
   const { mode, slug } = useParams<{ mode: string; slug: string }>();
 
@@ -35,7 +37,7 @@ export const MenuListPage = () => {
   } = useForm<QueryFormParams>();
 
   const onQuery = handleQuerySubmit(data => {
-    setQueryKey(data);
+    setQueryParams(data);
   });
 
   const onResetQuery = () => {

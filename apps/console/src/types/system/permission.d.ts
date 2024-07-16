@@ -17,6 +17,8 @@ export interface Permission {
 }
 
 export interface Permissions {
-  content: Permission[];
+  items: Permission[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }

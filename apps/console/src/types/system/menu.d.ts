@@ -25,10 +25,12 @@ export interface MenuTree extends Menu {
 }
 
 export interface MenuTrees {
-  content: MenuTree[];
+  items: MenuTree[];
 }
 
 export interface Menus {
-  content: Menu[];
+  items: Menu[];
   total: number;
+  has_next: boolean;
+  next?: string;
 }
