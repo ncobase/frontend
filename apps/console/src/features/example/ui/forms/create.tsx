@@ -32,8 +32,9 @@ import { ExplicitAny } from '@/types';
 export const CreatePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams] = useState({});
-  const { menus } = useListMenus(queryParams);
+  const [queryParams] = useState();
+  const { data } = useListMenus(queryParams);
+  const menus = data?.items || [];
 
   const fields: FieldConfigProps[] = [
     {

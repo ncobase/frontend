@@ -1,14 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import { createUser, getUser, getUsers, updateUser } from '@/apis/system/user';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { UserMeshes, AnyObject, User } from '@/types';
+import { UserMeshes, User } from '@/types';
 
 interface UserKeys {
   create: ['userService', 'create'];
   get: (options?: { user?: string }) => ['userService', 'user', { user?: string }];
   update: ['userService', 'update'];
-  list: (options?: AnyObject) => ['userService', 'users', AnyObject];
+  list: (options?: QueryFormParams) => ['userService', 'users', QueryFormParams];
 }
 
 export const userKeys: UserKeys = {
@@ -31,7 +33,7 @@ export const useUpdateUser = () =>
   useMutation({ mutationFn: (payload: Pick<UserMeshes, keyof UserMeshes>) => updateUser(payload) });
 
 // Hook to list users with pagination
-export const useListUsers = (queryParams: AnyObject = {}) => {
+export const useListUsers = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: userKeys.list(queryParams),
     queryFn: () => getUsers(queryParams)

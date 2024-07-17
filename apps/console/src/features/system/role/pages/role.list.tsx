@@ -18,9 +18,7 @@ import { Role } from '@/types';
 export const RoleListPage = () => {
   const { t } = useTranslation();
 
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: roles, refetch } = useListRoles(queryParams);
 
   const {

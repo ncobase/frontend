@@ -1,14 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import { createRole, getRole, getRoles, updateRole } from '@/apis/system/role';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Role } from '@/types';
+import { Role } from '@/types';
 
 interface RoleKeys {
   create: ['roleService', 'create'];
   get: (options?: { role?: string }) => ['roleService', 'role', { role?: string }];
   update: ['roleService', 'update'];
-  list: (options?: AnyObject) => ['roleService', 'roles', AnyObject];
+  list: (options?: QueryFormParams) => ['roleService', 'roles', QueryFormParams];
 }
 
 export const roleKeys: RoleKeys = {
@@ -31,7 +33,7 @@ export const useUpdateRole = () =>
   useMutation({ mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload) });
 
 // Hook to list roles with pagination
-export const useListRoles = (queryParams: AnyObject = {}) => {
+export const useListRoles = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: roleKeys.list(queryParams),
     queryFn: () => getRoles(queryParams)

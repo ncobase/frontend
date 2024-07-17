@@ -45,8 +45,8 @@ export class Request {
     if (err instanceof Error) {
       console.error(`${t('errors.request.label')} [${method} ${url}]: ${err.message}`);
     } else {
-      const { status, statusText } = err;
-      console.error(`${t('errors.response.label')} [${method} ${url}]: ${status} ${statusText}`);
+      const { status } = err;
+      // console.error(`${t('errors.response.label')} [${method} ${url}]: ${status} ${statusText}`);
       if (status === 401) {
         eventEmitter.emit('unauthorized');
       } else if (status === 403) {
@@ -83,7 +83,8 @@ export class Request {
           }
         }
       };
-      return this.$fetch(url, options);
+
+      return await this.$fetch(url, options);
     } catch (err) {
       await this.handleErrors(err as Error, method, url);
     }

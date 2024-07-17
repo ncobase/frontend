@@ -32,8 +32,9 @@ import { Page } from '@/layout';
 export const EditorPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams] = useState({});
-  const { menus } = useListMenus(queryParams);
+  const [queryParams] = useState();
+  const { data } = useListMenus(queryParams);
+  const menus = data?.items || [];
 
   const { currentTime } = useCurrentTime();
 

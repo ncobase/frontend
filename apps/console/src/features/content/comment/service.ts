@@ -1,14 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import { createComment, getComment, getComments, updateComment } from '@/apis/content/comment';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Comment, ExplicitAny } from '@/types';
+import { Comment } from '@/types';
 
 interface CommentKeys {
   create: ['commentService', 'create'];
   get: (options?: { comment?: string }) => ['commentService', 'comment', { comment?: string }];
   update: ['commentService', 'update'];
-  list: (options?: AnyObject) => ['commentService', 'comments', AnyObject];
+  list: (options?: QueryFormParams) => ['commentService', 'comments', QueryFormParams];
 }
 
 export const commentKeys: CommentKeys = {
@@ -31,7 +33,7 @@ export const useUpdateComment = () =>
   useMutation({ mutationFn: (payload: Pick<Comment, keyof Comment>) => updateComment(payload) });
 
 // Hook to list comments with pagination
-export const useListComments = (queryParams: AnyObject = {}) => {
+export const useListComments = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: commentKeys.list(queryParams),
     queryFn: () => getComments(queryParams)

@@ -1,14 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from '../menu/config/query';
+
 import { createTenant, getTenant, getTenants, updateTenant } from '@/apis/system/tenant';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Tenant } from '@/types';
+import { Tenant } from '@/types';
 
 interface TenantKeys {
   create: ['tenantService', 'create'];
   get: (options?: { tenant?: string }) => ['tenantService', 'tenant', { tenant?: string }];
   update: ['tenantService', 'update'];
-  list: (options?: AnyObject) => ['tenantService', 'tenants', AnyObject];
+  list: (options?: QueryFormParams) => ['tenantService', 'tenants', QueryFormParams];
 }
 
 export const tenantKeys: TenantKeys = {
@@ -31,7 +33,7 @@ export const useUpdateTenant = () =>
   useMutation({ mutationFn: (payload: Pick<Tenant, keyof Tenant>) => updateTenant(payload) });
 
 // Hook to list tenants with pagination
-export const useListTenants = (queryParams: AnyObject = {}) => {
+export const useListTenants = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: tenantKeys.list(queryParams),
     queryFn: () => getTenants(queryParams)

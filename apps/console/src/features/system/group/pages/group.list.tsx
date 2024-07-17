@@ -17,10 +17,7 @@ import { Group } from '@/types';
 
 export const GroupListPage = () => {
   const { t } = useTranslation();
-
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: groups, refetch } = useListGroups(queryParams);
 
   const {

@@ -18,9 +18,7 @@ import { Dictionary } from '@/types';
 export const DictionaryListPage = () => {
   const { t } = useTranslation();
 
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: dictionaries, refetch } = useListDictionaries(queryParams);
 
   const {

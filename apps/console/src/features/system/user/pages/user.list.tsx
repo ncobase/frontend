@@ -17,9 +17,7 @@ import { Account, User } from '@/types';
 
 export const UserListPage = () => {
   const { t } = useTranslation();
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: users, refetch } = useListUsers(queryParams);
 
   const {

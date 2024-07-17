@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { Button, Form, TableView, TableViewProps } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
@@ -29,13 +29,14 @@ export interface CommonProps<T extends object> {
   }[];
   onQuery?: (query: any) => void;
   onResetQuery?: () => void;
+  fetchData?: TableViewProps['fetchData'];
 }
 
 export type CurdProps<T extends object> = CommonProps<T> &
   (ModalViewProps<T> | FlattenViewProps<T>);
 
 const QueryBar = ({
-  queryFields,
+  queryFields = [],
   onQuery,
   onResetQuery,
   t
@@ -102,41 +103,6 @@ const PaginationTexts = (t: any) => ({
   perPageText: t('pagination.per_page_text')
 });
 
-const RenderTableView = ({
-  t,
-  data,
-  paginated,
-  pageSize,
-  pageSizes,
-  selected,
-  visibleControl,
-  columns,
-  className
-}: {
-  t: any;
-  data: any[];
-  paginated: boolean;
-  pageSize: number;
-  pageSizes: number[];
-  selected: any;
-  visibleControl: boolean;
-  columns: any;
-  className?: string;
-}) => (
-  <TableView
-    className={className}
-    data={data}
-    paginated={paginated}
-    pageSize={pageSize}
-    pageSizes={pageSizes}
-    paginationTexts={PaginationTexts(t)}
-    emptyDataLabel={t('empty.no_data')}
-    selected={selected}
-    visibleControl={visibleControl}
-    header={columns}
-  />
-);
-
 const renderTopbar = (mode: string, type: string | undefined) =>
   mode === 'modal' || (mode === 'flatten' && !type);
 
@@ -146,7 +112,7 @@ const renderQueryBar = (mode: string, queryFieldsLength: number, type: string | 
 const renderTableView = (mode: string, type: string | undefined) =>
   mode === 'modal' || (mode === 'flatten' && !type);
 
-const CurdView = <T extends object>({
+export const CurdView = <T extends object>({
   viewMode,
   type,
   title,
@@ -154,7 +120,7 @@ const CurdView = <T extends object>({
   topbarLeft,
   topbarRight,
   paginated = true,
-  pageSize = 20,
+  pageSize,
   pageSizes = [5, 10, 20, 50, 100],
   selected,
   visibleControl = true,
@@ -163,11 +129,40 @@ const CurdView = <T extends object>({
   queryFields = [],
   onQuery,
   onResetQuery,
+  fetchData,
   ...rest
 }: CurdProps<T>) => {
   const { t } = useTranslation();
   const { vmode } = useLayoutContext();
   const mode = viewMode || vmode;
+
+  const tableViewProps = useMemo(
+    () => ({
+      data,
+      paginated,
+      pageSize,
+      pageSizes,
+      selected,
+      visibleControl,
+      header: columns,
+      className: cn(queryFields.length && 'mt-4'),
+      fetchData,
+      paginationTexts: PaginationTexts(t),
+      emptyDataLabel: t('empty.no_data')
+    }),
+    [
+      data,
+      paginated,
+      pageSize,
+      pageSizes,
+      selected,
+      visibleControl,
+      columns,
+      queryFields.length,
+      fetchData,
+      t
+    ]
+  );
 
   const renderMode = (mode: string) => {
     switch (mode) {
@@ -194,24 +189,8 @@ const CurdView = <T extends object>({
       {renderQueryBar(mode, queryFields.length, type) && (
         <QueryBar queryFields={queryFields} onQuery={onQuery} onResetQuery={onResetQuery} t={t} />
       )}
-      {renderTableView(mode, type) && (
-        <RenderTableView
-          {...{
-            t,
-            data,
-            paginated,
-            pageSize,
-            pageSizes,
-            selected,
-            visibleControl,
-            columns,
-            className: cn(queryFields.length && 'mt-4')
-          }}
-        />
-      )}
+      {renderTableView(mode, type) && <TableView {...tableViewProps} />}
       {renderMode(mode)}
     </Page>
   );
 };
-
-export { CurdView };

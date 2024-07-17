@@ -17,9 +17,7 @@ import { Comment } from '@/types';
 
 export const CommentListPage = () => {
   const { t } = useTranslation();
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: comments, refetch } = useListComments(queryParams);
 
   const {

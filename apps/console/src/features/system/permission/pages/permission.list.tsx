@@ -18,9 +18,7 @@ import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: permissions, refetch } = useListPermissions(queryParams);
 
   const {

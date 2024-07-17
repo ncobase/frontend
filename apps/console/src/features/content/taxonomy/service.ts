@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import {
   createTaxonomy,
   getTaxonomies,
@@ -7,13 +9,13 @@ import {
   updateTaxonomy
 } from '@/apis/content/taxonomy';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Taxonomy } from '@/types';
+import { Taxonomy } from '@/types';
 
 interface TaxonomyKeys {
   create: ['taxonomyService', 'create'];
   get: (options?: { taxonomy?: string }) => ['taxonomyService', 'taxonomy', { taxonomy?: string }];
   update: ['taxonomyService', 'update'];
-  list: (options?: AnyObject) => ['taxonomyService', 'taxonomies', AnyObject];
+  list: (options?: QueryFormParams) => ['taxonomyService', 'taxonomies', QueryFormParams];
 }
 
 export const taxonomyKeys: TaxonomyKeys = {
@@ -36,7 +38,7 @@ export const useUpdateTaxonomy = () =>
   useMutation({ mutationFn: (payload: Pick<Taxonomy, keyof Taxonomy>) => updateTaxonomy(payload) });
 
 // Hook to list taxonomies with pagination
-export const useListTaxonomies = (queryParams: AnyObject = {}) => {
+export const useListTaxonomies = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: taxonomyKeys.list(queryParams),
     queryFn: () => getTaxonomies(queryParams)

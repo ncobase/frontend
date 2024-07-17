@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { InputField, SelectField } from '@ncobase/react';
+import { InputField, PaginationParams, SelectField } from '@ncobase/react';
 import { Control, Controller } from 'react-hook-form';
 
 import { ExplicitAny } from '@/types';
@@ -10,7 +10,7 @@ export type QueryFormParams = {
   code?: string;
   title?: string;
   status?: string;
-};
+} & PaginationParams;
 
 export const queryFields = (queryControl: Control<QueryFormParams, ExplicitAny>) => [
   {

@@ -1,7 +1,7 @@
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Menu, Menus, MenuTrees } from '@/types';
+import { ExplicitAny, Menu, MenuTrees, PaginationResult } from '@/types';
 
 const ENDPOINT = '/v1/menus';
 
@@ -26,7 +26,7 @@ export const deleteMenu = async (id: string): Promise<Menu> => {
 };
 
 // list
-export const getMenus = async (params: ExplicitAny): Promise<Menus> => {
+export const getMenus = async (params: ExplicitAny): Promise<PaginationResult<Menu>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

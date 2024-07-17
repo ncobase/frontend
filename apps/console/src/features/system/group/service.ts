@@ -1,14 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import { createGroup, getGroup, getGroups, updateGroup } from '@/apis/system/group';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Group } from '@/types';
+import { Group } from '@/types';
 
 interface GroupKeys {
   create: ['groupService', 'create'];
   get: (options?: { group?: string }) => ['groupService', 'group', { group?: string }];
   update: ['groupService', 'update'];
-  list: (options?: AnyObject) => ['groupService', 'groups', AnyObject];
+  list: (options?: QueryFormParams) => ['groupService', 'groups', QueryFormParams];
 }
 
 export const groupKeys: GroupKeys = {
@@ -31,7 +33,7 @@ export const useUpdateGroup = () =>
   useMutation({ mutationFn: (payload: Pick<Group, keyof Group>) => updateGroup(payload) });
 
 // Hook to list groups with pagination
-export const useListGroups = (queryParams: AnyObject = {}) => {
+export const useListGroups = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: groupKeys.list(queryParams),
     queryFn: () => getGroups(queryParams)

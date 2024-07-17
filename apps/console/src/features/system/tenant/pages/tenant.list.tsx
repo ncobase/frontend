@@ -16,7 +16,7 @@ import { Tenant } from '@/types';
 
 export const TenantListPage = () => {
   const { t } = useTranslation();
-  const [queryParams] = useState({});
+  const [queryParams] = useState();
   const { items: tenants, refetch } = useListTenants(queryParams);
 
   const [selectedRecord, setSelectedRecord] = useState<Tenant | null>(null);

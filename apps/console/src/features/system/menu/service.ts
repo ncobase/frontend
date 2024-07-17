@@ -1,6 +1,8 @@
 import { sortTree } from '@ncobase/utils';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import {
   getMenu,
   getMenuTree,
@@ -9,7 +11,6 @@ import {
   deleteMenu,
   getMenus
 } from '@/apis/system/menu';
-import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
 import { AnyObject, Menu } from '@/types';
 
 interface MenuKeys {
@@ -18,7 +19,7 @@ interface MenuKeys {
   tree: (options?: AnyObject) => ['menuService', 'tree', AnyObject];
   update: ['menuService', 'update'];
   delete: (options?: { menu?: string }) => ['menuService', 'delete', { menu?: string }];
-  list: (options?: AnyObject) => ['menuService', 'menus', AnyObject];
+  list: (options?: QueryFormParams) => ['menuService', 'menus', QueryFormParams];
 }
 
 export const menuKeys: MenuKeys = {
@@ -61,33 +62,10 @@ export const useUpdateMenu = () =>
 // Hook for delete menu mutation
 export const useDeleteMenu = () => useMutation({ mutationFn: (id: string) => deleteMenu(id) });
 
-// Hook to list menus with pagination
-export const useListMenus = (queryParams: AnyObject = {}) => {
-  const { data, ...rest } = useQuery({
+// Hook to list menus
+export const useListMenus = (queryParams: QueryFormParams) => {
+  return useQuery({
     queryKey: menuKeys.list(queryParams),
     queryFn: () => getMenus(queryParams)
   });
-
-  const paginatedResult = usePaginatedData<Menu>(
-    data || { items: [], total: 0, has_next: false },
-    queryParams?.cursor as string,
-    queryParams?.limit as number
-  );
-
-  return { ...paginatedResult, ...rest };
-};
-
-// Helper hook for paginated data
-const usePaginatedData = <T>(
-  data: { items: T[]; total: number; has_next: boolean; next?: string },
-  cursor?: string,
-  limit: number = 10
-): PaginationResult<T> => {
-  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
-    items: [],
-    has_next: data.has_next,
-    next: data.next
-  };
-
-  return { items, total: data.total, next, has_next };
 };

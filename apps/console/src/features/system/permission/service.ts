@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import {
   createPermission,
   getPermission,
@@ -16,7 +18,7 @@ interface PermissionKeys {
   }) => ['permissionService', 'permission', { permission?: string }];
   tree: (options?: AnyObject) => ['permissionService', 'tree', AnyObject];
   update: ['permissionService', 'update'];
-  list: (options?: AnyObject) => ['permissionService', 'permissions', AnyObject];
+  list: (options?: QueryFormParams) => ['permissionService', 'permissions', QueryFormParams];
 }
 
 export const permissionKeys: PermissionKeys = {
@@ -47,7 +49,7 @@ export const useUpdatePermission = () =>
   });
 
 // Hook to list permissions with pagination
-export const useListPermissions = (queryParams: AnyObject = {}) => {
+export const useListPermissions = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: permissionKeys.list(queryParams),
     queryFn: () => getPermissions(queryParams)

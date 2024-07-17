@@ -17,9 +17,7 @@ import { Topic } from '@/types';
 
 export const TopicListPage = () => {
   const { t } = useTranslation();
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: topics, refetch } = useListTopics(queryParams);
 
   const {

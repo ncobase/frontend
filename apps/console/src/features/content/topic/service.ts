@@ -1,14 +1,16 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import { createTopic, getTopic, getTopics, updateTopic } from '@/apis/content/topic';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Topic } from '@/types';
+import { Topic } from '@/types';
 
 interface TopicKeys {
   create: ['topicService', 'create'];
   get: (options?: { topic?: string }) => ['topicService', 'topic', { topic?: string }];
   update: ['topicService', 'update'];
-  list: (options?: AnyObject) => ['topicService', 'topics', AnyObject];
+  list: (options?: QueryFormParams) => ['topicService', 'topics', QueryFormParams];
 }
 
 export const topicKeys: TopicKeys = {
@@ -31,7 +33,7 @@ export const useUpdateTopic = () =>
   useMutation({ mutationFn: (payload: Pick<Topic, keyof Topic>) => updateTopic(payload) });
 
 // Hook to list topics with pagination
-export const useListTopics = (queryParams: AnyObject = {}) => {
+export const useListTopics = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: topicKeys.list(queryParams),
     queryFn: () => getTopics(queryParams)

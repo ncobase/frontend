@@ -14,9 +14,7 @@ import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/ro
 import { Role } from '@/types';
 
 export const ListPage = () => {
-  const [queryParams, setQueryParams] = useState<
-    QueryFormParams & { cursor?: string; limit?: number }
-  >({});
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { items: roles, refetch } = useListRoles(queryParams);
 
   const {

@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { QueryFormParams } from './config/query';
+
 import {
   createDictionary,
   getDictionaries,
@@ -7,7 +9,7 @@ import {
   updateDictionary
 } from '@/apis/system/dictionary';
 import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { AnyObject, Dictionary, ExplicitAny } from '@/types';
+import { Dictionary } from '@/types';
 
 interface DictionaryKeys {
   create: ['dictionaryService', 'create'];
@@ -15,7 +17,7 @@ interface DictionaryKeys {
     dictionary?: string;
   }) => ['dictionaryService', 'dictionary', { dictionary?: string }];
   update: ['dictionaryService', 'update'];
-  list: (options?: AnyObject) => ['dictionaryService', 'dictionaries', AnyObject];
+  list: (options?: QueryFormParams) => ['dictionaryService', 'dictionaries', QueryFormParams];
 }
 
 export const dictionaryKeys: DictionaryKeys = {
@@ -45,7 +47,7 @@ export const useUpdateDictionary = () =>
   });
 
 // Hook to list dictionaries with pagination
-export const useListDictionaries = (queryParams: AnyObject = {}) => {
+export const useListDictionaries = (queryParams: QueryFormParams = {}) => {
   const { data, ...rest } = useQuery({
     queryKey: dictionaryKeys.list(queryParams),
     queryFn: () => getDictionaries(queryParams)

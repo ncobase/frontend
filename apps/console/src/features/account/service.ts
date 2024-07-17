@@ -76,7 +76,7 @@ export const useAccount = () => {
 // };
 
 // // Hook to get the list of tenants with pagination
-// export const useAccountTenants = (queryParams: AnyObject = {}) => {
+// export const useAccountTenants = (queryParams: QueryFormParams = {}) => {
 //   const { data, ...rest } = useQuery({
 //     queryKey: accountKeys.tenants(queryParams),
 //     queryFn: getAccountTenants
