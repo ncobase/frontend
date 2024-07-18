@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { Dictionaries, Dictionary, ExplicitAny } from '@/types';
+import { Dictionary, ExplicitAny } from '@/types';
 
 const ENDPOINT = '/v1/dictionaries';
 
@@ -26,7 +27,9 @@ export const deleteDictionary = async (id: string): Promise<Dictionary> => {
 };
 
 // list
-export const getDictionaries = async (params: ExplicitAny): Promise<Dictionaries> => {
+export const getDictionaries = async (
+  params: ExplicitAny
+): Promise<PaginationResult<Dictionary>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

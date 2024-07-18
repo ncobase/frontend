@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DictionaryListPage } from './pages/dictionary.list';
+import { DictionaryListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

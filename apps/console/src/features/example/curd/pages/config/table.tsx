@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { parseStatus } from '@/helpers/status';
 import { Role } from '@/types';
 
-export const tableColumns = (handleView: Function): TableViewProps['header'] => {
+export const tableColumns = ({ handleView }): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {

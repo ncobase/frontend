@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Taxonomies, Taxonomy } from '@/types';
+import { ExplicitAny, Taxonomy } from '@/types';
 
 const ENDPOINT = '/v1/taxonomies';
 
@@ -26,7 +27,7 @@ export const deleteTaxonomy = async (id: string): Promise<Taxonomy> => {
 };
 
 // list
-export const getTaxonomies = async (params: ExplicitAny): Promise<Taxonomies> => {
+export const getTaxonomies = async (params: ExplicitAny): Promise<PaginationResult<Taxonomy>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

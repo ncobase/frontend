@@ -9,8 +9,6 @@ import { useQueryMenu } from '../service';
 import { IconSelector } from '@/components/modal/icons';
 
 export const EditorMenuForms = ({ record, onSubmit, control, setValue, errors }) => {
-  console.log(record);
-
   const { t } = useTranslation();
   const { data = {} } = useQueryMenu(record);
   const [isSelectIcon, setIsSelectIcon] = useState(false);

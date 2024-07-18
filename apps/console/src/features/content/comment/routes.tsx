@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CommentListPage } from './pages/comment.list';
+import { CommentListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

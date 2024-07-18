@@ -14,8 +14,8 @@ import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/ro
 import { Role } from '@/types';
 
 export const ListPage = () => {
-  const [queryParams, setQueryParams] = useState<QueryFormParams>();
-  const { items: roles, refetch } = useListRoles(queryParams);
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
+  const { data, refetch } = useListRoles(queryParams);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -81,11 +81,12 @@ export const ListPage = () => {
   return (
     <CurdView
       title='角色管理'
-      topbarLeft={topbarLeftSection(handleView)}
+      topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
-      data={roles}
-      columns={tableColumns(handleView)}
-      queryFields={queryFields(queryControl)}
+      data={data?.items}
+      pageSize={queryParams?.limit}
+      columns={tableColumns({ handleView })}
+      queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       createComponent={

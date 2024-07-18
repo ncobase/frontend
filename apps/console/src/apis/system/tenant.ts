@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Tenant, Tenants } from '@/types';
+import { ExplicitAny, Tenant } from '@/types';
 
 const ENDPOINT = '/v1/tenants';
 
@@ -20,13 +21,8 @@ export const updateTenant = async (payload: Tenant): Promise<Tenant> => {
   return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
-// delete
-export const deleteTenant = async (id: string): Promise<Tenant> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
 // list
-export const getTenants = async (params: ExplicitAny): Promise<Tenants> => {
+export const getTenants = async (params: ExplicitAny): Promise<PaginationResult<Tenant>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

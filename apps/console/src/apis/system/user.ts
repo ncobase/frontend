@@ -1,12 +1,13 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { UserMeshes, ExplicitAny, Users } from '@/types';
+import { UserMeshes, ExplicitAny, User } from '@/types';
 
 const ENDPOINT = '/v1/users';
 
 // create
-export const createUser = async (payload: UserMeshes): Promise<UserMeshes> => {
+export const createUser = async (payload: User): Promise<UserMeshes> => {
   return request.post(ENDPOINT, { ...payload });
 };
 
@@ -16,8 +17,8 @@ export const getUser = async (id: string): Promise<UserMeshes> => {
 };
 
 // update
-export const updateUser = async (payload: UserMeshes): Promise<UserMeshes> => {
-  return request.put(`${ENDPOINT}/${payload.user.id}`, { ...payload });
+export const updateUser = async (payload: User): Promise<UserMeshes> => {
+  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
 };
 
 // delete
@@ -26,7 +27,7 @@ export const deleteUser = async (id: string): Promise<ExplicitAny> => {
 };
 
 // list
-export const getUsers = async (params: ExplicitAny): Promise<Users> => {
+export const getUsers = async (params: ExplicitAny): Promise<PaginationResult<User>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

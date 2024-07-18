@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Role, Roles } from '@/types';
+import { ExplicitAny, Role } from '@/types';
 
 const ENDPOINT = '/v1/roles';
 
@@ -26,7 +27,7 @@ export const deleteRole = async (id: string): Promise<Role> => {
 };
 
 // list
-export const getRoles = async (params: ExplicitAny): Promise<Roles> => {
+export const getRoles = async (params: ExplicitAny): Promise<PaginationResult<Role>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

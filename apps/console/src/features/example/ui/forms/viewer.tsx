@@ -23,7 +23,7 @@ import { Page } from '@/layout';
 export const ViewerPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams] = useState();
+  const [queryParams] = useState({ limit: 20 });
   const { data } = useListMenus(queryParams);
   const menus = data?.items || [];
 

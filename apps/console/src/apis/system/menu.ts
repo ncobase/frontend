@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Menu, MenuTrees, PaginationResult } from '@/types';
+import { ExplicitAny, Menu, MenuTrees } from '@/types';
 
 const ENDPOINT = '/v1/menus';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PermissionListPage } from './pages/permission.list';
+import { PermissionListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

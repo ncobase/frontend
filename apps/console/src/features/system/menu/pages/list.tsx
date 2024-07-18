@@ -15,16 +15,16 @@ import { EditorMenuPage } from './editor';
 import { MenuViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
+import { useLayoutContext } from '@/layout';
 import { Menu } from '@/types';
 
 export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>();
-
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
   const { data, refetch } = useListMenus(queryParams);
+  const { vmode } = useLayoutContext();
   const { mode, slug } = useParams<{ mode: string; slug: string }>();
-  const vmode = 'flatten' as 'flatten' | 'modal';
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -41,21 +41,18 @@ export const MenuListPage = () => {
   };
 
   const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create'>();
+  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
 
   useEffect(() => {
-    if (slug && data) {
-      const record = data.items.find(menu => menu.id === slug || menu.slug === slug) || null;
+    if (data && data?.items?.length) {
+      const record = slug
+        ? data.items.find(item => item.id === slug || item.slug === slug) || null
+        : null;
       setSelectedRecord(record);
-      setViewType(mode as 'view' | 'edit');
-    } else if (mode === 'create') {
-      setSelectedRecord(null);
-      setViewType('create');
-    } else {
-      setSelectedRecord(null);
-      setViewType(undefined);
+      setViewType(slug ? (mode as 'view' | 'edit') : mode === 'create' ? 'create' : undefined);
     }
-  }, [mode, slug, data]);
+    return () => {};
+  }, [data]);
 
   const handleView = useCallback(
     (record: Menu | null, type: 'view' | 'edit' | 'create') => {
@@ -123,12 +120,10 @@ export const MenuListPage = () => {
 
   const fetchData = useCallback(
     async (newQueryParams: QueryFormParams) => {
-      if (!queryParams || !data) return data;
-      const mergedParams = { ...queryParams, ...newQueryParams };
-      if (isEqual(mergedParams, queryParams)) {
+      if (isEqual(newQueryParams, queryParams)) {
         return data;
       }
-      setQueryParams(mergedParams);
+      setQueryParams(newQueryParams);
       const result = await refetch();
       return result.data || { items: [], total: 0, next: null, has_next: false };
     },
@@ -143,6 +138,7 @@ export const MenuListPage = () => {
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
       selected
+      pageSize={queryParams?.limit}
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}

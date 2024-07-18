@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { Comment, Comments, ExplicitAny } from '@/types';
+import { Comment, ExplicitAny } from '@/types';
 
 const ENDPOINT = '/v1/comments';
 
@@ -26,7 +27,7 @@ export const deleteComment = async (id: string): Promise<Comment> => {
 };
 
 // list
-export const getComments = async (params: ExplicitAny): Promise<Comments> => {
+export const getComments = async (params: ExplicitAny): Promise<PaginationResult<Comment>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { parseStatus } from '@/helpers/status';
 import { Group } from '@/types';
 
-export const tableColumns = (handleView: Function): TableViewProps['header'] => {
+export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
@@ -83,7 +83,9 @@ export const tableColumns = (handleView: Function): TableViewProps['header'] => 
         {
           title: t('actions.delete'),
           icon: 'IconTrash',
-          onClick: () => console.log('delete events')
+          onClick: (record: Group) => {
+            handleDelete(record, 'delete');
+          }
         }
       ]
     }

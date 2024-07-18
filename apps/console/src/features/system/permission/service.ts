@@ -4,11 +4,11 @@ import { QueryFormParams } from './config/query';
 
 import {
   createPermission,
+  deletePermission,
   getPermission,
   getPermissions,
   updatePermission
 } from '@/apis/system/permission';
-import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
 import { AnyObject, Permission } from '@/types';
 
 interface PermissionKeys {
@@ -48,33 +48,14 @@ export const useUpdatePermission = () =>
     mutationFn: (payload: Pick<Permission, keyof Permission>) => updatePermission(payload)
   });
 
-// Hook to list permissions with pagination
-export const useListPermissions = (queryParams: QueryFormParams = {}) => {
-  const { data, ...rest } = useQuery({
+// Hook for delete permission mutation
+export const useDeletePermission = () =>
+  useMutation({ mutationFn: (id: string) => deletePermission(id) });
+
+// Hook to list permissions
+export const useListPermissions = (queryParams: QueryFormParams) => {
+  return useQuery({
     queryKey: permissionKeys.list(queryParams),
     queryFn: () => getPermissions(queryParams)
   });
-
-  const paginatedResult = usePaginatedData<Permission>(
-    data || { items: [], total: 0, has_next: false },
-    queryParams?.cursor as string,
-    queryParams?.limit as number
-  );
-
-  return { ...paginatedResult, ...rest };
-};
-
-// Helper hook for paginated data
-const usePaginatedData = <T>(
-  data: { items: T[]; total: number; has_next: boolean; next?: string },
-  cursor?: string,
-  limit: number = 10
-): PaginationResult<T> => {
-  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
-    items: [],
-    has_next: data.has_next,
-    next: data.next
-  };
-
-  return { items, total: data.total, next, has_next };
 };

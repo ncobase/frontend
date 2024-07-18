@@ -4,11 +4,11 @@ import { QueryFormParams } from './config/query';
 
 import {
   createDictionary,
+  deleteDictionary,
   getDictionaries,
   getDictionary,
   updateDictionary
 } from '@/apis/system/dictionary';
-import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
 import { Dictionary } from '@/types';
 
 interface DictionaryKeys {
@@ -46,33 +46,14 @@ export const useUpdateDictionary = () =>
     mutationFn: (payload: Pick<Dictionary, keyof Dictionary>) => updateDictionary(payload)
   });
 
-// Hook to list dictionaries with pagination
-export const useListDictionaries = (queryParams: QueryFormParams = {}) => {
-  const { data, ...rest } = useQuery({
+// Hook for delete dictionary mutation
+export const useDeleteDictionary = () =>
+  useMutation({ mutationFn: (id: string) => deleteDictionary(id) });
+
+// Hook to list dictionaries
+export const useListDictionaries = (queryParams: QueryFormParams) => {
+  return useQuery({
     queryKey: dictionaryKeys.list(queryParams),
     queryFn: () => getDictionaries(queryParams)
   });
-
-  const paginatedResult = usePaginatedData<Dictionary>(
-    data || { items: [], total: 0, has_next: false },
-    queryParams?.cursor as string,
-    queryParams?.limit as number
-  );
-
-  return { ...paginatedResult, ...rest };
-};
-
-// Helper hook for paginated data
-const usePaginatedData = <T>(
-  data: { items: T[]; total: number; has_next: boolean; next?: string },
-  cursor?: string,
-  limit: number = 10
-): PaginationResult<T> => {
-  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
-    items: [],
-    has_next: data.has_next,
-    next: data.next
-  };
-
-  return { items, total: data.total, next, has_next };
 };

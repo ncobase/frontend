@@ -2,9 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
 
-import { createUser, getUser, getUsers, updateUser } from '@/apis/system/user';
-import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
-import { UserMeshes, User } from '@/types';
+import { createUser, deleteUser, getUser, getUsers, updateUser } from '@/apis/system/user';
+import { User } from '@/types';
 
 interface UserKeys {
   create: ['userService', 'create'];
@@ -26,39 +25,19 @@ export const useQueryUser = (user: string) =>
 
 // Hook for create user mutation
 export const useCreateUser = () =>
-  useMutation({ mutationFn: (payload: Pick<UserMeshes, keyof UserMeshes>) => createUser(payload) });
+  useMutation({ mutationFn: (payload: Pick<User, keyof User>) => createUser(payload) });
 
 // Hook for update user mutation
 export const useUpdateUser = () =>
-  useMutation({ mutationFn: (payload: Pick<UserMeshes, keyof UserMeshes>) => updateUser(payload) });
+  useMutation({ mutationFn: (payload: Pick<User, keyof User>) => updateUser(payload) });
 
-// Hook to list users with pagination
-export const useListUsers = (queryParams: QueryFormParams = {}) => {
-  const { data, ...rest } = useQuery({
+// Hook for delete user mutation
+export const useDeleteUser = () => useMutation({ mutationFn: (id: string) => deleteUser(id) });
+
+// Hook to list users
+export const useListUsers = (queryParams: QueryFormParams) => {
+  return useQuery({
     queryKey: userKeys.list(queryParams),
     queryFn: () => getUsers(queryParams)
   });
-
-  const paginatedResult = usePaginatedData<User>(
-    data || { items: [], total: 0, has_next: false },
-    queryParams?.cursor as string,
-    queryParams?.limit as number
-  );
-
-  return { ...paginatedResult, ...rest };
-};
-
-// Helper hook for paginated data
-const usePaginatedData = <T>(
-  data: { items: T[]; total: number; has_next: boolean; next?: string },
-  cursor?: string,
-  limit: number = 10
-): PaginationResult<T> => {
-  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
-    items: [],
-    has_next: data.has_next,
-    next: data.next
-  };
-
-  return { items, total: data.total, next, has_next };
 };

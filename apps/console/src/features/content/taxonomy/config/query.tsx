@@ -12,7 +12,11 @@ export type QueryFormParams = {
   status?: string;
 } & PaginationParams;
 
-export const queryFields = (queryControl: Control<QueryFormParams, ExplicitAny>) => [
+export const queryFields = ({
+  queryControl
+}: {
+  queryControl: Control<QueryFormParams, ExplicitAny>;
+}) => [
   {
     name: 'code',
     label: '编号',

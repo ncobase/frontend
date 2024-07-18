@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Group, Groups } from '@/types';
+import { ExplicitAny, Group } from '@/types';
 
 const ENDPOINT = '/v1/groups';
 
@@ -26,7 +27,7 @@ export const deleteGroup = async (id: string): Promise<Group> => {
 };
 
 // list
-export const getGroups = async (params: ExplicitAny): Promise<Groups> => {
+export const getGroups = async (params: ExplicitAny): Promise<PaginationResult<Group>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

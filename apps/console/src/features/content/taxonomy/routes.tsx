@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TaxonomyListPage } from './pages/taxonomy.list';
+import { TaxonomyListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

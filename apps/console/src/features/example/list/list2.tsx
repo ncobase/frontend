@@ -76,7 +76,7 @@ const QueryBar = () => {
 export const ListPage2 = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams] = useState();
+  const [queryParams] = useState({ limit: 20 });
   const { data } = useListMenus(queryParams);
   const records = data?.items || [];
 

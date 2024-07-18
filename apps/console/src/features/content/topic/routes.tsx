@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TopicListPage } from './pages/topic.list';
+import { TopicListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

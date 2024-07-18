@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RoleListPage } from './pages/role.list';
+import { RoleListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

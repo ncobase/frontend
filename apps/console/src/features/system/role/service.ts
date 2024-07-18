@@ -2,8 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
 
-import { createRole, getRole, getRoles, updateRole } from '@/apis/system/role';
-import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
+import { createRole, deleteRole, getRole, getRoles, updateRole } from '@/apis/system/role';
 import { Role } from '@/types';
 
 interface RoleKeys {
@@ -32,33 +31,13 @@ export const useCreateRole = () =>
 export const useUpdateRole = () =>
   useMutation({ mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload) });
 
-// Hook to list roles with pagination
-export const useListRoles = (queryParams: QueryFormParams = {}) => {
-  const { data, ...rest } = useQuery({
+// Hook for delete role mutation
+export const useDeleteRole = () => useMutation({ mutationFn: (id: string) => deleteRole(id) });
+
+// Hook to list roles
+export const useListRoles = (queryParams: QueryFormParams) => {
+  return useQuery({
     queryKey: roleKeys.list(queryParams),
     queryFn: () => getRoles(queryParams)
   });
-
-  const paginatedResult = usePaginatedData<Role>(
-    data || { items: [], total: 0, has_next: false },
-    queryParams?.cursor as string,
-    queryParams?.limit as number
-  );
-
-  return { ...paginatedResult, ...rest };
-};
-
-// Helper hook for paginated data
-const usePaginatedData = <T>(
-  data: { items: T[]; total: number; has_next: boolean; next?: string },
-  cursor?: string,
-  limit: number = 10
-): PaginationResult<T> => {
-  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
-    items: [],
-    has_next: data.has_next,
-    next: data.next
-  };
-
-  return { items, total: data.total, next, has_next };
 };

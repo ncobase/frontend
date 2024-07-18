@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TenantListPage } from './pages/tenant.list';
+import { TenantListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 

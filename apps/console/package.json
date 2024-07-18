@@ -13,9 +13,9 @@
     "deploy:prod": "npx rimraf serverless.yaml && cp infra/serverless/tencent_cloud_prod.yaml serverless.yaml && sls deploy -s prod && npx rimraf serverless.yaml"
   },
   "dependencies": {
-    "@ncobase/react": "../../../../ncotone/frontend/packages/react",
-    "@ncobase/types": "../../../../ncotone/frontend/packages/types",
-    "@ncobase/utils": "../../../../ncotone/frontend/packages/utils",
+    "@ncobase/react": "latest",
+    "@ncobase/types": "latest",
+    "@ncobase/utils": "latest",
     "@popperjs/core": "^2.11.8",
     "@tanstack/react-query": "^5.35.5",
     "@tanstack/react-query-devtools": "^5.35.5",

@@ -1,7 +1,8 @@
+import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
 import { request } from '@/apis/request';
-import { ExplicitAny, Permission, Permissions } from '@/types';
+import { ExplicitAny, Permission } from '@/types';
 
 const ENDPOINT = '/v1/permissions';
 
@@ -26,7 +27,9 @@ export const deletePermission = async (id: string): Promise<Permission> => {
 };
 
 // list
-export const getPermissions = async (params: ExplicitAny): Promise<Permissions> => {
+export const getPermissions = async (
+  params: ExplicitAny
+): Promise<PaginationResult<Permission>> => {
   const queryString = buildQueryString(params);
   return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
 };

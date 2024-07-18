@@ -4,11 +4,11 @@ import { QueryFormParams } from './config/query';
 
 import {
   createTaxonomy,
+  deleteTaxonomy,
   getTaxonomies,
   getTaxonomy,
   updateTaxonomy
 } from '@/apis/content/taxonomy';
-import { paginateByCursor, PaginationResult } from '@/helpers/pagination';
 import { Taxonomy } from '@/types';
 
 interface TaxonomyKeys {
@@ -37,33 +37,14 @@ export const useCreateTaxonomy = () =>
 export const useUpdateTaxonomy = () =>
   useMutation({ mutationFn: (payload: Pick<Taxonomy, keyof Taxonomy>) => updateTaxonomy(payload) });
 
-// Hook to list taxonomies with pagination
-export const useListTaxonomies = (queryParams: QueryFormParams = {}) => {
-  const { data, ...rest } = useQuery({
+// Hook for delete taxonomy mutation
+export const useDeleteTaxonomy = () =>
+  useMutation({ mutationFn: (id: string) => deleteTaxonomy(id) });
+
+// Hook to list taxonomies
+export const useListTaxonomies = (queryParams: QueryFormParams) => {
+  return useQuery({
     queryKey: taxonomyKeys.list(queryParams),
     queryFn: () => getTaxonomies(queryParams)
   });
-
-  const paginatedResult = usePaginatedData<Taxonomy>(
-    data || { items: [], total: 0, has_next: false },
-    queryParams?.cursor as string,
-    queryParams?.limit as number
-  );
-
-  return { ...paginatedResult, ...rest };
-};
-
-// Helper hook for paginated data
-const usePaginatedData = <T>(
-  data: { items: T[]; total: number; has_next: boolean; next?: string },
-  cursor?: string,
-  limit: number = 10
-): PaginationResult<T> => {
-  const { items, has_next, next } = paginateByCursor(data.items, data.total, cursor, limit) || {
-    items: [],
-    has_next: data.has_next,
-    next: data.next
-  };
-
-  return { items, total: data.total, next, has_next };
 };
