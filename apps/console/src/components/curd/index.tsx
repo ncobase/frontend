@@ -30,6 +30,7 @@ export interface CommonProps<T extends object> {
   onQuery?: (query: any) => void;
   onResetQuery?: () => void;
   fetchData?: TableViewProps['fetchData'];
+  loading?: boolean;
 }
 
 export type CurdProps<T extends object> = CommonProps<T> &
@@ -130,6 +131,7 @@ export const CurdView = <T extends object>({
   onQuery,
   onResetQuery,
   fetchData,
+  loading,
   ...rest
 }: CurdProps<T>) => {
   const { t } = useTranslation();
@@ -147,6 +149,7 @@ export const CurdView = <T extends object>({
       header: columns,
       className: cn(queryFields.length && 'mt-4'),
       fetchData,
+      loading,
       paginationTexts: PaginationTexts(t),
       emptyDataLabel: t('empty.no_data')
     }),
@@ -160,6 +163,7 @@ export const CurdView = <T extends object>({
       columns,
       queryFields.length,
       fetchData,
+      loading,
       t
     ]
   );
