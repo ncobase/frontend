@@ -7,7 +7,6 @@ import { TenantProvider } from '@/features/system/tenant/context';
 // Define the shape of authentication context value
 interface AuthContextValue {
   isAuthenticated: boolean;
-
   updateTokens(accessToken?: string, refreshToken?: string): void;
 }
 

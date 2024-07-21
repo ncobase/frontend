@@ -58,11 +58,15 @@ export const useAccount = () => {
     staleTime: 1000 * 60 * 15 // 15 minutes
   });
 
-  const isAdministered = useMemo(() => {
-    return data?.roles?.some(role => ['admin', 'super-admin'].includes(role.slug));
+  const userRoles = useMemo(() => {
+    if (!data) return {};
+    return {
+      isAdmin: data?.roles?.some(role => role.slug === 'admin'),
+      isSuperAdmin: data?.roles?.some(role => role.slug === 'super-admin')
+    };
   }, [data?.roles]);
 
-  return { ...data, isAdministered, ...rest };
+  return { ...data, ...userRoles, ...rest };
 };
 
 // // Account related tenant request merged to useAccount hook

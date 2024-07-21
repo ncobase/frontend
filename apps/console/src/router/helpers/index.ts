@@ -1,4 +1,2 @@
-export * from './admin.guard';
-export * from './authenticated.guard';
-export * from './public.guard';
+export * from './guard';
 export * from './render';

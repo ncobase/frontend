@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Navigate, Route } from 'react-router-dom';
 
-import { AdminGuard, AuthenticatedGuard, PublicGuard, renderRoutes } from './helpers';
+import { Guard, renderRoutes } from './helpers';
 
 import { AnimatedSwitch } from '@/components/animate/switch';
 import { ErrorPage } from '@/components/errors';
@@ -26,18 +26,18 @@ import { SystemRoutes } from '@/features/system/routes';
 
 const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
-  { path: '/register', element: <PublicGuard children={<Register />} /> },
-  { path: '/login', element: <PublicGuard children={<Login />} /> },
-  { path: '/forget-password', element: <PublicGuard children={<ForgetPassword />} /> },
+  { path: '/register', element: <Register /> },
+  { path: '/login', element: <Login /> },
+  { path: '/forget-password', element: <ForgetPassword /> },
   { path: '/logout', element: <Logout /> },
-  { path: '/dash/*', element: <AuthenticatedGuard children={<DashRoutes />} /> },
-  { path: '/account/*', element: <AuthenticatedGuard children={<AccountRoutes />} /> },
-  { path: '/content/*', element: <AuthenticatedGuard children={<ContentRoutes />} /> },
+  { path: '/dash/*', element: <Guard children={<DashRoutes />} /> },
+  { path: '/account/*', element: <Guard children={<AccountRoutes />} /> },
+  { path: '/content/*', element: <Guard children={<ContentRoutes />} /> },
   {
     path: '/system/*',
-    element: <AuthenticatedGuard children={<AdminGuard children={<SystemRoutes />} />} />
+    element: <Guard super children={<SystemRoutes />} />
   },
-  { path: '/example/*', element: <AuthenticatedGuard children={<ExampleRoutes />} /> }
+  { path: '/example/*', element: <Guard children={<ExampleRoutes />} /> }
 ];
 
 export const publicRoutes = ['/login', '/register', '/forget-password', '/logout'];

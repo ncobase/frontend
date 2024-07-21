@@ -6,7 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 import { eventEmitter } from '@/helpers/events';
 
-const FallbackComponent = ({ error }: FallbackProps) => {
+const FallbackComponent = ({
+  error,
+  children
+}: {
+  error?: FallbackProps;
+  children?: React.ReactNode;
+}) => {
+  if (children) return <>{children}</>;
   const { t } = useTranslation();
   return (
     <Container className='flex items-center justify-center w-lvw h-lvh'>
@@ -20,6 +27,7 @@ const FallbackComponent = ({ error }: FallbackProps) => {
         // description={error?.message}
       >
         <CodeHighlighter language='json' className='h-full !my-0 text-wrap'>
+          {/** @ts-ignore */}
           {error?.stack}
         </CodeHighlighter>
       </Dialog>
@@ -30,21 +38,19 @@ const FallbackComponent = ({ error }: FallbackProps) => {
 export const ErrorBoundary: React.FC<React.PropsWithChildren> = props => {
   const handlerServerError = () => {
     console.log('request error event: server-error');
+    // return <FallbackComponent children={<ErrorPage code={500} />} />;
   };
+
   const handlerForbidden = () => {
     console.log('request error event: forbidden');
+    // return <FallbackComponent children={<ErrorPage code={403} />} />;
   };
-  const handlerUnauthorized = () => {
-    console.log('request error event: unauthorized');
-  };
+
   useEffect(() => {
     eventEmitter.on('server-error', handlerServerError);
-    eventEmitter.on('unauthorized', handlerUnauthorized);
     eventEmitter.on('forbidden', handlerForbidden);
-
     return () => {
       eventEmitter.off('server-error', handlerServerError);
-      eventEmitter.off('unauthorized', handlerUnauthorized);
       eventEmitter.off('forbidden', handlerForbidden);
     };
   }, []);
