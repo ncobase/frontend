@@ -122,9 +122,11 @@ export const GroupListPage = () => {
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
-      selected
       paginated={false}
+      selected
       fetchData={fetchData}
+      maxTreeLevel={-1}
+      isAllExpanded
       createComponent={
         <CreateGroupPage
           viewMode={vmode}

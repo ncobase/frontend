@@ -20,6 +20,9 @@ export interface CommonProps<T extends object> {
   pageSizes?: TableViewProps['pageSizes'];
   selected?: TableViewProps['selected'];
   visibleControl?: TableViewProps['visibleControl'];
+  expandComponent?: TableViewProps['expandComponent'];
+  maxTreeLevel?: TableViewProps['maxTreeLevel'];
+  isAllExpanded?: TableViewProps['isAllExpanded'];
   data?: T[];
   columns?: TableViewProps['header'];
   queryFields?: {
@@ -132,6 +135,9 @@ export const CurdView = <T extends object>({
   onResetQuery,
   fetchData,
   loading,
+  expandComponent,
+  maxTreeLevel,
+  isAllExpanded,
   ...rest
 }: CurdProps<T>) => {
   const { t } = useTranslation();
@@ -150,6 +156,9 @@ export const CurdView = <T extends object>({
       className: cn(queryFields.length && 'mt-4'),
       fetchData,
       loading,
+      expandComponent,
+      maxTreeLevel,
+      isAllExpanded,
       paginationTexts: PaginationTexts(t),
       emptyDataLabel: t('empty.no_data')
     }),
@@ -164,6 +173,9 @@ export const CurdView = <T extends object>({
       queryFields.length,
       fetchData,
       loading,
+      expandComponent,
+      maxTreeLevel,
+      isAllExpanded,
       t
     ]
   );
