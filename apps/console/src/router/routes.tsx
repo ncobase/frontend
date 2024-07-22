@@ -35,7 +35,7 @@ const routes = [
   { path: '/content/*', element: <Guard children={<ContentRoutes />} /> },
   {
     path: '/system/*',
-    element: <Guard super children={<SystemRoutes />} />
+    element: <Guard admin children={<SystemRoutes />} />
   },
   { path: '/example/*', element: <Guard children={<ExampleRoutes />} /> }
 ];

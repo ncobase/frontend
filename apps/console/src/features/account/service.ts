@@ -59,12 +59,19 @@ export const useAccount = () => {
   });
 
   const userRoles = useMemo(() => {
-    if (!data) return {};
-    return {
-      isAdmin: data?.roles?.some(role => role.slug === 'admin'),
-      isSuperAdmin: data?.roles?.some(role => role.slug === 'super-admin')
-    };
-  }, [data?.roles]);
+    if (!data || !data.roles) return { isAdmin: false, isSuperAdmin: false };
+    let isAdmin = false;
+    let isSuperAdmin = false;
+    for (const role of data.roles) {
+      if (role.slug === 'admin' || role.slug === 'super-admin') {
+        isAdmin = true;
+      }
+      if (role.slug === 'super-admin') {
+        isSuperAdmin = true;
+      }
+    }
+    return { isAdmin, isSuperAdmin };
+  }, [data]);
 
   return { ...data, ...userRoles, ...rest };
 };

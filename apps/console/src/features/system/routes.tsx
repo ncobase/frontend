@@ -9,7 +9,7 @@ import { RoleRoutes } from './role/routes';
 import { TenantRoutes } from './tenant/routes';
 import { UserRoutes } from './user/routes';
 
-import { renderRoutes } from '@/router';
+import { Guard, renderRoutes } from '@/router';
 
 export const SystemRoutes = () => {
   const routes = [
@@ -20,7 +20,7 @@ export const SystemRoutes = () => {
     { path: 'menu/*', element: <MenuRoutes /> },
     { path: 'role/*', element: <RoleRoutes /> },
     { path: 'tenant/*', element: <TenantRoutes /> },
-    { path: 'basic/*', element: <BasicRoutes /> }
+    { path: 'basic/*', element: <Guard super children={<BasicRoutes />} /> }
   ];
   return renderRoutes(routes);
 };
