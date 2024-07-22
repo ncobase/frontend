@@ -6,6 +6,7 @@ import { Control, Controller } from 'react-hook-form';
 import { ExplicitAny } from '@/types';
 
 export type QueryFormParams = {
+  children?: boolean;
   code?: string;
   title?: string;
   status?: string;

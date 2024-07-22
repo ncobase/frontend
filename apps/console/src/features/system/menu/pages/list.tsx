@@ -20,7 +20,7 @@ import { Menu } from '@/types';
 export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20, children: true });
   const { data, refetch } = useListMenus(queryParams);
   // const { vmode } = useLayoutContext();
 
@@ -139,9 +139,11 @@ export const MenuListPage = () => {
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
-      selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
+      maxTreeLevel={-1}
+      isAllExpanded
+      paginated={false}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
       createComponent={

@@ -39,7 +39,7 @@
   }
 
   ::-webkit-scrollbar {
-    @apply w-[7px] h-[7px] hidden;
+    @apply w-[7px] h-[7px];
   }
 
   ::-webkit-scrollbar-track {
@@ -55,9 +55,9 @@
     background-color: var(--scrollbar-thumb-hover-color);
   }
 
-  *:hover::-webkit-scrollbar {
+  /* *:hover::-webkit-scrollbar {
     @apply block;
-  }
+  } */
 
   /* Remove number input arrows */
   input[type='number']::-webkit-inner-spin-button,
