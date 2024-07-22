@@ -15,7 +15,6 @@ import { EditorMenuPage } from './editor';
 import { MenuViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
 import { Menu } from '@/types';
 
 export const MenuListPage = () => {
@@ -23,8 +22,10 @@ export const MenuListPage = () => {
   const navigate = useNavigate();
   const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
   const { data, refetch } = useListMenus(queryParams);
-  const { vmode } = useLayoutContext();
-  const { mode, slug } = useParams<{ mode: string; slug: string }>();
+  // const { vmode } = useLayoutContext();
+
+  // manually set the view type, the vmode in the layout context should be used by default.
+  const vmode = 'flatten' as 'flatten' | 'modal';
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -32,27 +33,26 @@ export const MenuListPage = () => {
     reset: queryReset
   } = useForm<QueryFormParams>();
 
-  const onQuery = handleQuerySubmit(data => {
+  const onQuery = handleQuerySubmit(async data => {
     setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
+    await refetch();
   });
 
   const onResetQuery = () => {
     queryReset();
   };
 
-  const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
   const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
-
+  const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
-    if (data && data?.items?.length) {
-      const record = slug
-        ? data.items.find(item => item.id === slug || item.slug === slug) || null
-        : null;
-      setSelectedRecord(record);
-      setViewType(slug ? (mode as 'view' | 'edit') : mode === 'create' ? 'create' : undefined);
+    if (mode) {
+      setViewType(mode as 'view' | 'edit' | 'create');
+    } else {
+      setViewType(undefined);
     }
-    return () => {};
-  }, [data]);
+  }, [mode]);
+
+  const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
 
   const handleView = useCallback(
     (record: Menu | null, type: 'view' | 'edit' | 'create') => {
@@ -120,14 +120,16 @@ export const MenuListPage = () => {
 
   const fetchData = useCallback(
     async (newQueryParams: QueryFormParams) => {
-      if (isEqual(newQueryParams, queryParams)) {
+      const mergedQueryParams = { ...queryParams, ...newQueryParams };
+      if (
+        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
+        isEqual(newQueryParams, queryParams)
+      ) {
         return data;
       }
-      setQueryParams(newQueryParams);
-      const result = await refetch();
-      return result.data || { items: [], total: 0, next: null, has_next: false };
+      setQueryParams({ ...mergedQueryParams });
     },
-    [data, refetch, queryParams]
+    [queryParams, data]
   );
 
   return (
@@ -138,7 +140,6 @@ export const MenuListPage = () => {
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
       selected
-      pageSize={queryParams?.limit}
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}

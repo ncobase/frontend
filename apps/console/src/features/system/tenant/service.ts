@@ -2,13 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from '../menu/config/query';
 
-import {
-  createTenant,
-  deleteTenant,
-  getTenant,
-  getTenants,
-  updateTenant
-} from '@/apis/system/tenant';
+import { createTenant, getTenant, getTenants, updateTenant } from '@/apis/system/tenant';
 import { Tenant } from '@/types';
 
 interface TenantKeys {

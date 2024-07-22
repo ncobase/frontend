@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
 import { isEqual } from 'lodash';
 import { useForm } from 'react-hook-form';
@@ -20,16 +20,15 @@ import { EditorPermissionPage } from './editor';
 import { PermissionViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
 import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
-  const { data, refetch } = useListPermissions(queryParams);
-  const { vmode } = useLayoutContext();
-  const { mode, slug } = useParams<{ mode: string; slug: string }>();
+  const { data, refetch, isLoading } = useListPermissions(queryParams);
+
+  const vmode = useMemo(() => 'flatten', []) as 'flatten' | 'modal';
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -37,25 +36,26 @@ export const PermissionListPage = () => {
     reset: queryReset
   } = useForm<QueryFormParams>();
 
-  const onQuery = handleQuerySubmit(data => {
+  const onQuery = handleQuerySubmit(async data => {
     setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
+    await refetch();
   });
 
   const onResetQuery = () => {
     queryReset();
   };
 
-  const [selectedRecord, setSelectedRecord] = useState<Permission | null>(null);
   const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
-
+  const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
-    if (data && data?.items?.length) {
-      const record = slug ? data.items.find(item => item.id === slug) || null : null;
-      setSelectedRecord(record);
-      setViewType(slug ? (mode as 'view' | 'edit') : mode === 'create' ? 'create' : undefined);
+    if (mode) {
+      setViewType(mode as 'view' | 'edit' | 'create');
+    } else {
+      setViewType(undefined);
     }
-    return () => {};
-  }, [data]);
+  }, [mode]);
+
+  const [selectedRecord, setSelectedRecord] = useState<Permission | null>(null);
 
   const handleView = useCallback(
     (record: Permission | null, type: 'view' | 'edit' | 'create') => {
@@ -123,14 +123,16 @@ export const PermissionListPage = () => {
 
   const fetchData = useCallback(
     async (newQueryParams: QueryFormParams) => {
-      if (isEqual(newQueryParams, queryParams)) {
+      const mergedQueryParams = { ...queryParams, ...newQueryParams };
+      if (
+        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
+        isEqual(newQueryParams, queryParams)
+      ) {
         return data;
       }
-      setQueryParams(newQueryParams);
-      const result = await refetch();
-      return result.data || { items: [], total: 0, next: null, has_next: false };
+      setQueryParams({ ...mergedQueryParams });
     },
-    [data, refetch, queryParams]
+    [queryParams, data]
   );
 
   return (
@@ -146,6 +148,7 @@ export const PermissionListPage = () => {
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
+      loading={isLoading}
       createComponent={
         <CreatePermissionPage
           viewMode={vmode}

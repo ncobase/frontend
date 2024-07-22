@@ -12,7 +12,7 @@ import { useCreateUser, useDeleteUser, useListUsers, useUpdateUser } from '../se
 
 import { CreateUserPage } from './create';
 import { EditorUserPage } from './editor';
-import { UserViewerUser } from './viewer';
+import { UserViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/layout';
@@ -24,7 +24,6 @@ export const UserListPage = () => {
   const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
   const { data, refetch } = useListUsers(queryParams);
   const { vmode } = useLayoutContext();
-  const { mode, slug } = useParams<{ mode: string; slug: string }>();
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -32,25 +31,26 @@ export const UserListPage = () => {
     reset: queryReset
   } = useForm<QueryFormParams>();
 
-  const onQuery = handleQuerySubmit(data => {
+  const onQuery = handleQuerySubmit(async data => {
     setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
+    await refetch();
   });
 
   const onResetQuery = () => {
     queryReset();
   };
 
-  const [selectedRecord, setSelectedRecord] = useState<User | null>(null);
   const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
-
+  const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
-    if (data && data?.items?.length) {
-      const record = slug ? data.items.find(item => item.id === slug) || null : null;
-      setSelectedRecord(record);
-      setViewType(slug ? (mode as 'view' | 'edit') : mode === 'create' ? 'create' : undefined);
+    if (mode) {
+      setViewType(mode as 'view' | 'edit' | 'create');
+    } else {
+      setViewType(undefined);
     }
-    return () => {};
-  }, [data]);
+  }, [mode]);
+
+  const [selectedRecord, setSelectedRecord] = useState<User | null>(null);
 
   const handleView = useCallback(
     (record: User | null, type: 'view' | 'edit' | 'create') => {
@@ -118,14 +118,16 @@ export const UserListPage = () => {
 
   const fetchData = useCallback(
     async (newQueryParams: QueryFormParams) => {
-      if (isEqual(newQueryParams, queryParams)) {
+      const mergedQueryParams = { ...queryParams, ...newQueryParams };
+      if (
+        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
+        isEqual(newQueryParams, queryParams)
+      ) {
         return data;
       }
-      setQueryParams(newQueryParams);
-      const result = await refetch();
-      return result.data || { items: [], total: 0, next: null, has_next: false };
+      setQueryParams({ ...mergedQueryParams });
     },
-    [data, refetch, queryParams]
+    [queryParams, data]
   );
 
   return (
@@ -136,7 +138,6 @@ export const UserListPage = () => {
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
       selected
-      pageSize={queryParams?.limit}
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
@@ -149,7 +150,7 @@ export const UserListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <UserViewerUser viewMode={vmode} record={record?.id} />}
+      viewComponent={record => <UserViewerPage viewMode={vmode} record={record?.id} />}
       editComponent={record => (
         <EditorUserPage
           viewMode={vmode}

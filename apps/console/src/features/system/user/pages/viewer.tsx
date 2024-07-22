@@ -4,7 +4,7 @@ import { UserViewerForms } from '../forms/viewer';
 
 import { useLayoutContext } from '@/layout';
 
-export const UserViewerUser = ({ viewMode, record }) => {
+export const UserViewerPage = ({ viewMode, record }) => {
   const { vmode } = useLayoutContext();
   if (!record) {
     return null;

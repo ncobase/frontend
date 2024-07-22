@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { QueryFormParams, queryFields } from '../config/query';
+import { QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateGroup, useDeleteGroup, useListGroups, useUpdateGroup } from '../service';
@@ -21,36 +21,21 @@ import { Group } from '@/types';
 export const GroupListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
-  const { data, refetch } = useListGroups(queryParams);
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20, children: true });
+  const { data } = useListGroups(queryParams);
   const { vmode } = useLayoutContext();
-  const { mode, slug } = useParams<{ mode: string; slug: string }>();
 
-  const {
-    handleSubmit: handleQuerySubmit,
-    control: queryControl,
-    reset: queryReset
-  } = useForm<QueryFormParams>();
-
-  const onQuery = handleQuerySubmit(data => {
-    setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
-  });
-
-  const onResetQuery = () => {
-    queryReset();
-  };
+  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const { mode } = useParams<{ mode: string; slug: string }>();
+  useEffect(() => {
+    if (mode) {
+      setViewType(mode as 'view' | 'edit' | 'create');
+    } else {
+      setViewType(undefined);
+    }
+  }, [mode]);
 
   const [selectedRecord, setSelectedRecord] = useState<Group | null>(null);
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
-
-  useEffect(() => {
-    if (data && data?.items?.length) {
-      const record = slug ? data.items.find(item => item.id === slug) || null : null;
-      setSelectedRecord(record);
-      setViewType(slug ? (mode as 'view' | 'edit') : mode === 'create' ? 'create' : undefined);
-    }
-    return () => {};
-  }, [data]);
 
   const handleView = useCallback(
     (record: Group | null, type: 'view' | 'edit' | 'create') => {
@@ -118,14 +103,16 @@ export const GroupListPage = () => {
 
   const fetchData = useCallback(
     async (newQueryParams: QueryFormParams) => {
-      if (isEqual(newQueryParams, queryParams)) {
+      const mergedQueryParams = { ...queryParams, ...newQueryParams };
+      if (
+        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
+        isEqual(newQueryParams, queryParams)
+      ) {
         return data;
       }
-      setQueryParams(newQueryParams);
-      const result = await refetch();
-      return result.data || { items: [], total: 0, next: null, has_next: false };
+      setQueryParams({ ...mergedQueryParams });
     },
-    [data, refetch, queryParams]
+    [queryParams, data]
   );
 
   return (
@@ -136,10 +123,7 @@ export const GroupListPage = () => {
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
       selected
-      pageSize={queryParams?.limit}
-      queryFields={queryFields({ queryControl })}
-      onQuery={onQuery}
-      onResetQuery={onResetQuery}
+      paginated={false}
       fetchData={fetchData}
       createComponent={
         <CreateGroupPage
