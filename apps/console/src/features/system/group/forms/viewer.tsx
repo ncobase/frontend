@@ -17,7 +17,7 @@ export const GroupViewerForms = ({ record }) => {
       </div>
       <FieldViewer title='编号'>{data?.id}</FieldViewer>
       <FieldViewer title='名称'>{data?.name}</FieldViewer>
-      <FieldViewer title='父级'>{data?.parent}</FieldViewer>
+      <FieldViewer title='父级'>{data?.parent_id}</FieldViewer>
       <FieldViewer title='是否禁用'>{parseStatus(!data.disabled)}</FieldViewer>
       <FieldViewer title='描述' className='col-span-full'>
         {data?.description}

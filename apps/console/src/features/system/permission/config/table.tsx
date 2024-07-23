@@ -26,19 +26,25 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       icon: 'IconFlame'
     },
     {
-      title: '标识',
-      code: 'slug',
+      title: '操作',
+      code: 'action',
       icon: 'IconProgress'
     },
     {
-      code: 'group',
-      title: '所属部门',
+      title: '资源',
+      code: 'subject',
       icon: 'IconProgress'
     },
     {
-      code: 'tenant',
-      title: '所属租户',
+      title: '描述',
+      code: 'description',
       icon: 'IconProgress'
+    },
+    {
+      title: '是否默认',
+      code: 'default',
+      parser: (value: string, _record: Permission) => parseStatus(!value),
+      icon: 'IconFlagCog'
     },
     {
       title: '是否禁用',
@@ -47,18 +53,13 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       icon: 'IconFlagCog'
     },
     {
-      title: '描述',
-      code: 'description',
-      icon: 'IconProgress'
-    },
-    {
       title: '创建日期',
       code: 'created_at',
       parser: (value: string) => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {
-      title: 'Actions',
+      title: 'operation-column',
       actions: [
         {
           title: t('actions.edit'),

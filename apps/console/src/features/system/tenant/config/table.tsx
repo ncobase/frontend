@@ -61,7 +61,7 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
       icon: 'IconCalendarMonth'
     },
     {
-      title: 'Actions',
+      title: 'operation-column',
       actions: [
         {
           title: t('actions.edit'),

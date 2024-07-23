@@ -26,7 +26,10 @@ import { Taxonomy } from '@/types';
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({
+    limit: 20,
+    type: 'all'
+  });
   const { data, refetch } = useListTaxonomies(queryParams);
   const { vmode } = useLayoutContext();
 
@@ -138,7 +141,7 @@ export const TaxonomyListPage = () => {
   return (
     <CurdView
       viewMode={vmode}
-      title={t('system.taxonomy.title')}
+      title={t('content.taxonomy.title')}
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}

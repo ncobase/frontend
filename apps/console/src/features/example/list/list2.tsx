@@ -223,7 +223,7 @@ export const ListPage2 = () => {
               icon: 'IconFlagCog'
             },
             {
-              code: 'actions',
+              code: 'operation-column',
               actions: [
                 {
                   title: 'Edit',
@@ -316,7 +316,7 @@ export const ListPage2 = () => {
               icon: 'IconCalendarMonth'
             },
             {
-              title: 'Actions',
+              title: 'operation-column',
               actions: [
                 {
                   title: 'Edit',

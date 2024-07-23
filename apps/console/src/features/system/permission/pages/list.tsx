@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { isEqual } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -25,7 +24,7 @@ import { Permission } from '@/types';
 export const PermissionListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
+  const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { data, refetch, isLoading } = useListPermissions(queryParams);
 
   const vmode = useMemo(() => 'flatten', []) as 'flatten' | 'modal';
@@ -121,19 +120,19 @@ export const PermissionListPage = () => {
     [handleFormSubmit, viewType, handleCreate, handleUpdate]
   );
 
-  const fetchData = useCallback(
-    async (newQueryParams: QueryFormParams) => {
-      const mergedQueryParams = { ...queryParams, ...newQueryParams };
-      if (
-        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
-        isEqual(newQueryParams, queryParams)
-      ) {
-        return data;
-      }
-      setQueryParams({ ...mergedQueryParams });
-    },
-    [queryParams, data]
-  );
+  // const fetchData = useCallback(
+  //   async (newQueryParams: QueryFormParams) => {
+  //     const mergedQueryParams = { ...queryParams, ...newQueryParams };
+  //     if (
+  //       (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
+  //       isEqual(newQueryParams, queryParams)
+  //     ) {
+  //       return data;
+  //     }
+  //     setQueryParams({ ...mergedQueryParams });
+  //   },
+  //   [queryParams, data]
+  // );
 
   return (
     <CurdView
@@ -143,11 +142,10 @@ export const PermissionListPage = () => {
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
       selected
-      pageSize={queryParams?.limit}
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
-      fetchData={fetchData}
+      data={data?.items}
       loading={isLoading}
       createComponent={
         <CreatePermissionPage

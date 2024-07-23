@@ -283,7 +283,7 @@ export const ListPage = () => {
             icon: 'IconCalendarMonth'
           },
           {
-            code: 'actions',
+            code: 'operation-column',
             actions: [
               {
                 title: 'Edit',

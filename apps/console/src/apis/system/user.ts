@@ -12,7 +12,7 @@ export const createUser = async (payload: User): Promise<UserMeshes> => {
 };
 
 // get
-export const getUser = async (id: string): Promise<UserMeshes> => {
+export const getUser = async (id: string): Promise<User> => {
   return request.get(`${ENDPOINT}/${id}`);
 };
 

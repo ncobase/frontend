@@ -133,7 +133,7 @@ export const TopicListPage = () => {
   return (
     <CurdView
       viewMode={vmode}
-      title={t('system.topic.title')}
+      title={t('content.topic.title')}
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
