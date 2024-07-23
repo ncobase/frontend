@@ -244,6 +244,8 @@
     "sidebar_expand": "展开侧边栏"
   },
   "query": {
+    "collapse": "收起查询栏",
+    "expand": "展开查询栏",
     "loading": "加载中...",
     "search": "查询",
     "reset": "重置"

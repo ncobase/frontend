@@ -250,7 +250,7 @@ const SidebarComponent: React.FC<{
       <Button
         variant='unstyle'
         size='ratio'
-        className='absolute bottom-4 -right-2.5 z-[9999] bg-white [&>svg]:stroke-slate-800 hover:[&>svg]:stroke-slate-900 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+        className='absolute bottom-4 -right-2.5 z-[9999] bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 hover:[&>svg]:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
         title={t(expanded ? 'actions.sidebar_collapse' : 'actions.sidebar_expand')}
         onClick={() => setExpanded(!expanded)}
       >

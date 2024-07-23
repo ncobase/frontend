@@ -146,12 +146,12 @@ export const TaxonomyListPage = () => {
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}
-      selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
       maxTreeLevel={-1}
+      paginated={false}
       isAllExpanded
       createComponent={
         <CreateTaxonomyPage

@@ -244,6 +244,8 @@
     "sidebar_expand": "Expand Sidebar"
   },
   "query": {
+    "collapse": "Collapse Query Bar",
+    "expand": "Expand Query Bar",
     "loading": "Loading...",
     "search": "Search",
     "reset": "Reset"
