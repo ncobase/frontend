@@ -21,7 +21,7 @@ import { Group } from '@/types';
 export const GroupListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20, children: true });
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ children: true });
   const { data } = useListGroups(queryParams);
   const { vmode } = useLayoutContext();
 

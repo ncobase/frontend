@@ -1,8 +1,6 @@
 import { PaginationParams } from '@ncobase/react';
 
-export type QueryFormParams = {
-  children?: boolean;
-} & PaginationParams;
+export type QueryFormParams = {} & PaginationParams;
 
 // export const queryFields = ({
 //   queryControl

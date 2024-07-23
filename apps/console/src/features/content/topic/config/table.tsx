@@ -1,9 +1,12 @@
 import React from 'react';
 
-import { Button, Icons, TableViewProps } from '@ncobase/react';
+import { Button, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
+import { useQueryTaxonomy } from '../../taxonomy/service';
+
+import { useQueryUser } from '@/features/system/user/service';
 import { parseStatus } from '@/helpers/status';
 import { Topic } from '@/types';
 
@@ -21,31 +24,44 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       icon: 'IconHash'
     },
     {
-      title: '名称',
-      code: 'name',
+      title: '标题',
+      code: 'title',
       icon: 'IconFlame'
     },
     {
       title: '别名',
       code: 'slug',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
-      title: '路径',
-      code: 'path',
-      icon: 'IconRoute'
+      title: '所属类别',
+      code: 'taxonomy_id',
+      icon: 'IconBookmark',
+      parser: (value: string) => {
+        const { data } = useQueryTaxonomy(value);
+        return data?.name || value || '-';
+      }
     },
     {
-      title: '图标',
-      code: 'icon',
-      parser: (value: string) => <Icons name={value} size={16} />,
-      icon: 'IconCategory'
+      title: '是否发布',
+      code: 'released',
+      icon: 'IconRoute',
+      parser: (value: string) => parseStatus(value, 'publishStatus')
     },
     {
       title: '状态',
       code: 'disabled',
       parser: (value: string) => parseStatus(!value),
       icon: 'IconFlagCog'
+    },
+    {
+      title: '创建者',
+      code: 'created_by',
+      icon: 'IconUser',
+      parser: (value: string) => {
+        const { data } = useQueryUser(value);
+        return data?.username || value || '-';
+      }
     },
     {
       title: '创建日期',

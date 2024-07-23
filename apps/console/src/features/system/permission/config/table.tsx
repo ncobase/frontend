@@ -28,17 +28,17 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '操作',
       code: 'action',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '资源',
       code: 'subject',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '描述',
       code: 'description',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '是否默认',

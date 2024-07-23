@@ -27,22 +27,22 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '标识',
       code: 'slug',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '类型',
       code: 'type',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '值',
       code: 'value',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '描述',
       code: 'description',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '创建日期',

@@ -196,7 +196,7 @@ export const ViewerPage = () => {
                   {
                     title: 'Slug',
                     code: 'slug',
-                    icon: 'IconProgress'
+                    icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',

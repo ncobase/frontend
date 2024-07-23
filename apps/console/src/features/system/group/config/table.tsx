@@ -31,7 +31,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '别名',
       code: 'slug',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '负责人',
@@ -50,7 +50,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         const { data } = useQueryTenant(value);
         return data?.name;
       },
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '是否禁用',

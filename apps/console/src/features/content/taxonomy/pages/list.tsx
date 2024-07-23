@@ -28,7 +28,8 @@ export const TaxonomyListPage = () => {
   const navigate = useNavigate();
   const [queryParams, setQueryParams] = useState<QueryFormParams>({
     limit: 20,
-    type: 'all'
+    type: 'all',
+    children: true
   });
   const { data, refetch } = useListTaxonomies(queryParams);
   const { vmode } = useLayoutContext();
@@ -150,6 +151,8 @@ export const TaxonomyListPage = () => {
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
+      maxTreeLevel={-1}
+      isAllExpanded
       createComponent={
         <CreateTaxonomyPage
           viewMode={vmode}

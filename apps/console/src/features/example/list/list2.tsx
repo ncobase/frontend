@@ -203,7 +203,7 @@ export const ListPage2 = () => {
             {
               title: '别名',
               code: 'slug',
-              icon: 'IconProgress'
+              icon: 'IconAffiliate'
             },
             {
               title: '路径',
@@ -284,7 +284,7 @@ export const ListPage2 = () => {
             {
               title: '别名',
               code: 'slug',
-              icon: 'IconProgress'
+              icon: 'IconAffiliate'
             },
             {
               title: '路径',

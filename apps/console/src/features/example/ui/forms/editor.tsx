@@ -285,7 +285,7 @@ export const EditorPage = () => {
                     parser: (value: string) => (
                       <Input type='text' defaultValue={value} className='py-1.5' />
                     ),
-                    icon: 'IconProgress'
+                    icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',

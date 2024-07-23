@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Button, Icons, TableViewProps } from '@ncobase/react';
+import { Button, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
+import { useQueryUser } from '@/features/system/user/service';
 import { parseStatus } from '@/helpers/status';
 import { Taxonomy } from '@/types';
 
@@ -28,23 +29,36 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '别名',
       code: 'slug',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
-      title: '路径',
-      code: 'path',
-      icon: 'IconRoute'
+      title: '类型',
+      code: 'type',
+      icon: 'IconTag'
     },
     {
-      title: '图标',
-      code: 'icon',
-      parser: (value: string) => <Icons name={value} size={16} />,
-      icon: 'IconCategory'
+      title: '关键词',
+      code: 'keywords',
+      icon: 'IconRoadSign'
+    },
+    {
+      title: '描述',
+      code: 'description',
+      icon: 'IconFileDescription'
     },
     {
       title: '状态',
       code: 'disabled',
       parser: (value: string) => parseStatus(!value),
+      icon: 'IconFlagCog'
+    },
+    {
+      title: '创建人',
+      code: 'created_by',
+      parser: (value: string) => {
+        const { data } = useQueryUser(value);
+        return data?.username || value || '-';
+      },
       icon: 'IconFlagCog'
     },
     {

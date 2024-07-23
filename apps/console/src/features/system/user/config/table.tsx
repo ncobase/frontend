@@ -28,7 +28,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '电话',
       code: 'phone',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '状态',

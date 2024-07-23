@@ -20,7 +20,7 @@ import { Menu } from '@/types';
 export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20, children: true });
+  const [queryParams, setQueryParams] = useState<QueryFormParams>({ children: true });
   const { data, refetch } = useListMenus(queryParams);
   // const { vmode } = useLayoutContext();
 

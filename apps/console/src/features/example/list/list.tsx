@@ -251,7 +251,7 @@ export const ListPage = () => {
           {
             title: 'Slug',
             code: 'slug',
-            icon: 'IconProgress'
+            icon: 'IconAffiliate'
           },
           {
             title: 'Path',

@@ -28,17 +28,17 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
     {
       title: '标识',
       code: 'slug',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       code: 'group',
       title: '所属部门',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       code: 'tenant',
       title: '所属租户',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '是否禁用',
@@ -49,7 +49,7 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
     {
       title: '描述',
       code: 'description',
-      icon: 'IconProgress'
+      icon: 'IconAffiliate'
     },
     {
       title: '创建日期',

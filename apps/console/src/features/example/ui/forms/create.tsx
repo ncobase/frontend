@@ -345,7 +345,7 @@ export const CreatePage = () => {
                   {
                     title: 'Slug',
                     code: 'slug',
-                    icon: 'IconProgress'
+                    icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',
