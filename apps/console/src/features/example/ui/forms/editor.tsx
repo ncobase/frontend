@@ -264,7 +264,7 @@ export const EditorPage = () => {
                   {
                     title: 'ID',
                     code: 'id',
-                    parser: (value: string) => (
+                    parser: value => (
                       <Button variant='link' size='sm' onClick={() => navigate(`viewer/${value}`)}>
                         {value}
                       </Button>
@@ -274,17 +274,13 @@ export const EditorPage = () => {
                   {
                     title: 'Name',
                     code: 'name',
-                    parser: (value: string) => (
-                      <Input type='text' defaultValue={value} className='py-1.5' />
-                    ),
+                    parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconFlame'
                   },
                   {
                     title: 'Slug',
                     code: 'slug',
-                    parser: (value: string) => (
-                      <Input type='text' defaultValue={value} className='py-1.5' />
-                    ),
+                    parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconAffiliate'
                   },
                   {
@@ -295,13 +291,13 @@ export const EditorPage = () => {
                   {
                     title: 'Icon',
                     code: 'icon',
-                    parser: (value: string) => <Icons name={value} size={16} />,
+                    parser: value => <Icons name={value} size={16} />,
                     icon: 'IconCategory'
                   },
                   {
                     title: 'Status',
                     code: 'disabled',
-                    parser: (value: string) => {
+                    parser: value => {
                       value = value ? '1' : '0';
                       return (
                         <Select defaultValue={value}>
@@ -320,7 +316,7 @@ export const EditorPage = () => {
                   {
                     title: 'Created At',
                     code: 'created_at',
-                    parser: (value: string) => formatDateTime(value),
+                    parser: value => formatDateTime(value),
                     icon: 'IconCalendarMonth'
                   }
                 ]}

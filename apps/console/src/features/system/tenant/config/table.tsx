@@ -13,7 +13,7 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
     {
       title: '编号',
       code: 'id',
-      parser: (value: string) => (
+      parser: value => (
         <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
@@ -28,7 +28,7 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
     {
       title: '类型',
       code: 'type',
-      parser: (value: string) => value || '-',
+      parser: value => value || '-',
       icon: 'IconCategory2'
     },
     {
@@ -39,25 +39,25 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
     {
       title: '官网',
       code: 'url',
-      parser: (value: string) => value || '-',
+      parser: value => value || '-',
       icon: 'IconWorldWww'
     },
     {
       title: '状态',
       code: 'disabled',
-      parser: (value: string) => parseStatus(!value),
+      parser: value => parseStatus(!value),
       icon: 'IconFlagCog'
     },
     {
       title: '到期时间',
       code: 'expired_at',
-      parser: (value: string) => formatDateTime(value),
+      parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {
       title: '更新时间',
       code: 'updated_at',
-      parser: (value: string) => formatDateTime(value),
+      parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {

@@ -4,7 +4,6 @@ import { Button, Icons, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { useQueryTenant } from '../../tenant/service';
 import { useQueryUser } from '../../user/service';
 
 import { parseStatus } from '@/helpers/status';
@@ -14,23 +13,18 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   const { t } = useTranslation();
   return [
     {
-      title: '编号',
-      code: 'id',
-      parser: (value: string) => (
-        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
+      title: '名称',
+      code: 'name',
+      parser: (value: string, record) => (
+        <Button variant='link' onClick={() => handleView({ id: record?.id }, 'view')}>
           {value}
         </Button>
       ),
-      icon: 'IconHash'
+      icon: 'IconFlame'
     },
     {
       title: '类型',
       code: 'type',
-      icon: 'IconFlame'
-    },
-    {
-      title: '名称',
-      code: 'name',
       icon: 'IconFlame'
     },
     {
@@ -41,28 +35,19 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '图标',
       code: 'icon',
-      parser: (value: string) => <Icons name={value} size={16} />,
+      parser: value => <Icons name={value} size={16} />,
       icon: 'IconCategory'
     },
     {
       title: '状态',
       code: 'disabled',
-      parser: (value: string) => parseStatus(!value),
+      parser: value => parseStatus(!value),
       icon: 'IconFlagCog'
-    },
-    {
-      title: '所属租户',
-      code: 'tenant_id',
-      parser: (value: string) => {
-        const { data } = useQueryTenant(value);
-        return data?.name || '-';
-      },
-      icon: 'IconUser'
     },
     {
       title: '创建人',
       code: 'created_by',
-      parser: (value: string) => {
+      parser: value => {
         const { data } = useQueryUser(value);
         return data?.username || '-';
       },
@@ -71,7 +56,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '创建日期',
       code: 'created_at',
-      parser: (value: string) => formatDateTime(value),
+      parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {

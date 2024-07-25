@@ -236,7 +236,7 @@ export const ListPage = () => {
           {
             title: 'ID',
             code: 'id',
-            parser: (value: string) => (
+            parser: value => (
               <Button variant='link' size='sm' onClick={() => navigate(`/example/ui/form/viewer`)}>
                 {value}
               </Button>
@@ -261,25 +261,25 @@ export const ListPage = () => {
           {
             title: 'Icon',
             code: 'icon',
-            parser: (value: string) => <Icons name={value} size={16} />,
+            parser: value => <Icons name={value} size={16} />,
             icon: 'IconCategory'
           },
           {
             title: 'Status',
             code: 'disabled',
-            parser: (value: string) => parseStatus(!value),
+            parser: value => parseStatus(!value),
             icon: 'IconFlagCog'
           },
           {
             title: 'Created At',
             code: 'created_at',
-            parser: (value: string) => formatDateTime(value),
+            parser: value => formatDateTime(value),
             icon: 'IconCalendarMonth'
           },
           {
             title: 'Updated At',
             code: 'updated_at',
-            parser: (value: string) => formatDateTime(value),
+            parser: value => formatDateTime(value),
             icon: 'IconCalendarMonth'
           },
           {

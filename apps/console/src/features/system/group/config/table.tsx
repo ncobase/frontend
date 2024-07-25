@@ -4,7 +4,6 @@ import { Button, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { useQueryTenant } from '../../tenant/service';
 import { useQueryUser } from '../../user/service';
 
 import { parseStatus } from '@/helpers/status';
@@ -14,18 +13,13 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   const { t } = useTranslation();
   return [
     {
-      title: '编号',
-      code: 'id',
-      parser: (value: string) => (
-        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
+      title: '名称',
+      code: 'name',
+      parser: (value: string, record) => (
+        <Button variant='link' onClick={() => handleView({ id: record?.id }, 'view')}>
           {value}
         </Button>
       ),
-      icon: 'IconHash'
-    },
-    {
-      title: '名称',
-      code: 'name',
       icon: 'IconFlame'
     },
     {
@@ -37,20 +31,11 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: '负责人',
       code: 'leader.user_id',
       icon: 'IconUser',
-      parser: (value: string) => {
+      parser: value => {
+        if (!value) return '-';
         const { data } = useQueryUser(value);
-
         return data?.username;
       }
-    },
-    {
-      code: 'tenant_id',
-      title: '所属租户',
-      parser: (value: string) => {
-        const { data } = useQueryTenant(value);
-        return data?.name;
-      },
-      icon: 'IconAffiliate'
     },
     {
       title: '是否禁用',
@@ -62,7 +47,8 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: '创建人',
       code: 'created_by',
       icon: 'IconUser',
-      parser: (value: string) => {
+      parser: value => {
+        if (!value) return '-';
         const { data } = useQueryUser(value);
         return data?.username;
       }
@@ -70,7 +56,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '创建日期',
       code: 'created_at',
-      parser: (value: string) => formatDateTime(value),
+      parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {
@@ -80,21 +66,6 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
           title: t('actions.edit'),
           icon: 'IconPencil',
           onClick: (record: Group) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.duplicate'),
-          icon: 'IconCopy',
-          onClick: () => console.log('duplicate events')
-        },
-        {
-          title: t('actions.shared'),
-          icon: 'IconShare2',
-          onClick: () => console.log('share events')
-        },
-        {
-          title: t('actions.disable'),
-          icon: 'IconCircleMinus',
-          onClick: () => console.log('disable events')
         },
         {
           title: t('actions.delete'),

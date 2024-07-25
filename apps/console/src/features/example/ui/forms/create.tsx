@@ -327,7 +327,7 @@ export const CreatePage = () => {
                   {
                     title: 'ID',
                     code: 'id',
-                    parser: (value: string) => (
+                    parser: value => (
                       <Button variant='link' size='sm' onClick={() => navigate(`viewer/${value}`)}>
                         {value}
                       </Button>
@@ -337,9 +337,7 @@ export const CreatePage = () => {
                   {
                     title: 'Name',
                     code: 'name',
-                    parser: (value: string) => (
-                      <Input type='text' defaultValue={value} className='py-1.5' />
-                    ),
+                    parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconFlame'
                   },
                   {
@@ -350,21 +348,19 @@ export const CreatePage = () => {
                   {
                     title: 'Path',
                     code: 'path',
-                    parser: (value: string) => (
-                      <Input type='text' defaultValue={value} className='py-1.5' />
-                    ),
+                    parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconRoute'
                   },
                   {
                     title: 'Icon',
                     code: 'icon',
-                    parser: (value: string) => <Icons name={value} size={16} />,
+                    parser: value => <Icons name={value} size={16} />,
                     icon: 'IconCategory'
                   },
                   {
                     title: 'Status',
                     code: 'disabled',
-                    parser: (value: string) => {
+                    parser: value => {
                       value = value ? '1' : '0';
                       return (
                         <Select defaultValue={value}>
@@ -383,7 +379,7 @@ export const CreatePage = () => {
                   {
                     title: 'Created At',
                     code: 'created_at',
-                    parser: (value: string) => <DatePicker defaultValue={value} />,
+                    parser: value => <DatePicker defaultValue={value} />,
                     icon: 'IconCalendarMonth'
                   }
                 ]}

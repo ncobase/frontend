@@ -16,7 +16,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '编号',
       code: 'id',
-      parser: (value: string) => (
+      parser: value => (
         <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
@@ -37,7 +37,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: '所属类别',
       code: 'taxonomy_id',
       icon: 'IconBookmark',
-      parser: (value: string) => {
+      parser: value => {
         const { data } = useQueryTaxonomy(value);
         return data?.name || value || '-';
       }
@@ -46,19 +46,19 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: '是否发布',
       code: 'released',
       icon: 'IconRoute',
-      parser: (value: string) => parseStatus(value, 'publishStatus')
+      parser: value => parseStatus(value, 'publishStatus')
     },
     {
       title: '状态',
       code: 'disabled',
-      parser: (value: string) => parseStatus(!value),
+      parser: value => parseStatus(!value),
       icon: 'IconFlagCog'
     },
     {
       title: '创建者',
       code: 'created_by',
       icon: 'IconUser',
-      parser: (value: string) => {
+      parser: value => {
         const { data } = useQueryUser(value);
         return data?.username || value || '-';
       }
@@ -66,7 +66,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '创建日期',
       code: 'created_at',
-      parser: (value: string) => formatDateTime(value),
+      parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {

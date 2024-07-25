@@ -13,7 +13,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '编号',
       code: 'id',
-      parser: (value: string) => (
+      parser: value => (
         <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
@@ -55,7 +55,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '创建日期',
       code: 'created_at',
-      parser: (value: string) => formatDateTime(value),
+      parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {

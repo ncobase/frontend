@@ -184,7 +184,7 @@ export const ListPage2 = () => {
             {
               title: '编号',
               code: 'id',
-              parser: (value: string) => (
+              parser: value => (
                 <Button
                   variant='link'
                   size='sm'
@@ -213,13 +213,13 @@ export const ListPage2 = () => {
             {
               title: '图标',
               code: 'icon',
-              parser: (value: string) => <Icons name={value} size={16} />,
+              parser: value => <Icons name={value} size={16} />,
               icon: 'IconCategory'
             },
             {
               title: '状态',
               code: 'disabled',
-              parser: (value: string) => parseStatus(!value),
+              parser: value => parseStatus(!value),
               icon: 'IconFlagCog'
             },
             {
@@ -265,7 +265,7 @@ export const ListPage2 = () => {
             {
               title: '编号',
               code: 'id',
-              parser: (value: string) => (
+              parser: value => (
                 <Button
                   variant='link'
                   size='sm'
@@ -294,25 +294,25 @@ export const ListPage2 = () => {
             {
               title: '图标',
               code: 'icon',
-              parser: (value: string) => <Icons name={value} size={16} />,
+              parser: value => <Icons name={value} size={16} />,
               icon: 'IconCategory'
             },
             {
               title: '状态',
               code: 'disabled',
-              parser: (value: string) => parseStatus(!value),
+              parser: value => parseStatus(!value),
               icon: 'IconFlagCog'
             },
             {
               code: 'created_at',
               title: '创建时间',
-              parser: (value: string) => formatDateTime(value),
+              parser: value => formatDateTime(value),
               icon: 'IconCalendarMonth'
             },
             {
               title: '更新时间',
               code: 'updated_at',
-              parser: (value: string) => formatDateTime(value),
+              parser: value => formatDateTime(value),
               icon: 'IconCalendarMonth'
             },
             {
