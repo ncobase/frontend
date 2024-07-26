@@ -11,6 +11,7 @@ import { useLayoutContext } from '@/layout';
 export const CreateMenuPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();
   const mode = viewMode || vmode || 'flatten';
+
   if (mode === 'modal') {
     return <CreateMenuForms onSubmit={onSubmit} control={control} errors={errors} />;
   }

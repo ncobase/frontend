@@ -2,7 +2,14 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
 
-import { createUser, deleteUser, getUser, getUsers, updateUser } from '@/apis/system/user';
+import {
+  createUser,
+  deleteUser,
+  getUser,
+  getUserMeshes,
+  getUsers,
+  updateUser
+} from '@/apis/system/user';
 import { User } from '@/types';
 
 interface UserKeys {
@@ -22,6 +29,11 @@ export const userKeys: UserKeys = {
 // Hook to query a specific user by ID or Slug
 export const useQueryUser = (user: string) =>
   useQuery({ queryKey: userKeys.get({ user }), queryFn: () => getUser(user) });
+
+// Hook to query user meshes
+export const useQueryUserMeshes = (user: string) => {
+  return useQuery({ queryKey: userKeys.get({ user }), queryFn: () => getUserMeshes(user) });
+};
 
 // Hook for create user mutation
 export const useCreateUser = () =>

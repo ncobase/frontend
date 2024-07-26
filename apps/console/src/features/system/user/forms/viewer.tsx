@@ -3,10 +3,10 @@ import React from 'react';
 import { Button, FieldViewer } from '@ncobase/react';
 import { joinName, randomId } from '@ncobase/utils';
 
-import { useQueryUser } from '../service';
+import { useQueryUserMeshes } from '../service';
 
 export const UserViewerForms = ({ record }) => {
-  const { data } = useQueryUser(record);
+  const { data } = useQueryUserMeshes(record);
 
   const { user, profile } = data || {};
 

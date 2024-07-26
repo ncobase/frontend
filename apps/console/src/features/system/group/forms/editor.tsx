@@ -86,7 +86,7 @@ export const EditorGroupForms = ({ record, onSubmit, control, setValue, errors }
     setValue('id', data?.id);
     setValue('name', data?.name);
     setValue('leader', data?.leader);
-    setValue('parent', data?.parent);
+    setValue('parent', data?.parent_id);
     setValue('disabled', data?.disabled);
     setValue('description', data?.description);
     setValue('extras', data?.extras);

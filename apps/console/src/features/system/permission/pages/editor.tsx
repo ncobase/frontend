@@ -1,15 +1,27 @@
 import React from 'react';
 
+import { useParams } from 'react-router-dom';
+
 import { EditorPermissionForms } from '../forms/editor';
 
 import { useLayoutContext } from '@/layout';
 
-export const EditorPermissionPage = ({ viewMode, record, onSubmit, control, setValue, errors }) => {
+export const EditorPermissionPage = ({
+  viewMode,
+  record: initialRecord,
+  onSubmit,
+  control,
+  setValue,
+  errors
+}) => {
   const { vmode } = useLayoutContext();
+  const { slug } = useParams<{ slug: string }>();
+  const record = initialRecord || slug;
+  const mode = viewMode || vmode || 'flatten';
+
   if (!record) {
     return null;
   }
-  const mode = viewMode || vmode || 'flatten';
   if (mode === 'modal') {
     return (
       <EditorPermissionForms

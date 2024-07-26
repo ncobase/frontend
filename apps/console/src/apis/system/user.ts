@@ -16,6 +16,11 @@ export const getUser = async (id: string): Promise<User> => {
   return request.get(`${ENDPOINT}/${id}`);
 };
 
+// get user meshes
+export const getUserMeshes = async (id: string): Promise<UserMeshes> => {
+  return request.get(`${ENDPOINT}/${id}/meshes`);
+};
+
 // update
 export const updateUser = async (payload: User): Promise<UserMeshes> => {
   return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });

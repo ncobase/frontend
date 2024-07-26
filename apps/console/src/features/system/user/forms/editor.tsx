@@ -3,12 +3,12 @@ import React, { useEffect } from 'react';
 import { FieldConfigProps, Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useQueryUser } from '../service';
+import { useQueryUserMeshes } from '../service';
 // import { useForm } from 'react-hook-form';
 
 export const EditorUserForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data } = useQueryUser(record);
+  const { data } = useQueryUserMeshes(record);
   const { user, profile } = data || {};
 
   const fields: FieldConfigProps[] = [

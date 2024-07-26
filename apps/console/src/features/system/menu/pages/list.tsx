@@ -22,7 +22,6 @@ export const MenuListPage = () => {
   const navigate = useNavigate();
   const [queryParams, setQueryParams] = useState<QueryFormParams>({ children: true });
   const { data, refetch } = useListMenus(queryParams);
-  // const { vmode } = useLayoutContext();
 
   // manually set the view type, the vmode in the layout context should be used by default.
   const vmode = 'flatten' as 'flatten' | 'modal';
@@ -43,7 +42,7 @@ export const MenuListPage = () => {
   };
 
   const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
-  const { mode } = useParams<{ mode: string; slug: string }>();
+  const { mode } = useParams<{ mode: string }>();
   useEffect(() => {
     if (mode) {
       setViewType(mode as 'view' | 'edit' | 'create');
