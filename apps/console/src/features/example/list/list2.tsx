@@ -4,18 +4,17 @@ import {
   Button,
   DatePicker,
   Icons,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  InputField,
+  PaginationParams,
+  SelectField,
   TableView,
   Tooltip,
   TooltipContent,
   TooltipTrigger
 } from '@ncobase/react';
-import { formatDateTime } from '@ncobase/utils';
+import { ExplicitAny } from '@ncobase/types';
+import { cn, formatDateTime } from '@ncobase/utils';
+import { Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,46 +22,113 @@ import { useListMenus } from '@/features/system/menu/service';
 import { parseStatus } from '@/helpers/status';
 import { Page, Topbar } from '@/layout';
 
-const QueryBar = () => {
+type QueryFormParams = {
+  code?: string;
+  title?: string;
+  status?: string;
+  'date-range'?: string;
+} & PaginationParams;
+
+const queryFields = ({ queryControl }: { queryControl: Control<QueryFormParams, ExplicitAny> }) => [
+  {
+    name: 'code',
+    label: '编号',
+    component: (
+      <Controller
+        name='code'
+        control={queryControl}
+        defaultValue=''
+        render={({ field }) => <InputField className='py-1.5' {...field} />}
+      />
+    )
+  },
+  {
+    name: 'title',
+    label: '名称',
+    component: (
+      <Controller
+        name='title'
+        control={queryControl}
+        defaultValue=''
+        render={({ field }) => <InputField className='py-1.5' {...field} />}
+      />
+    )
+  },
+  {
+    name: 'status',
+    label: '状态',
+    component: (
+      <Controller
+        name='status'
+        control={queryControl}
+        defaultValue=''
+        render={({ field }) => (
+          <SelectField
+            options={[
+              { label: '全部', value: 'all' },
+              { label: '启用', value: 'enabled' },
+              { label: '禁用', value: 'disabled' }
+            ]}
+            className='[&>button]:py-1.5'
+            {...field}
+          />
+        )}
+      />
+    )
+  },
+  {
+    name: 'date-range',
+    label: '范围',
+    component: <DatePicker mode='range' className='py-1.5' />
+  }
+];
+
+const QueryBar = ({ queryFields = [] }) => {
   const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
   return (
-    <div className='flex bg-white shadow-sm -mx-4 -mt-4 p-4'>
+    <div className='flex bg-white shadow-sm -mx-4 -mt-4 p-4 relative'>
       <div className='flex-1 items-center justify-between grid grid-cols-12 gap-x-4'>
-        <div className='col-span-11 grid grid-cols-4 gap-4'>
-          <div className='inline-flex items-center'>
-            <div className='flex text-slate-800'>编号：</div>
-            <div className='flex-1 gap-x-4 pl-4'>
-              <Input id='code' className='bg-slate-50 py-1.5 w-full' />
-            </div>
-          </div>
-          <div className='inline-flex items-center'>
-            <div className='flex text-slate-800'>名称：</div>
-            <div className='flex-1 gap-x-4 pl-4'>
-              <Input id='title' className='bg-slate-50 py-1.5 w-full' />
-            </div>
-          </div>
-          <div className='inline-flex items-center'>
-            <div className='flex text-slate-800'>状态：</div>
-            <div className='flex-1 gap-x-4 pl-4'>
-              <Select defaultValue='all'>
-                <SelectTrigger className='py-1.5 bg-slate-50' id='status'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>全部</SelectItem>
-                  <SelectItem value='normal'>正常</SelectItem>
-                  <SelectItem value='disabled'>已禁用</SelectItem>
-                  <SelectItem value='done'>已完成</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className='inline-flex items-center'>
-            <div className='flex text-slate-800'>范围：</div>
-            <div className='flex-1 flex gap-x-4 pl-4'>
-              <DatePicker mode='range' className='py-1.5' />
-            </div>
-          </div>
+        <div
+          className={cn(
+            'col-span-full md:col-span-11 grid gap-4',
+            queryFields.length === 2 && 'sm:grid-cols-2',
+            queryFields.length === 3 && 'sm:grid-cols-2 md:grid-cols-3',
+            queryFields.length >= 4 && 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+          )}
+        >
+          {queryFields
+            .slice(0, isExpanded ? queryFields.length : 3)
+            .map(({ name, label, component }) => (
+              <div key={name} className='inline-flex items-center'>
+                <div className='flex text-slate-800'>{label}：</div>
+                <div className='flex-1 gap-x-4 pl-4'>{component}</div>
+              </div>
+            ))}
+          {queryFields.length > 3 && (
+            <Button
+              variant='unstyle'
+              size='ratio'
+              className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-[9999] bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 hover:[&>svg]:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+              title={t(isExpanded ? 'query.collapse' : 'query.expand')}
+              onClick={toggleExpand}
+            >
+              <Icons name={isExpanded ? 'IconChevronUp' : 'IconChevronDown'} size={12} />
+            </Button>
+          )}
+
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-[9999] bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 hover:[&>svg]:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+            title={t(isExpanded ? 'query.collapse' : 'query.expand')}
+            onClick={toggleExpand}
+          >
+            <Icons name={isExpanded ? 'IconChevronUp' : 'IconChevronDown'} size={12} />
+          </Button>
         </div>
         <div className='col-span-1 flex flex-row items-center justify-start gap-x-4 flex-wrap'>
           <Button>{t('query.search')}</Button>
@@ -79,6 +145,8 @@ export const ListPage2 = () => {
   const [queryParams] = useState({ limit: 20 });
   const { data } = useListMenus(queryParams);
   const records = data?.items || [];
+
+  const { control: queryControl } = useForm<QueryFormParams>();
 
   const topbarElement = {
     title: t('example.list2.title'),
@@ -173,8 +241,8 @@ export const ListPage2 = () => {
 
   return (
     <Page sidebar topbar={topbar}>
-      <QueryBar />
-      <div className='flex-1 mt-4 overflow-auto'>
+      <QueryBar queryFields={queryFields({ queryControl })} />
+      <div className='flex-1 mt-4 overflow-y-auto'>
         <TableView
           pageSize={8}
           data={records}
