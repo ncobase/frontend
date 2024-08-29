@@ -11,19 +11,13 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   const { t } = useTranslation();
   return [
     {
-      title: '编号',
-      code: 'id',
-      parser: value => (
-        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
-          {value}
-        </Button>
-      ),
-      icon: 'IconHash'
-    },
-    {
       title: '名称',
       code: 'name',
-      icon: 'IconFlame'
+      parser: (value, record) => (
+        <Button variant='link' size='md' onClick={() => handleView({ id: record?.id }, 'view')}>
+          {value}
+        </Button>
+      )
     },
     {
       title: '操作',

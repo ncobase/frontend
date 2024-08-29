@@ -14,7 +14,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: '编号',
       code: 'id',
       parser: (value: string, _record: User) => (
-        <Button variant='link' size='sm' onClick={() => handleView({ id: value }, 'view')}>
+        <Button variant='link' size='md' onClick={() => handleView({ id: value }, 'view')}>
           {value}
         </Button>
       ),
