@@ -8,7 +8,6 @@ export const TenantRoutes = () => {
   const routes = [
     { path: '/', element: <TenantListPage /> },
     { path: '/:mode', element: <TenantListPage /> },
-    { path: '/:mode/:slug', element: <TenantListPage /> },
     { path: '/:mode/:slug', element: <TenantListPage /> }
   ];
   return renderRoutes(routes);

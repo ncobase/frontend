@@ -8,7 +8,6 @@ export const PermissionRoutes = () => {
   const routes = [
     { path: '/', element: <PermissionListPage /> },
     { path: '/:mode', element: <PermissionListPage /> },
-    { path: '/:mode/:slug', element: <PermissionListPage /> },
     { path: '/:mode/:slug', element: <PermissionListPage /> }
   ];
   return renderRoutes(routes);

@@ -8,7 +8,6 @@ export const DictionaryRoutes = () => {
   const routes = [
     { path: '/', element: <DictionaryListPage /> },
     { path: '/:mode', element: <DictionaryListPage /> },
-    { path: '/:mode/:slug', element: <DictionaryListPage /> },
     { path: '/:mode/:slug', element: <DictionaryListPage /> }
   ];
   return renderRoutes(routes);

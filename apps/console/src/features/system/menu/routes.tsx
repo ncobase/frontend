@@ -8,7 +8,6 @@ export const MenuRoutes = () => {
   const routes = [
     { path: '/', element: <MenuListPage /> },
     { path: '/:mode', element: <MenuListPage /> },
-    { path: '/:mode/:slug', element: <MenuListPage /> },
     { path: '/:mode/:slug', element: <MenuListPage /> }
   ];
   return renderRoutes(routes);

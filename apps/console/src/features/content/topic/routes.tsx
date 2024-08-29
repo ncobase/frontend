@@ -8,7 +8,6 @@ export const TopicRoutes = () => {
   const routes = [
     { path: '/', element: <TopicListPage /> },
     { path: '/:mode', element: <TopicListPage /> },
-    { path: '/:mode/:slug', element: <TopicListPage /> },
     { path: '/:mode/:slug', element: <TopicListPage /> }
   ];
   return renderRoutes(routes);
