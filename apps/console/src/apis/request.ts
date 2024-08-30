@@ -64,27 +64,35 @@ export class Request {
     method: string,
     url: string,
     data?: ExplicitAny,
-    fetchOptions?: FetchOptions
+    fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     try {
       const headers = this.getHeaders();
       const body = data ? { body: JSON.stringify(data) } : {};
+
+      let finalUrl = url;
+      const AUT = true; // always use timestamp;
+      if (fetchOptions?.timestamp || AUT) {
+        const separator = url.includes('?') ? '&' : '?';
+        finalUrl = `${url}${separator}_t=${Date.now()}`;
+      }
+
       const options: FetchOptions = {
         ...Request.baseConfig,
         method,
         headers,
         ...body,
         ...fetchOptions,
-        onRequestError: ({ error }) => this.handleErrors(error, method, url),
-        onResponseError: ({ response }) => this.handleErrors(response, method, url),
+        onRequestError: ({ error }) => this.handleErrors(error, method, finalUrl),
+        onResponseError: ({ response }) => this.handleErrors(response, method, finalUrl),
         onResponse: async ({ response }) => {
           if (!response.ok) {
-            await this.handleErrors(response, method, url);
+            await this.handleErrors(response, method, finalUrl);
           }
         }
       };
 
-      return await this.$fetch(url, options);
+      return await this.$fetch(finalUrl, options);
     } catch (err) {
       await this.handleErrors(err as Error, method, url);
     }
@@ -94,14 +102,17 @@ export class Request {
     ...Request.baseConfig
   };
 
-  public async get(url: string, fetchOptions?: FetchOptions): Promise<ExplicitAny> {
+  public async get(
+    url: string,
+    fetchOptions?: FetchOptions & { timestamp?: boolean }
+  ): Promise<ExplicitAny> {
     return this.request('GET', url, undefined, fetchOptions);
   }
 
   public async post(
     url: string,
     data?: ExplicitAny,
-    fetchOptions?: FetchOptions
+    fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     return this.request('POST', url, data, fetchOptions);
   }
@@ -109,12 +120,15 @@ export class Request {
   public async put(
     url: string,
     data?: ExplicitAny,
-    fetchOptions?: FetchOptions
+    fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     return this.request('PUT', url, data, fetchOptions);
   }
 
-  public async delete(url: string, fetchOptions?: FetchOptions): Promise<ExplicitAny> {
+  public async delete(
+    url: string,
+    fetchOptions?: FetchOptions & { timestamp?: boolean }
+  ): Promise<ExplicitAny> {
     return this.request('DELETE', url, undefined, fetchOptions);
   }
 }
