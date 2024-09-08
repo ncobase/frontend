@@ -27,7 +27,7 @@ export const Login = () => {
       </div>
       <div className='flex items-center justify-center flex-col min-h-lvh min-w-full'>
         <div className='p-6 bg-white shadow-sm max-w-2xl w-[38rem] -mt-14 rounded-md'>
-          <Logo className='mx-auto mt-6 mb-12' type='full' height='2.25rem' />
+          <Logo className='mx-auto mt-6 mb-12 py-1.5 drop-shadow-xl shadow-slate-900' type='full' />
           <LoginForm onSuccess={onLogin} />
           <Divider label='OR' style='dashed' className='my-2' />
           <div className='flex gap-x-8 items-center mb-5 justify-center'>
