@@ -15,6 +15,7 @@ export interface ModalProps<T extends object> {
   record?: T | null;
   isOpen?: boolean;
   className?: string;
+  toolbar?: ReactNode;
 }
 
 export const Modal = memo(
