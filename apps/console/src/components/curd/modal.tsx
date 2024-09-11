@@ -39,6 +39,7 @@ export const ModalView = memo(
     createComponent,
     viewComponent,
     editComponent,
+    isMaximized: defaultIsMaximized = false,
     ...rest
   }: ModalViewProps<T>) => {
     const { t } = useTranslation();
@@ -60,11 +61,9 @@ export const ModalView = memo(
       return isCreateType(type) || isEditType(type) ? confirmTexts[type] : null;
     };
 
-    const [isMaximized, setIsMaximized] = useState(false);
-    const defaultSize =
-      'w-[78lvw] h-[76lvh] max-w-[90lvw] max-h-[86lvh] shadow-lg rounded-lg -translate-x-[50%] -translate-y-[55%]';
-    const maximizedSize =
-      '!w-[100lvw] !h-[100lvh] max-w-[100lvw] max-h-[100lvh] shadow-none !rounded-none -translate-x-[50%] -translate-y-[50%]';
+    const [isMaximized, setIsMaximized] = useState(defaultIsMaximized);
+    const maximizedClasses =
+      '!w-[100lvw] !h-[100lvh] !max-w-[100lvw] !max-h-[100lvh] !shadow-none !rounded-none -translate-y-[50%] data-[state=open]:slide-in-from-top-[50%]';
     const handleMaximize = () => {
       setIsMaximized(prevStatus => !prevStatus);
     };
@@ -75,7 +74,7 @@ export const ModalView = memo(
         confirmText={getConfirmText()}
         cancelText={t('actions.cancel')}
         isOpen={!!type}
-        className={isMaximized ? maximizedSize : defaultSize}
+        className={isMaximized && maximizedClasses}
         toolbar={
           <Button
             variant='unstyle'
