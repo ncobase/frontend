@@ -104,8 +104,11 @@
       "required": "Please accept the terms and conditions"
     }
   },
-  "search_input": {
+  "search": {
     "placeholder": "Search...",
+    "required": "Please enter search content",
+    "invalid": "Invalid search content",
+    "no_results": "No results found",
     "clear": "Clear search"
   },
   "field_day_picker": {

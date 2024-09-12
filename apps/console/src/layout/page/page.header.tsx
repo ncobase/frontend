@@ -25,6 +25,7 @@ import { AccountDropdown, MainNavigation, TenantDropdown } from '../navigation';
 
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
+import { Search } from '@/components/search/search';
 import { useQueryMenuTreeData } from '@/features/system/menu/service';
 
 const Notifications = ({ notifications, onMarkAllAsRead }) => {
@@ -123,7 +124,7 @@ const HeaderComponent = ({ ...rest }) => {
 
   return (
     <ShellHeader
-      className='flex items-center justify-between bg-gradient-to-r border-b-0 from-slate-800 via-slate-700 via-20% to-slate-800'
+      className='flex items-center justify-between bg-gradient-to-r border-b-0 backdrop-blur from-slate-800 via-slate-700 via-20% to-slate-800'
       {...rest}
     >
       <div className='inline-flex items-center justify-start'>
@@ -131,6 +132,7 @@ const HeaderComponent = ({ ...rest }) => {
         {headerMenus.length > 0 && <MainNavigation menus={headerMenus} />}
       </div>
       <div className='inline-flex items-center px-4 gap-x-3'>
+        <Search />
         <LanguageSwitcher />
         <Notifications notifications={notifications} onMarkAllAsRead={handleMarkAllAsRead} />
         <TenantDropdown />

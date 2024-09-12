@@ -104,8 +104,11 @@
       "required": "请勾选注册条款和条件"
     }
   },
-  "search_input": {
+  "search": {
     "placeholder": "搜索...",
+    "required": "请输入搜索内容",
+    "invalid": "无效搜索内容",
+    "no_results": "没有找到结果",
     "clear": "清除搜索"
   },
   "field_day_picker": {
