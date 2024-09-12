@@ -2,7 +2,11 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "lint": {
-      "cache": false
+      "cache": false,
+      "persistent": true,
+      "dependsOn": [
+        "^lint:fix"
+      ]
     },
     "build": {
       "dependsOn": [

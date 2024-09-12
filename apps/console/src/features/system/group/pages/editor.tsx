@@ -1,6 +1,8 @@
 import React from 'react';
 
-import { useParams } from 'react-router-dom';
+import { Button, Icons, ScrollView, Container } from '@ncobase/react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { EditorGroupForms } from '../forms/editor';
 
@@ -33,13 +35,39 @@ export const EditorGroupPage = ({
       />
     );
   }
+
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
   return (
-    <EditorGroupForms
-      record={record}
-      onSubmit={onSubmit}
-      control={control}
-      setValue={setValue}
-      errors={errors}
-    />
+    <>
+      <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-x-4'>
+            <Button variant='outline-slate' onClick={() => navigate(-1)}>
+              <Icons name='IconArrowLeft' />
+            </Button>
+            <div className='text-slate-600 font-medium'>{t('actions.edit')}</div>
+          </div>
+          <div className='flex gap-x-4'>
+            <Button variant='outline-slate' onClick={() => navigate(-1)}>
+              {t('actions.cancel')}
+            </Button>
+            <Button onClick={onSubmit}>{t('actions.submit')}</Button>
+          </div>
+        </div>
+      </div>
+      <ScrollView className='bg-white'>
+        <Container>
+          <EditorGroupForms
+            record={record}
+            onSubmit={onSubmit}
+            control={control}
+            setValue={setValue}
+            errors={errors}
+          />
+        </Container>
+      </ScrollView>
+    </>
   );
 };

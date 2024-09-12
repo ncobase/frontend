@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +19,7 @@ import { EditorPermissionPage } from './editor';
 import { PermissionViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
+import { useLayoutContext } from '@/layout';
 import { Permission } from '@/types';
 
 export const PermissionListPage = () => {
@@ -27,7 +28,9 @@ export const PermissionListPage = () => {
   const [queryParams, setQueryParams] = useState<QueryFormParams>();
   const { data, refetch, isLoading } = useListPermissions(queryParams);
 
-  const vmode = useMemo(() => 'flatten', []) as 'flatten' | 'modal';
+  // const vmode = useMemo(() => 'flatten', []) as 'flatten' | 'modal';
+
+  const { vmode } = useLayoutContext();
 
   const {
     handleSubmit: handleQuerySubmit,

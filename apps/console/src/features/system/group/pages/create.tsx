@@ -24,7 +24,7 @@ export const CreateGroupPage = ({ viewMode, onSubmit, control, errors }) => {
             <Button variant='outline-slate' onClick={() => navigate(-1)}>
               <Icons name='IconArrowLeft' />
             </Button>
-            <div className='text-slate-600 font-medium'>创建表单</div>
+            <div className='text-slate-600 font-medium'>{t('actions.create')}</div>
           </div>
           <div className='flex gap-x-4'>
             <Button variant='outline-slate' onClick={() => navigate(-1)}>
