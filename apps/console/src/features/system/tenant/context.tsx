@@ -19,7 +19,7 @@ const TenantContext = React.createContext<TenantContextValue>({
 
 const updateTenant = (id?: string | null) => {
   if (!isBrowser) return;
-  id ? locals.set(TENANT_KEY, id) : locals.remove(TENANT_KEY);
+  return id ? locals.set(TENANT_KEY, id) : locals.remove(TENANT_KEY);
 };
 
 export const TenantProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
