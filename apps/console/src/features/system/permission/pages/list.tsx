@@ -47,11 +47,11 @@ export const PermissionListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -60,7 +60,7 @@ export const PermissionListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Permission | null>(null);
 
   const handleView = useCallback(
-    (record: Permission | null, type: 'view' | 'edit' | 'create') => {
+    (record: Permission | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -158,7 +158,9 @@ export const PermissionListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <PermissionViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <PermissionViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorPermissionPage
           viewMode={vmode}

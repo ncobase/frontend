@@ -244,7 +244,18 @@
     "mark_as_read": "Mark as Read",
     "mark_all_as_read": "Mark all as Read",
     "sidebar_collapse": "Collapse Sidebar",
-    "sidebar_expand": "Expand Sidebar"
+    "sidebar_expand": "Expand Sidebar",
+    "printer": "Printer",
+    "export": "Export",
+    "import": "Import",
+    "upload": "Upload",
+    "download": "Download",
+    "reset": "Reset",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "go_to": "Go to",
+    "go_to_list": "Go to List"
   },
   "query": {
     "collapse": "Collapse Query Bar",

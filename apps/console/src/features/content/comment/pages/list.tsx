@@ -40,11 +40,11 @@ export const CommentListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -53,7 +53,7 @@ export const CommentListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Comment | null>(null);
 
   const handleView = useCallback(
-    (record: Comment | null, type: 'view' | 'edit' | 'create') => {
+    (record: Comment | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -150,7 +150,9 @@ export const CommentListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <CommentViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <CommentViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorCommentPage
           viewMode={vmode}

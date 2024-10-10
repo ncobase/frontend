@@ -40,11 +40,11 @@ export const TopicListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -53,7 +53,7 @@ export const TopicListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Topic | null>(null);
 
   const handleView = useCallback(
-    (record: Topic | null, type: 'view' | 'edit' | 'create') => {
+    (record: Topic | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -150,7 +150,9 @@ export const TopicListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <TopicViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <TopicViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorTopicPage
           viewMode={vmode}

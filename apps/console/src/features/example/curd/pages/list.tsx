@@ -32,9 +32,9 @@ export const ListPage = () => {
   };
 
   const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
-  const [viewType, setViewType] = useState<'create' | 'view' | 'edit'>(undefined);
+  const [viewType, setViewType] = useState<string | undefined>(undefined);
 
-  const handleView = (record: Role | null, type: 'view' | 'edit' | 'create') => {
+  const handleView = (record: Role | null, type: string) => {
     setSelectedRecord(record);
     setViewType(type);
   };

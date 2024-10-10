@@ -25,11 +25,11 @@ export const TenantListPage = () => {
   const { data, refetch } = useListTenants(queryParams);
   const { vmode } = useLayoutContext();
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -38,7 +38,7 @@ export const TenantListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Tenant | null>(null);
 
   const handleView = useCallback(
-    (record: Tenant | null, type: 'view' | 'edit' | 'create') => {
+    (record: Tenant | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -121,7 +121,9 @@ export const TenantListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <TenantViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <TenantViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorTenantPage
           viewMode={vmode}

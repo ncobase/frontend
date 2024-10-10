@@ -40,11 +40,11 @@ export const RoleListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -53,7 +53,7 @@ export const RoleListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
 
   const handleView = useCallback(
-    (record: Role | null, type: 'view' | 'edit' | 'create') => {
+    (record: Role | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -150,7 +150,9 @@ export const RoleListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <RoleViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <RoleViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorRolePage
           viewMode={vmode}

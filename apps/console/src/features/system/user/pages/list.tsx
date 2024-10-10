@@ -40,11 +40,11 @@ export const UserListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -53,7 +53,7 @@ export const UserListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<User | null>(null);
 
   const handleView = useCallback(
-    (record: User | null, type: 'view' | 'edit' | 'create') => {
+    (record: User | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -150,7 +150,9 @@ export const UserListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <UserViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <UserViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorUserPage
           viewMode={vmode}

@@ -23,7 +23,7 @@
 //   items: T[];
 //   selectedItem: T | null;
 //   viewType: 'view' | 'edit' | 'create' | undefined;
-//   handleDialogView: (record: T | null, type: 'view' | 'edit' | 'create') => void;
+//   handleDialogView: (record: T | null, type: string) => void;
 //   handleDialogClose: () => void;
 //   handleCreate: (data: T) => void;
 //   handleUpdate: (data: T) => void;
@@ -99,7 +99,7 @@
 //   }, [mode, slug, selectedItem, fetchItem, setFormValue]);
 
 //   const handleDialogView = useCallback(
-//     (record: T | null, type: 'view' | 'edit' | 'create') => {
+//     (record: T | null, type: string) => {
 //       setSelectedItem(record);
 //       setViewType(type);
 //       navigate(`${type}${record ? `/${(record as any).id}` : ''}`);

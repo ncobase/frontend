@@ -41,11 +41,11 @@ export const MenuListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -54,7 +54,7 @@ export const MenuListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
 
   const handleView = useCallback(
-    (record: Menu | null, type: 'view' | 'edit' | 'create') => {
+    (record: Menu | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -153,7 +153,9 @@ export const MenuListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <MenuViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <MenuViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorMenuPage
           viewMode={vmode}

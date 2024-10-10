@@ -49,11 +49,11 @@ export const TaxonomyListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -62,7 +62,7 @@ export const TaxonomyListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Taxonomy | null>(null);
 
   const handleView = useCallback(
-    (record: Taxonomy | null, type: 'view' | 'edit' | 'create') => {
+    (record: Taxonomy | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -161,7 +161,9 @@ export const TaxonomyListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <TaxonomyViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <TaxonomyViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorTaxonomyPage
           viewMode={vmode}

@@ -8,7 +8,7 @@ import { Modal, ModalProps } from '../modal/modal';
 import { ExplicitAny } from '@/types';
 
 export interface ModalViewProps<T extends object> extends ModalProps<T> {
-  type?: 'create' | 'view' | 'edit';
+  type?: string; // 'create' | 'view' | 'edit';
   createComponent?: React.ReactNode;
   viewComponent?: (record: object | T | null) => React.ReactNode;
   editComponent?: (record: object | T | null) => React.ReactNode;

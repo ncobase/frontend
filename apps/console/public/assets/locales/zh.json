@@ -244,7 +244,18 @@
     "mark_as_read": "标记为已读",
     "mark_all_as_read": "全部标记为已读",
     "sidebar_collapse": "收起侧边栏",
-    "sidebar_expand": "展开侧边栏"
+    "sidebar_expand": "展开侧边栏",
+    "printer": "打印",
+    "export": "导出",
+    "import": "导入",
+    "upload": "上传",
+    "download": "下载",
+    "reset": "重置",
+    "search": "搜索",
+    "filter": "筛选",
+    "clear": "清除",
+    "go_to": "前往",
+    "go_to_list": "前往列表"
   },
   "query": {
     "collapse": "收起查询栏",

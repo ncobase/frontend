@@ -45,11 +45,11 @@ export const DictionaryListPage = () => {
     queryReset();
   };
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -58,7 +58,7 @@ export const DictionaryListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Dictionary | null>(null);
 
   const handleView = useCallback(
-    (record: Dictionary | null, type: 'view' | 'edit' | 'create') => {
+    (record: Dictionary | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -155,7 +155,9 @@ export const DictionaryListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <DictionaryViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <DictionaryViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorDictionaryPage
           viewMode={vmode}

@@ -8,7 +8,7 @@ import { RoleViewerForms } from '../forms/viewer';
 
 import { useLayoutContext } from '@/layout';
 
-export const RoleViewerPage = ({ viewMode, record: initialRecord }) => {
+export const RoleViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();
   const { slug } = useParams<{ slug: string }>();
   const record = initialRecord || slug;
@@ -33,6 +33,22 @@ export const RoleViewerPage = ({ viewMode, record: initialRecord }) => {
               <Icons name='IconArrowLeft' />
             </Button>
             <div className='text-slate-600 font-medium'>{t('actions.view')}</div>
+          </div>
+          <div className='flex gap-x-4'>
+            <Button
+              variant='outline-primary'
+              prependIcon={<Icons name='IconEdit' className='w-4 h-4' />}
+              onClick={() => handleView({ id: record }, '../edit')}
+            >
+              {t('actions.edit')}
+            </Button>
+            <Button
+              variant='outline-danger'
+              prependIcon={<Icons name='IconPrinter' className='w-4 h-4' />}
+              onClick={() => handleView({ id: record }, '../printer')}
+            >
+              {t('actions.printer')}
+            </Button>
           </div>
         </div>
       </div>

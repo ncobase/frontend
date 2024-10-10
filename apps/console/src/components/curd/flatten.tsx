@@ -7,7 +7,7 @@ import { CommonProps } from '.';
 import { ExplicitAny } from '@/types';
 
 export interface FlattenViewProps<T extends object> extends CommonProps<T> {
-  type?: 'create' | 'view' | 'edit';
+  type?: string; // 'create' | 'view' | 'edit';
   createComponent?: React.ReactNode;
   viewComponent?: (record: T | null) => React.ReactNode;
   editComponent?: (record: T | null) => React.ReactNode;
@@ -42,7 +42,7 @@ export const FlattenView = <T extends object>({
   return (
     <ViewComponent
       record={record}
-      type={mode as 'create' | 'view' | 'edit'}
+      type={mode}
       createComponent={createComponent}
       viewComponent={viewComponent}
       editComponent={editComponent}

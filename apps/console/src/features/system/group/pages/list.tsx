@@ -25,11 +25,11 @@ export const GroupListPage = () => {
   const { data } = useListGroups(queryParams);
   const { vmode } = useLayoutContext();
 
-  const [viewType, setViewType] = useState<'view' | 'edit' | 'create' | undefined>();
+  const [viewType, setViewType] = useState<string | undefined>();
   const { mode } = useParams<{ mode: string; slug: string }>();
   useEffect(() => {
     if (mode) {
-      setViewType(mode as 'view' | 'edit' | 'create');
+      setViewType(mode);
     } else {
       setViewType(undefined);
     }
@@ -38,7 +38,7 @@ export const GroupListPage = () => {
   const [selectedRecord, setSelectedRecord] = useState<Group | null>(null);
 
   const handleView = useCallback(
-    (record: Group | null, type: 'view' | 'edit' | 'create') => {
+    (record: Group | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
       if (vmode === 'flatten') {
@@ -135,7 +135,9 @@ export const GroupListPage = () => {
           errors={formErrors}
         />
       }
-      viewComponent={record => <GroupViewerPage viewMode={vmode} record={record?.id} />}
+      viewComponent={record => (
+        <GroupViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+      )}
       editComponent={record => (
         <EditorGroupPage
           viewMode={vmode}
