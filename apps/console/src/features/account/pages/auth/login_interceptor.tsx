@@ -78,6 +78,7 @@ export const LoginInterceptorProvider = () => {
         isOpen={opened}
         onChange={handleVisible}
         className='max-w-[475px] max-h-[365px]'
+        description={t('interceptor.account.description')}
       >
         <LoginForm onSuccess={handleLogin} hideRegister hideForgetPassword />
       </Modal>

@@ -6,6 +6,7 @@ import { ExplicitAny } from '@/types';
 
 export interface ModalProps<T extends object> {
   title?: string;
+  description?: string;
   children?: ReactNode | ((record: T | null) => ReactNode) | ExplicitAny;
   confirmText?: string;
   cancelText?: string;
@@ -23,6 +24,7 @@ export const Modal = memo(
   <T extends object>({
     children,
     title,
+    description,
     confirmText,
     cancelText,
     onConfirm,
@@ -45,6 +47,7 @@ export const Modal = memo(
         cancelText={cancelText}
         onConfirm={confirmText ? () => onConfirm?.(record) : undefined}
         confirmText={confirmText}
+        description={description}
         {...rest}
       >
         {renderChildren()}

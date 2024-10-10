@@ -475,7 +475,8 @@
   },
   "interceptor": {
     "account": {
-      "title": "请登录后继续..."
+      "title": "请登录后继续...",
+      "description": ""
     }
   },
   "account": {
