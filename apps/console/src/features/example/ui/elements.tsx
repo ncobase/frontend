@@ -163,6 +163,26 @@ export const Elements = ({ ...rest }) => {
                   <Button variant='outline-danger'>Danger</Button>
                   <Button variant='slate'>Slate</Button>
                   <Button variant='outline-slate'>Slate</Button>
+                  <Button variant='blue'>Blue</Button>
+                  <Button variant='outline-blue'>Blue</Button>
+                  <Button variant='indigo'>Indigo</Button>
+                  <Button variant='outline-indigo'>Indigo</Button>
+                  <Button variant='purple'>Purple</Button>
+                  <Button variant='outline-purple'>Purple</Button>
+                  <Button variant='pink'>Pink</Button>
+                  <Button variant='outline-pink'>Pink</Button>
+                  <Button variant='rose'>Rose</Button>
+                  <Button variant='outline-rose'>Rose</Button>
+                  <Button variant='orange'>Orange</Button>
+                  <Button variant='outline-orange'>Orange</Button>
+                  <Button variant='yellow'>Yellow</Button>
+                  <Button variant='outline-yellow'>Yellow</Button>
+                  <Button variant='green'>Green</Button>
+                  <Button variant='outline-green'>Green</Button>
+                  <Button variant='teal'>Teal</Button>
+                  <Button variant='outline-teal'>Teal</Button>
+                  <Button variant='cyan'>Cyan</Button>
+                  <Button variant='outline-cyan'>Cyan</Button>
                 </div>
               </div>
               <div className='grid grid-cols-1 gap-4 pb-4'>
@@ -206,6 +226,66 @@ export const Elements = ({ ...rest }) => {
                   <Button variant='outline-slate' disabled>
                     Slate
                   </Button>
+                  <Button variant='blue' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='pink' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='rose' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='orange' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='green' disabled>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' disabled>
+                    Green
+                  </Button>
+                  <Button variant='teal' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' disabled>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' disabled>
+                    Cyan
+                  </Button>
                 </div>
               </div>
             </div>
@@ -248,6 +328,66 @@ export const Elements = ({ ...rest }) => {
                   </Button>
                   <Button variant='outline-slate' size='xs'>
                     Slate
+                  </Button>
+                  <Button variant='blue' size='xs'>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='xs'>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='xs'>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='xs'>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='xs'>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='xs'>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='xs'>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='xs'>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='xs'>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='xs'>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='xs'>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='xs'>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='xs'>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='xs'>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='xs'>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='xs'>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='xs'>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='xs'>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='xs'>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='xs'>
+                    Cyan
                   </Button>
                 </div>
               </div>
@@ -293,6 +433,66 @@ export const Elements = ({ ...rest }) => {
                   <Button variant='outline-slate' size='xs' disabled>
                     Slate
                   </Button>
+                  <Button variant='blue' size='xs' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='xs' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='xs' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='xs' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='xs' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='xs' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='xs' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='xs' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='xs' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='xs' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='xs' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='xs' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='xs' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='xs' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='xs' disabled>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='xs' disabled>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='xs' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='xs' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='xs' disabled>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='xs' disabled>
+                    Cyan
+                  </Button>
                 </div>
               </div>
             </div>
@@ -335,6 +535,66 @@ export const Elements = ({ ...rest }) => {
                   </Button>
                   <Button variant='outline-slate' size='sm'>
                     Slate
+                  </Button>
+                  <Button variant='blue' size='sm'>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='sm'>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='sm'>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='sm'>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='sm'>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='sm'>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='sm'>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='sm'>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='sm'>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='sm'>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='sm'>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='sm'>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='sm'>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='sm'>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='sm'>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='sm'>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='sm'>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='sm'>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='sm'>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='sm'>
+                    Cyan
                   </Button>
                 </div>
               </div>
@@ -379,6 +639,66 @@ export const Elements = ({ ...rest }) => {
                   <Button variant='outline-slate' size='sm' disabled>
                     Slate
                   </Button>
+                  <Button variant='blue' size='sm' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='sm' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='sm' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='sm' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='sm' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='sm' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='sm' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='sm' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='sm' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='sm' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='sm' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='sm' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='sm' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='sm' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='sm' disabled>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='sm' disabled>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='sm' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='sm' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='sm' disabled>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='sm' disabled>
+                    Cyan
+                  </Button>
                 </div>
               </div>
             </div>
@@ -421,6 +741,66 @@ export const Elements = ({ ...rest }) => {
                   </Button>
                   <Button variant='outline-slate' size='lg'>
                     Slate
+                  </Button>
+                  <Button variant='blue' size='lg'>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='lg'>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='lg'>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='lg'>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='lg'>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='lg'>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='lg'>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='lg'>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='lg'>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='lg'>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='lg'>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='lg'>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='lg'>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='lg'>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='lg'>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='lg'>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='lg'>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='lg'>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='lg'>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='lg'>
+                    Cyan
                   </Button>
                 </div>
               </div>
@@ -465,6 +845,66 @@ export const Elements = ({ ...rest }) => {
                   <Button variant='outline-slate' size='lg' disabled>
                     Slate
                   </Button>
+                  <Button variant='blue' size='lg' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='lg' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='lg' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='lg' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='lg' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='lg' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='lg' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='lg' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='lg' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='lg' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='lg' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='lg' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='lg' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='lg' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='lg' disabled>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='lg' disabled>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='lg' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='lg' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='lg' disabled>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='lg' disabled>
+                    Cyan
+                  </Button>
                 </div>
               </div>
             </div>
@@ -508,6 +948,66 @@ export const Elements = ({ ...rest }) => {
                   <Button variant='outline-slate' size='xl'>
                     Slate
                   </Button>
+                  <Button variant='blue' size='xl'>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='xl'>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='xl'>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='xl'>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='xl'>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='xl'>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='xl'>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='xl'>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='xl'>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='xl'>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='xl'>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='xl'>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='xl'>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='xl'>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='xl'>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='xl'>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='xl'>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='xl'>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='xl'>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='xl'>
+                    Cyan
+                  </Button>
                 </div>
               </div>
               <div className='grid grid-cols-1 gap-4 pb-4'>
@@ -550,6 +1050,66 @@ export const Elements = ({ ...rest }) => {
                   </Button>
                   <Button variant='outline-slate' size='xl' disabled>
                     Slate
+                  </Button>
+                  <Button variant='blue' size='xl' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='outline-blue' size='xl' disabled>
+                    Blue
+                  </Button>
+                  <Button variant='indigo' size='xl' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='outline-indigo' size='xl' disabled>
+                    Indigo
+                  </Button>
+                  <Button variant='purple' size='xl' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='outline-purple' size='xl' disabled>
+                    Purple
+                  </Button>
+                  <Button variant='pink' size='xl' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='outline-pink' size='xl' disabled>
+                    Pink
+                  </Button>
+                  <Button variant='rose' size='xl' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='outline-rose' size='xl' disabled>
+                    Rose
+                  </Button>
+                  <Button variant='orange' size='xl' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='outline-orange' size='xl' disabled>
+                    Orange
+                  </Button>
+                  <Button variant='yellow' size='xl' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='outline-yellow' size='xl' disabled>
+                    Yellow
+                  </Button>
+                  <Button variant='green' size='xl' disabled>
+                    Green
+                  </Button>
+                  <Button variant='outline-green' size='xl' disabled>
+                    Green
+                  </Button>
+                  <Button variant='teal' size='xl' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='outline-teal' size='xl' disabled>
+                    Teal
+                  </Button>
+                  <Button variant='cyan' size='xl' disabled>
+                    Cyan
+                  </Button>
+                  <Button variant='outline-cyan' size='xl' disabled>
+                    Cyan
                   </Button>
                 </div>
               </div>
