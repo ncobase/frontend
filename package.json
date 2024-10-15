@@ -10,7 +10,7 @@
     "plugins/*"
   ],
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "clean": "npx rimraf --glob '**/{node_modules,.next,dist,.turbo,.eslintcache}'",
     "dev": "turbo run dev",
     "dev:console": "pnpm dev --filter=@ncobase/console --filter='./packages/*' --filter='./plugins/*'",
