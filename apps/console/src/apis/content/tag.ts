@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { ExplicitAny, Tag } from '@/types';
 
-const ENDPOINT = '/v1/tags';
+const ENDPOINT = '/content/tags';
 
 // create
 export const createTag = async (payload: Tag): Promise<Tag> => {

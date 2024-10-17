@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { ExplicitAny, Taxonomy } from '@/types';
 
-const ENDPOINT = '/v1/taxonomies';
+const ENDPOINT = '/content/taxonomies';
 
 // create
 export const createTaxonomy = async (payload: Taxonomy): Promise<Taxonomy> => {

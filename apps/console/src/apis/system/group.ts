@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { ExplicitAny, Group } from '@/types';
 
-const ENDPOINT = '/v1/groups';
+const ENDPOINT = '/group/groups';
 
 // create
 export const createGroup = async (payload: Group): Promise<Group> => {

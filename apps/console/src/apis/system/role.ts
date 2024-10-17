@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { ExplicitAny, Role } from '@/types';
 
-const ENDPOINT = '/v1/roles';
+const ENDPOINT = '/access/roles';
 
 // create
 export const createRole = async (payload: Role): Promise<Role> => {

@@ -1,7 +1,7 @@
 import { request } from '@/apis/request';
 import { LoginProps, LoginReply, RegisterProps } from '@/types';
 
-const ENDPOINT = '/v1';
+const ENDPOINT = '/auth';
 
 // login
 export const loginAccount = async (payload: LoginProps): Promise<LoginReply> => {

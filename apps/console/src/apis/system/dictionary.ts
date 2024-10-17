@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { Dictionary, ExplicitAny } from '@/types';
 
-const ENDPOINT = '/v1/dictionaries';
+const ENDPOINT = '/system/dictionaries';
 
 // create
 export const createDictionary = async (payload: Dictionary): Promise<Dictionary> => {
