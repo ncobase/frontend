@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { ExplicitAny, Tenant } from '@/types';
 
-const ENDPOINT = '/tenant/tenants';
+const ENDPOINT = '/iam/tenants';
 
 // create
 export const createTenant = async (payload: Tenant): Promise<Tenant> => {

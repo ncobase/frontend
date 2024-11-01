@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { UserMeshes, ExplicitAny, User } from '@/types';
 
-const ENDPOINT = '/user/users';
+const ENDPOINT = '/iam/users';
 
 // create
 export const createUser = async (payload: User): Promise<UserMeshes> => {

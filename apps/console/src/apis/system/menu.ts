@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { ExplicitAny, Menu, MenuTrees } from '@/types';
 
-const ENDPOINT = '/system/menus';
+const ENDPOINT = '/sys/menus';
 
 // create
 export const createMenu = async (payload: Menu): Promise<Menu> => {

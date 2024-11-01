@@ -1,7 +1,7 @@
 import { request } from '@/apis/request';
 import { Account, Tenant, Tenants } from '@/types';
 
-const ENDPOINT = '/auth/account';
+const ENDPOINT = '/iam/account';
 
 // current user
 export const getCurrentUser = async (): Promise<Account> => {

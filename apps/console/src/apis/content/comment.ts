@@ -4,7 +4,7 @@ import { buildQueryString } from '@ncobase/utils';
 import { request } from '@/apis/request';
 import { Comment, ExplicitAny } from '@/types';
 
-const ENDPOINT = '/content/comments';
+const ENDPOINT = '/cms/comments';
 
 // create
 export const createComment = async (payload: Comment): Promise<Comment> => {
