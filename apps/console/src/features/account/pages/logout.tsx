@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuthContext } from '@/features/account/context';
+import { clearTenant } from '@/features/system/tenant/context';
 
 export const Logout = () => {
   const { updateTokens } = useAuthContext();
@@ -12,6 +13,7 @@ export const Logout = () => {
 
   useEffect(() => {
     updateTokens();
+    clearTenant();
     queryCache.clear();
     navigate('/login');
   }, [updateTokens, queryCache]);

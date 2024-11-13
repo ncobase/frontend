@@ -22,6 +22,11 @@ const updateTenant = (id?: string | null) => {
   return id ? locals.set(TENANT_KEY, id) : locals.remove(TENANT_KEY);
 };
 
+export const clearTenant = () => {
+  if (!isBrowser) return;
+  locals.remove(TENANT_KEY);
+};
+
 export const TenantProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [tenant, setTenant] = useState<string | undefined>(
     (isBrowser && locals.get(TENANT_KEY)) ?? undefined
