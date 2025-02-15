@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { useCurrentTime } from '@/hooks/use_current_time';
 
 export const Footer = () => {

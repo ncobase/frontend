@@ -37,7 +37,7 @@ export const bizCode = (
   // const MINUTE = digitAlign(now.getMinutes());
   // const SECOND = digitAlign(now.getSeconds());
 
-  const DATETIME = `${YEAR}${MONTH}${DAY}${HOUR}${nanoid.Number(3)}`;
+  const DATETIME = `${YEAR}${MONTH}${DAY}${HOUR}${nanoid.number(3)}`;
 
   return `${prefix}${DATETIME}${suffix}`;
 };

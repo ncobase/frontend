@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { AnalyzePage } from '../example/analyze';
 
 import dataSeries from '@/assets/datas/ids.mjs';

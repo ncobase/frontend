@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { CommentRoutes } from './comment/routes';
 import { TaxonomyRoutes } from './taxonomy/routes';
 import { TopicRoutes } from './topic/routes';

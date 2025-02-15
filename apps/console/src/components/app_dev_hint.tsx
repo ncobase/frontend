@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { cn, getInitials } from '@ncobase/utils';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 

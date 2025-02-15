@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Container, FieldConfigProps, Form, Icons, ScrollView } from '@ncobase/react';
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';

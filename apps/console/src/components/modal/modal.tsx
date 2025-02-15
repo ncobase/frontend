@@ -1,4 +1,4 @@
-import React, { memo, ReactNode, useCallback } from 'react';
+import { memo, ReactNode, useCallback } from 'react';
 
 import { Dialog } from '@ncobase/react';
 

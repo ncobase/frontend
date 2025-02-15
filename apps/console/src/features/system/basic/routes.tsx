@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { SystemSettingsPage } from './system';
 
 import { renderRoutes } from '@/router';

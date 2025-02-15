@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, FieldViewer } from '@ncobase/react';
 import { joinName, randomId } from '@ncobase/utils';
 

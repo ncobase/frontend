@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { PaginationParams } from '@ncobase/react';
 import { isEqual } from 'lodash';

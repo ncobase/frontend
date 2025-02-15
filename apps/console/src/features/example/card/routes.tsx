@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { CardList } from './card';
 import { ElementPage } from './component/element';
 import { FormPage } from './component/form';

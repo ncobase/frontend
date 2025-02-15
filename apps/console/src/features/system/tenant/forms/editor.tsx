@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { FieldConfigProps, Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';

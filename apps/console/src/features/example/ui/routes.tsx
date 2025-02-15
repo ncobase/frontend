@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Elements } from './elements';
 import { CreatePage, EditorPage, ViewerPage } from './forms';
 

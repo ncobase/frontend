@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Divider, Icons, Tooltip, TooltipContent, TooltipTrigger } from '@ncobase/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';

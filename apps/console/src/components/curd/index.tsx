@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button, Form, Icons, TableView, TableViewProps } from '@ncobase/react';
 import { cn } from '@ncobase/utils';

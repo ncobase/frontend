@@ -1,5 +1,5 @@
 // global
-export * from '@ncobase/types/src/index';
+export * from '@ncobase/types';
 
 // system
 export * from './system/application';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Page } from '@/layout';
 
 export const BasicLayout = ({ children, ...rest }) => {

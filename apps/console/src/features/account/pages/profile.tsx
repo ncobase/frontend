@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Container, Icons, ScrollView } from '@ncobase/react';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';

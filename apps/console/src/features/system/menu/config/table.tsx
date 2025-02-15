@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Icons, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';

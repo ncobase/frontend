@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { UserListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';

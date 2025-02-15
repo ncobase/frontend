@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Props } from '@/components/logo/index';
 
 export const Min: React.FC<Props> = ({ height, logoColor, color }) => {

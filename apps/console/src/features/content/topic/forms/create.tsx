@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 

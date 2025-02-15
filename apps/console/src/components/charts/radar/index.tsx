@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Charts, { Props as ChartProps } from 'react-apexcharts';
 
 type RadarTypes = 'radar';

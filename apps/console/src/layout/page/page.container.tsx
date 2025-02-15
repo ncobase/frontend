@@ -1,4 +1,4 @@
-import React, { HtmlHTMLAttributes } from 'react';
+import { HtmlHTMLAttributes } from 'react';
 
 import { Container } from '@ncobase/react';
 

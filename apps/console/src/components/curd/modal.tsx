@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 
 import { Button, Icons } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { InputField, PaginationParams, SelectField } from '@ncobase/react';
 import { Control, Controller } from 'react-hook-form';
 

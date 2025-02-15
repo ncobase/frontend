@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { BasicRoutes } from './basic/routes';
 import { DictionaryRoutes } from './dictionary/routes';
 import { GroupRoutes } from './group/routes';

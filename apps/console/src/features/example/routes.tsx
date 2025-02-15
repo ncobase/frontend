@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { AnalyzePage } from './analyze';
 import { ExampleCardRoutes } from './card';
 import { Masonry } from './card/masonry';

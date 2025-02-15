@@ -1,6 +1,15 @@
 {
   "extends": "@ncobase/tsconfig/react.json",
   "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "strictNullChecks": false,
+    "verbatimModuleSyntax": false,
+    "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
       "@/*": [

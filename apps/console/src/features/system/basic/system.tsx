@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { BasicLayout } from './layout';
 
 export const SystemSettingsPage = () => {

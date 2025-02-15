@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { GroupListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';

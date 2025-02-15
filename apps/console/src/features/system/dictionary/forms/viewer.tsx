@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { CodeHighlighter, FieldViewer } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 

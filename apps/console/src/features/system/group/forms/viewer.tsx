@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { FieldViewer } from '@ncobase/react';
 
 import { useQueryGroup } from '../service';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, Icons, ScrollView, Container } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';

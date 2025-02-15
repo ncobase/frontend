@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Routes, useLocation } from 'react-router-dom';
 
 interface AnimatedSwitchProps extends React.PropsWithChildren {}

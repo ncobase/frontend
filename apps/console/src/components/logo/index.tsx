@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { cn } from '@ncobase/utils';
 
 import { Full } from '@/components/logo/full';

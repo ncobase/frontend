@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Button, DropdownControl, LayoutControl, ScreenControl } from '@/components/elements';
 
 export const topbarLeftSection = ({ handleView }) => [

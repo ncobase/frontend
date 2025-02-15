@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Analyzes } from './dashboard';
 
 import { renderRoutes } from '@/router';

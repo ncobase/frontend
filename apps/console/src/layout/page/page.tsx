@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import { Shell } from '@ncobase/react';
 import { locals } from '@ncobase/utils';
