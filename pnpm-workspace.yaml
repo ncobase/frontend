@@ -3,3 +3,6 @@ packages:
   - 'apps/*'
   - 'packages/*'
   - 'plugins/*'
+
+catalog:
+
