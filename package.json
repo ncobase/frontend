@@ -17,7 +17,8 @@
     "lint": "turbo run lint",
     "lint:fix": "pnpm lint -- --fix && pnpm prettier --write",
     "prettier": "prettier \"**/*.{js,jsx,ts,tsx}\"",
-    "build": "turbo run build --filter=!./apps/*",
+    "build": "turbo run build",
+    "build:console": "pnpm build --filter=@ncobase/console --filter='./packages/*' --filter='./plugins/*'",
     "update:deps": "npx taze -r -w"
   },
   "devDependencies": {
