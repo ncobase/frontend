@@ -1,1 +1,2 @@
+# pre-commit hooks
 pnpm lint-staged
