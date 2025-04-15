@@ -1,33 +1,10 @@
-import { PaginationResult } from '@ncobase/react';
-import { buildQueryString } from '@ncobase/utils';
+import { createApi } from '@/apis/factory';
+import { Topic } from '@/types';
 
-import { request } from '@/apis/request';
-import { ExplicitAny, Topic } from '@/types';
+export const topicApi = createApi<Topic>('/cms/topics');
 
-const ENDPOINT = '/cms/topics';
-
-// create
-export const createTopic = async (payload: Topic): Promise<Topic> => {
-  return request.post(ENDPOINT, { ...payload });
-};
-
-// get
-export const getTopic = async (id: string): Promise<Topic> => {
-  return request.get(`${ENDPOINT}/${id}`);
-};
-
-// update
-export const updateTopic = async (payload: Topic): Promise<Topic> => {
-  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
-};
-
-// delete
-export const deleteTopic = async (id: string): Promise<Topic> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
-// list
-export const getTopics = async (params: ExplicitAny): Promise<PaginationResult<Topic>> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
+export const createTopic = topicApi.create;
+export const getTopic = topicApi.get;
+export const updateTopic = topicApi.update;
+export const deleteTopic = topicApi.delete;
+export const getTopics = topicApi.list;

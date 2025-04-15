@@ -7,8 +7,10 @@ import { Tenant } from '@/types';
 
 interface TenantKeys {
   create: ['tenantService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: { tenant?: string }) => ['tenantService', 'tenant', { tenant?: string }];
   update: ['tenantService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['tenantService', 'tenants', QueryFormParams];
 }
 

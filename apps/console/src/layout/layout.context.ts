@@ -12,6 +12,7 @@ export interface LayoutContextValue {
    * @param vmode page view mode
    * @returns {void}
    */
+  // eslint-disable-next-line no-unused-vars
   setVmode?: (vmode: 'modal' | 'flatten') => void;
   /**
    * set page menus
@@ -22,6 +23,7 @@ export interface LayoutContextValue {
    * set page menus
    * @param menus {Menu[]}
    */
+  // eslint-disable-next-line no-unused-vars
   setMenus?: (menus: Menu[]) => void;
   /**
    * focus mode

@@ -16,7 +16,9 @@ import { Modal } from './modal';
 
 type IconSelectorProps = {
   opened: boolean;
+  // eslint-disable-next-line no-unused-vars
   onVisible?: (visible: boolean) => void;
+  // eslint-disable-next-line no-unused-vars
   onSelected?: (iconName: string) => void;
 };
 

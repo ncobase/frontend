@@ -1,33 +1,37 @@
-import { PaginationResult } from '@ncobase/react';
-import { buildQueryString } from '@ncobase/utils';
+import { createApi } from '@/apis/factory';
+import { Tag } from '@/types';
 
-import { request } from '@/apis/request';
-import { ExplicitAny, Tag } from '@/types';
+export const tagApi = createApi<Tag>('/cms/tags');
 
-const ENDPOINT = '/cms/tags';
+export const createTag = tagApi.create;
+export const getTag = tagApi.get;
+export const updateTag = tagApi.update;
+export const deleteTag = tagApi.delete;
+export const getTags = tagApi.list;
 
-// create
-export const createTag = async (payload: Tag): Promise<Tag> => {
-  return request.post(ENDPOINT, { ...payload });
-};
-
-// get
-export const getTag = async (id: string): Promise<Tag> => {
-  return request.get(`${ENDPOINT}/${id}`);
-};
-
-// update
-export const updateTag = async (payload: Tag): Promise<Tag> => {
-  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
-};
-
-// delete
-export const deleteTag = async (id: string): Promise<Tag> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
-// list
-export const getTags = async (params: ExplicitAny): Promise<PaginationResult<Tag>> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
+// Example of how to extend this API in the future:
+//
+// export const tagApiExtended = createApi<Tag, Tag, Tag, Tag, PaginationResult<Tag>>('/cms/tags', {
+//   // Override the list implementation to add special filtering
+//   list: async (params, { endpoint, request }) => {
+//     const queryString = buildQueryString({
+//       ...params,
+//       // Add special filtering parameters
+//       active: true
+//     });
+//     return request.get(`${endpoint}${queryString ? `?${queryString}` : ''}`);
+//   },
+//
+//   // Add custom methods
+//   extensions: ({ endpoint, request }) => ({
+//     // Get tags by category
+//     getTagsByCategory: async (categoryId: string): Promise<PaginationResult<Tag>> => {
+//       return request.get(`${endpoint}/category/${categoryId}`);
+//     },
+//
+//     // Bulk tag operations
+//     bulkCreate: async (tags: Omit<Tag, 'id'>[]): Promise<Tag[]> => {
+//       return request.post(`${endpoint}/bulk`, { tags });
+//     }
+//   })
+// });

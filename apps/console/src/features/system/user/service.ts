@@ -14,8 +14,10 @@ import { User } from '@/types';
 
 interface UserKeys {
   create: ['userService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: { user?: string }) => ['userService', 'user', { user?: string }];
   update: ['userService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['userService', 'users', QueryFormParams];
 }
 

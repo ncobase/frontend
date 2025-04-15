@@ -30,6 +30,7 @@ export interface CommonProps<T extends object> {
     label: string;
     component: React.ReactNode;
   }[];
+  // eslint-disable-next-line no-unused-vars
   onQuery?: (query: any) => void;
   onResetQuery?: () => void;
   fetchData?: TableViewProps['fetchData'];
@@ -50,6 +51,7 @@ const QueryBar = ({
     label: string;
     component: React.ReactNode;
   }[];
+  // eslint-disable-next-line no-unused-vars
   onQuery?: (query: any) => void;
   onResetQuery?: () => void;
   t: any;

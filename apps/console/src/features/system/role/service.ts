@@ -7,8 +7,10 @@ import { Role } from '@/types';
 
 interface RoleKeys {
   create: ['roleService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: { role?: string }) => ['roleService', 'role', { role?: string }];
   update: ['roleService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['roleService', 'roles', QueryFormParams];
 }
 

@@ -7,6 +7,7 @@ import { TenantProvider } from '@/features/system/tenant/context';
 // Define the shape of authentication context value
 interface AuthContextValue {
   isAuthenticated: boolean;
+  // eslint-disable-next-line no-unused-vars
   updateTokens(accessToken?: string, refreshToken?: string): void;
 }
 

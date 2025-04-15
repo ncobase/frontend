@@ -13,8 +13,10 @@ import { Comment } from '@/types';
 
 interface CommentKeys {
   create: ['commentService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: { comment?: string }) => ['commentService', 'comment', { comment?: string }];
   update: ['commentService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['commentService', 'comments', QueryFormParams];
 }
 

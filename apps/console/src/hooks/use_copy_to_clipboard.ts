@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 type Copied = string | null;
 
+// eslint-disable-next-line no-unused-vars
 type CopyFn = (text: string) => Promise<boolean>;
 
 /**

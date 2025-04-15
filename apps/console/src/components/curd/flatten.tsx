@@ -7,7 +7,9 @@ import { ExplicitAny } from '@/types';
 export interface FlattenViewProps<T extends object> extends CommonProps<T> {
   type?: string; // 'create' | 'view' | 'edit';
   createComponent?: React.ReactNode;
+  // eslint-disable-next-line no-unused-vars
   viewComponent?: (record: T | null) => React.ReactNode;
+  // eslint-disable-next-line no-unused-vars
   editComponent?: (record: T | null) => React.ReactNode;
   record?: T | null;
   onConfirm?: () => void;

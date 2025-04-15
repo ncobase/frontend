@@ -1,35 +1,10 @@
-import { PaginationResult } from '@ncobase/react';
-import { buildQueryString } from '@ncobase/utils';
+import { createApi } from '@/apis/factory';
+import { Dictionary } from '@/types';
 
-import { request } from '@/apis/request';
-import { Dictionary, ExplicitAny } from '@/types';
+export const dictionaryApi = createApi<Dictionary>('/sys/dictionaries');
 
-const ENDPOINT = '/sys/dictionaries';
-
-// create
-export const createDictionary = async (payload: Dictionary): Promise<Dictionary> => {
-  return request.post(ENDPOINT, { ...payload });
-};
-
-// get
-export const getDictionary = async (id: string): Promise<Dictionary> => {
-  return request.get(`${ENDPOINT}/${id}`);
-};
-
-// update
-export const updateDictionary = async (payload: Dictionary): Promise<Dictionary> => {
-  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
-};
-
-// delete
-export const deleteDictionary = async (id: string): Promise<Dictionary> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
-// list
-export const getDictionaries = async (
-  params: ExplicitAny
-): Promise<PaginationResult<Dictionary>> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
+export const createDictionary = dictionaryApi.create;
+export const getDictionary = dictionaryApi.get;
+export const updateDictionary = dictionaryApi.update;
+export const deleteDictionary = dictionaryApi.delete;
+export const getDictionaries = dictionaryApi.list;

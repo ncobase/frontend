@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
 
-import { getCurrentUser } from '@/apis/account/account';
+import { accountApi } from '@/apis/account/account';
 import { loginAccount, logoutAccount, registerAccount } from '@/apis/account/authorize';
 import { useAuthContext } from '@/features/account/context';
 import { AnyObject, LoginProps, LoginReply, RegisterProps } from '@/types';
@@ -12,7 +12,9 @@ interface AccountKeys {
   login: ['accountService', 'login'];
   register: ['accountService', 'register'];
   currentUser: ['accountService', 'currentUser'];
+  // eslint-disable-next-line no-unused-vars
   tenants: (options?: AnyObject) => ['accountService', 'tenants', AnyObject];
+  // eslint-disable-next-line no-unused-vars
   tenant: (options?: AnyObject) => ['accountService', 'tenant', AnyObject];
 }
 
@@ -26,6 +28,7 @@ export const accountKeys: AccountKeys = {
 
 // Custom hook for mutations that involve token updates
 const useMutationWithTokens = <TVariables>(
+  // eslint-disable-next-line no-unused-vars
   mutationFn: (variables: TVariables) => Promise<LoginReply>,
   options?: Partial<UseMutationOptions<LoginReply, FetchError, TVariables>>
 ) => {
@@ -54,7 +57,7 @@ export const useRegisterAccount = (
 export const useAccount = () => {
   const { data, ...rest } = useQuery({
     queryKey: accountKeys.currentUser,
-    queryFn: getCurrentUser,
+    queryFn: accountApi.getCurrentUser,
     staleTime: 1000 * 60 * 15 // 15 minutes
   });
 

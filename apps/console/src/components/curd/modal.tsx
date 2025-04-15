@@ -10,7 +10,9 @@ import { ExplicitAny } from '@/types';
 export interface ModalViewProps<T extends object> extends ModalProps<T> {
   type?: string; // 'create' | 'view' | 'edit';
   createComponent?: React.ReactNode;
+  // eslint-disable-next-line no-unused-vars
   viewComponent?: (record: object | T | null) => React.ReactNode;
+  // eslint-disable-next-line no-unused-vars
   editComponent?: (record: object | T | null) => React.ReactNode;
 }
 

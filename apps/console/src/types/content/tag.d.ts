@@ -1,4 +1,4 @@
-export interface Tag {
+export interface Tag extends BaseModel {
   id?: string;
   name?: string;
   topic?: string;

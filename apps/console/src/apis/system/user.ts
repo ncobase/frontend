@@ -1,38 +1,36 @@
-import { PaginationResult } from '@ncobase/react';
-import { buildQueryString } from '@ncobase/utils';
+import { createApi } from '@/apis/factory';
+import { User, UserMeshes, ExplicitAny } from '@/types';
 
-import { request } from '@/apis/request';
-import { UserMeshes, ExplicitAny, User } from '@/types';
+export const userApi = createApi<User, UserMeshes, UserMeshes, ExplicitAny>('/sys/users', {
+  extensions: ({ endpoint, request }) => ({
+    // Get user meshes
+    getUserMeshes: async (id: string): Promise<UserMeshes> => {
+      return request.get(`${endpoint}/${id}/meshes`);
+    }
 
-const ENDPOINT = '/sys/users';
+    // Future extensibility examples:
 
-// create
-export const createUser = async (payload: User): Promise<UserMeshes> => {
-  return request.post(ENDPOINT, { ...payload });
-};
+    // Get user roles
+    // getUserRoles: async (id: string): Promise<string[]> => {
+    //   return request.get(`${endpoint}/${id}/roles`);
+    // },
 
-// get
-export const getUser = async (id: string): Promise<User> => {
-  return request.get(`${ENDPOINT}/${id}`);
-};
+    // Assign roles to user
+    // assignRoles: async (id: string, roleIds: string[]): Promise<void> => {
+    //   return request.post(`${endpoint}/${id}/roles`, { roleIds });
+    // },
 
-// get user meshes
-export const getUserMeshes = async (id: string): Promise<UserMeshes> => {
-  return request.get(`${ENDPOINT}/${id}/meshes`);
-};
+    // Change user password
+    // changePassword: async (id: string, oldPassword: string, newPassword: string): Promise<void> => {
+    //   return request.put(`${endpoint}/${id}/password`, { oldPassword, newPassword });
+    // }
+  })
+});
 
-// update
-export const updateUser = async (payload: User): Promise<UserMeshes> => {
-  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
-};
-
-// delete
-export const deleteUser = async (id: string): Promise<ExplicitAny> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
-// list
-export const getUsers = async (params: ExplicitAny): Promise<PaginationResult<User>> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
+// For backwards compatibility, export individual functions
+export const createUser = userApi.create;
+export const getUser = userApi.get;
+export const updateUser = userApi.update;
+export const deleteUser = userApi.delete;
+export const getUsers = userApi.list;
+export const getUserMeshes = userApi.getUserMeshes;

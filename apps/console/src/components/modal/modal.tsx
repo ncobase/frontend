@@ -7,6 +7,7 @@ import { ExplicitAny } from '@/types';
 export interface ModalProps<T extends object> {
   title?: string;
   description?: string;
+  // eslint-disable-next-line no-unused-vars
   children?: ReactNode | ((record: T | null) => ReactNode) | ExplicitAny;
   confirmText?: string;
   cancelText?: string;

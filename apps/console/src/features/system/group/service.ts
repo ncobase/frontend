@@ -7,8 +7,10 @@ import { Group } from '@/types';
 
 interface GroupKeys {
   create: ['groupService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: { group?: string }) => ['groupService', 'group', { group?: string }];
   update: ['groupService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['groupService', 'groups', QueryFormParams];
 }
 

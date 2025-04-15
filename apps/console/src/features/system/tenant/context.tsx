@@ -5,7 +5,7 @@ import { isBrowser, locals } from '@ncobase/utils';
 interface TenantContextValue {
   tenant_id?: string;
   hasTenant: boolean;
-
+  // eslint-disable-next-line no-unused-vars
   updateTenant(id?: string | null): void;
 }
 

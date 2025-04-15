@@ -12,6 +12,7 @@ import { Tenant } from '@/types';
 
 interface TenantOptionProps extends Tenant {
   isSelected: boolean;
+  // eslint-disable-next-line no-unused-vars
   onSelect: (id: string) => void;
 }
 
@@ -51,6 +52,7 @@ export const TenantSwitcher = ({
 }: {
   opened?: boolean;
   tenants?: Tenant[];
+  // eslint-disable-next-line no-unused-vars
   onVisible?: (visible: boolean) => void;
 }) => {
   const { t } = useTranslation();

@@ -1,33 +1,10 @@
-import { PaginationResult } from '@ncobase/react';
-import { buildQueryString } from '@ncobase/utils';
+import { createApi } from '@/apis/factory';
+import { Comment } from '@/types';
 
-import { request } from '@/apis/request';
-import { Comment, ExplicitAny } from '@/types';
+export const commentApi = createApi<Comment>('/cms/comments');
 
-const ENDPOINT = '/cms/comments';
-
-// create
-export const createComment = async (payload: Comment): Promise<Comment> => {
-  return request.post(ENDPOINT, { ...payload });
-};
-
-// get
-export const getComment = async (id: string): Promise<Comment> => {
-  return request.get(`${ENDPOINT}/${id}`);
-};
-
-// update
-export const updateComment = async (payload: Comment): Promise<Comment> => {
-  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
-};
-
-// delete
-export const deleteComment = async (id: string): Promise<Comment> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
-// list
-export const getComments = async (params: ExplicitAny): Promise<PaginationResult<Comment>> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
+export const createComment = commentApi.create;
+export const getComment = commentApi.get;
+export const updateComment = commentApi.update;
+export const deleteComment = commentApi.delete;
+export const getComments = commentApi.list;

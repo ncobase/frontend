@@ -13,11 +13,14 @@ import { AnyObject, Permission } from '@/types';
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: {
     permission?: string;
   }) => ['permissionService', 'permission', { permission?: string }];
+  // eslint-disable-next-line no-unused-vars
   tree: (options?: AnyObject) => ['permissionService', 'tree', AnyObject];
   update: ['permissionService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['permissionService', 'permissions', QueryFormParams];
 }
 

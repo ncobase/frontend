@@ -7,8 +7,10 @@ import { Topic } from '@/types';
 
 interface TopicKeys {
   create: ['topicService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: { topic?: string }) => ['topicService', 'topic', { topic?: string }];
   update: ['topicService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['topicService', 'topics', QueryFormParams];
 }
 

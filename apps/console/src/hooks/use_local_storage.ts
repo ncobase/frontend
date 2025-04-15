@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 export const useLocalStorage = <T>(
   key: string,
   initialValue: T
+  // eslint-disable-next-line no-unused-vars
 ): { storedValue: T; setValue: (value: T) => void; clearValue: () => void; getValue: () => T } => {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {

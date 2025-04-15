@@ -13,10 +13,12 @@ import { Dictionary } from '@/types';
 
 interface DictionaryKeys {
   create: ['dictionaryService', 'create'];
+  // eslint-disable-next-line no-unused-vars
   get: (options?: {
     dictionary?: string;
   }) => ['dictionaryService', 'dictionary', { dictionary?: string }];
   update: ['dictionaryService', 'update'];
+  // eslint-disable-next-line no-unused-vars
   list: (options?: QueryFormParams) => ['dictionaryService', 'dictionaries', QueryFormParams];
 }
 

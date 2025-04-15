@@ -1,39 +1,33 @@
-import { PaginationResult } from '@ncobase/react';
 import { buildQueryString } from '@ncobase/utils';
 
-import { request } from '@/apis/request';
-import { ExplicitAny, Menu, MenuTrees } from '@/types';
+import { createApi } from '@/apis/factory';
+import { Menu, MenuTrees, ExplicitAny } from '@/types';
 
-const ENDPOINT = '/sys/menus';
+export const menuApi = createApi<Menu>('/sys/menus', {
+  extensions: ({ endpoint, request }) => ({
+    getMenuTree: async (params?: ExplicitAny): Promise<MenuTrees> => {
+      const queryString = params ? buildQueryString(params) : '';
+      return request.get(`${endpoint}${queryString ? `?${queryString}` : ''}`);
+    },
+    moveMenu: async (id: string, parentId: string | null, position: number): Promise<Menu> => {
+      return request.put(`${endpoint}/${id}/move`, {
+        parentId,
+        position
+      });
+    },
+    getChildMenus: async (parentId: string): Promise<Menu[]> => {
+      return request.get(`${endpoint}/children/${parentId}`);
+    }
+  })
+});
 
-// create
-export const createMenu = async (payload: Menu): Promise<Menu> => {
-  return request.post(ENDPOINT, { ...payload });
-};
+export const createMenu = menuApi.create;
+export const getMenu = menuApi.get;
+export const updateMenu = menuApi.update;
+export const deleteMenu = menuApi.delete;
+export const getMenus = menuApi.list;
+export const getMenuTree = menuApi.getMenuTree;
 
-// get
-export const getMenu = async (id: string): Promise<Menu> => {
-  return request.get(`${ENDPOINT}/${id}`);
-};
-
-// update
-export const updateMenu = async (payload: Menu): Promise<Menu> => {
-  return request.put(`${ENDPOINT}/${payload.id}`, { ...payload });
-};
-
-// delete
-export const deleteMenu = async (id: string): Promise<Menu> => {
-  return request.delete(`${ENDPOINT}/${id}`);
-};
-
-// list
-export const getMenus = async (params: ExplicitAny): Promise<PaginationResult<Menu>> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
-
-// get menu tree
-export const getMenuTree = async (params: ExplicitAny): Promise<MenuTrees> => {
-  const queryString = buildQueryString(params);
-  return request.get(`${ENDPOINT}${queryString ? `?${queryString}` : ''}`);
-};
+// Future exports as they are implemented
+// export const moveMenu = menuApi.moveMenu;
+// export const getChildMenus = menuApi.getChildMenus;
