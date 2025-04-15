@@ -1,641 +1,423 @@
 {
+  "account.forget_password.title": "找回密码",
+  "account.login.feedbacks.login_error.title": "登录失败",
+  "account.login.title": "登录",
+  "account.logout.title": "退出登录",
+  "account.register.feedbacks.registration_error.title": "注册失败",
+  "account.register.feedbacks.registration_success.description": "请检查您的电子邮件 \u003cstrong\u003e{{email}}\u003c/strong\u003e 收件箱以激活您的帐户。",
+  "account.register.feedbacks.registration_success.title": "成功创建帐户！",
+  "account.register.title": "注册",
+  "account.reset_password.actions.cancel": "后退",
+  "account.reset_password.actions.go_to_login": "去登录",
+  "account.reset_password.actions.reset": "重置密码",
+  "account.reset_password.actions.send": "发送",
+  "account.reset_password.feedbacks.confirm_error.title": "重置密码失败",
+  "account.reset_password.feedbacks.confirm_success.description": "您现在可以去登录",
+  "account.reset_password.feedbacks.confirm_success.title": "您的密码已重置",
+  "account.reset_password.feedbacks.init_error.title": "重置密码失败",
+  "account.reset_password.feedbacks.init_success.description": "如果存在 \u003cstrong\u003e{{email}}\u003c/strong\u003e 的帐户，您应该已经收到一封电子邮件。",
+  "account.reset_password.feedbacks.init_success.title": "重置密码电子邮件发送成功！",
+  "account.reset_password.title": "重置密码",
+  "actions.activate": "启用",
+  "actions.already_have_an_account": "已有帐号？",
+  "actions.cancel": "取消",
+  "actions.clear": "清除",
+  "actions.close": "关闭",
+  "actions.copied": "复制成功",
+  "actions.copy": "复制",
+  "actions.create": "创建",
+  "actions.deactivate": "停用",
+  "actions.delete": "删除",
+  "actions.disable": "禁用",
+  "actions.download": "下载",
+  "actions.duplicate": "复制",
+  "actions.edit": "编辑",
+  "actions.expand": "查看详情",
+  "actions.export": "导出",
+  "actions.filter": "筛选",
+  "actions.forgot_password": "忘记密码？",
+  "actions.go_back": "返回",
+  "actions.go_home": "返回首页",
+  "actions.go_to": "前往",
+  "actions.go_to_list": "前往列表",
+  "actions.go_to_login": "去登录",
+  "actions.import": "导入",
+  "actions.login": "登录",
+  "actions.mark_all_as_read": "全部标记为已读",
+  "actions.mark_all_as_unread": "全部标记为未读",
+  "actions.mark_as_read": "标记为已读",
+  "actions.mark_as_unread": "标记为未读",
+  "actions.more": "更多",
+  "actions.need_account": "没有帐号？",
+  "actions.printer": "打印",
+  "actions.register": "注册",
+  "actions.reset": "重置",
+  "actions.save": "保存",
+  "actions.search": "搜索",
+  "actions.shared": "共享",
+  "actions.sidebar_collapse": "收起侧边栏",
+  "actions.sidebar_expand": "展开侧边栏",
+  "actions.submit": "提交",
+  "actions.update": "更新",
+  "actions.upload": "上传",
+  "actions.view": "查看",
+  "actions_button.label": "执行",
   "application_title": "Ncobase 管理系统",
-  "login_hint": "数据环境为 <strong>{{name}}</strong>，您可以使用 <anchor>{{credentials}}</anchor> 登录",
-  "date_ago": {
-    "format": "dddd, DD MMMM YYYY, hh:mm a"
-  },
-  "actions_button": {
-    "label": "执行"
-  },
-  "confirm_menu_item": {
-    "confirm_text": "确认"
-  },
-  "confirm_popover": {
-    "confirm_text": "确认",
-    "heading": "你确定吗？"
-  },
-  "errors": {
-    "403": {
-      "title": "访问受限",
-      "description": "您没有访问该页面的权限。可能是因为您未经授权、登录状态失效或者被限制访问等原因。如果您认为这是一个错误，请联系我们的技术支持团队以获得更多帮助。"
-    },
-    "404": {
-      "title": "页面不存在",
-      "description": "您访问的页面不存在。可能是因为您输入了错误的地址，或者该页面已经被移动到另一个 URL。请确认您的输入是否正确并重试。"
-    },
-    "500": {
-      "title": "服务器错误",
-      "description": "服务器发生了错误，导致页面无法正常显示。我们已经记录了这个问题，将尽快解决。请您稍后再试，或者联系我们的技术支持团队以获得帮助。"
-    },
-    "unknown": {
-      "label": "未知错误",
-      "description": "发生了未知的错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。"
-    },
-    "boundary": {
-      "label": "发生意外错误",
-      "description": "发生了意外错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。"
-    },
-    "request": {
-      "label": "请求错误",
-      "description": "发生了请求错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。"
-    },
-    "response": {
-      "label": "响应错误",
-      "description": "发生了响应错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。"
-    }
-  },
-  "forms": {
-    "required": "字段为必填项",
-    "input_required": "字段为必填项",
-    "select_required": "字段为必选项",
-    "not_valid": "字段不合法",
-    "not_allowed": "字段不允许",
-    "required_with_field": "{{field}}字段为必填项",
-    "input_required_with_field": "{{field}}字段为必填项",
-    "select_required_with_field": "{{field}}字段为必选项",
-    "not_valid_with_field": "{{field}}字段不合法",
-    "not_allowed_with_field": "{{field}}字段不允许"
-  },
-  "fields": {
-    "username": {
-      "label": "用户名",
-      "placeholder": "请输入用户名",
-      "required": "请输入用户名",
-      "invalid": "用户名无效",
-      "too_short": "用户名太短（最少 {{count}} 个字符）",
-      "too_long": "用户名太长（最多 {{count}} 个字符）"
-    },
-    "email": {
-      "label": "邮箱",
-      "placeholder": "请输入邮箱",
-      "required": "请输入邮箱",
-      "invalid": "邮箱无效"
-    },
-    "username_or_email": {
-      "label": "用户名 / 邮箱",
-      "placeholder": "请输入用户名 / 邮箱",
-      "required": "请输入用户名 / 邮箱",
-      "invalid": "用户名 / 邮箱无效",
-      "too_short": "用户名 / 邮箱太短（最少 {{count}} 个字符）",
-      "too_long": "用户名 / 邮箱太长（最多 {{count}} 个字符）"
-    },
-    "password": {
-      "label": "密码",
-      "placeholder": "请输入密码",
-      "required": "请输入密码",
-      "too_short": "密码太短（最少 {{count}} 个字符）",
-      "too_long": "密码太长（最多 {{count}} 个字符）",
-      "missing_uppercase": "密码缺少大写字母",
-      "missing_lowercase": "密码缺少小写字母",
-      "missing_number": "密码缺少数字",
-      "missing_symbol": "密码缺少特殊字符"
-    },
-    "confirm_password": {
-      "label": "确认密码",
-      "placeholder": "请输入确认密码",
-      "required": "请输入确认密码",
-      "mismatch": "密码不一致，请检查"
-    },
-    "remember": {
-      "label": "记住登录"
-    },
-    "terms": {
-      "label": "我接受条款和条件",
-      "required": "请勾选注册条款和条件"
-    }
-  },
-  "search": {
-    "placeholder": "搜索...",
-    "required": "请输入搜索内容",
-    "invalid": "无效搜索内容",
-    "no_results": "没有找到结果",
-    "clear": "清除搜索"
-  },
-  "field_day_picker": {
-    "invalid_message": "无效日期"
-  },
-  "field_repeater": {
-    "invalid_message": "至少一项元素无效"
-  },
-  "field_multi_select": {
-    "no_option": "没有选择"
-  },
-  "sort": {
-    "sort_ascending": "升序",
-    "sort_descending": "降序",
-    "sort_by": "排序方式",
-    "order": "排序"
-  },
-  "icon_selector": {
-    "title": "选择图标",
-    "search_placeholder": "搜索...",
-    "outline": "边框",
-    "filled": "填充"
-  },
-  "tenant_switcher": {
-    "title": "切换租户"
-  },
-  "filter": {
-    "search": "搜索",
-    "clear": "清除",
-    "select_all": "全选",
-    "deselect_all": "取消全选",
-    "apply": "应用",
-    "reset": "重置",
-    "filter": "筛选",
-    "sort_by": "排序方式",
-    "ascending": "升序",
-    "descending": "降序",
-    "contains": "包含",
-    "does_not_contain": "不包含",
-    "starts_with": "以...开始",
-    "ends_with": "以...结束",
-    "is_equal_to": "等于",
-    "is_not_equal_to": "不等于",
-    "greater_than": "大于",
-    "less_than": "小于",
-    "between": "介于",
-    "clear_filters": "清除筛选",
-    "apply_filters": "应用筛选",
-    "date": "日期",
-    "realtime": "实时",
-    "last_5_minutes": "最近 5 分钟",
-    "last_10_minutes": "最近 10 分钟",
-    "last_15_minutes": "最近 15 分钟",
-    "last_30_minutes": "最近 30 分钟",
-    "last_1_hour": "最近 1 小时",
-    "last_2_hours": "最近 2 小时",
-    "last_3_hours": "最近 3 小时",
-    "last_6_hours": "最近 6 小时",
-    "last_9_hours": "最近 9 小时",
-    "last_12_hours": "最近 12 小时",
-    "last_24_hours": "最近 24 小时",
-    "today": "今天",
-    "yesterday": "昨天",
-    "last_7_days": "最近 7 天",
-    "last_30_days": "最近 30 天",
-    "last_60_days": "最近 60 天",
-    "last_90_days": "最近 90 天",
-    "last_180_days": "最近 180 天",
-    "last_365_days": "最近 365 天",
-    "this_week": "本周",
-    "last_week": "上周",
-    "last_2_weeks": "最近 2 周",
-    "last_3_weeks": "最近 3 周",
-    "last_6_weeks": "最近 6 周",
-    "last_9_weeks": "最近 9 周",
-    "last_12_weeks": "最近 12 周",
-    "this_month": "本月",
-    "last_month": "上月",
-    "last_3_months": "最近 3 月",
-    "last_6_months": "最近 6 月",
-    "last_9_months": "最近 9 月",
-    "last_12_months": "最近 12 月",
-    "this_quarter": "本季度",
-    "last_quarter": "上季度",
-    "last_3_quarters": "最近 3 季度",
-    "last_6_quarters": "最近 6 季度",
-    "last_9_quarters": "最近 9 季度",
-    "last_12_quarters": "最近 12 季度",
-    "this_year": "本年",
-    "last_year": "去年",
-    "last_3_years": "最近 3 年",
-    "last_5_years": "最近 5 年",
-    "last_10_years": "最近 10 年",
-    "clear_range": "清除区间",
-    "clear_date": "清除日期",
-    "clear_time": "清除时间",
-    "custom": "自定义",
-    "date_range": "日期范围",
-    "all": "全部",
-    "active": "启用",
-    "inactive": "禁用",
-    "deleted": "已删除"
-  },
-  "actions": {
-    "go_to_login": "去登录",
-    "already_have_an_account": "已有帐号？",
-    "forgot_password": "忘记密码？",
-    "login": "登录",
-    "need_account": "没有帐号？",
-    "register": "注册",
-    "activate": "启用",
-    "cancel": "取消",
-    "deactivate": "停用",
-    "duplicate": "复制",
-    "delete": "删除",
-    "create": "创建",
-    "update": "更新",
-    "edit": "编辑",
-    "view": "查看",
-    "submit": "提交",
-    "copied": "复制成功",
-    "copy": "复制",
-    "save": "保存",
-    "shared": "共享",
-    "disable": "禁用",
-    "expand": "查看详情",
-    "close": "关闭",
-    "go_back": "返回",
-    "go_home": "返回首页",
-    "more": "更多",
-    "mark_as_unread": "标记为未读",
-    "mark_all_as_unread": "全部标记为未读",
-    "mark_as_read": "标记为已读",
-    "mark_all_as_read": "全部标记为已读",
-    "sidebar_collapse": "收起侧边栏",
-    "sidebar_expand": "展开侧边栏",
-    "printer": "打印",
-    "export": "导出",
-    "import": "导入",
-    "upload": "上传",
-    "download": "下载",
-    "reset": "重置",
-    "search": "搜索",
-    "filter": "筛选",
-    "clear": "清除",
-    "go_to": "前往",
-    "go_to_list": "前往列表"
-  },
-  "query": {
-    "collapse": "收起查询栏",
-    "expand": "展开查询栏",
-    "loading": "加载中...",
-    "search": "查询",
-    "reset": "重置"
-  },
-  "pagination": {
-    "first_page": "第一页",
-    "previous_page": "上一页",
-    "next_page": "下一页",
-    "last_page": "最后一页",
-    "total_text": "共",
-    "of_text": "共",
-    "go_to_text": "跳转到",
-    "displaying_text": "显示",
-    "to_text": "至",
-    "items_text": "条记录",
-    "page_text": "页",
-    "per_page_text": "每页"
-  },
-  "empty": {
-    "no_data": "暂无数据",
-    "no_more_data": "没有更多数据了",
-    "no_results": "没有找到结果"
-  },
-  "table": {
-    "layout": {
-      "card": "卡片",
-      "board": "看板",
-      "table": "表格",
-      "fullscreen": "全屏"
-    }
-  },
-  "units": {
-    "kilogram": "千克",
-    "gram": "克",
-    "ounce": "盎司",
-    "pound": "磅",
-    "milliliter": "毫升",
-    "liter": "升",
-    "meter": "米",
-    "inch": "英寸",
-    "centimeter": "厘米",
-    "feet": "英尺",
-    "yard": "码",
-    "mile": "英里",
-    "millimeter": "毫米",
-    "cup": "杯",
-    "pint": "品脱",
-    "quart": "夸脱",
-    "tablespoon": "汤匙",
-    "teaspoon": "茶匙"
-  },
-  "currencies": {
-    "usd": "美元",
-    "eur": "欧元",
-    "jpy": "日元",
-    "gbp": "英镑",
-    "aud": "澳元",
-    "cad": "加元",
-    "chf": "瑞士法郎",
-    "cny": "人民币",
-    "rmb": "人民币",
-    "hkd": "港元",
-    "nzd": "新西兰元",
-    "sgd": "新加坡元",
-    "krw": "韩元",
-    "inr": "印度卢比",
-    "rub": "俄罗斯卢布",
-    "brl": "巴西雷亚尔",
-    "zar": "南非兰特",
-    "sek": "瑞典克朗",
-    "nok": "挪威克朗",
-    "dkk": "丹麦克朗",
-    "pln": "波兰兹罗提",
-    "mxn": "墨西哥比索",
-    "idr": "印尼盾",
-    "thb": "泰铢",
-    "myr": "马来西亚林吉特",
-    "php": "菲律宾比索",
-    "vnd": "越南盾",
-    "twd": "新台币",
-    "sar": "沙特里亚尔",
-    "aed": "阿联酋迪拉姆",
-    "try": "土耳其里拉",
-    "egp": "埃及镑",
-    "ngn": "尼日利亚奈拉",
-    "czk": "捷克克朗",
-    "huf": "匈牙利福林",
-    "ils": "以色列新谢克尔"
-  },
-  "currency_units": {
-    "thousand": "千",
-    "million": "百万",
-    "billion": "十亿",
-    "trillion": "万亿",
-    "ten_thousand": "万",
-    "hundred_million": "亿"
-  },
-  "datetime": {
-    "a_moment_ago": "刚刚",
-    "minutes_ago": "分钟前",
-    "minutes_ago_with_value": "{{minutes}} 分钟前",
-    "hours_ago": "小时前",
-    "hours_ago_with_value": "{{hours}} 小时前",
-    "days_ago": "天前",
-    "days_ago_with_value": "{{days}} 天前",
-    "weeks_ago": "周前",
-    "weeks_ago_with_value": "{{weeks}} 周前",
-    "months_ago": "月前",
-    "months_ago_with_value": "{{months}} 月前",
-    "years_ago": "年前",
-    "years_ago_with_value": "{{years}} 年前",
-    "now": "现在",
-    "today": "今天",
-    "yesterday": "昨天",
-    "last_week": "上周",
-    "last_month": "上个月",
-    "last_year": "去年",
-    "this_week": "本周",
-    "this_month": "本月",
-    "this_year": "今年",
-    "next_week": "下周",
-    "next_month": "下个月",
-    "next_year": "明年",
-    "this_quarter": "本季度",
-    "last_quarter": "上季度"
-  },
-  "dashboard": {
-    "navigation": "控制台"
-  },
-  "content": {
-    "navigation": "内容",
-    "topic": {
-      "title": "主题 / 内容管理",
-      "navigation": "主题"
-    },
-    "taxonomy": {
-      "title": "分类管理",
-      "navigation": "栏目"
-    },
-    "comment": {
-      "title": "评论管理",
-      "navigation": "评论"
-    },
-    "trash": {
-      "title": "回收站",
-      "navigation": "回收站"
-    },
-    "approval": {
-      "title": "内容审批",
-      "navigation": "审批"
-    },
-    "component": {
-      "title": "评论管理",
-      "navigation": "组件"
-    }
-  },
-  "system": {
-    "navigation": "系统",
-    "tenant": {
-      "title": "租户管理",
-      "navigation": "租户"
-    },
-    "group": {
-      "title": "组织架构",
-      "navigation": "组织"
-    },
-    "role": {
-      "title": "职务角色",
-      "navigation": "角色"
-    },
-    "menu": {
-      "title": "菜单管理",
-      "navigation": "菜单"
-    },
-    "permission": {
-      "title": "权限管理",
-      "navigation": "权限"
-    },
-    "dictionary": {
-      "title": "字典 / 枚举管理",
-      "navigation": "字典"
-    },
-    "user": {
-      "title": "系统用户",
-      "navigation": "用户"
-    },
-    "basic": {
-      "title": "系统配置",
-      "navigation": "系统配置",
-      "setting": {
-        "title": "系统配置",
-        "navigation": "系统配置"
-      }
-    }
-  },
-  "dropdowns": {
-    "tenant": {
-      "label": "租户",
-      "admin": {
-        "label": "管理租户"
-      },
-      "switch": {
-        "label": "切换租户"
-      }
-    },
-    "account": {
-      "label": "帐号",
-      "system": {
-        "label": "系统管理"
-      },
-      "switch_dark": {
-        "label": "切换到深色模式"
-      },
-      "switch_light": {
-        "label": "切换到浅色模式"
-      },
-      "profile": {
-        "label": "我的帐号"
-      },
-      "logout": {
-        "label": "退出"
-      }
-    }
-  },
-  "interceptor": {
-    "account": {
-      "title": "请登录后继续...",
-      "description": ""
-    }
-  },
-  "account": {
-    "register": {
-      "feedbacks": {
-        "registration_error": {
-          "title": "注册失败"
-        },
-        "registration_success": {
-          "title": "成功创建帐户！",
-          "description": "请检查您的电子邮件 <strong>{{email}}</strong> 收件箱以激活您的帐户。"
-        }
-      },
-      "title": "注册"
-    },
-    "login": {
-      "title": "登录",
-      "feedbacks": {
-        "login_error": {
-          "title": "登录失败"
-        }
-      }
-    },
-    "forget_password": {
-      "title": "找回密码"
-    },
-    "reset_password": {
-      "title": "重置密码",
-      "actions": {
-        "cancel": "后退",
-        "send": "发送",
-        "go_to_login": "去登录",
-        "reset": "重置密码"
-      },
-      "feedbacks": {
-        "init_success": {
-          "title": "重置密码电子邮件发送成功！",
-          "description": "如果存在 <strong>{{email}}</strong> 的帐户，您应该已经收到一封电子邮件。"
-        },
-        "init_error": {
-          "title": "重置密码失败"
-        },
-        "confirm_success": {
-          "title": "您的密码已重置",
-          "description": "您现在可以去登录"
-        },
-        "confirm_error": {
-          "title": "重置密码失败"
-        }
-      }
-    },
-    "logout": {
-      "title": "退出登录"
-    }
-  },
-  "notification": {
-    "title": "通知",
-    "push_setting": "通知推送设置",
-    "have_no_notification": "没有消息",
-    "have_new_notification": "有新消息",
-    "you_have_unread_notification": "您有未读消息",
-    "you_have_unread_notification_plural": "您有 {{count}} 条未读消息",
-    "you_have_no_unread_notification": "您没有未读消息"
-  },
-  "example": {
-    "navigation": "示例",
-    "card": {
-      "title": "卡片 / 子菜单视图",
-      "navigation": "卡片 / 子菜单",
-      "model": {
-        "title": "",
-        "navigation": "模型",
-        "user": {
-          "title": "",
-          "navigation": "用户"
-        },
-        "role": {
-          "title": "",
-          "navigation": "角色"
-        },
-        "permission": {
-          "title": "",
-          "navigation": "权限"
-        }
-      },
-      "component": {
-        "title": "",
-        "navigation": "组件",
-        "element": {
-          "title": "",
-          "navigation": "元素"
-        },
-        "form": {
-          "title": "",
-          "navigation": "表单"
-        },
-        "layout": {
-          "title": "",
-          "navigation": "布局"
-        },
-        "template": {
-          "title": "",
-          "navigation": "模板"
-        }
-      },
-      "efficiency": {
-        "title": "",
-        "navigation": "效率",
-        "log": {
-          "title": "",
-          "navigation": "日志"
-        },
-        "report": {
-          "title": "",
-          "navigation": "报表"
-        },
-        "workflow": {
-          "title": "",
-          "navigation": "工作流"
-        },
-        "task": {
-          "title": "",
-          "navigation": "任务"
-        }
-      }
-    },
-    "list1": {
-      "title": "销售列表",
-      "navigation": "列表"
-    },
-    "list2": {
-      "title": "菜单管理",
-      "navigation": "列表"
-    },
-    "analyze": {
-      "title": "分析列表",
-      "navigation": "分析",
-      "sales": {
-        "title": "销售额"
-      }
-    },
-    "ui": {
-      "title": "UI / 表单元素",
-      "navigation": "UI / 表单"
-    },
-    "masonry": {
-      "title": "瀑布流列表",
-      "navigation": "瀑布流"
-    }
-  }
+  "confirm_menu_item.confirm_text": "确认",
+  "confirm_popover.confirm_text": "确认",
+  "confirm_popover.heading": "你确定吗？",
+  "content.approval.navigation": "审批",
+  "content.approval.title": "内容审批",
+  "content.comment.navigation": "评论",
+  "content.comment.title": "评论管理",
+  "content.component.navigation": "组件",
+  "content.component.title": "评论管理",
+  "content.navigation": "内容",
+  "content.taxonomy.navigation": "栏目",
+  "content.taxonomy.title": "分类管理",
+  "content.topic.navigation": "主题",
+  "content.topic.title": "主题 / 内容管理",
+  "content.trash.navigation": "回收站",
+  "content.trash.title": "回收站",
+  "currencies.aed": "阿联酋迪拉姆",
+  "currencies.aud": "澳元",
+  "currencies.brl": "巴西雷亚尔",
+  "currencies.cad": "加元",
+  "currencies.chf": "瑞士法郎",
+  "currencies.cny": "人民币",
+  "currencies.czk": "捷克克朗",
+  "currencies.dkk": "丹麦克朗",
+  "currencies.egp": "埃及镑",
+  "currencies.eur": "欧元",
+  "currencies.gbp": "英镑",
+  "currencies.hkd": "港元",
+  "currencies.huf": "匈牙利福林",
+  "currencies.idr": "印尼盾",
+  "currencies.ils": "以色列新谢克尔",
+  "currencies.inr": "印度卢比",
+  "currencies.jpy": "日元",
+  "currencies.krw": "韩元",
+  "currencies.mxn": "墨西哥比索",
+  "currencies.myr": "马来西亚林吉特",
+  "currencies.ngn": "尼日利亚奈拉",
+  "currencies.nok": "挪威克朗",
+  "currencies.nzd": "新西兰元",
+  "currencies.php": "菲律宾比索",
+  "currencies.pln": "波兰兹罗提",
+  "currencies.rmb": "人民币",
+  "currencies.rub": "俄罗斯卢布",
+  "currencies.sar": "沙特里亚尔",
+  "currencies.sek": "瑞典克朗",
+  "currencies.sgd": "新加坡元",
+  "currencies.thb": "泰铢",
+  "currencies.try": "土耳其里拉",
+  "currencies.twd": "新台币",
+  "currencies.usd": "美元",
+  "currencies.vnd": "越南盾",
+  "currencies.zar": "南非兰特",
+  "currency_units.billion": "十亿",
+  "currency_units.hundred_million": "亿",
+  "currency_units.million": "百万",
+  "currency_units.ten_thousand": "万",
+  "currency_units.thousand": "千",
+  "currency_units.trillion": "万亿",
+  "dashboard.navigation": "控制台",
+  "date_ago.format": "dddd, DD MMMM YYYY, hh:mm a",
+  "datetime.a_moment_ago": "刚刚",
+  "datetime.days_ago": "天前",
+  "datetime.days_ago_with_value": "{{days}} 天前",
+  "datetime.hours_ago": "小时前",
+  "datetime.hours_ago_with_value": "{{hours}} 小时前",
+  "datetime.last_month": "上个月",
+  "datetime.last_quarter": "上季度",
+  "datetime.last_week": "上周",
+  "datetime.last_year": "去年",
+  "datetime.minutes_ago": "分钟前",
+  "datetime.minutes_ago_with_value": "{{minutes}} 分钟前",
+  "datetime.months_ago": "月前",
+  "datetime.months_ago_with_value": "{{months}} 月前",
+  "datetime.next_month": "下个月",
+  "datetime.next_week": "下周",
+  "datetime.next_year": "明年",
+  "datetime.now": "现在",
+  "datetime.this_month": "本月",
+  "datetime.this_quarter": "本季度",
+  "datetime.this_week": "本周",
+  "datetime.this_year": "今年",
+  "datetime.today": "今天",
+  "datetime.weeks_ago": "周前",
+  "datetime.weeks_ago_with_value": "{{weeks}} 周前",
+  "datetime.years_ago": "年前",
+  "datetime.years_ago_with_value": "{{years}} 年前",
+  "datetime.yesterday": "昨天",
+  "dropdowns.account.label": "帐号",
+  "dropdowns.account.logout.label": "退出",
+  "dropdowns.account.profile.label": "我的帐号",
+  "dropdowns.account.switch_dark.label": "切换到深色模式",
+  "dropdowns.account.switch_light.label": "切换到浅色模式",
+  "dropdowns.account.system.label": "系统管理",
+  "dropdowns.tenant.admin.label": "管理租户",
+  "dropdowns.tenant.label": "租户",
+  "dropdowns.tenant.switch.label": "切换租户",
+  "empty.no_data": "暂无数据",
+  "empty.no_more_data": "没有更多数据了",
+  "empty.no_results": "没有找到结果",
+  "errors.403.description": "您没有访问该页面的权限。可能是因为您未经授权、登录状态失效或者被限制访问等原因。如果您认为这是一个错误，请联系我们的技术支持团队以获得更多帮助。",
+  "errors.403.title": "访问受限",
+  "errors.404.description": "您访问的页面不存在。可能是因为您输入了错误的地址，或者该页面已经被移动到另一个 URL。请确认您的输入是否正确并重试。",
+  "errors.404.title": "页面不存在",
+  "errors.500.description": "服务器发生了错误，导致页面无法正常显示。我们已经记录了这个问题，将尽快解决。请您稍后再试，或者联系我们的技术支持团队以获得帮助。",
+  "errors.500.title": "服务器错误",
+  "errors.boundary.description": "发生了意外错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。",
+  "errors.boundary.label": "发生意外错误",
+  "errors.request.description": "发生了请求错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。",
+  "errors.request.label": "请求错误",
+  "errors.response.description": "发生了响应错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。",
+  "errors.response.label": "响应错误",
+  "errors.unknown.description": "发生了未知的错误。请稍后再试，或者联系我们的技术支持团队以获得帮助。",
+  "errors.unknown.label": "未知错误",
+  "example.analyze.navigation": "分析",
+  "example.analyze.sales.title": "销售额",
+  "example.analyze.title": "分析列表",
+  "example.card.component.element.navigation": "元素",
+  "example.card.component.element.title": "",
+  "example.card.component.form.navigation": "表单",
+  "example.card.component.form.title": "",
+  "example.card.component.layout.navigation": "布局",
+  "example.card.component.layout.title": "",
+  "example.card.component.navigation": "组件",
+  "example.card.component.template.navigation": "模板",
+  "example.card.component.template.title": "",
+  "example.card.component.title": "",
+  "example.card.efficiency.log.navigation": "日志",
+  "example.card.efficiency.log.title": "",
+  "example.card.efficiency.navigation": "效率",
+  "example.card.efficiency.report.navigation": "报表",
+  "example.card.efficiency.report.title": "",
+  "example.card.efficiency.task.navigation": "任务",
+  "example.card.efficiency.task.title": "",
+  "example.card.efficiency.title": "",
+  "example.card.efficiency.workflow.navigation": "工作流",
+  "example.card.efficiency.workflow.title": "",
+  "example.card.model.navigation": "模型",
+  "example.card.model.permission.navigation": "权限",
+  "example.card.model.permission.title": "",
+  "example.card.model.role.navigation": "角色",
+  "example.card.model.role.title": "",
+  "example.card.model.title": "",
+  "example.card.model.user.navigation": "用户",
+  "example.card.model.user.title": "",
+  "example.card.navigation": "卡片 / 子菜单",
+  "example.card.title": "卡片 / 子菜单视图",
+  "example.list1.navigation": "列表",
+  "example.list1.title": "销售列表",
+  "example.list2.navigation": "列表",
+  "example.list2.title": "菜单管理",
+  "example.masonry.navigation": "瀑布流",
+  "example.masonry.title": "瀑布流列表",
+  "example.navigation": "示例",
+  "example.ui.navigation": "UI / 表单",
+  "example.ui.title": "UI / 表单元素",
+  "field_day_picker.invalid_message": "无效日期",
+  "field_multi_select.no_option": "没有选择",
+  "field_repeater.invalid_message": "至少一项元素无效",
+  "fields.confirm_password.label": "确认密码",
+  "fields.confirm_password.mismatch": "密码不一致，请检查",
+  "fields.confirm_password.placeholder": "请输入确认密码",
+  "fields.confirm_password.required": "请输入确认密码",
+  "fields.email.invalid": "邮箱无效",
+  "fields.email.label": "邮箱",
+  "fields.email.placeholder": "请输入邮箱",
+  "fields.email.required": "请输入邮箱",
+  "fields.password.label": "密码",
+  "fields.password.missing_lowercase": "密码缺少小写字母",
+  "fields.password.missing_number": "密码缺少数字",
+  "fields.password.missing_symbol": "密码缺少特殊字符",
+  "fields.password.missing_uppercase": "密码缺少大写字母",
+  "fields.password.placeholder": "请输入密码",
+  "fields.password.required": "请输入密码",
+  "fields.password.too_long": "密码太长（最多 {{count}} 个字符）",
+  "fields.password.too_short": "密码太短（最少 {{count}} 个字符）",
+  "fields.remember.label": "记住登录",
+  "fields.terms.label": "我接受条款和条件",
+  "fields.terms.required": "请勾选注册条款和条件",
+  "fields.username.invalid": "用户名无效",
+  "fields.username.label": "用户名",
+  "fields.username.placeholder": "请输入用户名",
+  "fields.username.required": "请输入用户名",
+  "fields.username.too_long": "用户名太长（最多 {{count}} 个字符）",
+  "fields.username.too_short": "用户名太短（最少 {{count}} 个字符）",
+  "fields.username_or_email.invalid": "用户名 / 邮箱无效",
+  "fields.username_or_email.label": "用户名 / 邮箱",
+  "fields.username_or_email.placeholder": "请输入用户名 / 邮箱",
+  "fields.username_or_email.required": "请输入用户名 / 邮箱",
+  "fields.username_or_email.too_long": "用户名 / 邮箱太长（最多 {{count}} 个字符）",
+  "fields.username_or_email.too_short": "用户名 / 邮箱太短（最少 {{count}} 个字符）",
+  "filter.active": "启用",
+  "filter.all": "全部",
+  "filter.apply": "应用",
+  "filter.apply_filters": "应用筛选",
+  "filter.ascending": "升序",
+  "filter.between": "介于",
+  "filter.clear": "清除",
+  "filter.clear_date": "清除日期",
+  "filter.clear_filters": "清除筛选",
+  "filter.clear_range": "清除区间",
+  "filter.clear_time": "清除时间",
+  "filter.contains": "包含",
+  "filter.custom": "自定义",
+  "filter.date": "日期",
+  "filter.date_range": "日期范围",
+  "filter.deleted": "已删除",
+  "filter.descending": "降序",
+  "filter.deselect_all": "取消全选",
+  "filter.does_not_contain": "不包含",
+  "filter.ends_with": "以...结束",
+  "filter.filter": "筛选",
+  "filter.greater_than": "大于",
+  "filter.inactive": "禁用",
+  "filter.is_equal_to": "等于",
+  "filter.is_not_equal_to": "不等于",
+  "filter.last_10_minutes": "最近 10 分钟",
+  "filter.last_10_years": "最近 10 年",
+  "filter.last_12_hours": "最近 12 小时",
+  "filter.last_12_months": "最近 12 月",
+  "filter.last_12_quarters": "最近 12 季度",
+  "filter.last_12_weeks": "最近 12 周",
+  "filter.last_15_minutes": "最近 15 分钟",
+  "filter.last_180_days": "最近 180 天",
+  "filter.last_1_hour": "最近 1 小时",
+  "filter.last_24_hours": "最近 24 小时",
+  "filter.last_2_hours": "最近 2 小时",
+  "filter.last_2_weeks": "最近 2 周",
+  "filter.last_30_days": "最近 30 天",
+  "filter.last_30_minutes": "最近 30 分钟",
+  "filter.last_365_days": "最近 365 天",
+  "filter.last_3_hours": "最近 3 小时",
+  "filter.last_3_months": "最近 3 月",
+  "filter.last_3_quarters": "最近 3 季度",
+  "filter.last_3_weeks": "最近 3 周",
+  "filter.last_3_years": "最近 3 年",
+  "filter.last_5_minutes": "最近 5 分钟",
+  "filter.last_5_years": "最近 5 年",
+  "filter.last_60_days": "最近 60 天",
+  "filter.last_6_hours": "最近 6 小时",
+  "filter.last_6_months": "最近 6 月",
+  "filter.last_6_quarters": "最近 6 季度",
+  "filter.last_6_weeks": "最近 6 周",
+  "filter.last_7_days": "最近 7 天",
+  "filter.last_90_days": "最近 90 天",
+  "filter.last_9_hours": "最近 9 小时",
+  "filter.last_9_months": "最近 9 月",
+  "filter.last_9_quarters": "最近 9 季度",
+  "filter.last_9_weeks": "最近 9 周",
+  "filter.last_month": "上月",
+  "filter.last_quarter": "上季度",
+  "filter.last_week": "上周",
+  "filter.last_year": "去年",
+  "filter.less_than": "小于",
+  "filter.realtime": "实时",
+  "filter.reset": "重置",
+  "filter.search": "搜索",
+  "filter.select_all": "全选",
+  "filter.sort_by": "排序方式",
+  "filter.starts_with": "以...开始",
+  "filter.this_month": "本月",
+  "filter.this_quarter": "本季度",
+  "filter.this_week": "本周",
+  "filter.this_year": "本年",
+  "filter.today": "今天",
+  "filter.yesterday": "昨天",
+  "forms.input_required": "字段为必填项",
+  "forms.input_required_with_field": "{{field}}字段为必填项",
+  "forms.not_allowed": "字段不允许",
+  "forms.not_allowed_with_field": "{{field}}字段不允许",
+  "forms.not_valid": "字段不合法",
+  "forms.not_valid_with_field": "{{field}}字段不合法",
+  "forms.required": "字段为必填项",
+  "forms.required_with_field": "{{field}}字段为必填项",
+  "forms.select_required": "字段为必选项",
+  "forms.select_required_with_field": "{{field}}字段为必选项",
+  "icon_selector.filled": "填充",
+  "icon_selector.outline": "边框",
+  "icon_selector.search_placeholder": "搜索...",
+  "icon_selector.title": "选择图标",
+  "interceptor.account.description": "",
+  "interceptor.account.title": "请登录后继续...",
+  "login_hint": "数据环境为 \u003cstrong\u003e{{name}}\u003c/strong\u003e，您可以使用 \u003canchor\u003e{{credentials}}\u003c/anchor\u003e 登录",
+  "notification.have_new_notification": "有新消息",
+  "notification.have_no_notification": "没有消息",
+  "notification.push_setting": "通知推送设置",
+  "notification.title": "通知",
+  "notification.you_have_no_unread_notification": "您没有未读消息",
+  "notification.you_have_unread_notification": "您有未读消息",
+  "notification.you_have_unread_notification_plural": "您有 {{count}} 条未读消息",
+  "pagination.displaying_text": "显示",
+  "pagination.first_page": "第一页",
+  "pagination.go_to_text": "跳转到",
+  "pagination.items_text": "条记录",
+  "pagination.last_page": "最后一页",
+  "pagination.next_page": "下一页",
+  "pagination.of_text": "共",
+  "pagination.page_text": "页",
+  "pagination.per_page_text": "每页",
+  "pagination.previous_page": "上一页",
+  "pagination.to_text": "至",
+  "pagination.total_text": "共",
+  "query.collapse": "收起查询栏",
+  "query.expand": "展开查询栏",
+  "query.loading": "加载中...",
+  "query.reset": "重置",
+  "query.search": "查询",
+  "search.clear": "清除搜索",
+  "search.invalid": "无效搜索内容",
+  "search.no_results": "没有找到结果",
+  "search.placeholder": "搜索...",
+  "search.required": "请输入搜索内容",
+  "sort.order": "排序",
+  "sort.sort_ascending": "升序",
+  "sort.sort_by": "排序方式",
+  "sort.sort_descending": "降序",
+  "system.basic.navigation": "系统配置",
+  "system.basic.setting.navigation": "系统配置",
+  "system.basic.setting.title": "系统配置",
+  "system.basic.title": "系统配置",
+  "system.dictionary.navigation": "字典",
+  "system.dictionary.title": "字典 / 枚举管理",
+  "system.group.navigation": "组织",
+  "system.group.title": "组织架构",
+  "system.menu.navigation": "菜单",
+  "system.menu.title": "菜单管理",
+  "system.navigation": "系统",
+  "system.permission.navigation": "权限",
+  "system.permission.title": "权限管理",
+  "system.role.navigation": "角色",
+  "system.role.title": "职务角色",
+  "system.tenant.navigation": "租户",
+  "system.tenant.title": "租户管理",
+  "system.user.navigation": "用户",
+  "system.user.title": "系统用户",
+  "table.layout.board": "看板",
+  "table.layout.card": "卡片",
+  "table.layout.fullscreen": "全屏",
+  "table.layout.table": "表格",
+  "tenant_switcher.title": "切换租户",
+  "units.centimeter": "厘米",
+  "units.cup": "杯",
+  "units.feet": "英尺",
+  "units.gram": "克",
+  "units.inch": "英寸",
+  "units.kilogram": "千克",
+  "units.liter": "升",
+  "units.meter": "米",
+  "units.mile": "英里",
+  "units.milliliter": "毫升",
+  "units.millimeter": "毫米",
+  "units.ounce": "盎司",
+  "units.pint": "品脱",
+  "units.pound": "磅",
+  "units.quart": "夸脱",
+  "units.tablespoon": "汤匙",
+  "units.teaspoon": "茶匙",
+  "units.yard": "码"
 }

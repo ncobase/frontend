@@ -67,7 +67,7 @@ export default (({ mode }: ConfigEnv): UserConfig => {
       }
     },
     server: {
-      port: +ENV.VITE_PORT,
+      port: +ENV.VITE_PORT || 5173,
       proxy
     }
   };
