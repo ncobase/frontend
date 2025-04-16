@@ -63,6 +63,7 @@ export const Page: React.FC<PageProps> = ({
           topbar={topbar}
           submenu={submenu && !sidebarExpanded && <Submenu />}
           sidebarExpanded={sidebarExpanded}
+          direction={document.documentElement.dir as 'ltr' | 'rtl'}
         >
           {renderContent()}
         </Shell>
