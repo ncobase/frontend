@@ -1,49 +1,54 @@
+import React from 'react';
+
 import {
-  Button,
   Dropdown,
+  DropdownTrigger,
   DropdownContent,
   DropdownItem,
-  DropdownTrigger,
+  Button,
   Icons
 } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 
-import { AVAILABLE_LANGUAGES } from '@/helpers/constants';
-import { getNavigatorLanguage, getStoredLanguage, i18n } from '@/helpers/i18n';
+import { useLanguageSwitcher } from '@/hooks/use_language_switcher';
 
-export const LanguageSwitcher = () => {
-  const flagClasses = 'mt-0.5 text-base';
-  const language = AVAILABLE_LANGUAGES.find(
-    item => item.key === (getStoredLanguage() || getNavigatorLanguage())
+/**
+ * Language Switcher Component
+ * Provides a dropdown menu for language selection
+ */
+export const LanguageSwitcher: React.FC = () => {
+  const { currentLanguage, switchLanguage, availableLanguages } = useLanguageSwitcher();
+
+  /**
+   * Render language trigger button
+   * Display current language flag or global icon
+   */
+  const renderLanguageTrigger = () => (
+    <Button variant='unstyle' size='xs' className='text-muted-foreground hover:bg-transparent'>
+      {currentLanguage.flag ? (
+        <span className='text-base'>{currentLanguage.flag}</span>
+      ) : (
+        <Icons name='IconWorld' className='h-5 w-5' />
+      )}
+    </Button>
   );
-
-  const changeLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
-  };
 
   return (
     <Dropdown>
-      <DropdownTrigger asChild>
-        <Button variant='unstyle' className='p-0 text-slate-400/80 [&>svg]:stroke-slate-400/80'>
-          {language.flag ? (
-            <span className={flagClasses}>{language.flag}</span>
-          ) : (
-            <Icons name='IconWorld' />
-          )}
-          {/* {language.name} */}
-        </Button>
-      </DropdownTrigger>
-      <DropdownContent align='end' alignOffset={-16}>
-        {AVAILABLE_LANGUAGES.map(({ key, flag, name }) => (
+      <DropdownTrigger asChild>{renderLanguageTrigger()}</DropdownTrigger>
+
+      <DropdownContent align='end' className='min-w-[120px]'>
+        {availableLanguages.map(({ key, flag, name }) => (
           <DropdownItem
             key={key}
-            className={cn('text-slate-400/90 py-1.5', key === language.key && 'text-slate-600')}
-            onClick={() => {
-              changeLanguage(key);
-            }}
+            onSelect={() => switchLanguage(key)}
+            className={cn(
+              'flex items-center gap-2 cursor-pointer',
+              key === currentLanguage.key && 'bg-accent text-accent-foreground'
+            )}
           >
-            {flag && <span className={`${flagClasses} mr-2`}>{flag}</span>}
-            {name}
+            {flag && <span className='text-base'>{flag}</span>}
+            <span>{name}</span>
           </DropdownItem>
         ))}
       </DropdownContent>

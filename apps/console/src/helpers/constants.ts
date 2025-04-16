@@ -19,68 +19,52 @@ export const XMdDomainKey = 'x-md-did';
 export const XMdTotalKey = 'x-md-total';
 
 // --- i18n
-export const STORAGE_LANGUAGE_KEY = 'app.language';
+export const LANGUAGE_CONFIG = {
+  /** Language key stored in local storage */
+  STORAGE_KEY: 'app.language',
+  /** Default language */
+  DEFAULT_LANGUAGE: 'en'
+};
 
-interface Language {
+/**
+ * Language option
+ */
+export interface LanguageOption {
+  /** Language unique identifier */
   key: string;
-  name?: string;
+  /** Language display name */
+  name: string;
+  /** Language flag emoji or icon */
   flag?: string;
+  /** Text direction */
   dir?: 'ltr' | 'rtl';
+  /** Font scale ratio */
   fontScale?: number;
 }
-
-export const DEFAULT_LANGUAGE_KEY: Language['key'] = 'en';
-
-// Reference: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-export const AVAILABLE_LANGUAGES: Language[] = [
-  {
-    key: 'zh',
-    name: '中文',
-    dir: 'ltr'
-  },
+/**
+ * Available languages
+ * @reference https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+ */
+export const AVAILABLE_LANGUAGES: LanguageOption[] = [
   {
     key: 'en',
     name: 'English',
-    dir: 'ltr'
+    flag: '🇺🇸',
+    dir: 'ltr',
+    fontScale: 1
   },
   {
-    key: 'ja',
-    name: '日本語',
-    dir: 'ltr'
+    key: 'zh',
+    name: '中文',
+    flag: '🇨🇳',
+    dir: 'ltr',
+    fontScale: 1
   },
   {
-    key: 'ko',
-    name: '한국어',
-    dir: 'ltr'
-  },
-  {
-    key: 'ru',
-    name: 'Русский',
-    dir: 'ltr'
-  },
-  {
-    key: 'es',
-    name: 'Español',
-    dir: 'ltr'
-  },
-  {
-    key: 'fr',
-    name: 'Français',
-    dir: 'ltr'
-  },
-  {
-    key: 'de',
-    name: 'Deutsch',
-    dir: 'ltr'
-  },
-  {
-    key: 'it',
-    name: 'Italiano',
-    dir: 'ltr'
-  },
-  {
-    key: 'pt',
-    name: 'Português',
-    dir: 'ltr'
+    key: 'ar',
+    name: 'العربية',
+    flag: '🇸🇦',
+    dir: 'rtl',
+    fontScale: 1.1
   }
 ];

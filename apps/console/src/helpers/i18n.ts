@@ -1,72 +1,69 @@
-import { isBrowser, locals } from '@ncobase/utils';
 import i18n from 'i18next';
-import HttpBackend, { HttpBackendOptions } from 'i18next-http-backend';
+import HttpBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 
-import versionInfo from '@/../version.json';
-import { request } from '@/apis/request';
-import {
-  AVAILABLE_LANGUAGES,
-  DEFAULT_LANGUAGE_KEY,
-  STORAGE_LANGUAGE_KEY
-} from '@/helpers/constants';
+import { LANGUAGE_CONFIG, AVAILABLE_LANGUAGES } from './constants';
 
-const setHtmlProperties = (lang: string) => {
-  const language = AVAILABLE_LANGUAGES.find(({ key }) => key === lang);
-  if (!language) return;
-  document.documentElement.lang = lang.toLocaleLowerCase();
-  document.documentElement.dir = language.dir ?? 'ltr';
-  document.documentElement.style.fontSize = `${(language.fontScale ?? 1) * 100}%`;
+/**
+ * Get initial language
+ * Priority: Local Storage > Browser Language > Default Language
+ */
+const getInitialLanguage = (): string => {
+  // Try to get language from local storage
+  const storedLang = localStorage.getItem(LANGUAGE_CONFIG.STORAGE_KEY);
+  if (storedLang) return storedLang;
+
+  // Get browser language
+  const browserLang = navigator.language.split('-')[0];
+
+  // Match available languages
+  const matchedLang = AVAILABLE_LANGUAGES.find(lang => lang.key === browserLang);
+
+  return matchedLang?.key || LANGUAGE_CONFIG.DEFAULT_LANGUAGE;
 };
 
-export const getStoredLanguage = () => {
-  if (!isBrowser) return;
-  const storedLang = locals.get(STORAGE_LANGUAGE_KEY);
-  if (storedLang && AVAILABLE_LANGUAGES.map(lang => lang.key).includes(storedLang)) {
-    return storedLang;
-  }
-};
-
-export const setStoredLanguage = (lang: string) => {
-  if (!isBrowser) return;
-  locals.set(STORAGE_LANGUAGE_KEY, lang);
-  setHtmlProperties(lang);
-};
-
-export const getNavigatorLanguage = () => {
-  if (!isBrowser) return DEFAULT_LANGUAGE_KEY;
-  const lang = window.navigator.language;
-  const availableLangKeys = AVAILABLE_LANGUAGES.map(lang => lang.key);
-  const normalizedLang = lang.split('-')[0];
-  return availableLangKeys.find(key => key === normalizedLang) || DEFAULT_LANGUAGE_KEY;
-};
-
-const backendOptions: HttpBackendOptions = {
-  // TODO: change to api url
-  // loadPath: `${request.config.baseURL}/locales/{{lng}}.json?ver=${versionInfo?.commit}`,
-  loadPath: `/assets/locales/{{lng}}.json?ver=${versionInfo?.commit}`,
-  customHeaders: {
-    ...request.getHeaders()
-  }
-};
+/**
+ * i18n Configuration
+ * Handle language resource loading and initialization
+ */
 
 i18n
   .use(HttpBackend)
   .use(initReactI18next)
   .init({
-    lng: getStoredLanguage() || getNavigatorLanguage(),
-    fallbackLng: DEFAULT_LANGUAGE_KEY,
-    backend: backendOptions,
-    interpolation: {
-      escapeValue: false
+    // Initial language
+    lng: getInitialLanguage(),
+
+    // Fallback language
+    fallbackLng: LANGUAGE_CONFIG.DEFAULT_LANGUAGE,
+
+    // Language resource loading configuration
+    backend: {
+      // Language resource path (adjust according to actual project)
+      loadPath: '/assets/locales/{{lng}}.json',
+
+      // Optional: Add version control
+      queryStringParams: {
+        v: process.env.VERSION || 'latest'
+      }
     },
-    returnNull: false
+
+    // Interpolation configuration
+    interpolation: {
+      // Prevent XSS attacks
+      escapeValue: true
+    },
+
+    // Handle missing keys
+    returnNull: false,
+
+    // Debug mode (disabled in production)
+    debug: process.env.NODE_ENV === 'development'
   });
 
-i18n.on('languageChanged', lang => {
-  if (isBrowser) {
-    setStoredLanguage(lang);
-  }
+// Update local storage when language changes
+i18n.on('languageChanged', lng => {
+  localStorage.setItem(LANGUAGE_CONFIG.STORAGE_KEY, lng);
 });
 
 export { i18n };
