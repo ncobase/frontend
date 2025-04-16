@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ApexChart, ChartContainer } from '@ncobase/charts';
+import { ChartContainer } from '@ncobase/charts';
 import {
   Button,
   Card,
@@ -659,66 +659,52 @@ export const AnalyzePage = ({ ...rest }) => {
             </Dropdown>
           </CardHeader>
           <CardContent>
-            {/* Bar chart using ApexCharts */}
-            <ApexChart
-              type='bar'
-              options={{
-                chart: {
-                  type: 'bar',
-                  stacked: true,
-                  toolbar: { show: false }
-                },
-                plotOptions: {
-                  bar: {
-                    horizontal: true,
-                    dataLabels: {
-                      total: {
-                        enabled: true,
-                        offsetX: 0,
-                        style: {
-                          fontSize: '0.8125rem',
-                          fontWeight: 900
-                        }
-                      }
+            {/* Bar chart using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  tooltip: {
+                    trigger: 'axis'
+                  },
+                  legend: {
+                    show: false
+                  },
+                  grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                  },
+                  xAxis: {
+                    type: 'value',
+                    axisLabel: {
+                      formatter: '{value}K'
                     }
-                  }
-                },
-                stroke: {
-                  width: 1,
-                  colors: ['#fff']
-                },
-                xaxis: {
-                  categories: getFilteredBarData(filterDays).categories,
-                  labels: {
-                    formatter: function (val) {
-                      return val + 'K';
+                  },
+                  yAxis: {
+                    type: 'category',
+                    data: getFilteredBarData(filterDays).categories
+                  },
+                  series: getFilteredBarData(filterDays).series.map((item, index) => ({
+                    name: item.name,
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                      show: false
+                    },
+                    emphasis: {
+                      focus: 'series'
+                    },
+                    data: item.data,
+                    itemStyle: {
+                      color: chartColors[index % chartColors.length]
                     }
-                  }
-                },
-                yaxis: {
-                  title: {
-                    text: undefined
-                  }
-                },
-                tooltip: {
-                  y: {
-                    formatter: function (val) {
-                      return val + 'K';
-                    }
-                  }
-                },
-                fill: {
-                  opacity: 1
-                },
-                legend: {
-                  show: false,
-                  position: 'top',
-                  horizontalAlign: 'left',
-                  offsetX: 40
-                },
-                colors: chartColors
+                  }))
+                }
               }}
-              series={getFilteredBarData(filterDays).series}
+              style={{ height: '300px' }}
             />
           </CardContent>
         </Card>

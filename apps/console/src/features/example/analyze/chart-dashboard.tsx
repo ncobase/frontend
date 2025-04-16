@@ -1,16 +1,6 @@
 import { useState } from 'react';
 
-import {
-  ChartContainer,
-  ChartTooltipContent,
-  ChartLegendContent,
-  LineChart,
-  BarChart,
-  PieChart,
-  RadarChart,
-  AreaChart
-} from '@ncobase/charts';
-import { rest } from 'lodash';
+import { ChartContainer, ChartTooltipContent, ChartLegendContent } from '@ncobase/charts';
 import { useTranslation } from 'react-i18next';
 import {
   LineChart as RechartsLineChart,
@@ -56,35 +46,6 @@ const performanceData = [
   { metric: 'Reliability', valueA: 70, valueB: 88 },
   { metric: 'Efficiency', valueA: 85, valueB: 75 },
   { metric: 'Support', valueA: 75, valueB: 92 }
-];
-
-// Format data for different chart libraries
-const apexLineSeries = [
-  {
-    name: 'Sales',
-    data: salesData.map(item => item.sales)
-  },
-  {
-    name: 'Revenue',
-    data: salesData.map(item => item.revenue)
-  },
-  {
-    name: 'Profit',
-    data: salesData.map(item => item.profit)
-  }
-];
-
-const apexPieSeries = productData.map(item => item.value);
-
-const apexRadarSeries = [
-  {
-    name: 'Product A',
-    data: performanceData.map(item => item.valueA)
-  },
-  {
-    name: 'Product B',
-    data: performanceData.map(item => item.valueB)
-  }
 ];
 
 // Dashboard component
@@ -172,100 +133,6 @@ export const ChartDashboard = () => {
     }
   };
 
-  // ApexCharts options
-  const lineChartOptions = {
-    chart: {
-      toolbar: { show: false }
-    },
-    xaxis: {
-      categories: salesData.map(item => item.month)
-    },
-    stroke: {
-      curve: 'smooth',
-      width: 2
-    },
-    yaxis: {
-      title: {
-        text: 'Amount (thousands)'
-      }
-    }
-  };
-
-  const barChartOptions = {
-    chart: {
-      toolbar: { show: false },
-      stacked: true
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '70%'
-      }
-    },
-    xaxis: {
-      categories: salesData.slice(0, 6).map(item => item.month)
-    },
-    yaxis: {
-      title: {
-        text: 'Amount (thousands)'
-      }
-    }
-  };
-
-  const pieChartOptions = {
-    chart: {
-      toolbar: { show: false }
-    },
-    labels: productData.map(item => item.name),
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 300
-          },
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    ]
-  };
-
-  const radarChartOptions = {
-    chart: {
-      toolbar: { show: false }
-    },
-    xaxis: {
-      categories: performanceData.map(item => item.metric)
-    },
-    yaxis: {
-      show: false
-    }
-  };
-
-  const areaChartOptions = {
-    chart: {
-      toolbar: { show: false }
-    },
-    xaxis: {
-      categories: salesData.map(item => item.month)
-    },
-    stroke: {
-      curve: 'smooth',
-      width: 2
-    },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.7,
-        opacityTo: 0.3,
-        stops: [0, 90, 100]
-      }
-    }
-  };
-
   // Toggle theme handler
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
@@ -273,7 +140,7 @@ export const ChartDashboard = () => {
   };
 
   return (
-    <Page title={t('example.analyze.title')} {...rest}>
+    <Page title={t('example.analyze.title')}>
       <div className={`w-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
         <div
           style={{
@@ -288,14 +155,61 @@ export const ChartDashboard = () => {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-          {/* ApexCharts Line Chart */}
+          {/* ECharts Line Chart */}
           <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Monthly Performance (ApexCharts)</h2>
+            <h2>Monthly Performance (ECharts)</h2>
             <div>
-              <ChartContainer config={salesConfig} library='apexcharts'>
-                {/* @ts-expect-error */}
-                <LineChart series={apexLineSeries} options={lineChartOptions} />
-              </ChartContainer>
+              <ChartContainer
+                config={salesConfig}
+                library='echarts'
+                style={{ height: '350px' }}
+                echartsProps={{
+                  option: {
+                    tooltip: {
+                      trigger: 'axis'
+                    },
+                    legend: {
+                      data: ['Sales', 'Revenue', 'Profit']
+                    },
+                    xAxis: {
+                      type: 'category',
+                      data: salesData.map(item => item.month)
+                    },
+                    yAxis: {
+                      type: 'value'
+                    },
+                    series: [
+                      {
+                        name: 'Sales',
+                        type: 'line',
+                        smooth: true,
+                        data: salesData.map(item => item.sales),
+                        lineStyle: {
+                          color: salesConfig.sales.theme.light
+                        }
+                      },
+                      {
+                        name: 'Revenue',
+                        type: 'line',
+                        smooth: true,
+                        data: salesData.map(item => item.revenue),
+                        lineStyle: {
+                          color: salesConfig.revenue.theme.light
+                        }
+                      },
+                      {
+                        name: 'Profit',
+                        type: 'line',
+                        smooth: true,
+                        data: salesData.map(item => item.profit),
+                        lineStyle: {
+                          color: salesConfig.profit.theme.light
+                        }
+                      }
+                    ]
+                  }
+                }}
+              />
             </div>
           </div>
 
@@ -316,34 +230,139 @@ export const ChartDashboard = () => {
             </ChartContainer>
           </div>
 
-          {/* ApexCharts Pie Chart */}
+          {/* ECharts Pie Chart */}
           <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
             <h2>Product Distribution</h2>
-            <ChartContainer config={productConfig} library='apexcharts'>
-              <PieChart series={apexPieSeries} options={pieChartOptions} />
-            </ChartContainer>
+            <ChartContainer
+              config={productConfig}
+              library='echarts'
+              style={{ height: '350px' }}
+              echartsProps={{
+                option: {
+                  tooltip: {
+                    trigger: 'item'
+                  },
+                  legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                  },
+                  series: [
+                    {
+                      type: 'pie',
+                      radius: '50%',
+                      data: productData.map((item, index) => ({
+                        value: item.value,
+                        name: item.name,
+                        itemStyle: {
+                          color: Object.values(productConfig)[index].theme.light
+                        }
+                      })),
+                      emphasis: {
+                        itemStyle: {
+                          shadowBlur: 10,
+                          shadowOffsetX: 0,
+                          shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                      }
+                    }
+                  ]
+                }
+              }}
+            />
           </div>
 
-          {/* ApexCharts Radar Chart */}
+          {/* ECharts Radar Chart */}
           <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
             <h2>Performance Comparison</h2>
-            <ChartContainer config={performanceConfig} library='apexcharts'>
-              <RadarChart series={apexRadarSeries} options={radarChartOptions} />
-            </ChartContainer>
+            <ChartContainer
+              config={performanceConfig}
+              library='echarts'
+              style={{ height: '350px' }}
+              echartsProps={{
+                option: {
+                  radar: {
+                    indicator: performanceData.map(item => ({
+                      name: item.metric,
+                      max: 100
+                    }))
+                  },
+                  series: [
+                    {
+                      type: 'radar',
+                      data: [
+                        {
+                          value: performanceData.map(item => item.valueA),
+                          name: 'Product A',
+                          itemStyle: {
+                            color: performanceConfig['product-a'].theme.light
+                          }
+                        },
+                        {
+                          value: performanceData.map(item => item.valueB),
+                          name: 'Product B',
+                          itemStyle: {
+                            color: performanceConfig['product-b'].theme.light
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }}
+            />
           </div>
 
-          {/* ApexCharts Bar Chart */}
+          {/* ECharts Bar Chart */}
           <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Half-Year Comparison (ApexCharts)</h2>
-            <ChartContainer config={salesConfig} library='apexcharts'>
-              <BarChart
-                series={apexLineSeries.map(series => ({
-                  ...series,
-                  data: series.data.slice(0, 6)
-                }))}
-                options={barChartOptions}
-              />
-            </ChartContainer>
+            <h2>Half-Year Comparison (ECharts)</h2>
+            <ChartContainer
+              config={salesConfig}
+              library='echarts'
+              style={{ height: '350px' }}
+              echartsProps={{
+                option: {
+                  tooltip: {
+                    trigger: 'axis'
+                  },
+                  legend: {
+                    data: ['Sales', 'Revenue', 'Profit']
+                  },
+                  xAxis: {
+                    type: 'category',
+                    data: salesData.slice(0, 6).map(item => item.month)
+                  },
+                  yAxis: {
+                    type: 'value'
+                  },
+                  series: [
+                    {
+                      name: 'Sales',
+                      type: 'bar',
+                      data: salesData.slice(0, 6).map(item => item.sales),
+                      itemStyle: {
+                        color: salesConfig.sales.theme.light
+                      }
+                    },
+                    {
+                      name: 'Revenue',
+                      type: 'bar',
+                      data: salesData.slice(0, 6).map(item => item.revenue),
+                      itemStyle: {
+                        color: salesConfig.revenue.theme.light
+                      }
+                    },
+                    {
+                      name: 'Profit',
+                      type: 'bar',
+                      data: salesData.slice(0, 6).map(item => item.profit),
+                      itemStyle: {
+                        color: salesConfig.profit.theme.light
+                      }
+                    }
+                  ]
+                }
+              }}
+            />
           </div>
 
           {/* Recharts Bar Chart */}
@@ -363,7 +382,7 @@ export const ChartDashboard = () => {
             </ChartContainer>
           </div>
 
-          {/* ApexCharts Area Chart */}
+          {/* ECharts Area Chart */}
           <div
             style={{
               border: '1px solid #e8e8e8',
@@ -373,12 +392,63 @@ export const ChartDashboard = () => {
             }}
           >
             <h2>Trend Analysis</h2>
-            <div>
-              <ChartContainer config={salesConfig} library='apexcharts'>
-                {/* @ts-expect-error */}
-                <AreaChart series={apexLineSeries} options={areaChartOptions} />
-              </ChartContainer>
-            </div>
+            <ChartContainer
+              config={salesConfig}
+              library='echarts'
+              style={{ height: '400px' }}
+              echartsProps={{
+                option: {
+                  tooltip: {
+                    trigger: 'axis'
+                  },
+                  legend: {
+                    data: ['Sales', 'Revenue', 'Profit']
+                  },
+                  xAxis: {
+                    type: 'category',
+                    data: salesData.map(item => item.month)
+                  },
+                  yAxis: {
+                    type: 'value'
+                  },
+                  series: [
+                    {
+                      name: 'Sales',
+                      type: 'line',
+                      stack: 'Total',
+                      smooth: true,
+                      areaStyle: {},
+                      data: salesData.map(item => item.sales),
+                      itemStyle: {
+                        color: salesConfig.sales.theme.light
+                      }
+                    },
+                    {
+                      name: 'Revenue',
+                      type: 'line',
+                      stack: 'Total',
+                      smooth: true,
+                      areaStyle: {},
+                      data: salesData.map(item => item.revenue),
+                      itemStyle: {
+                        color: salesConfig.revenue.theme.light
+                      }
+                    },
+                    {
+                      name: 'Profit',
+                      type: 'line',
+                      stack: 'Total',
+                      smooth: true,
+                      areaStyle: {},
+                      data: salesData.map(item => item.profit),
+                      itemStyle: {
+                        color: salesConfig.profit.theme.light
+                      }
+                    }
+                  ]
+                }
+              }}
+            />
           </div>
         </div>
       </div>

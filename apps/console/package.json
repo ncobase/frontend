@@ -13,9 +13,9 @@
     "deploy:prod": "npx rimraf serverless.yaml && cp infra/serverless/tencent_cloud_prod.yaml serverless.yaml && sls deploy -s prod && npx rimraf serverless.yaml"
   },
   "dependencies": {
-    "@ncobase/charts": "latest",
+    "@ncobase/charts": "^0.2.0",
     "@ncobase/flows": "latest",
-    "@ncobase/react": "latest",
+    "@ncobase/react": "^0.1.0-alpha.1",
     "@ncobase/utils": "latest",
     "@popperjs/core": "^2.11.8",
     "@tanstack/react-query": "^5.74.3",
@@ -32,7 +32,6 @@
     "lodash": "^4.17.21",
     "ofetch": "^1.4.1",
     "react": "^18.3.1",
-    "react-apexcharts": "^1.7.0",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.1.2",
     "react-helmet-async": "^2.0.5",
@@ -43,7 +42,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
-    "@ncobase/tailwind": "latest",
+    "@ncobase/tailwind": "^0.2.0-alpha.1",
     "@ncobase/tsconfig": "latest",
     "@ncobase/types": "latest",
     "@tanstack/eslint-plugin-query": "^5.73.3",

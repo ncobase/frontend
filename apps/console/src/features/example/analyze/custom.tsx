@@ -1,70 +1,81 @@
 import { forwardRef, useState } from 'react';
 
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from '@ncobase/charts';
-import { rest } from 'lodash';
-import Charts from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 import { Page } from '@/layout';
 
-// Define a custom chart component that extends the NCOBase charts functionality
+// Define a custom chart component that extends the @ncobase/charts functionality
 export const GradientAreaChart = forwardRef(
-  ({ series, options, height = 350, width, config = {}, ...props }: any, ref) => {
-    // Default options for gradient area chart
-    const defaultOptions = {
-      chart: {
-        type: 'area',
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      stroke: {
-        curve: 'smooth',
-        width: 2
-      },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.7,
-          opacityTo: 0.3,
-          stops: [0, 90, 100]
-        }
-      },
-      legend: {
-        show: false
-      }
-    };
-
-    // Merge default options with user provided options
-    const mergedOptions = {
-      ...defaultOptions,
-      ...options,
-      chart: {
-        ...defaultOptions.chart,
-        ...options?.chart
-      },
-      fill: {
-        ...defaultOptions.fill,
-        ...options?.fill,
-        gradient: {
-          ...defaultOptions.fill.gradient,
-          ...options?.fill?.gradient
-        }
-      }
-    };
-
+  (
+    { series, options, height, width = '100%', config = {}, categories = [], ...props }: any,
+    ref
+  ) => {
     return (
-      <ChartContainer ref={ref} config={config} library='apexcharts' {...props}>
-        <Charts options={mergedOptions} series={series} type='area' height={height} width={width} />
-      </ChartContainer>
+      <ChartContainer
+        ref={ref}
+        config={config}
+        library='echarts'
+        style={{ height, width }}
+        echartsProps={{
+          option: {
+            tooltip: {
+              trigger: 'axis'
+            },
+            legend: {
+              data: series.map(s => s.name)
+            },
+            xAxis: {
+              type: 'category',
+              data: categories,
+              boundaryGap: false
+            },
+            yAxis: {
+              type: 'value'
+            },
+            series: series.map((seriesItem, index) => ({
+              name: seriesItem.name,
+              type: 'line',
+              stack: 'Total',
+              smooth: true,
+              symbol: 'none',
+              areaStyle: {
+                opacity: 0.8,
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color:
+                        options?.series?.[index]?.color ||
+                        config?.[seriesItem.name]?.theme?.light ||
+                        '#1677ff'
+                    },
+                    {
+                      offset: 1,
+                      color: 'transparent'
+                    }
+                  ]
+                }
+              },
+              lineStyle: {
+                width: 2,
+                color:
+                  options?.series?.[index]?.color ||
+                  config?.[seriesItem.name]?.theme?.light ||
+                  '#1677ff'
+              },
+              data: seriesItem.data
+            }))
+          }
+        }}
+        {...props}
+      />
     );
   }
 );
@@ -190,7 +201,7 @@ export const CustomChartExample = () => {
     }
   };
 
-  // Format data for ApexCharts
+  // Format data for ECharts
   const areaSeries = [
     {
       name: 'Series 1',
@@ -206,7 +217,7 @@ export const CustomChartExample = () => {
     }
   ];
 
-  // ApexCharts options
+  // ECharts options
   const areaOptions = {
     xaxis: {
       categories: timeSeriesData.map(item => item.date),
@@ -243,7 +254,7 @@ export const CustomChartExample = () => {
   };
 
   return (
-    <Page title={t('example.analyze.title')} {...rest}>
+    <Page title={t('example.analyze.title')}>
       <div className={`w-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
         <div
           style={{
@@ -273,6 +284,7 @@ export const CustomChartExample = () => {
                 config={areaChartConfig}
                 series={areaSeries}
                 options={areaOptions}
+                categories={timeSeriesData.map(item => item.date)}
               />
             </div>
           </div>

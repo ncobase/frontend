@@ -69,14 +69,14 @@ importers:
   apps/console:
     dependencies:
       '@ncobase/charts':
-        specifier: latest
-        version: 0.1.2(apexcharts@4.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.2.0
+        version: 0.2.0
       '@ncobase/flows':
         specifier: latest
         version: 0.0.1-alpha.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ncobase/react':
-        specifier: latest
-        version: 0.0.1-alpha.12(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)
+        specifier: ^0.1.0-alpha.1
+        version: 0.1.0-alpha.1(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(postcss@8.5.3)(react@18.3.1)(tailwindcss@3.4.17)
       '@ncobase/utils':
         specifier: latest
         version: 0.1.0
@@ -125,9 +125,6 @@ importers:
       react:
         specifier: ^18.3.1
         version: 18.3.1
-      react-apexcharts:
-        specifier: ^1.7.0
-        version: 1.7.0(apexcharts@4.4.0)(react@18.3.1)
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -154,8 +151,8 @@ importers:
         version: 1.6.1
     devDependencies:
       '@ncobase/tailwind':
-        specifier: latest
-        version: 0.1.0
+        specifier: ^0.2.0-alpha.1
+        version: 0.2.0-alpha.1(postcss@8.5.3)(tailwindcss@3.4.17)
       '@ncobase/tsconfig':
         specifier: latest
         version: 0.1.0
@@ -809,17 +806,20 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@ncobase/charts@0.1.2':
-    resolution: {integrity: sha512-EDtAWYbCVjc21mng6WotIFwa6ewKwlRZT46Tv8SlwfWGc0lMegRZijbrmujEp59Pb/eiTx0vrAjt2Ism1x/5Xg==}
+  '@ncobase/charts@0.2.0':
+    resolution: {integrity: sha512-lt5XqXbzgv2CV5s9Bs/KvnoIfEiaRKJq55tapYDjSQvmEG5h71wdGweZJsfYWPrAtSe/Vj6Zs4U7mKFm5ZIaaA==}
 
   '@ncobase/flows@0.0.1-alpha.1':
     resolution: {integrity: sha512-f2mGhM1IAY6c5F8SaauqRvDcsRBHfeJkDxmlgHDno9UqbNgGRWY5/VEVP3fwZ5JLnWel6QoHbPkeipYS0iSeCw==}
 
-  '@ncobase/react@0.0.1-alpha.12':
-    resolution: {integrity: sha512-yizPdtLRJpLyfKIyTBelefSX4thOhNk2FmZy3bgG1DJ63RbUPG2D7hKG79BX/H6MvicZaeWMx7JFhOlrIm1WyA==}
+  '@ncobase/react@0.1.0-alpha.1':
+    resolution: {integrity: sha512-ipM9PkgPDKNu8/2wDy65Govp7y/aw5/+R6fVKg9s2D/WUeLiuE0gmokOwfJyjJoqXPA6ZFQrLjto7vEUFuWSEg==}
 
-  '@ncobase/tailwind@0.1.0':
-    resolution: {integrity: sha512-ub0pVto3R2Zs5zXdu2c+xoXpTuWWAv/BXmzbSUf4swaHh57wefGSQKRpC2tSPmySjPZK0+11zxBOO4E0ELFUHg==}
+  '@ncobase/tailwind@0.2.0-alpha.1':
+    resolution: {integrity: sha512-KX6kdtllSG7a1yFw3iJAT/xtNyI1uFqgVk3m+PHdcYD6SVzJZVd3s6vZVSgghq9BgaqiLops6eGfPi/BSWjxpA==}
+    peerDependencies:
+      postcss: ^8.5.0
+      tailwindcss: ^3.4.0 || ^4.0.0
 
   '@ncobase/tsconfig@0.1.0':
     resolution: {integrity: sha512-r0SLfOEKZHnLlXZFVFgHRgZv6mV5wOae52amQBDUMRTJSiPUXxvTiltquWibZdSRnd4CweYDWBwLgp+tP0OqAA==}
@@ -1743,8 +1743,8 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  apexcharts@4.4.0:
-    resolution: {integrity: sha512-JGsHeQEKDlQh1rob8aBai9/HKvXIpbZ83TnobKZAcdOELf+oQZaxZyAnbbldr6PPBdCgG2zzzLaP1dtEsJxzWw==}
+  apexcharts@4.5.0:
+    resolution: {integrity: sha512-E7ZkrVqPNBUWy/Rmg8DEIqHNBmElzICE/oxOX5Ekvs2ICQUOK/VkEkMH09JGJu+O/EA0NL31hxlmF+wrwrSLaQ==}
 
   arg@5.0.2:
     resolution: {integrity: sha512-PYjyFOLKQ9y57JvQ6QLo8dAgNqswh8M1RMJYdQduT6xbWSgK36P/Z/v+p888pM69jMMfS8Xd8F6I1kQ/I9HUGg==}
@@ -2147,9 +2147,6 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
-
-  date-fns@3.6.0:
-    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
 
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
@@ -3980,6 +3977,9 @@ packages:
   tailwind-merge@3.0.1:
     resolution: {integrity: sha512-AvzE8FmSoXC7nC+oU5GlQJbip2UO7tmOhOfQyOmPhrStOGXHU08j8mZEHZ4BmCqY5dWTCo4ClWkNyRNx1wpT0g==}
 
+  tailwind-merge@3.2.0:
+    resolution: {integrity: sha512-FQT/OVqCD+7edmmJpsgCsY820RTD5AkBryuG5IUqR5YQZSdj5xlH5nLgH7YPths7WsLPSpSBNneJdM8aS8aeFA==}
+
   tailwindcss-animate@1.0.7:
     resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
     peerDependencies:
@@ -4871,15 +4871,12 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@ncobase/charts@0.1.2(apexcharts@4.4.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@ncobase/charts@0.2.0':
     dependencies:
       echarts: 5.6.0
-      react-apexcharts: 1.7.0(apexcharts@4.4.0)(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
       recharts: 2.15.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-    transitivePeerDependencies:
-      - apexcharts
-      - react
-      - react-dom
 
   '@ncobase/flows@0.0.1-alpha.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -4890,9 +4887,9 @@ snapshots:
       - react
       - react-dom
 
-  '@ncobase/react@0.0.1-alpha.12(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)':
+  '@ncobase/react@0.1.0-alpha.1(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(postcss@8.5.3)(react@18.3.1)(tailwindcss@3.4.17)':
     dependencies:
-      '@ncobase/tailwind': 0.1.0
+      '@ncobase/tailwind': 0.2.0-alpha.1(postcss@8.5.3)(tailwindcss@3.4.17)
       '@ncobase/utils': 0.1.0
       '@radix-ui/react-accordion': 1.2.4(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-checkbox': 1.1.5(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4909,26 +4906,27 @@ snapshots:
       '@radix-ui/react-tooltip': 1.2.0(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tabler/icons-react': 3.31.0(react@18.3.1)
       '@tanstack/react-table': 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      apexcharts: 4.4.0
+      apexcharts: 4.5.0
       class-variance-authority: 0.7.1
       clsx: 2.1.1
-      date-fns: 3.6.0
-      react-apexcharts: 1.7.0(apexcharts@4.4.0)(react@18.3.1)
-      react-day-picker: 8.10.1(date-fns@3.6.0)(react@18.3.1)
+      date-fns: 4.1.0
+      react-apexcharts: 1.7.0(apexcharts@4.5.0)(react@18.3.1)
+      react-day-picker: 8.10.1(date-fns@4.1.0)(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
       react-dropzone: 14.3.8(react@18.3.1)
       react-hook-form: 7.55.0(react@18.3.1)
       react-syntax-highlighter: 15.6.1(react@18.3.1)
       sonner: 1.7.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      tailwind-merge: 3.0.1
+      tailwind-merge: 3.2.0
       vaul: 1.1.2(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
+      - postcss
       - react
-      - ts-node
+      - tailwindcss
 
-  '@ncobase/tailwind@0.1.0':
+  '@ncobase/tailwind@0.2.0-alpha.1(postcss@8.5.3)(tailwindcss@3.4.17)':
     dependencies:
       '@tailwindcss/typography': 0.5.16(tailwindcss@3.4.17)
       autoprefixer: 10.4.21(postcss@8.5.3)
@@ -4938,8 +4936,6 @@ snapshots:
       postcss-nesting: 13.0.1(postcss@8.5.3)
       tailwindcss: 3.4.17
       tailwindcss-animate: 1.0.7(tailwindcss@3.4.17)
-    transitivePeerDependencies:
-      - ts-node
 
   '@ncobase/tsconfig@0.1.0': {}
 
@@ -5924,7 +5920,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  apexcharts@4.4.0:
+  apexcharts@4.5.0:
     dependencies:
       '@svgdotjs/svg.draggable.js': 3.0.6(@svgdotjs/svg.js@3.2.4)
       '@svgdotjs/svg.filter.js': 3.0.8
@@ -6384,8 +6380,6 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-data-view: 1.0.2
-
-  date-fns@3.6.0: {}
 
   date-fns@4.1.0: {}
 
@@ -7908,15 +7902,15 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-apexcharts@1.7.0(apexcharts@4.4.0)(react@18.3.1):
+  react-apexcharts@1.7.0(apexcharts@4.5.0)(react@18.3.1):
     dependencies:
-      apexcharts: 4.4.0
+      apexcharts: 4.5.0
       prop-types: 15.8.1
       react: 18.3.1
 
-  react-day-picker@8.10.1(date-fns@3.6.0)(react@18.3.1):
+  react-day-picker@8.10.1(date-fns@4.1.0)(react@18.3.1):
     dependencies:
-      date-fns: 3.6.0
+      date-fns: 4.1.0
       react: 18.3.1
 
   react-dom@18.3.1(react@18.3.1):
@@ -8391,6 +8385,8 @@ snapshots:
       tslib: 2.8.1
 
   tailwind-merge@3.0.1: {}
+
+  tailwind-merge@3.2.0: {}
 
   tailwindcss-animate@1.0.7(tailwindcss@3.4.17):
     dependencies:
