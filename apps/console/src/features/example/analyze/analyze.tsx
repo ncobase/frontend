@@ -1,5 +1,6 @@
-import React from 'react';
+import { useState } from 'react';
 
+import { ApexChart, ChartContainer } from '@ncobase/charts';
 import {
   Button,
   Card,
@@ -21,43 +22,166 @@ import {
   SelectValue
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Line,
+  ResponsiveContainer,
+  LineChart,
+  Legend,
+  Tooltip
+} from 'recharts';
 
 import dataSeries from '@/assets/datas/ids.mjs';
-import { AreaChart, BarChart, LineChart, PieChart, RadarChart } from '@/components/charts';
-import { filterDays, filterQuarters } from '@/helpers/enums/filter';
+import { filterQuarters } from '@/helpers/enums/filter';
 import { Page, Topbar } from '@/layout';
-import { ExplicitAny } from '@/types';
 
-export const FilterBar = ({ ...rest }) => {
+// Generate sample time series data for demonstration
+const generateTimeSeriesData = () => {
+  let ts = 1484418600000;
+  const dates = [];
+  for (let i = 0; i < 120; i++) {
+    ts = ts + 86400000;
+    const innerArr = [ts, dataSeries[1][i]?.value || Math.round(Math.random() * 100)];
+    dates.push(innerArr);
+  }
+  return dates;
+};
+
+const sampleTimeSeriesData = generateTimeSeriesData();
+
+// Chart configuration with direct color values
+const chartConfig = {
+  sales: {
+    label: 'Sales',
+    color: '#4285F4' // Blue
+  },
+  siteA: {
+    label: 'Site A',
+    color: '#4285F4' // Blue
+  },
+  siteB: {
+    label: 'Site B',
+    color: '#EA4335' // Red
+  },
+  total: {
+    label: 'Total',
+    color: '#34A853' // Green
+  },
+  ddr5: {
+    label: 'DDR5',
+    color: '#4285F4' // Blue
+  },
+  nvme: {
+    label: 'SSD M.2 NVMe',
+    color: '#EA4335' // Red
+  },
+  sata: {
+    label: 'SSD M.2 SATA',
+    color: '#34A853' // Green
+  },
+  m3Max: {
+    label: 'Macbook M3 Max',
+    color: '#FBBC05' // Yellow
+  },
+  m1: {
+    label: 'Macbook M1',
+    color: '#9C27B0' // Purple
+  },
+  seriesA: {
+    label: 'Series A',
+    color: '#4285F4' // Blue
+  },
+  seriesB: {
+    label: 'Series B',
+    color: '#EA4335' // Red
+  },
+  sessionDuration: {
+    label: 'Session Duration',
+    color: '#4285F4' // Blue
+  },
+  pageViews: {
+    label: 'Page Views',
+    color: '#EA4335' // Red
+  },
+  totalVisits: {
+    label: 'Total Visits',
+    color: '#34A853' // Green
+  },
+  radarA: {
+    label: 'Series A',
+    color: '#4285F4' // Blue
+  },
+  ncobase: {
+    label: 'Ncobase',
+    color: '#4285F4' // Blue
+  },
+  category1: {
+    label: 'Category 1',
+    color: '#4285F4' // Blue
+  },
+  category2: {
+    label: 'Category 2',
+    color: '#EA4335' // Red
+  },
+  category3: {
+    label: 'Category 3',
+    color: '#34A853' // Green
+  },
+  category4: {
+    label: 'Category 4',
+    color: '#FBBC05' // Yellow
+  },
+  category5: {
+    label: 'Category 5',
+    color: '#9C27B0' // Purple
+  }
+};
+
+// Color palette for charts
+const chartColors = [
+  '#4285F4', // Blue
+  '#EA4335', // Red
+  '#34A853', // Green
+  '#FBBC05', // Yellow
+  '#9C27B0', // Purple
+  '#00ACC1', // Cyan
+  '#FF7043', // Deep Orange
+  '#8BC34A' // Light Green
+];
+
+// Filter options
+const timeFilters = [
+  { id: 'last_24_hours', label: 'filter.last_24_hours', days: 1 },
+  { id: 'last_7_days', label: 'filter.last_7_days', days: 7 },
+  { id: 'last_30_days', label: 'filter.last_30_days', days: 30 },
+  { id: 'last_90_days', label: 'filter.last_90_days', days: 90 }
+];
+
+export const FilterBar = ({ activeFilter, onFilterChange, ...rest }) => {
   const { t } = useTranslation();
+
   return (
     <Topbar {...rest}>
+      {/* Filter buttons for different time ranges */}
       <div className='rounded-md shadow-inner'>
-        <Button
-          variant='outline-slate'
-          className='bg-white -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg shadow-sm'
-        >
-          {t('filter.last_24_hours')}
-        </Button>
-        <Button
-          variant='primary'
-          className='-ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg shadow-sm border border-slate-200/65'
-        >
-          {t('filter.last_7_days')}
-        </Button>
-        <Button
-          variant='outline-slate'
-          className='bg-white -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg shadow-sm'
-        >
-          {t('filter.last_30_days')}
-        </Button>
-        <Button
-          variant='outline-slate'
-          className='bg-white -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg shadow-sm'
-        >
-          {t('filter.last_90_days')}
-        </Button>
+        {timeFilters.map(filter => (
+          <Button
+            key={filter.id}
+            variant={activeFilter === filter.id ? 'primary' : 'outline-slate'}
+            className={`${
+              activeFilter === filter.id ? '' : 'bg-white'
+            } -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg shadow-sm ${
+              activeFilter === filter.id ? 'border border-slate-200/65' : ''
+            }`}
+            onClick={() => onFilterChange(filter.id)}
+          >
+            {t(filter.label)}
+          </Button>
+        ))}
       </div>
+      {/* Additional filter options */}
       <div className='flex items-center gap-x-2'>
         <Button variant='outline-slate' className='shadow-sm'>
           <Icons name='IconCalendarMonth' />
@@ -72,21 +196,197 @@ export const FilterBar = ({ ...rest }) => {
   );
 };
 
+// Generate data based on selected time filter
+const generateFilteredData = (baseData, filterDays) => {
+  // Simulate filtered data by reducing the dataset size
+  const factor = Math.max(1, Math.floor(baseData.length / filterDays));
+  return baseData.filter((_, index) => index % factor === 0).slice(0, filterDays);
+};
+
 export const AnalyzePage = ({ ...rest }) => {
   const { t } = useTranslation();
-  let ts2 = 1484418600000;
-  const dates = [];
-  for (let i = 0; i < 120; i++) {
-    ts2 = ts2 + 86400000;
-    const innerArr = [ts2, dataSeries[1][i].value];
-    dates.push(innerArr);
-  }
+  const [saleRange, setSaleRange] = useState('this_quarter');
+  const [activeFilter, setActiveFilter] = useState('last_7_days');
 
-  const [saleRange, setSaleRange] = React.useState('this_quarter');
+  // Apply filter to data
+  const filterDays = timeFilters.find(f => f.id === activeFilter)?.days || 7;
+
+  // Filter time series data based on selected filter
+  const filteredTimeSeriesData = generateFilteredData(sampleTimeSeriesData, filterDays);
+
+  // Line chart data configuration - adjusted for filters
+  const getFilteredLineData = days => {
+    // Simulate different data for different time periods
+    const multiplier = days / 30;
+    return {
+      categories: Array(days)
+        .fill(0)
+        .map((_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (days - i - 1));
+          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }),
+      series: [
+        {
+          name: 'siteA',
+          data: Array(days)
+            .fill(0)
+            .map(() => Math.round(Math.random() * 50 * multiplier) + 5)
+        },
+        {
+          name: 'siteB',
+          data: Array(days)
+            .fill(0)
+            .map(() => Math.round(Math.random() * 60 * multiplier) + 10)
+        },
+        {
+          name: 'total',
+          data: Array(days)
+            .fill(0)
+            .map(() => Math.round(Math.random() * 100 * multiplier) + 20)
+        }
+      ]
+    };
+  };
+
+  const lineChartData = getFilteredLineData(filterDays);
+
+  // Pie chart data configuration
+  const pieChartData = {
+    series: [44, 55, 41, 17, 15],
+    labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5']
+  };
+
+  // Bar chart data configuration - adjusted for filters
+  const getFilteredBarData = days => {
+    const years = Array(7)
+      .fill(0)
+      .map((_, i) => new Date().getFullYear() - 6 + i);
+    // Simulate different data for different time periods
+    const multiplier = days / 30;
+    return {
+      categories: years,
+      series: [
+        {
+          name: 'ddr5',
+          data: years.map(() => Math.round(Math.random() * 40 * multiplier) + 10)
+        },
+        {
+          name: 'nvme',
+          data: years.map(() => Math.round(Math.random() * 50 * multiplier) + 10)
+        },
+        {
+          name: 'sata',
+          data: years.map(() => Math.round(Math.random() * 20 * multiplier) + 5)
+        },
+        {
+          name: 'm3Max',
+          data: years.map(() => Math.round(Math.random() * 10 * multiplier) + 2)
+        },
+        {
+          name: 'm1',
+          data: years.map(() => Math.round(Math.random() * 25 * multiplier) + 5)
+        }
+      ]
+    };
+  };
+
+  // Radar chart data configuration
+  const radarChartData = {
+    categories: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    series: [
+      {
+        name: 'radarA',
+        data: [20, 100, 40, 30, 50, 80, 33]
+      }
+    ]
+  };
+
+  // Area chart data configuration - adjusted for filters
+  const getFilteredAreaData = days => {
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    // Use a subset of days based on the filter
+    const categories = Array(Math.min(days, 8))
+      .fill(0)
+      .map((_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (Math.min(days, 8) - i - 1));
+        return daysOfWeek[date.getDay()];
+      });
+
+    // Simulate different data for different time periods
+    const multiplier = days / 30;
+
+    return {
+      categories,
+      series: [
+        {
+          name: 'seriesA',
+          data: categories.map(() => Math.round(Math.random() * 50 * multiplier) + 20)
+        },
+        {
+          name: 'seriesB',
+          data: categories.map(() => Math.round(Math.random() * 60 * multiplier) + 10)
+        }
+      ]
+    };
+  };
+
+  const areaChartData = getFilteredAreaData(filterDays);
+
+  // Page statistics data configuration - adjusted for filters
+  const getFilteredPageStatsData = days => {
+    // Generate categories based on filter days
+    const categories = Array(Math.min(days, 12))
+      .fill(0)
+      .map((_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (Math.min(days, 12) - i - 1));
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      });
+
+    // Simulate different data for different time periods
+    const multiplier = days / 30;
+
+    return {
+      categories,
+      series: [
+        {
+          name: 'sessionDuration',
+          data: categories.map(() => Math.round(Math.random() * 40 * multiplier) + 5)
+        },
+        {
+          name: 'pageViews',
+          data: categories.map(() => Math.round(Math.random() * 50 * multiplier) + 10)
+        },
+        {
+          name: 'totalVisits',
+          data: categories.map(() => Math.round(Math.random() * 80 * multiplier) + 20)
+        }
+      ]
+    };
+  };
+
+  const pageStatsData = getFilteredPageStatsData(filterDays);
+
+  // Format filtered time series data for charts
+  const formattedPageStatsData = pageStatsData.categories.map((category, index) => {
+    const dataPoint = { name: category };
+    pageStatsData.series.forEach(series => {
+      dataPoint[series.name] = series.data[index];
+    });
+    return dataPoint;
+  });
 
   return (
-    <Page sidebar title={t('example.analyze.title')} topbar={<FilterBar />} {...rest}>
+    <Page
+      sidebar
+      title={t('example.analyze.title')}
+      topbar={<FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />}
+      {...rest}
+    >
       <div className='grid grid-cols-2 gap-4'>
+        {/* Sales Card */}
         <Card>
           <CardHeader className='flex-row justify-between border-b border-slate-100'>
             <div className='inline-flex flex-col space-y-1.5'>
@@ -103,55 +403,63 @@ export const AnalyzePage = ({ ...rest }) => {
               <Icons name='IconArrowUp' stroke={2} className='stroke-success-500 mt-[1.5px]' />
             </div>
           </CardHeader>
-          <CardContent className='px-0 pb-0'>
-            <AreaChart
-              height={170}
-              options={{
-                chart: {
-                  type: 'area',
-                  stacked: false,
-                  zoom: {
-                    enabled: false
+          <CardContent className='p-6'>
+            {/* Area chart using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  grid: {
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    bottom: 0
                   },
-                  toolbar: {
-                    show: false
-                  }
-                },
-                dataLabels: {
-                  enabled: false
-                },
-                fill: {
-                  type: 'gradient',
-                  gradient: {
-                    shadeIntensity: 1,
-                    inverseColors: false,
-                    opacityFrom: 0.5,
-                    opacityTo: 0,
-                    stops: [0, 90, 100]
-                  }
-                },
-                yaxis: {
-                  show: false
-                },
-                xaxis: {
-                  type: 'datetime',
-                  labels: {
+                  xAxis: {
+                    type: 'time',
                     show: false
                   },
-                  axisBorder: {
+                  yAxis: {
+                    type: 'value',
                     show: false
                   },
-                  axisTicks: {
-                    show: false
+                  series: [
+                    {
+                      type: 'line',
+                      name: 'Sales',
+                      showSymbol: false,
+                      data: filteredTimeSeriesData,
+                      areaStyle: {
+                        color: {
+                          type: 'linear',
+                          x: 0,
+                          y: 0,
+                          x2: 0,
+                          y2: 1,
+                          colorStops: [
+                            {
+                              offset: 0,
+                              color: '#4285F4BF' // Semi-transparent blue
+                            },
+                            {
+                              offset: 1,
+                              color: '#4285F400' // Transparent blue
+                            }
+                          ]
+                        }
+                      },
+                      lineStyle: {
+                        color: '#4285F4' // Blue
+                      }
+                    }
+                  ],
+                  tooltip: {
+                    trigger: 'axis'
                   }
                 }
               }}
-              series={[
-                {
-                  name: '销售额',
-                  data: dates
-                }
-              ]}
+              style={{ height: '170px' }}
             />
           </CardContent>
           <CardFooter className='justify-between'>
@@ -168,16 +476,18 @@ export const AnalyzePage = ({ ...rest }) => {
               </SelectContent>
             </Select>
             <Button variant='slate'>
-              用户报告 <Icons name='IconChevronRight' />
+              User Report <Icons name='IconChevronRight' />
             </Button>
           </CardFooter>
         </Card>
+
+        {/* Clicks and Cost Card */}
         <Card>
           <CardHeader className='flex-row justify-between border-b border-slate-100'>
             <div className='grid gap-4 grid-cols-2'>
               <div className='flex flex-col gap-y-2'>
                 <Label className='flex gap-x-2'>
-                  点击数
+                  Clicks
                   <span className='inline-flex text-danger-500 gap-x-0'>
                     5%
                     <Icons name='IconArrowUp' className='stroke-danger-500' />
@@ -187,7 +497,7 @@ export const AnalyzePage = ({ ...rest }) => {
               </div>
               <div className='flex flex-col gap-y-2'>
                 <Label className='flex gap-x-2'>
-                  单次点击成本
+                  Cost Per Click
                   <span className='inline-flex text-success-500 gap-x-0'>
                     1%
                     <Icons name='IconArrowUp' className='stroke-success-500' />
@@ -197,13 +507,16 @@ export const AnalyzePage = ({ ...rest }) => {
               </div>
             </div>
             <div>
-              <Select defaultValue={filterDays[2].value}>
+              <Select
+                defaultValue={timeFilters[2].id}
+                onValueChange={value => setActiveFilter(value)}
+              >
                 <SelectTrigger className='w-auto border-none bg-transparent shadow-none px-0'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {filterDays.map(item => (
-                    <SelectItem key={item.value} value={item.value}>
+                  {timeFilters.map(item => (
+                    <SelectItem key={item.id} value={item.id}>
                       {t(item.label)}
                     </SelectItem>
                   ))}
@@ -211,101 +524,59 @@ export const AnalyzePage = ({ ...rest }) => {
               </Select>
             </div>
           </CardHeader>
-          <CardContent className='px-0 pb-0'>
-            <LineChart
-              height={180}
-              options={{
-                chart: {
-                  type: 'line',
-                  zoom: {
-                    enabled: false
+          <CardContent className='p-6'>
+            {/* Line chart using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  grid: {
+                    left: 5,
+                    right: 5,
+                    top: 5,
+                    bottom: 5
                   },
-                  toolbar: {
-                    show: false
-                  }
-                },
-                dataLabels: {
-                  enabled: false
-                },
-                stroke: {
-                  width: [5, 7, 5],
-                  curve: 'straight',
-                  dashArray: [0, 8, 5]
-                },
-                legend: {
-                  show: false,
-                  tooltipHoverFormatter: function (val, opts) {
-                    return (
-                      val +
-                      ' - <strong>' +
-                      opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] +
-                      '</strong>'
-                    );
-                  }
-                },
-                markers: {
-                  size: 0,
-                  hover: {
-                    sizeOffset: 0
-                  }
-                },
-                yaxis: {
-                  show: false
-                },
-                xaxis: {
-                  categories: [
-                    '01 Jan',
-                    '02 Jan',
-                    '03 Jan',
-                    '04 Jan',
-                    '05 Jan',
-                    '06 Jan',
-                    '07 Jan',
-                    '08 Jan',
-                    '09 Jan',
-                    '10 Jan',
-                    '11 Jan',
-                    '12 Jan'
-                  ],
-                  labels: {
+                  xAxis: {
+                    type: 'category',
+                    data: lineChartData.categories,
                     show: false
                   },
-                  axisBorder: {
+                  yAxis: {
+                    type: 'value',
                     show: false
                   },
-                  axisTicks: {
-                    show: false
+                  series: lineChartData.series.map((item, index) => ({
+                    type: 'line',
+                    name: chartConfig[item.name]?.label || item.name,
+                    data: item.data,
+                    smooth: true,
+                    symbol: 'none',
+                    lineStyle: {
+                      color:
+                        chartConfig[item.name]?.color || chartColors[index % chartColors.length],
+                      width: index === 1 ? 3 : 2,
+                      type: index === 1 ? 'dashed' : 'solid'
+                    }
+                  })),
+                  tooltip: {
+                    trigger: 'axis'
                   }
-                },
-                grid: {
-                  borderColor: '#f1f1f1'
                 }
               }}
-              series={[
-                {
-                  name: '站点 A',
-                  data: [45, 52, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10]
-                },
-                {
-                  name: '站点 B',
-                  data: [35, 41, 62, 42, 13, 18, 29, 37, 36, 51, 32, 35]
-                },
-                {
-                  name: '合计',
-                  data: [87, 57, 74, 99, 75, 38, 62, 47, 82, 56, 45, 47]
-                }
-              ]}
+              style={{ height: '180px' }}
             />
           </CardContent>
           <CardFooter className='justify-end'>
-            <Button variant='primary'>查看报告</Button>
+            <Button variant='primary'>View Report</Button>
           </CardFooter>
         </Card>
       </div>
       <div className='mt-4 grid grid-cols-3 gap-4'>
+        {/* Donut Chart Card */}
         <Card>
           <CardHeader className='border-b border-slate-100 flex-row justify-between'>
-            <CardTitle className='text-lg'>甜甜圈饼图</CardTitle>
+            <CardTitle className='text-lg'>Donut Chart</CardTitle>
             <Dropdown>
               <DropdownTrigger asChild>
                 <Button variant='unstyle' className='p-0'>
@@ -318,32 +589,63 @@ export const AnalyzePage = ({ ...rest }) => {
               </DropdownContent>
             </Dropdown>
           </CardHeader>
-          <CardContent className='px-6 pb-0'>
-            <PieChart
-              type='donut'
-              options={{
-                responsive: [
-                  {
-                    breakpoint: 480,
-                    options: {
-                      chart: {
-                        width: 200
+          <CardContent className='p-6'>
+            {/* Pie chart using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  tooltip: {
+                    trigger: 'item'
+                  },
+                  legend: {
+                    show: false
+                  },
+                  series: [
+                    {
+                      type: 'pie',
+                      radius: ['40%', '70%'],
+                      avoidLabelOverlap: false,
+                      itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
                       },
-                      legend: {
-                        position: 'bottom'
-                      }
+                      label: {
+                        show: false
+                      },
+                      emphasis: {
+                        label: {
+                          show: true,
+                          fontSize: 14,
+                          fontWeight: 'bold'
+                        }
+                      },
+                      labelLine: {
+                        show: false
+                      },
+                      data: pieChartData.series.map((value, index) => ({
+                        value,
+                        name: pieChartData.labels[index],
+                        itemStyle: {
+                          color:
+                            chartConfig[`category${index + 1}`]?.color ||
+                            chartColors[index % chartColors.length]
+                        }
+                      }))
                     }
-                  }
-                ],
-                legend: { show: false }
+                  ]
+                }
               }}
-              series={[44, 55, 41, 17, 15]}
+              style={{ height: '300px' }}
             />
           </CardContent>
         </Card>
+        {/* Bar Chart Card */}
         <Card>
           <CardHeader className='border-b border-slate-100 flex-row justify-between'>
-            <CardTitle className='text-lg'>物料配件销售</CardTitle>
+            <CardTitle className='text-lg'>Material Sales</CardTitle>
             <Dropdown>
               <DropdownTrigger asChild>
                 <Button variant='unstyle' className='p-0'>
@@ -356,30 +658,10 @@ export const AnalyzePage = ({ ...rest }) => {
               </DropdownContent>
             </Dropdown>
           </CardHeader>
-          <CardContent className='px-6 pb-0'>
-            <BarChart
-              series={[
-                {
-                  name: 'DDR5',
-                  data: [44, 55, 41, 37, 22, 43, 21]
-                },
-                {
-                  name: 'SSD M.2 NVMe',
-                  data: [53, 32, 33, 52, 13, 43, 32]
-                },
-                {
-                  name: 'SSD M.2 SATA',
-                  data: [12, 17, 11, 9, 15, 11, 20]
-                },
-                {
-                  name: 'Macbook M3 Max',
-                  data: [9, 7, 5, 8, 6, 9, 4]
-                },
-                {
-                  name: 'Macbook M1',
-                  data: [25, 12, 19, 32, 25, 24, 10]
-                }
-              ]}
+          <CardContent>
+            {/* Bar chart using ApexCharts */}
+            <ApexChart
+              type='bar'
               options={{
                 chart: {
                   type: 'bar',
@@ -406,9 +688,8 @@ export const AnalyzePage = ({ ...rest }) => {
                   colors: ['#fff']
                 },
                 xaxis: {
-                  categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
+                  categories: getFilteredBarData(filterDays).categories,
                   labels: {
-                    // show: false,
                     formatter: function (val) {
                       return val + 'K';
                     }
@@ -434,14 +715,18 @@ export const AnalyzePage = ({ ...rest }) => {
                   position: 'top',
                   horizontalAlign: 'left',
                   offsetX: 40
-                }
+                },
+                colors: chartColors
               }}
+              series={getFilteredBarData(filterDays).series}
             />
           </CardContent>
         </Card>
+
+        {/* Stock Market Chart Card */}
         <Card>
           <CardHeader className='border-b border-slate-100 flex-row justify-between'>
-            <CardTitle className='text-lg'>沪市行情</CardTitle>
+            <CardTitle className='text-lg'>Shanghai Market</CardTitle>
             <Dropdown>
               <DropdownTrigger asChild>
                 <Button variant='unstyle' className='p-0'>
@@ -454,70 +739,86 @@ export const AnalyzePage = ({ ...rest }) => {
               </DropdownContent>
             </Dropdown>
           </CardHeader>
-          <CardContent className='px-6 pb-0'>
-            <AreaChart
-              options={{
-                chart: {
-                  type: 'area',
-                  stacked: false,
-                  zoom: {
-                    type: 'x',
-                    enabled: true,
-                    autoScaleYaxis: true
+          <CardContent className='p-6'>
+            {/* Area chart for stock data using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  grid: {
+                    left: 40,
+                    right: 20,
+                    top: 30,
+                    bottom: 40
                   },
-                  toolbar: {
-                    show: false,
-                    autoSelected: 'zoom'
-                  }
-                },
-                dataLabels: {
-                  enabled: false
-                },
-                markers: {
-                  size: 0
-                },
-                fill: {
-                  type: 'gradient',
-                  gradient: {
-                    shadeIntensity: 1,
-                    inverseColors: false,
-                    opacityFrom: 0.5,
-                    opacityTo: 0,
-                    stops: [0, 90, 100]
-                  }
-                },
-                yaxis: {
-                  labels: {
-                    formatter: function (val) {
-                      return (val / 1000000).toFixed(0);
+                  tooltip: {
+                    trigger: 'axis',
+                    formatter: function (params) {
+                      const date = new Date(params[0].value[0]).toLocaleDateString();
+                      const value = params[0].value[1];
+                      return `${date}: ${value}`;
                     }
                   },
-                  title: {
-                    text: 'Price'
-                  }
-                },
-                xaxis: {
-                  type: 'datetime'
-                },
-                tooltip: {
-                  shared: false,
-                  y: {
-                    formatter: val => (val / 1000000).toFixed(0)
-                  }
+                  xAxis: {
+                    type: 'time'
+                  },
+                  yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                      formatter: function (value) {
+                        return (value / 1000000).toFixed(0);
+                      }
+                    }
+                  },
+                  dataZoom: [
+                    {
+                      type: 'inside',
+                      start: 0,
+                      end: 100
+                    }
+                  ],
+                  series: [
+                    {
+                      type: 'line',
+                      name: 'Ncobase',
+                      showSymbol: false,
+                      data: filteredTimeSeriesData,
+                      areaStyle: {
+                        color: {
+                          type: 'linear',
+                          x: 0,
+                          y: 0,
+                          x2: 0,
+                          y2: 1,
+                          colorStops: [
+                            {
+                              offset: 0,
+                              color: '#4285F4BF' // Semi-transparent blue
+                            },
+                            {
+                              offset: 1,
+                              color: '#4285F400' // Transparent blue
+                            }
+                          ]
+                        }
+                      },
+                      lineStyle: {
+                        color: '#4285F4' // Blue
+                      }
+                    }
+                  ]
                 }
               }}
-              series={[
-                {
-                  name: 'Ncobase',
-                  data: dates
-                }
-              ]}
+              style={{ height: '300px' }}
             />
           </CardContent>
         </Card>
+
+        {/* Area Chart (2-column span) */}
         <Card className='col-span-2'>
           <CardHeader className='border-b border-slate-100 flex-row justify-between'>
-            <CardTitle className='text-lg'>曲线面积图</CardTitle>
+            <CardTitle className='text-lg'>Area Chart</CardTitle>
             <Dropdown>
               <DropdownTrigger asChild>
                 <Button variant='unstyle' className='p-0'>
@@ -530,34 +831,63 @@ export const AnalyzePage = ({ ...rest }) => {
               </DropdownContent>
             </Dropdown>
           </CardHeader>
-          <CardContent className='px-6 pb-0'>
-            <AreaChart
-              options={{
-                chart: {
-                  toolbar: {
-                    show: false
-                  }
-                },
-                xaxis: {
-                  categories: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          <CardContent className='p-6'>
+            {/* Area chart using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  grid: {
+                    left: 30,
+                    right: 30,
+                    top: 30,
+                    bottom: 30
+                  },
+                  tooltip: {
+                    trigger: 'axis'
+                  },
+                  legend: {
+                    data: areaChartData.series.map(s => chartConfig[s.name]?.label || s.name)
+                  },
+                  xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: areaChartData.categories
+                  },
+                  yAxis: {
+                    type: 'value'
+                  },
+                  series: areaChartData.series.map((item, index) => ({
+                    name: chartConfig[item.name]?.label || item.name,
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,
+                    lineStyle: {
+                      width: 0
+                    },
+                    showSymbol: false,
+                    areaStyle: {
+                      opacity: 0.8,
+                      color:
+                        chartConfig[item.name]?.color || chartColors[index % chartColors.length]
+                    },
+                    emphasis: {
+                      focus: 'series'
+                    },
+                    data: item.data
+                  }))
                 }
               }}
-              series={[
-                {
-                  name: '系列-A',
-                  data: [30, 40, 25, 50, 49, 21, 70, 51]
-                },
-                {
-                  name: '系列-B',
-                  data: [23, 12, 54, 61, 32, 56, 81, 19]
-                }
-              ]}
+              style={{ height: '300px' }}
             />
           </CardContent>
         </Card>
+
+        {/* Radar Chart */}
         <Card>
           <CardHeader className='border-b border-slate-100 flex-row justify-between'>
-            <CardTitle className='text-lg'>多边形雷达图</CardTitle>
+            <CardTitle className='text-lg'>Polygon Radar Chart</CardTitle>
             <Dropdown>
               <DropdownTrigger asChild>
                 <Button variant='unstyle' className='p-0'>
@@ -570,78 +900,70 @@ export const AnalyzePage = ({ ...rest }) => {
               </DropdownContent>
             </Dropdown>
           </CardHeader>
-          <CardContent className='px-6 pb-0'>
-            <RadarChart
-              series={[
-                {
-                  name: '系列 A',
-                  data: [20, 100, 40, 30, 50, 80, 33]
-                }
-              ]}
-              options={{
-                chart: {
-                  toolbar: {
-                    show: false
-                  }
-                },
-                dataLabels: {
-                  enabled: true
-                },
-                plotOptions: {
+          <CardContent className='p-6'>
+            {/* Radar chart using ECharts */}
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                option: {
+                  tooltip: {
+                    trigger: 'item'
+                  },
                   radar: {
-                    size: 140,
-                    polygons: {
-                      strokeColors: '#e9e9e9',
-                      fill: {
-                        colors: ['#f8f8f8', '#fff']
+                    indicator: radarChartData.categories.map(name => ({ name, max: 100 })),
+                    radius: '60%',
+                    splitNumber: 4,
+                    splitArea: {
+                      areaStyle: {
+                        color: ['#f8f8f8', '#fff'],
+                        shadowColor: 'rgba(0, 0, 0, 0.05)',
+                        shadowBlur: 10
+                      }
+                    },
+                    axisLine: {
+                      lineStyle: {
+                        color: '#e9e9e9'
                       }
                     }
-                  }
-                },
-                colors: ['#FF4560'],
-                markers: {
-                  size: 4,
-                  colors: ['#fff'],
-                  strokeColors: '#FF4560',
-                  strokeWidth: 2
-                },
-                tooltip: {
-                  y: {
-                    formatter: (val: ExplicitAny) => val
-                  }
-                },
-                xaxis: {
-                  categories: [
-                    'Sunday',
-                    'Monday',
-                    'Tuesday',
-                    'Wednesday',
-                    'Thursday',
-                    'Friday',
-                    'Saturday'
+                  },
+                  series: [
+                    {
+                      name: 'RadarChart',
+                      type: 'radar',
+                      data: radarChartData.series.map((item, index) => ({
+                        value: item.data,
+                        name: chartConfig[item.name]?.label || item.name,
+                        areaStyle: {
+                          color:
+                            // eslint-disable-next-line no-constant-binary-expression
+                            `${chartConfig[item.name]?.color}33` ||
+                            `${chartColors[index % chartColors.length]}33` // 20% opacity
+                        },
+                        lineStyle: {
+                          color:
+                            chartConfig[item.name]?.color || chartColors[index % chartColors.length]
+                        },
+                        itemStyle: {
+                          color:
+                            chartConfig[item.name]?.color || chartColors[index % chartColors.length]
+                        }
+                      }))
+                    }
                   ]
-                },
-                yaxis: {
-                  tickAmount: 7,
-                  labels: {
-                    formatter: ({ val, i }: ExplicitAny) => {
-                      if (i % 2 === 0) {
-                        return val;
-                      } else {
-                        return '';
-                      }
-                    }
-                  }
                 }
               }}
+              style={{ height: '300px' }}
             />
           </CardContent>
         </Card>
       </div>
+
+      {/* Page Statistics (full width) */}
       <div className='mt-4 grid grid-cols-3 gap-4'>
         <Card className='col-span-full'>
           <CardHeader className='border-b border-slate-100 flex-row justify-between'>
-            <CardTitle className='text-lg'>页面统计</CardTitle>
+            <CardTitle className='text-lg'>Page Statistics</CardTitle>
             <Dropdown>
               <DropdownTrigger asChild>
                 <Button variant='unstyle' className='p-0'>
@@ -654,102 +976,71 @@ export const AnalyzePage = ({ ...rest }) => {
               </DropdownContent>
             </Dropdown>
           </CardHeader>
-          <CardContent className='px-6 pb-0'>
-            <LineChart
-              options={{
-                chart: {
-                  type: 'line',
-                  zoom: {
-                    enabled: false
-                  },
-                  toolbar: {
-                    show: false
-                  }
-                },
-                dataLabels: {
-                  enabled: false
-                },
-                stroke: {
-                  width: [5, 7, 5],
-                  curve: 'straight',
-                  dashArray: [0, 8, 5]
-                },
-                legend: {
-                  tooltipHoverFormatter: function (val, opts) {
+          <CardContent className='p-6'>
+            {/* Fixed Recharts implementation with proper ResponsiveContainer */}
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer width='100%' height='100%'>
+                <LineChart data={formattedPageStatsData}>
+                  <CartesianGrid strokeDasharray='3 3' />
+                  <XAxis dataKey='name' />
+                  <YAxis />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className='bg-white border border-gray-200 p-2 rounded shadow-md'>
+                            <p className='font-bold'>{label}</p>
+                            {payload.map((entry, index) => (
+                              <p key={`item-${index}`} style={{ color: entry.color }}>
+                                {chartConfig[entry.dataKey]?.label || entry.dataKey}: {entry.value}
+                              </p>
+                            ))}
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Legend
+                    content={({ payload }) => {
+                      return (
+                        <div className='flex justify-center mt-4 gap-4'>
+                          {payload.map((entry: any, index: number) => (
+                            <div key={`item-${index}`} className='flex items-center'>
+                              <div
+                                style={{
+                                  backgroundColor: entry.color,
+                                  width: 10,
+                                  height: 10,
+                                  marginRight: 5
+                                }}
+                              />
+                              <span>{chartConfig[entry?.dataKey]?.label || entry.dataKey}</span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    }}
+                  />
+
+                  {pageStatsData.series.map((item, index) => {
+                    const strokeType = index === 1 ? '5 5' : index === 2 ? '3 3' : undefined;
                     return (
-                      val +
-                      ' - <strong>' +
-                      opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] +
-                      '</strong>'
+                      <Line
+                        key={item.name}
+                        type='monotone'
+                        dataKey={item.name}
+                        stroke={
+                          chartConfig[item.name]?.color || chartColors[index % chartColors.length]
+                        }
+                        strokeDasharray={strokeType}
+                        activeDot={{ r: 8 }}
+                      />
                     );
-                  }
-                },
-                markers: {
-                  size: 0,
-                  hover: {
-                    sizeOffset: 6
-                  }
-                },
-                xaxis: {
-                  categories: [
-                    '01 Jan',
-                    '02 Jan',
-                    '03 Jan',
-                    '04 Jan',
-                    '05 Jan',
-                    '06 Jan',
-                    '07 Jan',
-                    '08 Jan',
-                    '09 Jan',
-                    '10 Jan',
-                    '11 Jan',
-                    '12 Jan'
-                  ]
-                },
-                tooltip: {
-                  y: [
-                    {
-                      title: {
-                        formatter: function (val) {
-                          return val + ' (分钟)';
-                        }
-                      }
-                    },
-                    {
-                      title: {
-                        formatter: function (val) {
-                          return val + ' (次数)';
-                        }
-                      }
-                    },
-                    {
-                      title: {
-                        formatter: function (val) {
-                          return val;
-                        }
-                      }
-                    }
-                  ]
-                },
-                grid: {
-                  borderColor: '#f1f1f1'
-                }
-              }}
-              series={[
-                {
-                  name: '会话持续时间',
-                  data: [45, 52, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10]
-                },
-                {
-                  name: '页面浏览量',
-                  data: [35, 41, 62, 42, 13, 18, 29, 37, 36, 51, 32, 35]
-                },
-                {
-                  name: '总访问量',
-                  data: [87, 57, 74, 99, 75, 38, 62, 47, 82, 56, 45, 47]
-                }
-              ]}
-            />
+                  })}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
