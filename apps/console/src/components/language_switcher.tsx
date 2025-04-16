@@ -9,13 +9,18 @@ import {
 import { cn } from '@ncobase/utils';
 
 import { AVAILABLE_LANGUAGES } from '@/helpers/constants';
-import { getNavigatorLanguage, getStoredLanguage, setStoredLanguage } from '@/helpers/i18n';
+import { getNavigatorLanguage, getStoredLanguage, i18n } from '@/helpers/i18n';
 
 export const LanguageSwitcher = () => {
   const flagClasses = 'mt-0.5 text-base';
   const language = AVAILABLE_LANGUAGES.find(
     item => item.key === (getStoredLanguage() || getNavigatorLanguage())
   );
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
+
   return (
     <Dropdown>
       <DropdownTrigger asChild>
@@ -34,8 +39,7 @@ export const LanguageSwitcher = () => {
             key={key}
             className={cn('text-slate-400/90 py-1.5', key === language.key && 'text-slate-600')}
             onClick={() => {
-              setStoredLanguage(key);
-              window.location.reload();
+              changeLanguage(key);
             }}
           >
             {flag && <span className={`${flagClasses} mr-2`}>{flag}</span>}
