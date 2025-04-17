@@ -1,6 +1,5 @@
 import { isBrowser, locals } from '@ncobase/utils';
-import { t } from 'i18next';
-import { $Fetch, $fetch, FetchOptions } from 'ofetch';
+import { $Fetch, $fetch, FetchError, FetchOptions } from 'ofetch';
 
 import { ACCESS_TOKEN_KEY } from '@/features/account/context';
 import { checkAndRefreshToken } from '@/features/account/token_service';
@@ -53,22 +52,46 @@ export class Request {
   }
 
   private async handleErrors(err: Error | Response, method: string, url: string): Promise<void> {
-    if (err instanceof Error) {
-      console.error(`${t('errors.request.label')} [${method} ${url}]: ${err.message}`);
-    } else {
-      const { status } = err;
-      // console.error(`${t('errors.response.label')} [${method} ${url}]: ${status} ${statusText}`);
-      if (status === 401) {
-        eventEmitter.emit('unauthorized');
-      } else if (status === 403) {
-        eventEmitter.emit('forbidden');
-      } else if (status === 500) {
-        eventEmitter.emit('server-error');
-      } else if (status === 503) {
-        eventEmitter.emit('server-unavailable');
-      }
+    // Network error handling
+    if (err instanceof Error && !(err instanceof FetchError)) {
+      console.error(`Network error [${method} ${url}]: ${err.message}`);
+      eventEmitter.emit('network-error', { method, url, message: err.message });
+      throw err;
     }
-    throw err;
+
+    // Fetch error or Response error
+    if (err instanceof Response) {
+      const { status } = err;
+
+      // Try to parse error response
+      let errorData = null;
+      try {
+        errorData = await err.json();
+      } catch (e: ExplicitAny) {
+        console.error(`Error parsing error response [${method} ${url}]: ${e.message}`);
+        // Error response is not JSON
+      }
+
+      const errorMessage = errorData?.message || 'Unknown error occurred';
+
+      // Handle different error scenarios
+      if (status === 401) {
+        eventEmitter.emit('unauthorized', errorMessage);
+      } else if (status === 403) {
+        eventEmitter.emit('forbidden', errorMessage);
+      } else if (status === 404) {
+        eventEmitter.emit('not-found', { url, message: errorMessage });
+      } else if (status === 422) {
+        eventEmitter.emit('validation-error', errorData?.errors || {});
+      } else if (status >= 500) {
+        eventEmitter.emit('server-error', { status, message: errorMessage });
+      }
+
+      console.error(`HTTP Error [${method} ${url}]: ${status} - ${errorMessage}`);
+      throw err;
+    }
+
+    throw err; // Rethrow any other errors
   }
 
   protected async request(
@@ -78,8 +101,13 @@ export class Request {
     fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     try {
-      // For non-auth endpoints, check and refresh token if needed
-      if (!url.includes('/iam/login') && !url.includes('/iam/refresh')) {
+      // Skip token refresh for auth endpoints to avoid infinite loops
+      if (
+        !url.includes('/iam/login') &&
+        !url.includes('/iam/refresh-token') &&
+        !url.includes('/iam/token-status')
+      ) {
+        // Only attempt to refresh if not already doing an auth request
         await checkAndRefreshToken();
       }
 
