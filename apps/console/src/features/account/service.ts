@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
@@ -46,7 +46,91 @@ const useMutationWithTokens = <TVariables>(
 // Hook for user login
 export const useLogin = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, LoginProps>>
-) => useMutationWithTokens(loginAccount, options);
+) => {
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isLockedOut, setIsLockedOut] = useState(false);
+  const [lockoutEnd, setLockoutEnd] = useState<Date | null>(null);
+
+  // Check for existing lockout in localStorage
+  useEffect(() => {
+    const storedLockoutEnd = localStorage.getItem('login_lockout_end');
+    if (storedLockoutEnd) {
+      const endTime = new Date(storedLockoutEnd);
+      if (endTime > new Date()) {
+        setIsLockedOut(true);
+        setLockoutEnd(endTime);
+      } else {
+        localStorage.removeItem('login_lockout_end');
+        localStorage.removeItem('login_attempts');
+      }
+    }
+
+    const storedAttempts = localStorage.getItem('login_attempts');
+    if (storedAttempts) {
+      setLoginAttempts(parseInt(storedAttempts, 10));
+    }
+  }, []);
+
+  // Reset lockout status when lockout period expires
+  useEffect(() => {
+    if (isLockedOut && lockoutEnd) {
+      const timeoutId = setTimeout(() => {
+        setIsLockedOut(false);
+        setLockoutEnd(null);
+        setLoginAttempts(0);
+        localStorage.removeItem('login_lockout_end');
+        localStorage.removeItem('login_attempts');
+      }, lockoutEnd.getTime() - Date.now());
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isLockedOut, lockoutEnd]);
+
+  return useMutationWithTokens(
+    async (variables: LoginProps) => {
+      // If locked out, prevent login attempt
+      if (isLockedOut) {
+        throw new Error('Account is temporarily locked. Please try again later.');
+      }
+
+      try {
+        const result = await loginAccount(variables);
+        // Reset attempts on successful login
+        setLoginAttempts(0);
+        localStorage.removeItem('login_attempts');
+        return result;
+      } catch (error) {
+        // Increment attempts on failure
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        localStorage.setItem('login_attempts', String(newAttempts));
+
+        // Lock account after 5 failed attempts
+        if (newAttempts >= 5) {
+          const lockoutDuration = 15 * 60 * 1000; // 15 minutes
+          const end = new Date(Date.now() + lockoutDuration);
+          setIsLockedOut(true);
+          setLockoutEnd(end);
+          localStorage.setItem('login_lockout_end', end.toISOString());
+        }
+
+        throw error;
+      }
+    },
+    {
+      ...options,
+      onError: (error, variables, context) => {
+        if (isLockedOut) {
+          // Custom error notification for lockout
+          // TODO: Display notification
+          console.error('Account is temporarily locked. Please try again later.');
+        } else {
+          options?.onError?.(error, variables, context);
+        }
+      }
+    }
+  );
+};
 
 // Hook for user registration
 export const useRegisterAccount = (

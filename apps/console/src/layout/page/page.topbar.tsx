@@ -45,8 +45,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
   right = [],
   children,
   className,
-  ariaLabel,
-  ...rest
+  ariaLabel
 }) => {
   if (children) {
     return (

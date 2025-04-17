@@ -3,6 +3,7 @@ import { t } from 'i18next';
 import { $Fetch, $fetch, FetchOptions } from 'ofetch';
 
 import { ACCESS_TOKEN_KEY } from '@/features/account/context';
+import { checkAndRefreshToken } from '@/features/account/token_service';
 import { TENANT_KEY } from '@/features/system/tenant/context';
 import { BearerKey, XMdTenantKey } from '@/helpers/constants';
 import { eventEmitter } from '@/helpers/events';
@@ -11,6 +12,7 @@ import { ExplicitAny } from '@/types';
 export class Request {
   private readonly $fetch: $Fetch;
   private readonly defaultHeaders: Record<string, string | undefined>;
+  private readonly csrfToken: string | null = null;
 
   static baseConfig: FetchOptions = {
     baseURL:
@@ -28,6 +30,14 @@ export class Request {
       'Content-Type': 'application/json;charset=utf-8',
       ...defaultHeaders
     };
+
+    // Get CSRF token from meta tag if in browser
+    if (isBrowser) {
+      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      if (csrfMeta) {
+        this.csrfToken = csrfMeta.getAttribute('content');
+      }
+    }
   }
 
   public getHeaders() {
@@ -37,7 +47,8 @@ export class Request {
     return {
       ...this.defaultHeaders,
       ...(token && tenant && { [XMdTenantKey]: tenant }),
-      ...(token && { Authorization: `${BearerKey}${token}` })
+      ...(token && { Authorization: `${BearerKey}${token}` }),
+      ...(this.csrfToken && { 'X-CSRF-Token': this.csrfToken })
     };
   }
 
@@ -67,6 +78,11 @@ export class Request {
     fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     try {
+      // For non-auth endpoints, check and refresh token if needed
+      if (!url.includes('/iam/login') && !url.includes('/iam/refresh')) {
+        await checkAndRefreshToken();
+      }
+
       const headers = this.getHeaders();
       const body = data ? { body: JSON.stringify(data) } : {};
 

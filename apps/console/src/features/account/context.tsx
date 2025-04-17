@@ -1,6 +1,15 @@
-import React, { PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from 'react';
 
 import { isBrowser, locals } from '@ncobase/utils';
+
+import { tokenService } from './token_service';
 
 import { TenantProvider } from '@/features/system/tenant/context';
 
@@ -41,20 +50,52 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | undefined>(
     isBrowser ? locals.get(ACCESS_TOKEN_KEY) : undefined
   );
+  const [isTokenValid, setIsTokenValid] = useState<boolean>(false);
+
+  // Validate token on initial load
+  useEffect(() => {
+    const validateToken = () => {
+      if (!accessToken) {
+        setIsTokenValid(false);
+        return;
+      }
+
+      try {
+        const isExpired = tokenService.isTokenExpired(accessToken);
+        setIsTokenValid(!isExpired);
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        setIsTokenValid(false);
+      }
+    };
+
+    validateToken();
+
+    // Set up interval to check token validity
+    const interval = setInterval(validateToken, 60 * 1000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [accessToken]);
 
   // Callback to handle token updates
   const handleTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
     setAccessToken(newAccessToken);
     updateTokens(newAccessToken, newRefreshToken);
+
+    if (newAccessToken) {
+      setIsTokenValid(!tokenService.isTokenExpired(newAccessToken));
+    } else {
+      setIsTokenValid(false);
+    }
   }, []);
 
   // Memoize the context value to avoid unnecessary re-renders
   const authContextValue = useMemo<AuthContextValue>(
     () => ({
-      isAuthenticated: !!accessToken,
+      isAuthenticated: !!accessToken && isTokenValid,
       updateTokens: handleTokens
     }),
-    [accessToken, handleTokens]
+    [accessToken, isTokenValid, handleTokens]
   );
 
   return (
