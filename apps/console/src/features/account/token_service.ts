@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+import { ExplicitAny } from '@ncobase/types';
 import { locals } from '@ncobase/utils';
 import { jwtDecode } from 'jwt-decode';
 
@@ -6,11 +8,15 @@ import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from './context';
 import { request } from '@/apis/request';
 
 // Token payload interface
-interface TokenPayload {
+export interface TokenPayload {
   exp: number;
   jti: string;
   payload: {
     user_id: string;
+    roles: string[];
+    permissions: string[];
+    tenant_id: string;
+    is_admin: boolean;
   };
   sub: string;
 }
@@ -89,9 +95,16 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
     }
 
     return tokens;
-  } catch (error) {
+  } catch (error: ExplicitAny) {
     console.error('Failed to refresh token:', error);
-    // Don't clear tokens on failure, let the calling code decide what to do
+
+    // Clear tokens on unauthorized error (token invalid/expired)
+    if (error.response?.status === 401) {
+      locals.remove(ACCESS_TOKEN_KEY);
+      locals.remove(REFRESH_TOKEN_KEY);
+      window.location.href = '/login';
+    }
+
     throw error;
   } finally {
     refreshingPromise = null;
@@ -107,16 +120,22 @@ export const checkAndRefreshToken = async (): Promise<string | null> => {
   if (!accessToken) return null;
 
   try {
-    // Only refresh if the token is actually expired
-    // if (tokenService.isTokenExpired(accessToken)) {
-    console.log('Token expired, refreshing...');
-    const newTokens = await refreshAccessToken();
-    return newTokens.access_token;
-    // }
-    // return accessToken;
-  } catch (error) {
+    // Check if token is actually expired or nearing expiration
+    if (tokenService.isTokenExpired(accessToken)) {
+      console.log('Token expired or expiring soon, refreshing...');
+      const newTokens = await refreshAccessToken();
+      return newTokens.access_token;
+    }
+    return accessToken;
+  } catch (error: ExplicitAny) {
     console.error('Token refresh failed:', error);
-    // Don't clear tokens here, let auth context handle this decision
-    return accessToken; // Return the existing token even if refresh failed
+
+    // Only clear tokens for authentication errors
+    if (error.response?.status === 401) {
+      locals.remove(ACCESS_TOKEN_KEY);
+      locals.remove(REFRESH_TOKEN_KEY);
+    }
+
+    return null;
   }
 };
