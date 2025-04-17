@@ -4,6 +4,8 @@ import { initReactI18next } from 'react-i18next';
 
 import { LANGUAGE_CONFIG, AVAILABLE_LANGUAGES } from './constants';
 
+import versionInfo from '@/../version.json';
+
 /**
  * Get initial language
  * Priority: Local Storage > Browser Language > Default Language
@@ -39,19 +41,21 @@ i18n
 
     // Language resource loading configuration
     backend: {
-      // Language resource path (adjust according to actual project)
+      // TODO: change to api url
+      // Language resource path
+      // loadPath: `${request.config.baseURL}/locales/{{lng}}.json`,
       loadPath: '/assets/locales/{{lng}}.json',
 
-      // Optional: Add version control
+      // Add version control
       queryStringParams: {
-        v: process.env.VERSION || 'latest'
+        v: versionInfo?.commit || 'latest'
       }
     },
 
     // Interpolation configuration
     interpolation: {
-      // Prevent XSS attacks
-      escapeValue: true
+      // Prevent XSS attacks, disable by default
+      escapeValue: false
     },
 
     // Handle missing keys
