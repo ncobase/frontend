@@ -1564,7 +1564,7 @@ export const Elements = ({ ...rest }) => {
           <CardHeader className='p-4 border-b border-slate-100'>
             <CardTitle className='text-lg font-normal'>Table</CardTitle>
           </CardHeader>
-          <CardContent className='px-0 pb-0 overflow-auto'>
+          <CardContent className='p-0 overflow-auto'>
             <TableView
               pageSize={6}
               selected
