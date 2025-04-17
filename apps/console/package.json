@@ -15,7 +15,7 @@
   "dependencies": {
     "@ncobase/charts": "^0.2.0",
     "@ncobase/flows": "latest",
-    "@ncobase/react": "^0.1.0-alpha.1",
+    "@ncobase/react": "^0.1.0",
     "@ncobase/utils": "latest",
     "@popperjs/core": "^2.11.8",
     "@tanstack/react-query": "^5.74.3",

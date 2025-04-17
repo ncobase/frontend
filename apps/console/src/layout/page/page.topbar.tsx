@@ -16,11 +16,24 @@ export interface TopbarProps extends React.ComponentProps<'div'> {
    * @type React.ReactNode[]
    * */
   right?: React.ReactNode[];
+  /**
+   * Accessibility label for the topbar
+   */
+  ariaLabel?: string;
 }
 
-const TopbarWrapper: React.FC<TopbarProps> = ({ children, className }) => {
+const TopbarWrapper: React.FC<
+  React.PropsWithChildren<{
+    className?: string;
+    ariaLabel?: string;
+  }>
+> = ({ children, className, ariaLabel = 'Page toolbar' }) => {
   return (
-    <ShellTopbar className={cn('px-4 align-middle flex items-center justify-between', className)}>
+    <ShellTopbar
+      className={cn('px-4 align-middle flex items-center justify-between', className)}
+      role='toolbar'
+      aria-label={ariaLabel}
+    >
       {children}
     </ShellTopbar>
   );
@@ -31,28 +44,47 @@ const TopbarComponent: React.FC<TopbarProps> = ({
   left = [],
   right = [],
   children,
-  className
+  className,
+  ariaLabel,
+  ...rest
 }) => {
-  if (children) return <TopbarWrapper className={className}>{children}</TopbarWrapper>;
+  if (children) {
+    return (
+      <TopbarWrapper className={className} ariaLabel={ariaLabel}>
+        {children}
+      </TopbarWrapper>
+    );
+  }
+
   return (
-    <TopbarWrapper className={className}>
+    <TopbarWrapper className={className} ariaLabel={ariaLabel}>
       {title && (
-        <div className='text-base font-medium text-slate-600'>
+        <div className='text-base font-medium text-slate-600 flex-shrink-0' id='topbar-title'>
           {title}
           {(!!left.length || !!right.length) && (
-            <span className='pl-px ml-4 mr-3 w-px bg-slate-200' />
+            <span className='pl-px ml-4 mr-3 w-px bg-slate-200' aria-hidden='true' />
           )}
         </div>
       )}
+
       {!!left.length && (
-        <div className='flex gap-2'>
+        <div
+          className='flex gap-2 flex-shrink-0'
+          role='group'
+          aria-labelledby={title ? 'topbar-title' : undefined}
+        >
           {left.map((element, index) => (
             <React.Fragment key={index}>{element}</React.Fragment>
           ))}
         </div>
       )}
+
       {!!right.length && (
-        <div className='grow flex justify-end items-center gap-2'>
+        <div
+          className='grow flex justify-end items-center gap-2 flex-shrink-0'
+          role='group'
+          aria-label='Actions'
+        >
           {right.map((element, index) => (
             <React.Fragment key={index}>{element}</React.Fragment>
           ))}

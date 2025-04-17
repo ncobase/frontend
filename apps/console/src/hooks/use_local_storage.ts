@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { locals } from '@ncobase/utils';
+
 /**
  * Use local storage
  * @param key
@@ -11,20 +13,24 @@ export const useLocalStorage = <T>(
   initialValue: T
   // eslint-disable-next-line no-unused-vars
 ): { storedValue: T; setValue: (value: T) => void; clearValue: () => void; getValue: () => T } => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
+  // Getter function that reads from localStorage
+  const getValue = useCallback(() => {
     try {
-      const item = window.localStorage.getItem(key);
+      const item = locals.get(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.log(error);
       return initialValue;
     }
-  });
+  }, [key, initialValue]);
 
+  const [storedValue, setStoredValue] = useState<T>(() => getValue());
+
+  // Setter function that saves to localStorage
   const setValue = useCallback(
     (value: T) => {
       try {
-        window.localStorage.setItem(key, JSON.stringify(value));
+        locals.set(key, JSON.stringify(value));
         setStoredValue(value);
         window.dispatchEvent(new Event(`localStorage.${key}`));
       } catch (error) {
@@ -34,9 +40,10 @@ export const useLocalStorage = <T>(
     [key]
   );
 
+  // Clear function that removes from localStorage
   const clearValue = useCallback(() => {
     try {
-      window.localStorage.removeItem(key);
+      locals.remove(key);
       setStoredValue(initialValue);
       window.dispatchEvent(new Event(`localStorage.${key}`));
     } catch (error) {
@@ -44,21 +51,13 @@ export const useLocalStorage = <T>(
     }
   }, [key, initialValue]);
 
-  const getValue = () => {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.log(error);
-      return initialValue;
-    }
-  };
-
+  // Listen for changes to this localStorage key from other components
   useEffect(() => {
     const handleStorageChange = () => {
       const value = getValue();
       setStoredValue(value);
     };
+
     window.addEventListener(`storage.${key}`, handleStorageChange);
     return () => {
       window.removeEventListener(`storage.${key}`, handleStorageChange);

@@ -1,7 +1,6 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 
 import { Shell } from '@ncobase/react';
-import { locals } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useFocusMode } from '../layout.hooks';
@@ -12,6 +11,8 @@ import { Header } from './page.header';
 import { Sidebar } from './page.sidebar';
 import { Submenu } from './page.submenu';
 import { PageTitle } from './page.title';
+
+import { useLocalStorage } from '@/hooks/use_local_storage';
 
 const SIDEBAR_EXPANDED_KEY = 'app.sidebar.expanded';
 
@@ -35,14 +36,12 @@ export const Page: React.FC<PageProps> = ({
 }): JSX.Element => {
   useFocusMode();
   const { t } = useTranslation();
-  const [sidebarExpanded, setSidebarExpanded] = useState(() => {
-    const savedState = locals.get(SIDEBAR_EXPANDED_KEY);
-    return savedState ? JSON.parse(savedState) : false;
-  });
 
-  useEffect(() => {
-    locals.set(SIDEBAR_EXPANDED_KEY, JSON.stringify(sidebarExpanded));
-  }, [sidebarExpanded]);
+  // Use our custom localStorage hook
+  const { storedValue: sidebarExpanded, setValue: setSidebarExpanded } = useLocalStorage(
+    SIDEBAR_EXPANDED_KEY,
+    false
+  );
 
   const pageContextValue = useMemo(
     () => ({ layout, header, topbar, sidebar, submenu }),
@@ -51,6 +50,12 @@ export const Page: React.FC<PageProps> = ({
 
   const renderContent = () => <PageContainer {...rest} />;
 
+  // Get document direction once, don't recalculate on every render
+  const documentDirection = useMemo(
+    () => (document.documentElement.dir || 'ltr') as 'ltr' | 'rtl',
+    []
+  );
+
   return (
     <PageContext.Provider value={pageContextValue}>
       <PageTitle suffix={t('application_title')}>{title}</PageTitle>
@@ -58,12 +63,17 @@ export const Page: React.FC<PageProps> = ({
         <Shell
           header={header && <Header />}
           sidebar={
-            sidebar && <Sidebar expanded={sidebarExpanded} setExpanded={setSidebarExpanded} />
+            sidebar && (
+              <Sidebar
+                expanded={sidebarExpanded}
+                setExpanded={value => setSidebarExpanded(value as boolean)}
+              />
+            )
           }
           topbar={topbar}
           submenu={submenu && !sidebarExpanded && <Submenu />}
           sidebarExpanded={sidebarExpanded}
-          direction={document.documentElement.dir as 'ltr' | 'rtl'}
+          direction={documentDirection}
         >
           {renderContent()}
         </Shell>

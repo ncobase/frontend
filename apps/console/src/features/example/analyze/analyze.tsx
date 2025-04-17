@@ -181,7 +181,7 @@ export const FilterBar = ({ activeFilter, onFilterChange, ...rest }) => {
           </Button>
         ))}
       </div>
-      {/* Additional filter options */}
+      {/* Filter options */}
       <div className='flex items-center gap-x-2'>
         <Button variant='outline-slate' className='shadow-sm'>
           <Icons name='IconCalendarMonth' />
