@@ -62,7 +62,7 @@ i18n
     returnNull: false,
 
     // Debug mode (disabled in production)
-    debug: process.env.NODE_ENV === 'development'
+    debug: false // process.env.NODE_ENV === 'development'
   });
 
 // Update local storage when language changes
