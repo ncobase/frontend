@@ -63,6 +63,14 @@
     --chart-5: 340 75% 55%;
   }
 
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
   body {
     @apply text-sm;
     color: var(--text-color);
@@ -74,27 +82,31 @@
       color 0.3s;
   }
 
-  /* Scrollbar Styles */
-  * {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  html,
+  body {
+    @apply h-full overflow-hidden;
   }
 
-  ::-webkit-scrollbar {
-    @apply w-[7px] h-[7px];
+  .overflow-y-auto::-webkit-scrollbar {
+    @apply w-2;
   }
 
-  ::-webkit-scrollbar-track {
+  .overflow-y-auto::-webkit-scrollbar-track {
     @apply bg-transparent rounded-[3px];
   }
 
-  ::-webkit-scrollbar-thumb {
-    @apply w-[3px] bg-clip-content rounded-[3px] border-2 border-solid border-transparent;
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    @apply bg-clip-content rounded-[3px] border-2 border-solid border-transparent;
     background-color: var(--scrollbar-thumb-color);
   }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--scrollbar-thumb-hover-color);
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    @apply bg-black/40;
+  }
+
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
 
   /* *:hover::-webkit-scrollbar {
