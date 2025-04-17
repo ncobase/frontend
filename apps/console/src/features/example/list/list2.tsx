@@ -16,7 +16,7 @@ import { ExplicitAny } from '@ncobase/types';
 import { cn, formatDateTime } from '@ncobase/utils';
 import { Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useListMenus } from '@/features/system/menu/service';
 import { parseStatus } from '@/helpers/status';

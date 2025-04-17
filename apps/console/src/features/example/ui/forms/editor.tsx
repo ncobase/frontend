@@ -23,7 +23,7 @@ import {
 } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useListMenus } from '@/features/system/menu/service';
 import { useCurrentTime } from '@/hooks/use_current_time';

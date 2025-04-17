@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger, Icons } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useMenus } from '../layout.hooks';
 

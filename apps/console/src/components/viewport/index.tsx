@@ -1,7 +1,7 @@
 import { FC, useEffect } from 'react';
 
 import { isBrowser } from '@ncobase/utils';
-import { useLocation, useNavigationType } from 'react-router-dom';
+import { useLocation, useNavigationType } from 'react-router';
 
 interface ViewportProps extends React.PropsWithChildren {}
 

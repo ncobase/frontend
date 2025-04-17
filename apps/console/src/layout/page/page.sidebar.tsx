@@ -14,7 +14,7 @@ import {
 } from '@ncobase/react';
 import { cn, getInitials, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 import { useMenus } from '../layout.hooks';
 

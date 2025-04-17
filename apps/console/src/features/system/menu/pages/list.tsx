@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { isEqual } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';

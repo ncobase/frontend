@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Error403 } from '@/components/errors/403';

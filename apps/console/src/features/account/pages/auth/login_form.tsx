@@ -4,7 +4,7 @@ import { Button, CheckboxField, Form, InputField } from '@ncobase/react';
 import { cn, upperFirst } from '@ncobase/utils';
 import { Controller, useForm, UseFormSetValue } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useLogin } from '@/features/account/service';
 import { ExplicitAny, LoginProps } from '@/types';

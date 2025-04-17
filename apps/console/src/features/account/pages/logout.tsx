@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { useAuthContext } from '@/features/account/context';
 import { clearTenant } from '@/features/system/tenant/context';
