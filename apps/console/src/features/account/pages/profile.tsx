@@ -1,8 +1,8 @@
 import { Button, Container, Icons, ScrollView } from '@ncobase/react';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';
+import { Page } from '@/components/layout';
 import { useAccount } from '@/features/account/service';
-import { Page } from '@/layout';
 
 export const Profile = () => {
   const { user, profile, isLoading } = useAccount();

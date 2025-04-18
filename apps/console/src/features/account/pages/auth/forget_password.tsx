@@ -3,11 +3,12 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { ForgetPasswordProps } from '../../account';
+
 import { Footer } from '@/components/footer/footer';
 import { LanguageSwitcher } from '@/components/language_switcher';
+import { Page } from '@/components/layout';
 import { Logo } from '@/components/logo';
-import { Page } from '@/layout';
-import { ForgetPasswordProps } from '@/types';
 
 export const ForgetPassword = () => {
   const { t } = useTranslation();

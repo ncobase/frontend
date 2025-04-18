@@ -4,7 +4,7 @@ import { ChartContainer, ChartTooltipContent, ChartLegendContent } from '@ncobas
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 // Define a custom chart component that extends the @ncobase/charts functionality
 export const GradientAreaChart = forwardRef(

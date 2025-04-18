@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { CreateUserForms } from '../forms/create';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const CreateUserPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();

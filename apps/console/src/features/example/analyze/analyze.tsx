@@ -34,8 +34,8 @@ import {
 } from 'recharts';
 
 import dataSeries from '@/assets/datas/ids.mjs';
-import { filterQuarters } from '@/helpers/enums/filter';
-import { Page, Topbar } from '@/layout';
+import { Page, Topbar } from '@/components/layout';
+import { filterQuarters } from '@/lib/enums';
 
 // Generate sample time series data for demonstration
 const generateTimeSeriesData = () => {

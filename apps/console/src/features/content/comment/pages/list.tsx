@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
+import { Comment } from '../comment';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
@@ -15,8 +16,7 @@ import { EditorCommentPage } from './editor';
 import { CommentViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Comment } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const CommentListPage = () => {
   const { t } = useTranslation();

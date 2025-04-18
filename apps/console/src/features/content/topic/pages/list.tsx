@@ -9,14 +9,14 @@ import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateTopic, useDeleteTopic, useListTopics, useUpdateTopic } from '../service';
+import { Topic } from '../topic';
 
 import { CreateTopicPage } from './create';
 import { EditorTopicPage } from './editor';
 import { TopicViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Topic } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const TopicListPage = () => {
   const { t } = useTranslation();

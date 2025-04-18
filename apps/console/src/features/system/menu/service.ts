@@ -1,7 +1,9 @@
+import { AnyObject } from '@ncobase/types';
 import { sortTree } from '@ncobase/utils';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Menu } from './menu';
 
 import {
   getMenu,
@@ -10,8 +12,7 @@ import {
   updateMenu,
   deleteMenu,
   getMenus
-} from '@/apis/system/menu';
-import { AnyObject, Menu } from '@/types';
+} from '@/features/system/menu/apis';
 
 interface MenuKeys {
   create: ['menuService', 'create'];

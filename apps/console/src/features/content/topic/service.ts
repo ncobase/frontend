@@ -1,9 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Topic } from './topic';
 
-import { createTopic, deleteTopic, getTopic, getTopics, updateTopic } from '@/apis/content/topic';
-import { Topic } from '@/types';
+import {
+  createTopic,
+  deleteTopic,
+  getTopic,
+  getTopics,
+  updateTopic
+} from '@/features/content/topic/apis';
 
 interface TopicKeys {
   create: ['topicService', 'create'];

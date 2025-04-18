@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { EditorMenuForms } from '../forms/editor';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const EditorMenuPage = ({
   viewMode,

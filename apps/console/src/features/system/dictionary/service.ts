@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Dictionary } from './dictionary';
 
 import {
   createDictionary,
@@ -8,8 +9,7 @@ import {
   getDictionaries,
   getDictionary,
   updateDictionary
-} from '@/apis/system/dictionary';
-import { Dictionary } from '@/types';
+} from '@/features/system/dictionary/apis';
 
 interface DictionaryKeys {
   create: ['dictionaryService', 'create'];

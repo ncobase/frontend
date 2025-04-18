@@ -2,7 +2,7 @@ import { FieldViewer } from '@ncobase/react';
 
 import { useQueryRole } from '../service';
 
-import { parseStatus } from '@/helpers/status';
+import { parseStatus } from '@/lib/status';
 
 export const RoleViewerForms = ({ record }) => {
   const { data = {} } = useQueryRole(record);

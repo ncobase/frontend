@@ -1,6 +1,8 @@
+import { AnyObject } from '@ncobase/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Permission } from './permission';
 
 import {
   createPermission,
@@ -8,8 +10,7 @@ import {
   getPermission,
   getPermissions,
   updatePermission
-} from '@/apis/system/permission';
-import { AnyObject, Permission } from '@/types';
+} from '@/features/system/permission/apis';
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];

@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { Role } from '../role';
 import { useCreateRole, useDeleteRole, useListRoles, useUpdateRole } from '../service';
 
 import { CreateRolePage } from './create';
@@ -15,8 +16,7 @@ import { EditorRolePage } from './editor';
 import { RoleViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Role } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const RoleListPage = () => {
   const { t } = useTranslation();

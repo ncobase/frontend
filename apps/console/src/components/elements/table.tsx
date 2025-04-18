@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from './form/button';
 
-import { filterDays } from '@/helpers/enums/filter';
+import { filterDays } from '@/lib/enums';
 
 // eslint-disable-next-line no-unused-vars
 export const DropdownControl = ({ onChange }: { onChange?: (value: string) => void }) => {

@@ -9,14 +9,14 @@ import { useNavigate, useParams } from 'react-router';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateTenant, useListTenants, useUpdateTenant } from '../service';
+import { Tenant } from '../tenant';
 
 import { CreateTenantPage } from './create';
 import { EditorTenantPage } from './editor';
 import { TenantViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Tenant } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const TenantListPage = () => {
   const { t } = useTranslation();

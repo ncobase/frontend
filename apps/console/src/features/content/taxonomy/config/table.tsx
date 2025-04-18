@@ -2,9 +2,10 @@ import { Button, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
+import { Taxonomy } from '../taxonomy';
+
 import { useQueryUser } from '@/features/system/user/service';
-import { parseStatus } from '@/helpers/status';
-import { Taxonomy } from '@/types';
+import { parseStatus } from '@/lib/status';
 
 export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
   const { t } = useTranslation();

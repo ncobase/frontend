@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { Footer } from '@/components/footer/footer';
 import { LanguageSwitcher } from '@/components/language_switcher';
+import { Page } from '@/components/layout';
 import { Logo } from '@/components/logo';
 import { LoginForm } from '@/features/account/pages/auth/login_form';
-import { Page } from '@/layout';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
 export const Login = () => {

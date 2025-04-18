@@ -2,7 +2,7 @@ import { FieldViewer } from '@ncobase/react';
 
 import { useQueryPermission } from '../service';
 
-import { parseStatus } from '@/helpers/status';
+import { parseStatus } from '@/lib/status';
 
 export const PermissionViewerForms = ({ record }) => {
   const { data = {} } = useQueryPermission(record);

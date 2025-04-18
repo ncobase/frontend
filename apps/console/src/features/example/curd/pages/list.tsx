@@ -10,8 +10,8 @@ import { EditorPage } from './editor';
 import { ViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
+import { Role } from '@/features/system/role/role';
 import { useCreateRole, useListRoles, useUpdateRole } from '@/features/system/role/service';
-import { Role } from '@/types';
 
 export const ListPage = () => {
   const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });

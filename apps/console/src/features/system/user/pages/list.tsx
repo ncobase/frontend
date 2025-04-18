@@ -9,14 +9,14 @@ import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useCreateUser, useDeleteUser, useListUsers, useUpdateUser } from '../service';
+import { User } from '../user';
 
 import { CreateUserPage } from './create';
 import { EditorUserPage } from './editor';
 import { UserViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { User } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const UserListPage = () => {
   const { t } = useTranslation();

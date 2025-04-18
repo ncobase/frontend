@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/modal/modal';
 import { useAuthContext } from '@/features/account/context';
 import { useTenantContext } from '@/features/system/tenant/context';
+import { Tenant } from '@/features/system/tenant/tenant';
 import { useRedirectFromUrl } from '@/router/router.hooks';
-import { Tenant } from '@/types';
 
 interface TenantOptionProps extends Tenant {
   isSelected: boolean;

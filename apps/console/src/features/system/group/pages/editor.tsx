@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { EditorGroupForms } from '../forms/editor';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const EditorGroupPage = ({
   viewMode,

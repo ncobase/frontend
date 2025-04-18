@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { UserViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const UserViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

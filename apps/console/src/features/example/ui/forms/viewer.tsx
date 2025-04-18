@@ -16,9 +16,9 @@ import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { Page } from '@/components/layout';
 import { useListMenus } from '@/features/system/menu/service';
-import { parseStatus } from '@/helpers/status';
-import { Page } from '@/layout';
+import { parseStatus } from '@/lib/status';
 
 export const ViewerPage = () => {
   const { t } = useTranslation();

@@ -1,4 +1,4 @@
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 export const BasicLayout = ({ children, ...rest }) => {
   return (

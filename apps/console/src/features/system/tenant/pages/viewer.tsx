@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { TenantViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const TenantViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

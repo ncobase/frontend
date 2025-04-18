@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { RoleViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const RoleViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

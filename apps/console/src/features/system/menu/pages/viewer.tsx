@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { MenuViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const MenuViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

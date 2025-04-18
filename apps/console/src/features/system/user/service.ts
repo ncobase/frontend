@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { User } from './user';
 
 import {
   createUser,
@@ -9,8 +10,7 @@ import {
   getUserMeshes,
   getUsers,
   updateUser
-} from '@/apis/system/user';
-import { User } from '@/types';
+} from '@/features/system/user/apis';
 
 interface UserKeys {
   create: ['userService', 'create'];

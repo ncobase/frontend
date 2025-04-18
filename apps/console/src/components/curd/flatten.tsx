@@ -1,8 +1,7 @@
+import { ExplicitAny } from '@ncobase/types';
 import { useParams } from 'react-router';
 
 import { CommonProps } from '.';
-
-import { ExplicitAny } from '@/types';
 
 export interface FlattenViewProps<T extends object> extends CommonProps<T> {
   type?: string; // 'create' | 'view' | 'edit';

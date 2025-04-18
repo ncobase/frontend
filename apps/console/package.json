@@ -13,6 +13,7 @@
     "deploy:prod": "npx rimraf serverless.yaml && cp infra/serverless/tencent_cloud_prod.yaml serverless.yaml && sls deploy -s prod && npx rimraf serverless.yaml"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
     "@ncobase/charts": "^0.2.0",
     "@ncobase/flows": "latest",
     "@ncobase/react": "^0.1.2",
@@ -37,6 +38,7 @@
     "react-error-boundary": "^4.1.2",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.55.0",
+    "react-hot-toast": "^2.5.2",
     "react-i18next": "^15.4.1",
     "react-router": "^7.5.0",
     "recharts": "^2.15.2",

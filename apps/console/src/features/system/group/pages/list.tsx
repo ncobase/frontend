@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { Group } from '../group';
 import { useCreateGroup, useDeleteGroup, useListGroups, useUpdateGroup } from '../service';
 
 import { CreateGroupPage } from './create';
@@ -15,8 +16,7 @@ import { EditorGroupPage } from './editor';
 import { GroupViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Group } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const GroupListPage = () => {
   const { t } = useTranslation();

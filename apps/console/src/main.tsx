@@ -1,4 +1,4 @@
-import '@/helpers/setup';
+import '@/lib/setup';
 
 import React from 'react';
 
@@ -8,9 +8,9 @@ import ReactDOM from 'react-dom/client';
 import { setupStyles } from '@/assets/styles';
 import { AppDevHint } from '@/components/app_dev_hint';
 import { LoadingIndicator } from '@/components/loading/indicator';
+import { ThemeProvider } from '@/components/theme';
 import { AuthProvider } from '@/features/account/context';
 import { Router } from '@/router';
-import { ThemeProvider } from '@/themes';
 
 const queryClient = new QueryClient({
   defaultOptions: {

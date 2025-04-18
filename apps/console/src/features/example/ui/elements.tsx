@@ -27,7 +27,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { Page, Topbar } from '@/layout';
+import { Page, Topbar } from '@/components/layout';
 
 export const UITopbar = ({ ...rest }) => {
   const { t } = useTranslation();

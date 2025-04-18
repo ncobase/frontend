@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
+import { Comment } from './comment';
 import { QueryFormParams } from './config/query';
 
 import {
@@ -8,8 +9,7 @@ import {
   getComment,
   getComments,
   updateComment
-} from '@/apis/content/comment';
-import { Comment } from '@/types';
+} from '@/features/content/comment/apis';
 
 interface CommentKeys {
   create: ['commentService', 'create'];

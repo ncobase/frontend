@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { GroupViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const GroupViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

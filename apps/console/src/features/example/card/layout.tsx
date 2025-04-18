@@ -2,7 +2,7 @@ import { Button, Icons, Tooltip, TooltipContent, TooltipTrigger } from '@ncobase
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { Page, Topbar } from '@/layout';
+import { Page, Topbar } from '@/components/layout';
 
 export const CardTopbar = () => {
   const { t } = useTranslation();

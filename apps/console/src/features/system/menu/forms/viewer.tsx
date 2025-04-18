@@ -2,7 +2,7 @@ import { FieldViewer } from '@ncobase/react';
 
 import { useQueryMenu } from '../service';
 
-import { parseStatus } from '@/helpers/status';
+import { parseStatus } from '@/lib/status';
 
 export const MenuViewerForms = ({ record }) => {
   const { data = {} } = useQueryMenu(record);

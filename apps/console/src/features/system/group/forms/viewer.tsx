@@ -2,7 +2,7 @@ import { FieldViewer } from '@ncobase/react';
 
 import { useQueryGroup } from '../service';
 
-import { parseStatus } from '@/helpers/status';
+import { parseStatus } from '@/lib/status';
 
 export const GroupViewerForms = ({ record }) => {
   const { data = {} } = useQueryGroup(record);

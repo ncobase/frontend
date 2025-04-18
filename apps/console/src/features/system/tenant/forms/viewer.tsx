@@ -3,7 +3,7 @@ import { formatDateTime } from '@ncobase/utils';
 
 import { useQueryTenant } from '../service';
 
-import { parseStatus } from '@/helpers/status';
+import { parseStatus } from '@/lib/status';
 
 export const TenantViewerForms = ({ record }) => {
   const { data = {} } = useQueryTenant(record);

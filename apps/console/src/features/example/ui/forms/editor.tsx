@@ -25,9 +25,9 @@ import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { Page } from '@/components/layout';
 import { useListMenus } from '@/features/system/menu/service';
 import { useCurrentTime } from '@/hooks/use_current_time';
-import { Page } from '@/layout';
 
 export const EditorPage = () => {
   const { t } = useTranslation();

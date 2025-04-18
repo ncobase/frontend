@@ -4,7 +4,7 @@ import { Button, CodeHighlighter, Container, Dialog } from '@ncobase/react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
-import { eventEmitter } from '@/helpers/events';
+import { eventEmitter } from '@/lib/events';
 
 const FallbackComponent = ({
   error,

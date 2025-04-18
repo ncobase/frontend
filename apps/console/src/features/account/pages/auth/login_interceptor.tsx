@@ -7,7 +7,7 @@ import { useLocation } from 'react-router';
 import { Modal } from '@/components/modal/modal';
 import { useAuthContext } from '@/features/account/context';
 import { LoginForm } from '@/features/account/pages/auth/login_form';
-import { eventEmitter } from '@/helpers/events';
+import { eventEmitter } from '@/lib/events';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 import { publicRoutes } from '@/router/routes';
 

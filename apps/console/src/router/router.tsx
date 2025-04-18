@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router';
 
 import { Routes } from './routes';
 
+import { Layout } from '@/components/layout';
 import { Spinner } from '@/components/loading/spinner';
-import { Layout } from '@/layout';
 
 export const Router = () => {
   return (

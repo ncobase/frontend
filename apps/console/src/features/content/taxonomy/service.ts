@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Taxonomy } from './taxonomy';
 
 import {
   createTaxonomy,
@@ -8,8 +9,7 @@ import {
   getTaxonomies,
   getTaxonomy,
   updateTaxonomy
-} from '@/apis/content/taxonomy';
-import { Taxonomy } from '@/types';
+} from '@/features/content/taxonomy/apis';
 
 interface TaxonomyKeys {
   create: ['taxonomyService', 'create'];

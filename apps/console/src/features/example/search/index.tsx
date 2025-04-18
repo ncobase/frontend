@@ -20,7 +20,7 @@ import {
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { Page, Topbar } from '@/layout';
+import { Page, Topbar } from '@/components/layout';
 
 const generateMockData = (count = 100) => {
   const statuses = ['活跃', '已归档', '已暂停', '已删除'];

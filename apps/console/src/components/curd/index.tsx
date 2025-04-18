@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { FlattenView, FlattenViewProps } from './flatten';
 import { ModalView, ModalViewProps } from './modal';
 
-import { Page, Topbar, useLayoutContext } from '@/layout';
+import { Page, Topbar, useLayoutContext } from '@/components/layout';
 
 export interface CommonProps<T extends object> {
   viewMode?: 'modal' | 'flatten';

@@ -3,10 +3,10 @@ import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useQueryTaxonomy } from '../../taxonomy/service';
+import { Topic } from '../topic';
 
 import { useQueryUser } from '@/features/system/user/service';
-import { parseStatus } from '@/helpers/status';
-import { Topic } from '@/types';
+import { parseStatus } from '@/lib/status';
 
 export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
   const { t } = useTranslation();

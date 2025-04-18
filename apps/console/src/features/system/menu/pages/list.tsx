@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { Menu } from '../menu';
 import { useCreateMenu, useDeleteMenu, useListMenus, useUpdateMenu } from '../service';
 
 import { CreateMenuPage } from './create';
@@ -15,7 +16,6 @@ import { EditorMenuPage } from './editor';
 import { MenuViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { Menu } from '@/types';
 
 export const MenuListPage = () => {
   const { t } = useTranslation();

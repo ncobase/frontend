@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 
 import i18n from 'i18next';
 
-import { AVAILABLE_LANGUAGES, LANGUAGE_CONFIG, LanguageOption } from '@/helpers/constants';
+import { AVAILABLE_LANGUAGES, LANGUAGE_CONFIG, LanguageOption } from '@/lib/constants';
 
 /**
  * Language switcher hook

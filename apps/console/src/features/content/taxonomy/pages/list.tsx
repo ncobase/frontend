@@ -14,14 +14,14 @@ import {
   useListTaxonomies,
   useUpdateTaxonomy
 } from '../service';
+import { Taxonomy } from '../taxonomy';
 
 import { CreateTaxonomyPage } from './create';
 import { EditorTaxonomyPage } from './editor';
 import { TaxonomyViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Taxonomy } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const TaxonomyListPage = () => {
   const { t } = useTranslation();

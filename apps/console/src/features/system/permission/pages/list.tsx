@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { Permission } from '../permission';
 import {
   useCreatePermission,
   useDeletePermission,
@@ -19,8 +20,7 @@ import { EditorPermissionPage } from './editor';
 import { PermissionViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Permission } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();

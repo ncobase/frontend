@@ -2,8 +2,8 @@ import { Button, TableViewProps } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { parseStatus } from '@/helpers/status';
-import { Role } from '@/types';
+import { Role } from '@/features/system/role/role';
+import { parseStatus } from '@/lib/status';
 
 export const tableColumns = ({ handleView }): TableViewProps['header'] => {
   const { t } = useTranslation();

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { CreateDictionaryForms } from '../forms/create';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const CreateDictionaryPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();

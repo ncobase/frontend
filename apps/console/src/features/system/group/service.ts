@@ -1,9 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Group } from './group';
 
-import { createGroup, deleteGroup, getGroup, getGroups, updateGroup } from '@/apis/system/group';
-import { Group } from '@/types';
+import {
+  createGroup,
+  deleteGroup,
+  getGroup,
+  getGroups,
+  updateGroup
+} from '@/features/system/group/apis';
 
 interface GroupKeys {
   create: ['groupService', 'create'];

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { TopicViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const TopicViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

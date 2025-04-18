@@ -18,7 +18,7 @@ import {
   AreaChart
 } from 'recharts';
 
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 export const ECommerceDashboard = () => {
   const [timeRange, setTimeRange] = useState('month');

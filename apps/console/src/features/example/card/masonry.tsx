@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { UITopbar } from '../ui/elements';
 
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 const records = [
   {

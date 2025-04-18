@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { DictionaryViewerForms } from '../forms/viewer';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const DictionaryViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();

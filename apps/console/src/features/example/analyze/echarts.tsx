@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ChartContainer } from '@ncobase/charts';
 import { useTranslation } from 'react-i18next';
 
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 export const EChartsExample = () => {
   const { t } = useTranslation();

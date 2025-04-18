@@ -17,7 +17,7 @@ import {
 import { t } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { Page, Topbar } from '@/layout';
+import { Page, Topbar } from '@/components/layout';
 
 const useMockData = (delay = 1500, shouldError = false) => {
   const [data, setData] = useState([]);

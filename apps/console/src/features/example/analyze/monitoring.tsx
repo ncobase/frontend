@@ -20,7 +20,7 @@ import {
   Legend
 } from 'recharts';
 
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 export const OperationsDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());

@@ -1,11 +1,10 @@
 import { memo, useState } from 'react';
 
 import { Button, Icons } from '@ncobase/react';
+import { ExplicitAny } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
 import { Modal, ModalProps } from '../modal/modal';
-
-import { ExplicitAny } from '@/types';
 
 export interface ModalViewProps<T extends object> extends ModalProps<T> {
   type?: string; // 'create' | 'view' | 'edit';

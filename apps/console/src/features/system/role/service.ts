@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { QueryFormParams } from './config/query';
+import { Role } from './role';
 
-import { createRole, deleteRole, getRole, getRoles, updateRole } from '@/apis/system/role';
-import { Role } from '@/types';
+import { createRole, deleteRole, getRole, getRoles, updateRole } from '@/features/system/role/apis';
 
 interface RoleKeys {
   create: ['roleService', 'create'];

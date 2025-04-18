@@ -13,8 +13,8 @@ import {
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
+import { Page, Topbar } from '@/components/layout';
 import { useLanguageSwitcher } from '@/hooks/use_language_switcher';
-import { Page, Topbar } from '@/layout';
 
 export const I18nExample = () => {
   const { t } = useTranslation();

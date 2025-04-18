@@ -5,7 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from './context';
 
-import { request } from '@/apis/request';
+import { request } from '@/lib/api/request';
 
 // Token payload interface
 export interface TokenPayload {

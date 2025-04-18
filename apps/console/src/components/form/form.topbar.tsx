@@ -3,7 +3,7 @@ import React from 'react';
 import { Container } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 
-import { TopbarProps } from '@/layout';
+import { TopbarProps } from '@/components/layout';
 
 export interface FormTopbarProps extends TopbarProps {}
 

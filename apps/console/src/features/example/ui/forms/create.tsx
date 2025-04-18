@@ -21,13 +21,13 @@ import {
   TabsList,
   TabsTrigger
 } from '@ncobase/react';
+import { ExplicitAny } from '@ncobase/types';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { Page } from '@/components/layout';
 import { useListMenus } from '@/features/system/menu/service';
-import { Page } from '@/layout';
-import { ExplicitAny } from '@/types';
 
 export const CreatePage = () => {
   const { t } = useTranslation();

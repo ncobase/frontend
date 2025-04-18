@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { Dictionary } from '../dictionary';
 import {
   useCreateDictionary,
   useDeleteDictionary,
@@ -20,8 +21,7 @@ import { EditorDictionaryPage } from './editor';
 import { DictionaryViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/layout';
-import { Dictionary } from '@/types';
+import { useLayoutContext } from '@/components/layout';
 
 export const DictionaryListPage = () => {
   const { t } = useTranslation();

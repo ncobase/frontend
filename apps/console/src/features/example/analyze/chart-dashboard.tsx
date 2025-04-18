@@ -14,7 +14,7 @@ import {
   Bar
 } from 'recharts';
 
-import { Page } from '@/layout';
+import { Page } from '@/components/layout';
 
 // Sample data for charts
 const salesData = [

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { CreatePermissionForms } from '../forms/create';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const CreatePermissionPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();

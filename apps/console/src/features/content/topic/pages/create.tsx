@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 
 import { CreateTopicForms } from '../forms/create';
 
-import { useLayoutContext } from '@/layout';
+import { useLayoutContext } from '@/components/layout';
 
 export const CreateTopicPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();
