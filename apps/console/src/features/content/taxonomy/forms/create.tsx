@@ -1,94 +1,157 @@
+import { useEffect, useState } from 'react';
+
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { FieldConfigProps } from '@/components/form';
+import { useListTaxonomies } from '@/features/content/taxonomy/service';
 import { useTenantContext } from '@/features/system/tenant/context';
 
 export const CreateTaxonomyForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
   const { tenant_id } = useTenantContext();
+  const [parentOptions, setParentOptions] = useState([]);
+
+  // Fetch taxonomies for parent dropdown
+  const { data: taxonomiesData } = useListTaxonomies({
+    limit: 100,
+    type: 'all',
+    children: false
+  });
+
+  useEffect(() => {
+    if (taxonomiesData?.items) {
+      const options = taxonomiesData.items.map(tax => ({
+        label: tax.name,
+        value: tax.id
+      }));
+      // Add a "None" option
+      // options.unshift({ label: 'None (Root Level)', value: '' });
+      setParentOptions(options);
+    }
+  }, [taxonomiesData]);
 
   const fields: FieldConfigProps[] = [
+    // Basic Information Section
     {
-      title: '名称',
+      title: 'Name',
       name: 'name',
       defaultValue: '',
-      placeholder: '请输入名称',
-      type: 'text',
+      placeholder: 'Enter taxonomy name',
+      type: 'section',
       rules: { required: t('forms.input_required') }
     },
     {
-      title: '上级菜单',
-      name: 'parent',
-      defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      title: 'Type',
+      name: 'type',
+      defaultValue: 'category',
+      type: 'select',
+      options: [
+        { label: 'Category', value: 'category' },
+        { label: 'Tag', value: 'tag' },
+        { label: 'Topic', value: 'topic' },
+        { label: 'Section', value: 'section' },
+        { label: 'Department', value: 'department' },
+        { label: 'Custom', value: 'custom' }
+      ],
+      rules: { required: t('forms.input_required') }
     },
     {
-      title: 'i18n 标签',
-      name: 'label',
-      placeholder: '请输入 i18n 标签',
+      title: 'Slug',
+      name: 'slug',
       defaultValue: '',
+      placeholder: 'Enter slug (leave empty to auto-generate)',
       type: 'text'
     },
     {
-      title: '图标',
-      name: 'icon',
+      title: 'Parent',
+      name: 'parent_id',
       defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      type: 'select',
+      options: parentOptions
     },
-    { title: '别名', name: 'slug', defaultValue: '', type: 'text' },
-    { title: '路径 / URL', name: 'path', defaultValue: '', type: 'text' },
-    { title: '类型', name: 'type', defaultValue: '', type: 'text' },
+
+    // Appearance Section
     {
-      title: '打开方式',
-      name: 'target',
-      defaultValue: '_self',
+      title: 'Cover Image',
+      name: 'cover',
+      defaultValue: '',
+      placeholder: 'Enter cover image URL',
+      type: 'text'
+    },
+    {
+      title: 'Thumbnail',
+      name: 'thumbnail',
+      defaultValue: '',
+      placeholder: 'Enter thumbnail URL',
+      type: 'text'
+    },
+    {
+      title: 'Color',
+      name: 'color',
+      defaultValue: '#3B82F6',
+      type: 'color'
+    },
+    {
+      title: 'Icon',
+      name: 'icon',
+      defaultValue: 'IconFolder',
+      type: 'icon'
+    },
+
+    // SEO & Metadata Section
+    {
+      title: 'URL',
+      name: 'url',
+      defaultValue: '',
+      placeholder: 'Custom URL (optional)',
+      type: 'text'
+    },
+    {
+      title: 'Keywords',
+      name: 'keywords',
+      defaultValue: '',
+      placeholder: 'SEO keywords (comma separated)',
+      type: 'text'
+    },
+    {
+      title: 'Description',
+      name: 'description',
+      defaultValue: '',
+      placeholder: 'Enter description',
+      type: 'textarea'
+    },
+
+    // Status Section
+    {
+      title: 'Status',
+      name: 'status',
+      defaultValue: 0,
       type: 'select',
       options: [
-        { label: '当前窗口', value: '_self' },
-        { label: '新窗口', value: '_blank' }
+        { label: 'Enabled', value: 0 },
+        { label: 'Disabled', value: 1 }
       ]
     },
-    { title: '权限标识', name: 'perms', defaultValue: '', type: 'text' },
+
+    // Hidden Fields
     {
-      title: '是否显示',
-      name: 'hidden',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    { title: '排序', name: 'order', defaultValue: 99, type: 'number' },
-    {
-      title: '是否停用',
-      name: 'disabled',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    {
-      title: '所属租户',
-      name: 'tenant',
+      title: 'Tenant ID',
+      name: 'tenant_id',
       defaultValue: tenant_id,
       type: 'hidden'
+    },
+    {
+      title: 'Extras',
+      name: 'extras',
+      defaultValue: {},
+      type: 'hidden'
     }
-    // {
-    //   title: '扩展字段',
-    //   name: 'extras',
-    //   defaultValue: []
-    // }
   ];
 
   return (
     <Form
-      id='create-user'
+      id='create-taxonomy'
       className='my-4 md:grid-cols-2'
       onSubmit={onSubmit}
       control={control}

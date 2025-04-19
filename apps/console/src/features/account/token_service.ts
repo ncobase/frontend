@@ -122,7 +122,6 @@ export const checkAndRefreshToken = async (): Promise<string | null> => {
   try {
     // Check if token is actually expired or nearing expiration
     if (tokenService.isTokenExpired(accessToken)) {
-      console.log('Token expired or expiring soon, refreshing...');
       const newTokens = await refreshAccessToken();
       return newTokens.access_token;
     }

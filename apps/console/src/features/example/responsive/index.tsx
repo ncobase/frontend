@@ -101,13 +101,13 @@ export const ResponsiveDesignExample = () => {
           <CardContent className='p-0'>
             <TableView
               header={[
-                { title: t('example.i18n.name'), code: 'name' },
-                { title: t('example.i18n.role'), code: 'role' },
-                { title: t('example.i18n.department'), code: 'department' },
-                { title: t('example.i18n.status'), code: 'status' },
+                { title: t('example.i18n.name'), accessorKey: 'name' },
+                { title: t('example.i18n.role'), accessorKey: 'role' },
+                { title: t('example.i18n.department'), accessorKey: 'department' },
+                { title: t('example.i18n.status'), accessorKey: 'status' },
                 {
                   title: t('example.i18n.operations'),
-                  code: 'operation-column',
+                  accessorKey: 'operation-column',
                   actions: [
                     {
                       title: t('actions.edit'),

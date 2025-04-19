@@ -106,9 +106,9 @@ const RecordCard = () => {
           selected
           visibleControl
           header={[
-            { title: '姓名', code: 'name' },
-            { title: '性别', code: 'sex' },
-            { title: '年龄', code: 'age' }
+            { title: '姓名', accessorKey: 'name' },
+            { title: '性别', accessorKey: 'sex' },
+            { title: '年龄', accessorKey: 'age' }
           ]}
           data={[
             { id: 1, name: '张三', sex: '男', age: 18 },
@@ -124,9 +124,9 @@ const RecordCard = () => {
           pageSize={4}
           visibleControl
           header={[
-            { title: '姓名', code: 'name' },
-            { title: '性别', code: 'sex' },
-            { title: '年龄', code: 'age' }
+            { title: '姓名', accessorKey: 'name' },
+            { title: '性别', accessorKey: 'sex' },
+            { title: '年龄', accessorKey: 'age' }
           ]}
           data={[
             { id: 1, name: '张三', sex: '男', age: 18 },
@@ -550,9 +550,9 @@ const RecordCard = () => {
           pageSize={4}
           visibleControl
           header={[
-            { title: '姓名', code: 'name' },
-            { title: '性别', code: 'sex' },
-            { title: '年龄', code: 'age' }
+            { title: '姓名', accessorKey: 'name' },
+            { title: '性别', accessorKey: 'sex' },
+            { title: '年龄', accessorKey: 'age' }
           ]}
           data={[
             { id: 1, name: '张三', sex: '男', age: 18 },
@@ -567,9 +567,9 @@ const RecordCard = () => {
         <TableView
           pageSize={4}
           header={[
-            { title: '姓名', code: 'name' },
-            { title: '性别', code: 'sex' },
-            { title: '年龄', code: 'age' }
+            { title: '姓名', accessorKey: 'name' },
+            { title: '性别', accessorKey: 'sex' },
+            { title: '年龄', accessorKey: 'age' }
           ]}
           data={[
             { id: 1, name: '张三', sex: '男', age: 18 },

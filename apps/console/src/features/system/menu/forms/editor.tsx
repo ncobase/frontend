@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { FieldConfigProps, Form } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
@@ -6,12 +6,9 @@ import { useTranslation } from 'react-i18next';
 
 import { useQueryMenu } from '../service';
 
-import { IconSelector } from '@/components/modal/icons';
-
 export const EditorMenuForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
   const { data = {} } = useQueryMenu(record);
-  const [isSelectIcon, setIsSelectIcon] = useState(false);
 
   const fields: FieldConfigProps[] = [
     {
@@ -43,20 +40,7 @@ export const EditorMenuForms = ({ record, onSubmit, control, setValue, errors })
       title: '图标',
       name: 'icon',
       defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        setIsSelectIcon(true);
-      },
-      valueComponent: ({ onChange }) => (
-        <IconSelector
-          opened={isSelectIcon}
-          onVisible={setIsSelectIcon}
-          onSelected={value => {
-            onChange(value);
-          }}
-        />
-      )
+      type: 'icon'
     },
     { title: '别名', name: 'slug', defaultValue: '', type: 'text' },
     { title: '路径 / URL', name: 'path', defaultValue: '', type: 'text' },

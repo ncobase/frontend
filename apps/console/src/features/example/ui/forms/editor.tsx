@@ -263,7 +263,7 @@ export const EditorPage = () => {
                 header={[
                   {
                     title: 'ID',
-                    code: 'id',
+                    accessorKey: 'id',
                     parser: value => (
                       <Button variant='link' size='sm' onClick={() => navigate(`viewer/${value}`)}>
                         {value}
@@ -273,30 +273,30 @@ export const EditorPage = () => {
                   },
                   {
                     title: 'Name',
-                    code: 'name',
+                    accessorKey: 'name',
                     parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconFlame'
                   },
                   {
                     title: 'Slug',
-                    code: 'slug',
+                    accessorKey: 'slug',
                     parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',
-                    code: 'path',
+                    accessorKey: 'path',
                     icon: 'IconRoute'
                   },
                   {
                     title: 'Icon',
-                    code: 'icon',
+                    accessorKey: 'icon',
                     parser: value => <Icons name={value} size={16} />,
                     icon: 'IconCategory'
                   },
                   {
                     title: 'Status',
-                    code: 'disabled',
+                    accessorKey: 'disabled',
                     parser: value => {
                       value = value ? '1' : '0';
                       return (
@@ -315,7 +315,7 @@ export const EditorPage = () => {
                   },
                   {
                     title: 'Created At',
-                    code: 'created_at',
+                    accessorKey: 'created_at',
                     parser: value => formatDateTime(value),
                     icon: 'IconCalendarMonth'
                   }

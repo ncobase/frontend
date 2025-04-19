@@ -326,7 +326,7 @@ export const CreatePage = () => {
                 header={[
                   {
                     title: 'ID',
-                    code: 'id',
+                    accessorKey: 'id',
                     parser: value => (
                       <Button variant='link' size='sm' onClick={() => navigate(`viewer/${value}`)}>
                         {value}
@@ -336,30 +336,30 @@ export const CreatePage = () => {
                   },
                   {
                     title: 'Name',
-                    code: 'name',
+                    accessorKey: 'name',
                     parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconFlame'
                   },
                   {
                     title: 'Slug',
-                    code: 'slug',
+                    accessorKey: 'slug',
                     icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',
-                    code: 'path',
+                    accessorKey: 'path',
                     parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconRoute'
                   },
                   {
                     title: 'Icon',
-                    code: 'icon',
+                    accessorKey: 'icon',
                     parser: value => <Icons name={value} size={16} />,
                     icon: 'IconCategory'
                   },
                   {
                     title: 'Status',
-                    code: 'disabled',
+                    accessorKey: 'disabled',
                     parser: value => {
                       value = value ? '1' : '0';
                       return (
@@ -378,7 +378,7 @@ export const CreatePage = () => {
                   },
                   {
                     title: 'Created At',
-                    code: 'created_at',
+                    accessorKey: 'created_at',
                     parser: value => <DatePicker defaultValue={value} />,
                     icon: 'IconCalendarMonth'
                   }

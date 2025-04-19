@@ -300,11 +300,11 @@ export const LoadingStatesExample = () => {
                 <TableView
                   data={data}
                   header={[
-                    { title: 'ID', code: 'id' },
-                    { title: t('example.name'), code: 'name' },
+                    { title: 'ID', accessorKey: 'id' },
+                    { title: t('example.name'), accessorKey: 'name' },
                     {
                       title: t('example.status'),
-                      code: 'status',
+                      accessorKey: 'status',
                       parser: value => {
                         const colorMap = {
                           [t('example.active')]: 'bg-green-100 text-green-800',
@@ -322,7 +322,7 @@ export const LoadingStatesExample = () => {
                     },
                     {
                       title: t('example.progress'),
-                      code: 'progress',
+                      accessorKey: 'progress',
                       parser: value => (
                         <div className='w-full bg-slate-200 rounded-full h-2.5'>
                           <div
@@ -334,7 +334,7 @@ export const LoadingStatesExample = () => {
                     },
                     {
                       title: t('example.i18n.operations'),
-                      code: 'operation-column',
+                      accessorKey: 'operation-column',
                       actions: [
                         {
                           title: t('actions.view'),

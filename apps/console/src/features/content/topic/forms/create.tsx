@@ -1,95 +1,139 @@
+import { useEffect, useState } from 'react';
+
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { FieldConfigProps } from '@/components/form';
+import { MarkdownEditor } from '@/components/markdown/editor';
+import { useListTaxonomies } from '@/features/content/taxonomy/service';
 import { useTenantContext } from '@/features/system/tenant/context';
 
 export const CreateTopicForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
   const { tenant_id } = useTenantContext();
+  const [taxonomyOptions, setTaxonomyOptions] = useState([]);
+
+  // Fetch taxonomies for dropdown
+  const { data: taxonomiesData } = useListTaxonomies({
+    limit: 100,
+    type: 'all',
+    children: false
+  });
+
+  useEffect(() => {
+    if (taxonomiesData?.items) {
+      const options = taxonomiesData.items.map(tax => ({
+        label: tax.name,
+        value: tax.id
+      }));
+      setTaxonomyOptions(options);
+    }
+  }, [taxonomiesData]);
 
   const fields: FieldConfigProps[] = [
+    // Basic Info Section
     {
-      title: '名称',
+      title: 'Topic Name',
       name: 'name',
       defaultValue: '',
-      placeholder: '请输入名称',
+      placeholder: 'Enter topic name',
       type: 'text',
       rules: { required: t('forms.input_required') }
     },
     {
-      title: '上级菜单',
-      name: 'parent',
+      title: 'Title',
+      name: 'title',
       defaultValue: '',
+      placeholder: 'Enter topic title',
       type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      rules: { required: t('forms.input_required') }
     },
     {
-      title: 'i18n 标签',
-      name: 'label',
-      placeholder: '请输入 i18n 标签',
+      title: 'Slug',
+      name: 'slug',
       defaultValue: '',
+      placeholder: 'Enter URL slug (leave empty to auto-generate)',
+      type: 'text'
+    },
+    {
+      title: 'Taxonomy',
+      name: 'taxonomy_id',
+      defaultValue: '',
+      type: 'select',
+      options: taxonomyOptions,
+      rules: { required: t('forms.input_required') }
+    },
+    {
+      title: 'Thumbnail',
+      name: 'thumbnail',
+      defaultValue: '',
+      placeholder: 'Enter thumbnail URL',
       type: 'text'
     },
 
+    // Content Section
     {
-      title: '图标',
-      name: 'icon',
+      title: 'Content',
+      name: 'content',
       defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      placeholder: 'Enter content',
+      type: 'markdown',
+      fullWidth: true,
+      component: ({ field }) => (
+        <MarkdownEditor {...field} className='min-h-[300px] border rounded-md' />
+      )
     },
-    { title: '别名', name: 'slug', defaultValue: '', type: 'text' },
-    { title: '路径 / URL', name: 'path', defaultValue: '', type: 'text' },
-    { title: '类型', name: 'type', defaultValue: '', type: 'text' },
+
+    // Publishing Options Section
     {
-      title: '打开方式',
-      name: 'target',
-      defaultValue: '_self',
+      title: 'Use Markdown',
+      name: 'markdown',
+      defaultValue: true,
+      type: 'switch',
+      elementClassName: 'my-3'
+    },
+    {
+      title: 'Is Private',
+      name: 'private',
+      defaultValue: false,
+      type: 'switch',
+      elementClassName: 'my-3'
+    },
+    {
+      title: 'Is Temporary',
+      name: 'temp',
+      defaultValue: false,
+      type: 'switch',
+      elementClassName: 'my-3'
+    },
+    {
+      title: 'Status',
+      name: 'status',
+      defaultValue: 0,
       type: 'select',
       options: [
-        { label: '当前窗口', value: '_self' },
-        { label: '新窗口', value: '_blank' }
+        { label: 'Draft', value: 0 },
+        { label: 'Published', value: 1 },
+        { label: 'Archived', value: 2 }
       ]
     },
-    { title: '权限标识', name: 'perms', defaultValue: '', type: 'text' },
     {
-      title: '是否显示',
-      name: 'hidden',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    { title: '排序', name: 'order', defaultValue: 99, type: 'number' },
-    {
-      title: '是否停用',
-      name: 'disabled',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
+      title: 'Release Date',
+      name: 'released',
+      defaultValue: Date.now(),
+      type: 'datetime'
     },
     {
-      title: '所属租户',
-      name: 'tenant',
+      title: 'Tenant ID',
+      name: 'tenant_id',
       defaultValue: tenant_id,
       type: 'hidden'
     }
-    // {
-    //   title: '扩展字段',
-    //   name: 'extras',
-    //   defaultValue: []
-    // }
   ];
 
   return (
     <Form
-      id='create-user'
+      id='create-topic'
       className='my-4 md:grid-cols-2'
       onSubmit={onSubmit}
       control={control}

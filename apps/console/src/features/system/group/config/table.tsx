@@ -12,7 +12,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   return [
     {
       title: '名称',
-      code: 'name',
+      accessorKey: 'name',
       parser: (value: string, record) => (
         <Button variant='link' onClick={() => handleView({ id: record?.id }, 'view')}>
           {value}
@@ -22,12 +22,12 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: '别名',
-      code: 'slug',
+      accessorKey: 'slug',
       icon: 'IconAffiliate'
     },
     {
       title: '负责人',
-      code: 'leader.user_id',
+      accessorKey: 'leader.user_id',
       icon: 'IconUser',
       parser: value => {
         if (!value) return '-';
@@ -37,13 +37,13 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: '是否禁用',
-      code: 'disabled',
+      accessorKey: 'disabled',
       parser: (value: string, _record: Group) => parseStatus(!value),
       icon: 'IconFlagCog'
     },
     {
       title: '创建人',
-      code: 'created_by',
+      accessorKey: 'created_by',
       icon: 'IconUser',
       parser: value => {
         if (!value) return '-';
@@ -53,7 +53,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: '创建日期',
-      code: 'created_at',
+      accessorKey: 'created_at',
       parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },

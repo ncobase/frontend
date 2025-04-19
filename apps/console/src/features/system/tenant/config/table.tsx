@@ -11,7 +11,7 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
   return [
     {
       title: '名称',
-      code: 'name',
+      accessorKey: 'name',
       parser: (value, record) => (
         <Button variant='link' size='md' onClick={() => handleView({ id: record?.id }, 'view')}>
           {value}
@@ -21,36 +21,36 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
     },
     {
       title: '类型',
-      code: 'type',
+      accessorKey: 'type',
       parser: value => value || '-',
       icon: 'IconCategory2'
     },
     {
       title: '别名',
-      code: 'slug',
+      accessorKey: 'slug',
       icon: 'IconRouteAltLeft'
     },
     {
       title: '官网',
-      code: 'url',
+      accessorKey: 'url',
       parser: value => value || '-',
       icon: 'IconWorldWww'
     },
     {
       title: '状态',
-      code: 'disabled',
+      accessorKey: 'disabled',
       parser: value => parseStatus(!value),
       icon: 'IconFlagCog'
     },
     {
       title: '到期时间',
-      code: 'expired_at',
+      accessorKey: 'expired_at',
       parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {
       title: '更新时间',
-      code: 'updated_at',
+      accessorKey: 'updated_at',
       parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },

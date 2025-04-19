@@ -11,7 +11,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   return [
     {
       title: '编号',
-      code: 'id',
+      accessorKey: 'id',
       parser: (value: string, _record: User) => (
         <Button variant='link' size='md' onClick={() => handleView({ id: value }, 'view')}>
           {value}
@@ -21,23 +21,23 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: '用户名',
-      code: 'username',
+      accessorKey: 'username',
       icon: 'IconFlame'
     },
     {
       title: '电话',
-      code: 'phone',
+      accessorKey: 'phone',
       icon: 'IconAffiliate'
     },
     {
       title: '状态',
-      code: 'status',
+      accessorKey: 'status',
       parser: (value: string, _record: User) => parseStatus(value),
       icon: 'IconFlagCog'
     },
     {
       title: '创建日期',
-      code: 'created_at',
+      accessorKey: 'created_at',
       parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },

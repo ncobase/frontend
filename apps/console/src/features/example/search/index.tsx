@@ -359,7 +359,7 @@ export const AdvancedSearchExample = () => {
               header={[
                 {
                   title: t('example.search.table.projectName'),
-                  code: 'title',
+                  accessorKey: 'title',
                   filter: 'sort',
                   parser: (value, _record) => {
                     if (filters.keyword && value) {
@@ -384,12 +384,12 @@ export const AdvancedSearchExample = () => {
                 },
                 {
                   title: t('example.search.table.type'),
-                  code: 'type',
+                  accessorKey: 'type',
                   filter: 'sort'
                 },
                 {
                   title: t('example.search.table.status'),
-                  code: 'status',
+                  accessorKey: 'status',
                   filter: 'sort',
                   parser: value => {
                     const colorMap = {
@@ -409,7 +409,7 @@ export const AdvancedSearchExample = () => {
                 },
                 {
                   title: t('example.search.table.priority'),
-                  code: 'priority',
+                  accessorKey: 'priority',
                   filter: 'sort',
                   parser: value => {
                     const colorMap = {
@@ -428,7 +428,7 @@ export const AdvancedSearchExample = () => {
                 },
                 {
                   title: t('example.search.table.owner'),
-                  code: 'owner',
+                  accessorKey: 'owner',
                   filter: 'sort',
                   parser: value => {
                     if (filters.keyword && value) {
@@ -453,19 +453,19 @@ export const AdvancedSearchExample = () => {
                 },
                 {
                   title: t('example.search.table.createdAt'),
-                  code: 'createdAt',
+                  accessorKey: 'createdAt',
                   filter: 'sort',
                   parser: value => formatDateTime(value)
                 },
                 {
                   title: t('example.search.table.updatedAt'),
-                  code: 'updatedAt',
+                  accessorKey: 'updatedAt',
                   filter: 'sort',
                   parser: value => formatDateTime(value)
                 },
                 {
                   title: t('example.search.table.operations'),
-                  code: 'operation-column',
+                  accessorKey: 'operation-column',
                   actions: [
                     {
                       title: t('actions.view'),

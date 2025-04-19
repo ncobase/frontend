@@ -1,17 +1,13 @@
-import { useState } from 'react';
-
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { useTenantContext } from '../../tenant/context';
 
 import { FieldConfigProps } from '@/components/form';
-import { IconSelector } from '@/components/modal/icons';
 
 export const CreateMenuForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
   const { tenant_id } = useTenantContext();
-  const [isSelectIcon, setIsSelectIcon] = useState(false);
 
   const fields: FieldConfigProps[] = [
     {
@@ -44,20 +40,7 @@ export const CreateMenuForms = ({ onSubmit, control, errors }) => {
       title: '图标',
       name: 'icon',
       defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        setIsSelectIcon(true);
-      },
-      valueComponent: ({ onChange }) => (
-        <IconSelector
-          opened={isSelectIcon}
-          onVisible={setIsSelectIcon}
-          onSelected={value => {
-            onChange(value);
-          }}
-        />
-      )
+      type: 'icon'
     },
     { title: '别名', name: 'slug', defaultValue: '', type: 'text' },
     { title: '路径 / URL', name: 'path', defaultValue: '', type: 'text' },

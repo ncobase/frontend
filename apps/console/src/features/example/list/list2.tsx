@@ -251,7 +251,7 @@ export const ListPage2 = () => {
           header={[
             {
               title: '编号',
-              code: 'id',
+              accessorKey: 'id',
               parser: value => (
                 <Button
                   variant='link'
@@ -265,33 +265,33 @@ export const ListPage2 = () => {
             },
             {
               title: '名称',
-              code: 'name',
+              accessorKey: 'name',
               icon: 'IconFlame'
             },
             {
               title: '别名',
-              code: 'slug',
+              accessorKey: 'slug',
               icon: 'IconAffiliate'
             },
             {
               title: '路径',
-              code: 'path',
+              accessorKey: 'path',
               icon: 'IconRoute'
             },
             {
               title: '图标',
-              code: 'icon',
+              accessorKey: 'icon',
               parser: value => <Icons name={value} size={16} />,
               icon: 'IconCategory'
             },
             {
               title: '状态',
-              code: 'disabled',
+              accessorKey: 'disabled',
               parser: value => parseStatus(!value),
               icon: 'IconFlagCog'
             },
             {
-              code: 'operation-column',
+              accessorKey: 'operation-column',
               actions: [
                 {
                   title: 'Edit',
@@ -332,7 +332,7 @@ export const ListPage2 = () => {
           header={[
             {
               title: '编号',
-              code: 'id',
+              accessorKey: 'id',
               parser: value => (
                 <Button
                   variant='link'
@@ -346,40 +346,40 @@ export const ListPage2 = () => {
             },
             {
               title: '名称',
-              code: 'name',
+              accessorKey: 'name',
               icon: 'IconFlame'
             },
             {
               title: '别名',
-              code: 'slug',
+              accessorKey: 'slug',
               icon: 'IconAffiliate'
             },
             {
               title: '路径',
-              code: 'path',
+              accessorKey: 'path',
               icon: 'IconRoute'
             },
             {
               title: '图标',
-              code: 'icon',
+              accessorKey: 'icon',
               parser: value => <Icons name={value} size={16} />,
               icon: 'IconCategory'
             },
             {
               title: '状态',
-              code: 'disabled',
+              accessorKey: 'disabled',
               parser: value => parseStatus(!value),
               icon: 'IconFlagCog'
             },
             {
-              code: 'created_at',
+              accessorKey: 'created_at',
               title: '创建时间',
               parser: value => formatDateTime(value),
               icon: 'IconCalendarMonth'
             },
             {
               title: '更新时间',
-              code: 'updated_at',
+              accessorKey: 'updated_at',
               parser: value => formatDateTime(value),
               icon: 'IconCalendarMonth'
             },

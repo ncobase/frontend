@@ -288,12 +288,12 @@ export const AuthExample = () => {
               <TableView
                 visibleControl
                 header={[
-                  { title: 'ID', code: 'id', filter: false, icon: 'IconHash' },
-                  { title: t('example.i18n.name'), code: 'name' },
-                  { title: 'Email', code: 'email' },
+                  { title: 'ID', accessorKey: 'id', filter: false, icon: 'IconHash' },
+                  { title: t('example.i18n.name'), accessorKey: 'name' },
+                  { title: 'Email', accessorKey: 'email' },
                   {
                     title: t('example.auth.roles.title'),
-                    code: 'roles',
+                    accessorKey: 'roles',
                     parser: userRoles => {
                       const rolesArray = Array.isArray(userRoles) ? userRoles : [userRoles];
                       return rolesArray
@@ -306,12 +306,12 @@ export const AuthExample = () => {
                   },
                   {
                     title: t('example.auth.lastLogin'),
-                    code: 'lastLogin',
+                    accessorKey: 'lastLogin',
                     parser: date => (date ? date.toLocaleString() : '-')
                   },
                   {
                     title: t('example.i18n.operations'),
-                    code: 'operation-column',
+                    accessorKey: 'operation-column',
                     parser: (_, _record) => (
                       <div className='flex space-x-2'>
                         <PermissionGuard requiredPermission='edit_users' currentRole={currentRole}>
@@ -378,20 +378,20 @@ export const AuthExample = () => {
               <div className='space-y-6'>
                 <TableView
                   header={[
-                    { title: 'ID', code: 'id' },
-                    { title: t('example.auth.roleManagement.roleName'), code: 'name' },
+                    { title: 'ID', accessorKey: 'id' },
+                    { title: t('example.auth.roleManagement.roleName'), accessorKey: 'name' },
                     {
                       title: t('example.auth.roleManagement.roleDescription'),
-                      code: 'description'
+                      accessorKey: 'description'
                     },
                     {
                       title: t('example.auth.permissionsCount'),
-                      code: 'permissions',
+                      accessorKey: 'permissions',
                       parser: permissions => permissions.length
                     },
                     {
                       title: t('example.i18n.operations'),
-                      code: 'operation-column',
+                      accessorKey: 'operation-column',
                       parser: (_, _record) => (
                         <div className='flex space-x-2'>
                           <Button variant='outline-primary' size='sm'>

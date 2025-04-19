@@ -133,13 +133,13 @@ export const ThemeSwitcherExample = () => {
             <TableView
               className={theme === 'dark' ? 'dark-table' : ''}
               header={[
-                { title: t('example.i18n.name'), code: 'name' },
-                { title: t('example.i18n.role'), code: 'role' },
-                { title: t('example.i18n.status'), code: 'status' },
-                { title: 'Progress', code: 'progress' },
+                { title: t('example.i18n.name'), accessorKey: 'name' },
+                { title: t('example.i18n.role'), accessorKey: 'role' },
+                { title: t('example.i18n.status'), accessorKey: 'status' },
+                { title: 'Progress', accessorKey: 'progress' },
                 {
                   title: t('example.i18n.operations'),
-                  code: 'operation-column',
+                  accessorKey: 'operation-column',
                   actions: [
                     {
                       title: t('actions.edit'),

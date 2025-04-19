@@ -1,6 +1,6 @@
 import { CardList } from './card';
+import { FormBuilderPage } from './component/builder';
 import { ElementPage } from './component/element';
-import { FormPage } from './component/form';
 import { LayoutPage } from './component/layout';
 import { TemplatePage } from './component/template';
 import { LogPage } from './efficiency/log';
@@ -21,7 +21,7 @@ export const ExampleCardRoutes = () => {
     { path: 'role', element: <RolePage /> },
     { path: 'permission', element: <PermissionPage /> },
     { path: 'element', element: <ElementPage /> },
-    { path: 'form', element: <FormPage /> },
+    { path: 'form', element: <FormBuilderPage /> },
     { path: 'layout', element: <LayoutPage /> },
     { path: 'template', element: <TemplatePage /> },
     { path: 'log', element: <LogPage /> },

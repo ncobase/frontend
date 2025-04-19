@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import { Modal } from '@ncobase/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
-import { Modal } from '@/components/modal/modal';
 import { useAuthContext } from '@/features/account/context';
 import { LoginForm } from '@/features/account/pages/auth/login_form';
 import { eventEmitter } from '@/lib/events';

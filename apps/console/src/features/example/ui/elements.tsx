@@ -1135,7 +1135,7 @@ export const Elements = ({ ...rest }) => {
                 <div className='flex flex-col gap-y-1'>
                   <Label>Mr.</Label>
                   <Select>
-                    <SelectTrigger>
+                    <SelectTrigger allowClear>
                       <SelectValue placeholder='Select' />
                     </SelectTrigger>
                     <SelectContent>
@@ -1570,12 +1570,12 @@ export const Elements = ({ ...rest }) => {
               selected
               visibleControl
               header={[
-                { title: '姓名', code: 'name' },
-                { title: '性别', code: 'sex' },
-                { title: '年龄', code: 'age' },
-                { title: '所属部门', code: 'department' },
-                { title: '职务', code: 'position' },
-                { title: '操作', code: 'operation' }
+                { title: '姓名', accessorKey: 'name' },
+                { title: '性别', accessorKey: 'sex' },
+                { title: '年龄', accessorKey: 'age' },
+                { title: '所属部门', accessorKey: 'department' },
+                { title: '职务', accessorKey: 'position' },
+                { title: '操作', accessorKey: 'operation' }
               ]}
               data={[
                 {
