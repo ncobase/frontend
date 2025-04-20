@@ -60,7 +60,7 @@ export const ModalView = memo(
           <Button
             variant='unstyle'
             size='ratio'
-            className='rounded-full mt-[5px] p-1 text-default-11 hover:bg-default-1/10 focus:outline-hidden hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)] [&>svg]:hover:stroke-danger-400'
+            className='rounded-full mt-0.5 p-1 text-default-11 hover:bg-default-1/10 focus:outline-hidden hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)] [&>svg]:hover:stroke-danger-400'
             onClick={handleMaximize}
           >
             <Icons name={isMaximized ? 'IconWindowMinimize' : 'IconWindowMaximize'} size={16} />
