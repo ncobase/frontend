@@ -77,7 +77,7 @@ const QueryBar = ({
       id='querybar-form'
       onSubmit={onQuery}
       noValidate
-      className='flex bg-white shadow-sm -mx-4 -mt-4 p-4 relative'
+      className='flex bg-white shadow-xs -mx-4 -mt-4 p-4 relative'
     >
       <div className='flex-1 items-start justify-between grid grid-cols-12 gap-4'>
         <div
@@ -100,7 +100,7 @@ const QueryBar = ({
             <Button
               variant='unstyle'
               size='ratio'
-              className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-[9999] bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 hover:[&>svg]:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+              className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
               title={t(isExpanded ? 'query.collapse' : 'query.expand')}
               onClick={toggleExpand}
             >

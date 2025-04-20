@@ -17,7 +17,7 @@ export const DropdownControl = ({ onChange }: { onChange?: (value: string) => vo
   const { t } = useTranslation();
   return (
     <Select defaultValue={filterDays[0].value} onValueChange={onChange}>
-      <SelectTrigger className='w-auto outline-none py-1.5 px-1.5 gap-x-1.5 shadow-none border-none bg-slate-100 hover:bg-slate-100/80'>
+      <SelectTrigger className='w-auto outline-hidden py-1.5 px-1.5 gap-x-1.5 shadow-none border-none bg-slate-100 hover:bg-slate-100/80'>
         <Icons name='IconCalendar' />
         <SelectValue />
       </SelectTrigger>

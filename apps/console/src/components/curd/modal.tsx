@@ -44,7 +44,7 @@ export const ModalView = memo(
 
     const [isMaximized, setIsMaximized] = useState(defaultIsMaximized);
     const maximizedClasses =
-      '!w-[100lvw] !h-[100lvh] !max-w-[100lvw] !max-h-[100lvh] !shadow-none !rounded-none -translate-y-[50%] data-[state=open]:slide-in-from-top-[50%]';
+      'w-[100lvw]! h-[100lvh]! max-w-[100lvw]! max-h-[100lvh]! shadow-none! rounded-none! -translate-y-[50%] data-[state=open]:slide-in-from-top-[50%]';
     const handleMaximize = () => {
       setIsMaximized(prevStatus => !prevStatus);
     };
@@ -60,7 +60,7 @@ export const ModalView = memo(
           <Button
             variant='unstyle'
             size='ratio'
-            className='rounded-full p-1 text-default-11 hover:bg-default-1/10 focus:outline-none hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:[&>svg]:stroke-danger-400'
+            className='rounded-full mt-[5px] p-1 text-default-11 hover:bg-default-1/10 focus:outline-hidden hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)] [&>svg]:hover:stroke-danger-400'
             onClick={handleMaximize}
           >
             <Icons name={isMaximized ? 'IconWindowMinimize' : 'IconWindowMaximize'} size={16} />

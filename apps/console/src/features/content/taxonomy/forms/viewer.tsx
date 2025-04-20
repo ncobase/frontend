@@ -22,7 +22,7 @@ export const TaxonomyViewerForms = ({ record }) => {
   return (
     <div className='grid grid-cols-1 gap-8 mt-4'>
       {/* Basic Information */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <div className='flex items-center mb-6'>
           <div
             className='w-8 h-8 rounded-md mr-3 flex items-center justify-center'
@@ -47,7 +47,7 @@ export const TaxonomyViewerForms = ({ record }) => {
       </div>
 
       {/* Appearance */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <h2 className='text-lg font-semibold mb-4 flex items-center'>
           <Icons name='IconPalette' className='mr-2' />
           Appearance
@@ -57,7 +57,7 @@ export const TaxonomyViewerForms = ({ record }) => {
           <FieldViewer title='Color'>
             <div className='flex items-center'>
               <div
-                className='w-5 h-5 rounded-sm mr-2'
+                className='w-5 h-5 rounded-xs mr-2'
                 style={{ backgroundColor: data.color || '#3B82F6' }}
               ></div>
               {data.color || '-'}
@@ -80,7 +80,7 @@ export const TaxonomyViewerForms = ({ record }) => {
               <img
                 src={data.cover}
                 alt={`Cover for ${data.name}`}
-                className='max-h-40 rounded-md shadow-sm'
+                className='max-h-40 rounded-md shadow-xs'
               />
             </div>
           )}
@@ -91,7 +91,7 @@ export const TaxonomyViewerForms = ({ record }) => {
               <img
                 src={data.thumbnail}
                 alt={`Thumbnail for ${data.name}`}
-                className='max-h-40 rounded-md shadow-sm'
+                className='max-h-40 rounded-md shadow-xs'
               />
             </div>
           )}
@@ -99,7 +99,7 @@ export const TaxonomyViewerForms = ({ record }) => {
       </div>
 
       {/* SEO & Metadata */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <h2 className='text-lg font-semibold mb-4 flex items-center'>
           <Icons name='IconSearch' className='mr-2' />
           SEO & Metadata
@@ -114,7 +114,7 @@ export const TaxonomyViewerForms = ({ record }) => {
       </div>
 
       {/* System Information */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <h2 className='text-lg font-semibold mb-4 flex items-center'>
           <Icons name='IconInfoCircle' className='mr-2' />
           System Information
@@ -135,7 +135,7 @@ export const TaxonomyViewerForms = ({ record }) => {
 
       {/* Extra Properties */}
       {data.extras && Object.keys(data.extras).length > 0 && (
-        <div className='bg-white rounded-lg shadow-sm p-6'>
+        <div className='bg-white rounded-lg shadow-xs p-6'>
           <h2 className='text-lg font-semibold mb-4 flex items-center'>
             <Icons name='IconSettings' className='mr-2' />
             Extra Properties

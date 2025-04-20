@@ -334,7 +334,7 @@ export const NotificationExample: React.FC = () => {
                 </ul>
 
                 <div className='mt-4 p-3 bg-slate-50 rounded-md'>
-                  <p className='text-xs font-mono'>
+                  <p className='font-mono'>
                     toast.success('Message', &#123; description: 'Description' &#125;);
                     <br />
                     toast.error('Error message');
@@ -357,7 +357,7 @@ export const NotificationExample: React.FC = () => {
                 </ul>
 
                 <div className='mt-4 p-3 bg-slate-50 rounded-md'>
-                  <p className='text-xs font-mono'>
+                  <p className='font-mono'>
                     addNotification(&#123;
                     <br />
                     &nbsp;&nbsp;title: 'Notification Title',

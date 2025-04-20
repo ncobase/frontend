@@ -24,7 +24,7 @@ export const Login = () => {
         <LanguageSwitcher />
       </div>
       <div className='flex items-center justify-center flex-col min-h-lvh min-w-full'>
-        <div className='p-6 bg-white shadow-sm max-w-2xl w-[38rem] -mt-14 rounded-md'>
+        <div className='p-6 bg-white shadow-xs max-w-2xl w-[38rem] -mt-14 rounded-md'>
           <Logo className='mx-auto mt-6 mb-12 py-1.5 drop-shadow-xl shadow-slate-900' type='full' />
           <LoginForm onSuccess={onLogin} />
           <Divider label='OR' style='dashed' className='my-2' />
@@ -32,7 +32,7 @@ export const Login = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                  <Icons name='IconBrandGoogle' className='!stroke-white !stroke-2' />
+                  <Icons name='IconBrandGoogle' className='stroke-white! stroke-2!' />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side='bottom'>Google</TooltipContent>
@@ -40,7 +40,7 @@ export const Login = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                  <Icons name='IconBrandGithub' className='!stroke-white !stroke-2' />
+                  <Icons name='IconBrandGithub' className='stroke-white! stroke-2!' />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side='bottom'>Github</TooltipContent>
@@ -48,7 +48,7 @@ export const Login = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                  <Icons name='IconBrandTiktok' className='!stroke-white !stroke-2' />
+                  <Icons name='IconBrandTiktok' className='stroke-white! stroke-2!' />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side='bottom'>Tiktok</TooltipContent>

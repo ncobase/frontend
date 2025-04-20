@@ -35,7 +35,7 @@ export const PortalExample: React.FC = () => {
             <p className='text-sm'>{t('example.basic_portal_explanation')}</p>
 
             <div className='overflow-hidden border border-slate-200 rounded-md p-4 h-32 relative'>
-              <p className='text-xs text-slate-500'>{t('example.parent_container')}</p>
+              <p className='text-slate-500'>{t('example.parent_container')}</p>
 
               <Button onClick={() => setShowBasicPortal(!showBasicPortal)} className='mt-2'>
                 {showBasicPortal
@@ -75,7 +75,7 @@ export const PortalExample: React.FC = () => {
             <p className='text-sm'>{t('example.custom_container_explanation')}</p>
 
             <div className='overflow-hidden border border-slate-200 rounded-md p-4 h-32 relative'>
-              <p className='text-xs text-slate-500'>{t('example.parent_container')}</p>
+              <p className='text-slate-500'>{t('example.parent_container')}</p>
 
               <Button onClick={() => setShowCustomPortal(!showCustomPortal)} className='mt-2'>
                 {showCustomPortal
@@ -86,15 +86,15 @@ export const PortalExample: React.FC = () => {
               {/* Custom container for portal */}
               <div
                 ref={customContainerRef}
-                className='mt-4 border border-dashed border-blue-300 p-2 rounded bg-blue-50 h-20 relative'
+                className='mt-4 border border-dashed border-blue-300 p-2 rounded-sm bg-blue-50 h-20 relative'
               >
-                <p className='text-xs text-blue-600'>{t('example.custom_container_target')}</p>
+                <p className='text-blue-600'>{t('example.custom_container_target')}</p>
               </div>
 
               {showCustomPortal && (
                 <Portal container={customContainerRef.current}>
-                  <div className='absolute inset-0 flex items-center justify-center bg-blue-100 rounded'>
-                    <div className='bg-white p-3 rounded shadow-md text-center'>
+                  <div className='absolute inset-0 flex items-center justify-center bg-blue-100 rounded-sm'>
+                    <div className='bg-white p-3 rounded-sm shadow-md text-center'>
                       <p className='text-sm font-medium'>{t('example.custom_portal_content')}</p>
                       <Button
                         size='sm'
@@ -125,10 +125,10 @@ export const PortalExample: React.FC = () => {
             </div>
 
             <div className='overflow-hidden border border-slate-200 rounded-md p-4 relative'>
-              <p className='text-xs text-slate-500 mb-4'>{t('example.parent_container')}</p>
+              <p className='text-slate-500 mb-4'>{t('example.parent_container')}</p>
 
               <div className='bg-slate-100 p-4 h-32 overflow-auto'>
-                <p className='text-xs text-slate-500 mb-2'>{t('example.scrollable_container')}</p>
+                <p className='text-slate-500 mb-2'>{t('example.scrollable_container')}</p>
 
                 <Portal disablePortal={disablePortal}>
                   <div className='bg-emerald-100 border border-emerald-300 p-3 rounded-md my-3'>
@@ -137,7 +137,7 @@ export const PortalExample: React.FC = () => {
                         ? t('example.rendering_inline')
                         : t('example.rendering_in_portal')}
                     </p>
-                    <p className='text-xs text-emerald-700 mt-1'>
+                    <p className='text-emerald-700 mt-1'>
                       {disablePortal
                         ? t('example.affected_by_parent_overflow')
                         : t('example.escapes_parent_overflow')}
@@ -146,13 +146,13 @@ export const PortalExample: React.FC = () => {
                 </Portal>
 
                 <div className='h-64 flex items-end'>
-                  <p className='text-xs text-slate-400'>{t('example.scroll_down')}</p>
+                  <p className='text-slate-400'>{t('example.scroll_down')}</p>
                 </div>
               </div>
             </div>
           </CardContent>
           <CardFooter>
-            <p className='text-xs text-slate-500'>{t('example.portal_usage_tip')}</p>
+            <p className='text-slate-500'>{t('example.portal_usage_tip')}</p>
           </CardFooter>
         </Card>
       </div>

@@ -11,12 +11,12 @@ export const Profile = () => {
     <Page title='Profile' className='p-0'>
       <ScrollView className='py-4'>
         <Container className='max-w-7xl bg-white'>
-          <div className='p-6 pb-0 mb-6 bg-white rounded-xl shadow-sm'>
+          <div className='p-6 pb-0 mb-6 bg-white rounded-xl shadow-xs'>
             <div className='flex items-center justify-start gap-x-4'>
               <div className='relative'>
                 <AvatarButton
                   isLoading={isLoading}
-                  className=' rounded-md size-32'
+                  className='rounded-md size-32'
                   src={profile?.thumbnail}
                   title={profile?.display_name || user?.username || ''}
                   alt={profile?.display_name || user?.username || ''}
@@ -29,27 +29,27 @@ export const Profile = () => {
                 <div className='flex items-center justify-start gap-x-4 py-1'>
                   <Button
                     variant='unstyle'
-                    className='px-0 py-1.5 [&>svg]:hover:stroke-success-500'
+                    className='px-0 py-1.5 hover:[&>svg]:stroke-success-500'
                   >
                     <Icons name='IconShieldCheck' className='stroke-slate-400/65' />
                   </Button>
                   <Button
                     variant='unstyle'
-                    className='px-0 py-1.5 [&>svg]:hover:stroke-success-400'
+                    className='px-0 py-1.5 hover:[&>svg]:stroke-success-400'
                   >
                     <Icons name='IconMapPin' className='stroke-slate-400/65' />
-                    <span className=' text-slate-400 text-gradient-hover'>{user?.phone}</span>
+                    <span className='text-slate-400 text-gradient-hover'>{user?.phone}</span>
                   </Button>
-                  <Button variant='unstyle' className='px-0 py-1.5 [&>svg]:hover:stroke-orange-400'>
+                  <Button variant='unstyle' className='px-0 py-1.5 hover:[&>svg]:stroke-orange-400'>
                     <Icons name='IconAt' className='stroke-slate-400/65' />
-                    <span className=' text-slate-400 text-gradient-hover'>{user?.email}</span>
+                    <span className='text-slate-400 text-gradient-hover'>{user?.email}</span>
                   </Button>
                   <Button
                     variant='unstyle'
-                    className='px-0 py-1.5 [&>svg]:hover:stroke-primary-400'
+                    className='px-0 py-1.5 hover:[&>svg]:stroke-primary-400'
                   >
                     <Icons name='IconPhoneCall' className='stroke-slate-400/65' />
-                    <span className=' text-slate-400 text-gradient-hover'>{user?.phone}</span>
+                    <span className='text-slate-400 text-gradient-hover'>{user?.phone}</span>
                   </Button>
                 </div>
                 <div className='flex items-center gap-x-4 mt-4'>
@@ -87,7 +87,7 @@ export const Profile = () => {
               </button>
             </div>
           </div>
-          <div className='p-6 mb-6 bg-white rounded-xl shadow-sm'>
+          <div className='p-6 mb-6 bg-white rounded-xl shadow-xs'>
             <div className='grid gap-y-2 grid-cols-6 pb-5'>
               <div className='col-span-full'>
                 <span className='block font-medium leading-6 text-slate-800'>显示名称</span>

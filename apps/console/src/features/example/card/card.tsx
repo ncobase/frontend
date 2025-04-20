@@ -14,7 +14,7 @@ import { CardLayout } from './layout';
 
 const QueryBar = () => {
   return (
-    <div className='sticky -top-[0.9rem] z-[666] bg-white shadow-sm flex-col grid -mx-4 -mt-4 px-4 divide-y divide-slate-100'>
+    <div className='sticky -top-[0.9rem] z-666 bg-white shadow-xs flex-col grid -mx-4 -mt-4 px-4 divide-y divide-slate-100'>
       <div className='py-4 flex items-center justify-start'>
         <div className='flex items-center text-slate-800'>类别：</div>
         <div className='flex-1 flex gap-x-4 pl-4'>
@@ -141,7 +141,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -188,7 +188,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>
@@ -298,7 +298,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -345,7 +345,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>
@@ -455,7 +455,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -502,7 +502,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>
@@ -647,7 +647,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -694,7 +694,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>
@@ -804,7 +804,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -851,7 +851,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>
@@ -961,7 +961,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -1008,7 +1008,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>
@@ -1118,7 +1118,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-success-100 rounded-md text-xs px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
+            <span className='inline-flex bg-success-100 rounded-md px-1 py-0.5 ml-2 text-success-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedCheck' className='stroke-green-400' />
               已开通
             </span>
@@ -1165,7 +1165,7 @@ const RecordCard = () => {
         <CardHeader>
           <CardTitle className='text-lg font-normal'>
             用户画像分析
-            <span className='inline-flex bg-danger-100 rounded-md text-xs px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
+            <span className='inline-flex bg-danger-100 rounded-md px-1 py-0.5 ml-2 text-danger-500 gap-x-0.5'>
               <Icons name='IconSquareRoundedX' className='stroke-red-400' />
               已过期
             </span>

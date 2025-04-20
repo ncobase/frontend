@@ -78,7 +78,7 @@ const HeaderComponent = ({ ...rest }) => {
 
   return (
     <ShellHeader
-      className='flex items-center justify-between bg-gradient-to-r border-b-0 backdrop-blur from-slate-800 via-slate-700 via-20% to-slate-800'
+      className='flex items-center justify-between bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
       {...rest}
     >
       <div className='inline-flex items-center justify-start'>

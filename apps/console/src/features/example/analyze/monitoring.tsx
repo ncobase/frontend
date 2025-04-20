@@ -274,7 +274,7 @@ export const OperationsDashboard = () => {
           </div>
           <div className='flex gap-4'>
             <select
-              className='bg-white border border-slate-300 rounded px-3 py-1.5 text-sm'
+              className='bg-white border border-slate-300 rounded-sm px-3 py-1.5 text-sm'
               value={dataPoints}
               onChange={e => setDataPoints(Number(e.target.value))}
             >
@@ -283,7 +283,7 @@ export const OperationsDashboard = () => {
               <option value={30}>Last 30 points</option>
               <option value={60}>Last 60 points</option>
             </select>
-            <button className='bg-blue-600 text-white px-4 py-1.5 rounded text-sm hover:bg-blue-700 transition-colors'>
+            <button className='bg-blue-600 text-white px-4 py-1.5 rounded-sm text-sm hover:bg-blue-700 transition-colors'>
               Refresh Data
             </button>
           </div>
@@ -296,12 +296,12 @@ export const OperationsDashboard = () => {
             {serverStatus.map(server => (
               <div
                 key={server.id}
-                className='bg-white rounded-lg p-4 shadow-sm border border-slate-200 flex flex-col'
+                className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 flex flex-col'
               >
                 <div className='flex items-center justify-between mb-2'>
                   <h3 className='font-medium'>{server.name}</h3>
                   <span
-                    className='px-2 py-0.5 rounded-full text-xs font-medium'
+                    className='px-2 py-0.5 rounded-full font-medium'
                     style={{
                       backgroundColor:
                         server.status === 'OK'
@@ -320,7 +320,7 @@ export const OperationsDashboard = () => {
                     {server.status}
                   </span>
                 </div>
-                <div className='text-xs text-slate-500 mb-1'>Role: {server.role}</div>
+                <div className='text-slate-500 mb-1'>Role: {server.role}</div>
                 <div className='flex justify-between items-center mb-1.5'>
                   <span className='text-xs'>CPU</span>
                   <div className='flex-1 mx-2 bg-slate-100 rounded-full h-2 overflow-hidden'>
@@ -337,7 +337,7 @@ export const OperationsDashboard = () => {
                       }}
                     ></div>
                   </div>
-                  <span className='text-xs font-medium'>{server.cpu}%</span>
+                  <span className='font-medium'>{server.cpu}%</span>
                 </div>
                 <div className='flex justify-between items-center'>
                   <span className='text-xs'>MEM</span>
@@ -355,9 +355,9 @@ export const OperationsDashboard = () => {
                       }}
                     ></div>
                   </div>
-                  <span className='text-xs font-medium'>{server.memory}%</span>
+                  <span className='font-medium'>{server.memory}%</span>
                 </div>
-                <div className='mt-2 text-xs text-slate-500'>
+                <div className='mt-2 text-slate-500'>
                   Uptime: {Math.floor(server.uptime / 24)}d {Math.floor(server.uptime % 24)}h
                 </div>
               </div>
@@ -368,7 +368,7 @@ export const OperationsDashboard = () => {
         {/* Charts Row 1 */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
           {/* CPU Usage Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2 text-slate-700'>CPU Usage by Service</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -415,7 +415,7 @@ export const OperationsDashboard = () => {
           </div>
 
           {/* Memory Usage Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2 text-slate-700'>Memory Allocation</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -464,7 +464,7 @@ export const OperationsDashboard = () => {
         {/* Charts Row 2 */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-6'>
           {/* Network Traffic Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200 md:col-span-2'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 md:col-span-2'>
             <h2 className='text-lg font-semibold mb-2 text-slate-700'>Network Traffic (MB/s)</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -499,7 +499,7 @@ export const OperationsDashboard = () => {
           </div>
 
           {/* Performance Score Radar Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2 text-slate-700'>Performance Score</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -532,7 +532,7 @@ export const OperationsDashboard = () => {
         {/* Charts Row 3 */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           {/* Response Time Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2 text-slate-700'>API Response Times (ms)</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -578,7 +578,7 @@ export const OperationsDashboard = () => {
           </div>
 
           {/* Error Rate Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2 text-slate-700'>Error Rates</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -609,23 +609,23 @@ export const OperationsDashboard = () => {
         {/* Critical Alerts Section */}
         <div className='mt-6'>
           <h2 className='text-lg font-semibold mb-3 text-slate-700'>Recent Alerts</h2>
-          <div className='bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden'>
+          <div className='bg-white rounded-lg shadow-xs border border-slate-200 overflow-hidden'>
             <table className='min-w-full divide-y divide-slate-200'>
               <thead className='bg-slate-50'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
                     Time
                   </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
                     Severity
                   </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
                     Resource
                   </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
                     Message
                   </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider'>
+                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
                     Status
                   </th>
                 </tr>
@@ -636,7 +636,7 @@ export const OperationsDashboard = () => {
                     Today 10:15 AM
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
                       Critical
                     </span>
                   </td>
@@ -645,7 +645,7 @@ export const OperationsDashboard = () => {
                     CPU usage exceeded 90% threshold for 5 minutes
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    <span className='px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>
@@ -655,7 +655,7 @@ export const OperationsDashboard = () => {
                     Today 09:42 AM
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
                       Warning
                     </span>
                   </td>
@@ -666,7 +666,7 @@ export const OperationsDashboard = () => {
                     High 5xx error rate detected
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    <span className='px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>
@@ -676,7 +676,7 @@ export const OperationsDashboard = () => {
                     Today 09:15 AM
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
                       Critical
                     </span>
                   </td>
@@ -687,7 +687,7 @@ export const OperationsDashboard = () => {
                     Memory usage at 95%, potential memory leak
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    <span className='px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
                       Investigating
                     </span>
                   </td>
@@ -697,7 +697,7 @@ export const OperationsDashboard = () => {
                     Yesterday 11:52 PM
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
                       Warning
                     </span>
                   </td>
@@ -708,7 +708,7 @@ export const OperationsDashboard = () => {
                     Response time increased by 40%
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    <span className='px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>
@@ -718,7 +718,7 @@ export const OperationsDashboard = () => {
                     Yesterday 10:23 PM
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 text-xs font-medium bg-slate-100 text-slate-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-slate-100 text-slate-800 rounded-full'>
                       Info
                     </span>
                   </td>
@@ -727,7 +727,7 @@ export const OperationsDashboard = () => {
                     Queue depth exceeding normal patterns
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    <span className='px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full'>
+                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>

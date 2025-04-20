@@ -65,9 +65,9 @@ const LoadingState = ({ message = t('example.loading.states.loading'), type = 's
 
       {type === 'skeleton' && (
         <div className='space-y-2 w-full max-w-md'>
-          <div className='h-4 bg-slate-200 rounded w-3/4 animate-pulse'></div>
-          <div className='h-4 bg-slate-200 rounded animate-pulse'></div>
-          <div className='h-4 bg-slate-200 rounded w-5/6 animate-pulse'></div>
+          <div className='h-4 bg-slate-200 rounded-sm w-3/4 animate-pulse'></div>
+          <div className='h-4 bg-slate-200 rounded-sm animate-pulse'></div>
+          <div className='h-4 bg-slate-200 rounded-sm w-5/6 animate-pulse'></div>
         </div>
       )}
 
@@ -134,7 +134,7 @@ const TableSkeleton = ({ rowCount = 5, columnCount = 4 }) => {
         {Array(columnCount)
           .fill(0)
           .map((_, i) => (
-            <div key={`header-${i}`} className='h-6 bg-slate-200 rounded'></div>
+            <div key={`header-${i}`} className='h-6 bg-slate-200 rounded-sm'></div>
           ))}
       </div>
 
@@ -150,7 +150,7 @@ const TableSkeleton = ({ rowCount = 5, columnCount = 4 }) => {
               .map((_, colIndex) => (
                 <div
                   key={`cell-${rowIndex}-${colIndex}`}
-                  className={`h-6 bg-slate-200 rounded ${colIndex === 0 ? 'w-1/2' : 'w-3/4'}`}
+                  className={`h-6 bg-slate-200 rounded-sm ${colIndex === 0 ? 'w-1/2' : 'w-3/4'}`}
                 ></div>
               ))}
           </div>
@@ -167,16 +167,16 @@ const CardSkeleton = ({ count = 4 }) => {
         .map((_, i) => (
           <div
             key={i}
-            className='bg-white rounded-lg shadow-sm border border-slate-200 p-4 animate-pulse'
+            className='bg-white rounded-lg shadow-xs border border-slate-200 p-4 animate-pulse'
           >
-            <div className='h-6 bg-slate-200 rounded w-3/4 mb-4'></div>
+            <div className='h-6 bg-slate-200 rounded-sm w-3/4 mb-4'></div>
             <div className='space-y-2'>
-              <div className='h-4 bg-slate-200 rounded'></div>
-              <div className='h-4 bg-slate-200 rounded w-5/6'></div>
-              <div className='h-4 bg-slate-200 rounded w-4/6'></div>
+              <div className='h-4 bg-slate-200 rounded-sm'></div>
+              <div className='h-4 bg-slate-200 rounded-sm w-5/6'></div>
+              <div className='h-4 bg-slate-200 rounded-sm w-4/6'></div>
             </div>
             <div className='mt-4 pt-4 border-t border-slate-100 flex justify-end'>
-              <div className='h-8 bg-slate-200 rounded w-24'></div>
+              <div className='h-8 bg-slate-200 rounded-sm w-24'></div>
             </div>
           </div>
         ))}
@@ -313,7 +313,7 @@ export const LoadingStatesExample = () => {
                         };
                         return (
                           <span
-                            className={`inline-block px-2 py-0.5 rounded-full text-xs ${colorMap[value] || ''}`}
+                            className={`inline-block px-2 py-0.5 rounded-full ${colorMap[value] || ''}`}
                           >
                             {value}
                           </span>
@@ -393,7 +393,7 @@ export const LoadingStatesExample = () => {
                         <span>{item.name}</span>
                         <span
                           className={`
-                          text-xs px-2 py-0.5 rounded-full
+                          px-2 py-0.5 rounded-full
                           ${item.status === t('example.active') ? 'bg-green-100 text-green-800' : ''}
                           ${item.status === t('example.completed') ? 'bg-blue-100 text-blue-800' : ''}
                           ${item.status === t('example.paused') ? 'bg-yellow-100 text-yellow-800' : ''}
@@ -413,9 +413,7 @@ export const LoadingStatesExample = () => {
                               style={{ width: `${item.progress}%` }}
                             ></div>
                           </div>
-                          <div className='text-right text-xs text-slate-500 mt-1'>
-                            {item.progress}%
-                          </div>
+                          <div className='text-right text-slate-500 mt-1'>{item.progress}%</div>
                         </div>
 
                         <div>

@@ -183,11 +183,11 @@ export const FilterBar = ({ activeFilter, onFilterChange, ...rest }) => {
       </div>
       {/* Filter options */}
       <div className='flex items-center gap-x-2'>
-        <Button variant='outline-slate' className='shadow-sm'>
+        <Button variant='outline-slate' className='shadow-xs'>
           <Icons name='IconCalendarMonth' />
           {t('filter.date')}
         </Button>
-        <Button variant='outline-slate' className='shadow-sm'>
+        <Button variant='outline-slate' className='shadow-xs'>
           <Icons name='IconFilter' />
           {t('filter.filter')}
         </Button>
@@ -974,7 +974,7 @@ export const AnalyzePage = ({ ...rest }) => {
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <div className='bg-white border border-gray-200 p-2 rounded shadow-md'>
+                          <div className='bg-white border border-gray-200 p-2 rounded-sm shadow-md'>
                             <p className='font-bold'>{label}</p>
                             {payload.map((entry, index) => (
                               <p key={`item-${index}`} style={{ color: entry.color }}>

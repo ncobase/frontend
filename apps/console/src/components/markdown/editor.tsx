@@ -69,7 +69,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Bold'
         onClick={() => insertMarkdown('**', '**')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconBold' size={16} />
       </Button>
@@ -78,7 +78,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Italic'
         onClick={() => insertMarkdown('*', '*')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconItalic' size={16} />
       </Button>
@@ -87,7 +87,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Heading'
         onClick={() => insertMarkdown('## ')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconHeading' size={16} />
       </Button>
@@ -96,7 +96,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Link'
         onClick={() => insertMarkdown('[', '](url)')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconLink' size={16} />
       </Button>
@@ -105,7 +105,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Image'
         onClick={() => insertMarkdown('![alt text](', ')')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconPhoto' size={16} />
       </Button>
@@ -114,7 +114,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Bulleted List'
         onClick={() => insertMarkdown('- ')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconList' size={16} />
       </Button>
@@ -123,7 +123,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Numbered List'
         onClick={() => insertMarkdown('1. ')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconListNumbers' size={16} />
       </Button>
@@ -132,7 +132,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Code'
         onClick={() => insertMarkdown('`', '`')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconCode' size={16} />
       </Button>
@@ -141,7 +141,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Code Block'
         onClick={() => insertMarkdown('```\n', '\n```')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconBraces' size={16} />
       </Button>
@@ -150,7 +150,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Blockquote'
         onClick={() => insertMarkdown('> ')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconQuote' size={16} />
       </Button>
@@ -159,7 +159,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         size='sm'
         title='Horizontal Rule'
         onClick={() => insertMarkdown('\n---\n')}
-        className='p-1 hover:bg-gray-100 rounded'
+        className='p-1 hover:bg-gray-100 rounded-sm'
       >
         <Icons name='IconSeparator' size={16} />
       </Button>
@@ -191,7 +191,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             value={content}
             onChange={handleContentChange}
             placeholder={placeholder}
-            className='w-full p-4 focus:outline-none resize-y'
+            className='w-full p-4 focus:outline-hidden resize-y'
             style={{ minHeight }}
           />
         </TabsContent>

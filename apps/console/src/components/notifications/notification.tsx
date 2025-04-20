@@ -155,13 +155,13 @@ export const Notifications = ({
             aria-label={t('notification.title')}
           >
             {displayCount > 0 && (
-              <Badge className='absolute -top-1 -right-1 text-[9px] !px-1'>{displayCount}</Badge>
+              <Badge className='absolute -top-1 -right-1 text-[9px] px-1!'>{displayCount}</Badge>
             )}
             <Icons name={triggerIcon} className='stroke-slate-500/85' />
           </Button>
         )}
       </HoverCardTrigger>
-      <HoverCardContent className={`p-0 w-80 ${contentClassName}`}>
+      <HoverCardContent className={`p-0 mt-3.5 w-80 ${contentClassName}`}>
         <CardHeader className='flex-row justify-between'>
           <div className='inline-flex flex-col space-y-1.5'>
             <CardTitle>{t('notification.title')}</CardTitle>
@@ -211,14 +211,14 @@ export const Notifications = ({
                     {notification.title}
                   </p>
                   {notification.description && (
-                    <p className='text-xs text-slate-400'>{notification.description}</p>
+                    <p className='text-slate-400'>{notification.description}</p>
                   )}
                 </div>
               </div>
             ))
           )}
           {items.length > maxItems && (
-            <div className='text-center text-xs text-slate-400'>
+            <div className='text-center text-slate-400'>
               {t('notification.and_more_notifications', {
                 count: items.length - maxItems
               })}

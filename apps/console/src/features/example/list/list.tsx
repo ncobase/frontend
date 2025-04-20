@@ -30,7 +30,7 @@ const QueryBar = () => {
     setIsExpanded(!isExpanded);
   };
   return (
-    <div className='bg-white shadow-sm flex-col grid rounded-md px-4 divide-y divide-slate-100 relative'>
+    <div className='bg-white shadow-xs flex-col grid rounded-md px-4 divide-y divide-slate-100 relative'>
       <div className='py-4 flex items-center justify-start'>
         <div className='flex items-center text-slate-800'>类别：</div>
         <div className='flex-1 flex gap-x-4 pl-4'>
@@ -134,7 +134,7 @@ const QueryBar = () => {
       <Button
         variant='unstyle'
         size='ratio'
-        className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-[9999] bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 hover:[&>svg]:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+        className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
         title={t(isExpanded ? 'query.collapse' : 'query.expand')}
         onClick={toggleExpand}
       >

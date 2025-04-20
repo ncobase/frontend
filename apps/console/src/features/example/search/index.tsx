@@ -400,7 +400,7 @@ export const AdvancedSearchExample = () => {
                     };
                     return (
                       <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs ${colorMap[value] || ''}`}
+                        className={`inline-block px-2 py-1 rounded-full ${colorMap[value] || ''}`}
                       >
                         {value}
                       </span>
@@ -419,7 +419,7 @@ export const AdvancedSearchExample = () => {
                     };
                     return (
                       <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs ${colorMap[value] || ''}`}
+                        className={`inline-block px-2 py-1 rounded-full ${colorMap[value] || ''}`}
                       >
                         {value}
                       </span>

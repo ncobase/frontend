@@ -58,7 +58,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
   return (
     <TopbarWrapper className={className} ariaLabel={ariaLabel}>
       {title && (
-        <div className='text-base font-medium text-slate-600 flex-shrink-0' id='topbar-title'>
+        <div className='font-medium text-slate-600 shrink-0' id='topbar-title'>
           {title}
           {(!!left.length || !!right.length) && (
             <span className='pl-px ml-4 mr-3 w-px bg-slate-200' aria-hidden='true' />
@@ -68,7 +68,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
 
       {!!left.length && (
         <div
-          className='flex gap-2 flex-shrink-0'
+          className='flex gap-2 shrink-0'
           role='group'
           aria-labelledby={title ? 'topbar-title' : undefined}
         >
@@ -80,7 +80,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
 
       {!!right.length && (
         <div
-          className='grow flex justify-end items-center gap-2 flex-shrink-0'
+          className='grow flex justify-end items-center gap-2 shrink-0'
           role='group'
           aria-label='Actions'
         >

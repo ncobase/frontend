@@ -208,7 +208,7 @@ export const ThemeSwitcherExample = () => {
                     {t('actions.outline')}
                   </Button>
                   <div
-                    className={`p-4 rounded bg-${color}-100 text-${color}-800 dark:bg-${color}-900 dark:text-${color}-200`}
+                    className={`p-4 rounded-sm bg-${color}-100 text-${color}-800 dark:bg-${color}-900 dark:text-${color}-200`}
                   >
                     {t('example.theme.content')}
                   </div>

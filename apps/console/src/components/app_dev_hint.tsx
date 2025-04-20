@@ -10,7 +10,7 @@ export const AppDevHint = () => {
   }
 
   const classess = cn(
-    'fixed top-0 left-0 w-4 h-4 text-white rounded-br-[0.375rem] z-[999] flex items-center justify-center text-xs uppercase bg-warning-400'
+    'fixed top-0 left-0 w-4 h-4 text-white rounded-br-[0.375rem] z-999 flex items-center justify-center uppercase bg-warning-400'
   );
 
   return (

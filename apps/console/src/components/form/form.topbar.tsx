@@ -11,7 +11,7 @@ const FormTopbarWrapper: React.FC<FormTopbarProps> = ({ children, className }) =
   return (
     <div
       className={cn(
-        'h-16 shadow-sm bg-white sticky top-0 right-0 left-0 flex items-center',
+        'h-16 shadow-xs bg-white sticky top-0 right-0 left-0 flex items-center',
         className
       )}
     >
@@ -47,10 +47,10 @@ export const FormTopbar: React.FC<FormTopbarProps> = ({
             ))}
           </div>
         )}
-        {title && <div className='flex text-base font-medium text-slate-600'>{title}</div>}
+        {title && <div className='flex font-medium text-slate-600'>{title}</div>}
       </div>
       {right.length > 0 && (
-        <div className='flex-grow flex justify-end items-center gap-2'>
+        <div className='grow flex justify-end items-center gap-2'>
           {right.map((element, index) => (
             <React.Fragment key={index}>{element}</React.Fragment>
           ))}

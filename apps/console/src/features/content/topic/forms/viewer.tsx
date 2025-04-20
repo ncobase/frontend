@@ -54,7 +54,7 @@ export const TopicViewerForms = ({ record }) => {
   return (
     <div className='grid grid-cols-1 gap-8 mt-4'>
       {/* Title and Basic Info */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <h1 className='text-2xl font-bold text-gray-800 mb-4'>{data.title}</h1>
 
         <div className='flex flex-wrap gap-2 mb-4'>
@@ -83,7 +83,7 @@ export const TopicViewerForms = ({ record }) => {
       </div>
 
       {/* Content */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <h2 className='text-lg font-semibold mb-4 flex items-center'>
           <Icons name='IconFileText' className='mr-2' />
           Content
@@ -101,7 +101,7 @@ export const TopicViewerForms = ({ record }) => {
       </div>
 
       {/* Meta Information */}
-      <div className='bg-white rounded-lg shadow-sm p-6'>
+      <div className='bg-white rounded-lg shadow-xs p-6'>
         <h2 className='text-lg font-semibold mb-4 flex items-center'>
           <Icons name='IconInfoCircle' className='mr-2' />
           System Information
@@ -122,14 +122,14 @@ export const TopicViewerForms = ({ record }) => {
 
       {/* Thumbnail Preview */}
       {data.thumbnail && (
-        <div className='bg-white rounded-lg shadow-sm p-6'>
+        <div className='bg-white rounded-lg shadow-xs p-6'>
           <h2 className='text-lg font-semibold mb-4 flex items-center'>
             <Icons name='IconPhoto' className='mr-2' />
             Thumbnail
           </h2>
 
           <div className='flex justify-center'>
-            <img src={data.thumbnail} alt={data.title} className='max-h-64 rounded-md shadow-sm' />
+            <img src={data.thumbnail} alt={data.title} className='max-h-64 rounded-md shadow-xs' />
           </div>
         </div>
       )}

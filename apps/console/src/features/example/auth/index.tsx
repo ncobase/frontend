@@ -177,7 +177,7 @@ export const AuthExample = () => {
               <p>{t('example.auth.description')}</p>
 
               {errorMessage && (
-                <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
+                <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-sm'>
                   <p>{errorMessage}</p>
                 </div>
               )}
@@ -185,7 +185,7 @@ export const AuthExample = () => {
               <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <Card>
                   <CardHeader className='pb-2'>
-                    <CardTitle className='text-base font-medium'>
+                    <CardTitle className='font-medium'>
                       {t('example.auth.permissions.dashboardAccess')}
                     </CardTitle>
                   </CardHeader>
@@ -204,7 +204,7 @@ export const AuthExample = () => {
 
                 <Card>
                   <CardHeader className='pb-2'>
-                    <CardTitle className='text-base font-medium'>
+                    <CardTitle className='font-medium'>
                       {t('example.auth.permissions.projectManagement')}
                     </CardTitle>
                   </CardHeader>
@@ -241,7 +241,7 @@ export const AuthExample = () => {
 
                 <Card>
                   <CardHeader className='pb-2'>
-                    <CardTitle className='text-base font-medium'>
+                    <CardTitle className='font-medium'>
                       {t('example.auth.permissions.userManagement')}
                     </CardTitle>
                   </CardHeader>

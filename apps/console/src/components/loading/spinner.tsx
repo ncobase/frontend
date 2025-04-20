@@ -6,7 +6,7 @@ interface SpinnerProps {
 
 export const Spinner: React.FC<SpinnerProps> = ({ className }) => {
   const classes = cn(
-    'absolute top-0 right-0 bottom-0 left-0 z-[666] flex items-center justify-center',
+    'absolute top-0 right-0 bottom-0 left-0 z-666 flex items-center justify-center',
     className
   );
 

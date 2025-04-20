@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { ConfigEnv, loadEnv, UserConfig } from 'vite';
+import tailwindcss from "@tailwindcss/vite";
 
 import pkg from './package.json';
 
@@ -9,7 +10,8 @@ function pathResolve(dir: string) {
 }
 
 const setupPlugins = ({}: ImportMetaEnv) => ([
-  react()
+  react(),
+  tailwindcss()
 ]);
 
 // noinspection JSUnusedGlobalSymbols

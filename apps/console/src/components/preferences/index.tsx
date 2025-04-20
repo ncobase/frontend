@@ -33,7 +33,7 @@ type ColorMode = 'light' | 'dark' | 'system';
 
 export const Preferences = () => {
   const { t } = useTranslation();
-  const { vmode, setVmode } = useLayoutContext();
+  const { setVmode } = useLayoutContext();
 
   // Get stored preferences
   const { storedValue: storedViewMode, setValue: setStoredViewMode } = useLocalStorage<ViewMode>(
@@ -118,7 +118,7 @@ export const Preferences = () => {
         <TooltipContent side='bottom'>{t('preferences.title')}</TooltipContent>
       </Tooltip>
 
-      <PopoverContent className='w-80 mt-4 p-4 bg-white z-[999]'>
+      <PopoverContent className='w-80 mt-4 p-4 bg-white z-999'>
         <h3 className='text-lg font-medium mb-4'>{t('preferences.title')}</h3>
 
         <div className='space-y-4'>

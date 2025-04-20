@@ -40,7 +40,7 @@ export const EditorPage = () => {
 
   return (
     <Page layout={false}>
-      <div className='h-16 shadow-sm bg-white sticky top-0 right-0 left-0'>
+      <div className='h-16 shadow-xs bg-white sticky top-0 right-0 left-0'>
         <Container className='max-w-7xl'>
           <div className='flex items-center justify-center'>
             <div className='flex-1 flex items-center gap-x-4'>

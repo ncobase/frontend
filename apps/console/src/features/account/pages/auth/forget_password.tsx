@@ -31,7 +31,7 @@ export const ForgetPassword = () => {
         <LanguageSwitcher />
       </div>
       <div className='flex items-center justify-center flex-col min-h-lvh min-w-full'>
-        <div className='p-6 bg-white shadow-sm max-w-2xl w-[38rem] -mt-14 rounded-md'>
+        <div className='p-6 bg-white shadow-xs max-w-2xl w-[38rem] -mt-14 rounded-md'>
           <div className='flex justify-center mb-3 mt-2'>
             <Logo type='full' height='2.25rem' />
           </div>

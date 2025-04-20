@@ -26,7 +26,7 @@ const FallbackComponent = ({
         // title={error?.name}
         // description={error?.message}
       >
-        <CodeHighlighter language='json' className='h-full !my-0 text-wrap'>
+        <CodeHighlighter language='json' className='h-full my-0! text-wrap'>
           {/** @ts-ignore */}
           {error?.stack}
         </CodeHighlighter>

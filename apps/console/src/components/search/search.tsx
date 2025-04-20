@@ -26,7 +26,7 @@ export const Search = () => {
         defaultValue=''
         render={({ field }) => (
           <InputField
-            className='mr-3 py-[3.5px] border-transparent focus:border-slate-600 text-slate-300 [&>*>input]:bg-slate-50/15 backdrop-blur-sm hover:[&>*>input]:border-slate-600 hover:[&>*>input]:bg-slate-50/15'
+            className='mr-3 py-[3.5px] border-transparent focus:border-slate-600 text-slate-300 [&>*>input]:bg-slate-50/15 backdrop-blur-xs [&>*>input]:hover:border-slate-600 [&>*>input]:hover:bg-slate-50/15'
             placeholder={t('search.placeholder')}
             prependIcon='IconSearch'
             onChange={field.onChange}

@@ -235,14 +235,14 @@ export const ECommerceDashboard = () => {
             <select
               value={timeRange}
               onChange={e => setTimeRange(e.target.value)}
-              className='bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-sm shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500'
             >
               <option value='week'>Last 7 days</option>
               <option value='month'>Last 30 days</option>
               <option value='quarter'>Last quarter</option>
               <option value='year'>Last year</option>
             </select>
-            <button className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 shadow-sm'>
+            <button className='bg-blue-600 text-white px-4 py-2 rounded-sm hover:bg-blue-700 shadow-xs'>
               Download Report
             </button>
           </div>
@@ -251,7 +251,7 @@ export const ECommerceDashboard = () => {
         {/* KPI Cards */}
         <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
           {/* Total Sales Card */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm text-slate-500 font-medium'>Total Sales</p>
@@ -297,7 +297,7 @@ export const ECommerceDashboard = () => {
           </div>
 
           {/* Total Orders Card */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm text-slate-500 font-medium'>Total Orders</p>
@@ -343,7 +343,7 @@ export const ECommerceDashboard = () => {
           </div>
 
           {/* Average Order Value Card */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm text-slate-500 font-medium'>Avg. Order Value</p>
@@ -389,7 +389,7 @@ export const ECommerceDashboard = () => {
           </div>
 
           {/* Return Rate Card */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
                 <p className='text-sm text-slate-500 font-medium'>Return Rate</p>
@@ -438,7 +438,7 @@ export const ECommerceDashboard = () => {
         {/* Charts Row 1 */}
         <div className='grid lg:grid-cols-3 gap-6 mb-6'>
           {/* Sales Trend Chart */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200 lg:col-span-2'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200 lg:col-span-2'>
             <h2 className='text-lg font-semibold mb-4'>Sales Trend</h2>
             <div className='h-80'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -487,7 +487,7 @@ export const ECommerceDashboard = () => {
           </div>
 
           {/* Category Distribution */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-4'>Sales by Category</h2>
             <div className='h-80 flex items-center justify-center'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -528,7 +528,7 @@ export const ECommerceDashboard = () => {
         {/* Charts Row 2 */}
         <div className='grid lg:grid-cols-3 gap-6 mb-6'>
           {/* Orders & Returns Chart */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200 lg:col-span-2'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200 lg:col-span-2'>
             <h2 className='text-lg font-semibold mb-4'>Orders & Returns</h2>
             <div className='h-80'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -569,7 +569,7 @@ export const ECommerceDashboard = () => {
           {/* Device & Customer Charts */}
           <div className='grid grid-rows-2 gap-6'>
             {/* Device Distribution */}
-            <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+            <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
               <h2 className='text-lg font-semibold mb-4'>Traffic by Device</h2>
               <div className='h-32'>
                 <ResponsiveContainer width='100%' height='100%'>
@@ -608,7 +608,7 @@ export const ECommerceDashboard = () => {
                         className='w-3 h-3 rounded-full mr-1'
                         style={{ backgroundColor: item.color }}
                       ></div>
-                      <span className='text-xs text-slate-600'>{item.name}</span>
+                      <span className='text-slate-600'>{item.name}</span>
                     </div>
                     <span className='text-sm font-medium'>{item.value}%</span>
                   </div>
@@ -617,7 +617,7 @@ export const ECommerceDashboard = () => {
             </div>
 
             {/* Customer Type */}
-            <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+            <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
               <h2 className='text-lg font-semibold mb-4'>Customer Type</h2>
               <div className='h-32'>
                 <ResponsiveContainer width='100%' height='100%'>
@@ -656,7 +656,7 @@ export const ECommerceDashboard = () => {
                         className='w-3 h-3 rounded-full mr-1'
                         style={{ backgroundColor: item.color }}
                       ></div>
-                      <span className='text-xs text-slate-600'>{item.name}</span>
+                      <span className='text-slate-600'>{item.name}</span>
                     </div>
                     <span className='text-sm font-medium'>{item.value}%</span>
                   </div>
@@ -669,7 +669,7 @@ export const ECommerceDashboard = () => {
         {/* Charts Row 3 */}
         <div className='grid lg:grid-cols-2 gap-6 mb-6'>
           {/* Conversion Funnel */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-4'>Conversion Funnel</h2>
             <div className='h-80'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -708,7 +708,7 @@ export const ECommerceDashboard = () => {
               </ResponsiveContainer>
             </div>
             <div className='flex justify-center items-center mt-2'>
-              <div className='bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium flex items-center'>
+              <div className='bg-red-100 text-red-800 px-3 py-1 rounded-full font-medium flex items-center'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   className='h-4 w-4 mr-1'
@@ -729,14 +729,14 @@ export const ECommerceDashboard = () => {
           </div>
 
           {/* Top Selling Products */}
-          <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200'>
+          <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-center mb-4'>
               <h2 className='text-lg font-semibold'>Top Selling Products</h2>
               <button className='text-sm text-blue-600 hover:text-blue-800'>View All</button>
             </div>
             <div className='overflow-x-auto'>
               <table className='min-w-full'>
-                <thead className='bg-slate-50 text-slate-500 text-xs uppercase'>
+                <thead className='bg-slate-50 text-slate-500 uppercase'>
                   <tr>
                     <th className='py-3 px-4 text-left rounded-tl-lg'>Product</th>
                     <th className='py-3 px-4 text-right'>Units Sold</th>
@@ -769,7 +769,7 @@ export const ECommerceDashboard = () => {
         </div>
 
         {/* Hourly Sales Chart */}
-        <div className='bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-6'>
+        <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200 mb-6'>
           <h2 className='text-lg font-semibold mb-4'>Hourly Activity</h2>
           <div className='h-80'>
             <ResponsiveContainer width='100%' height='100%'>

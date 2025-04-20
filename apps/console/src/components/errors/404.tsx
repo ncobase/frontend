@@ -7,7 +7,7 @@ export const Error404 = ({ to = null }) => {
   const navigate = useNavigate();
   return (
     <div className='flex flex-col mx-auto pt-20'>
-      <div className='text-center font-medium text-6xl text-gradient drop-shadow-sm'>
+      <div className='text-center font-medium text-6xl text-gradient drop-shadow-xs'>
         {t('errors.404.title')}
       </div>
       <span className='mx-auto max-w-full/2 text-secondary-600 mt-12 mb-24'>

@@ -106,7 +106,7 @@ const ExpandedLink: React.FC<{
           <AccordionItem value={link.id} className='border-b border-b-gray-50 py-2.5'>
             <AccordionTrigger
               className={cn(
-                'justify-between font-normal no-underline hover:no-underline px-2.5 py-2.5 mx-2.5 text-slate-500 hover:[&>svg]:stroke-slate-400 focus:[&>svg]:stroke-slate-400 hover:opacity-80 focus:opacity-90 hover:bg-slate-100/85 rounded-md',
+                'justify-between font-normal no-underline hover:no-underline px-2.5 py-2.5 mx-2.5 text-slate-500 [&>svg]:hover:stroke-slate-400 [&>svg]:focus:stroke-slate-400 hover:opacity-80 focus:opacity-90 hover:bg-slate-100/85 rounded-md',
                 link.disabled && 'cursor-not-allowed opacity-80'
               )}
               aria-label={`${link.name || link.label} submenu`}
@@ -126,7 +126,7 @@ const ExpandedLink: React.FC<{
                   isActive={isActive}
                   handleLinkClick={handleLinkClick}
                   depth={depth + 1}
-                  className={'!pl-[2.25rem]'}
+                  className={'pl-[2.25rem]!'}
                   isInsideAccordion={true}
                   expandedAccordions={expandedAccordions}
                   toggleAccordion={toggleAccordion}
@@ -170,7 +170,7 @@ const CollapsedLink: React.FC<{
   const { t } = useTranslation();
 
   if (isDividerLink(link)) {
-    return <div className='h-[0.03125rem] w-1/2 !mx-auto bg-slate-200' role='separator' />;
+    return <div className='h-[0.03125rem] w-1/2 mx-auto! bg-slate-200' role='separator' />;
   }
 
   return (
@@ -279,7 +279,7 @@ const SidebarComponent: React.FC<{
       <Button
         variant='unstyle'
         size='ratio'
-        className='absolute bottom-4 -right-2.5 z-[9999] bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 hover:[&>svg]:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+        className='absolute bottom-4 -right-2.5 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
         title={t(expanded ? 'actions.sidebar_collapse' : 'actions.sidebar_expand')}
         onClick={() => setExpanded?.(!expanded)}
         aria-label={t(expanded ? 'actions.sidebar_collapse' : 'actions.sidebar_expand') as string}

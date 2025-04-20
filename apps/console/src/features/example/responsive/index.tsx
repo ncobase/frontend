@@ -66,7 +66,7 @@ export const ResponsiveDesignExample = () => {
                   </div>
                 </CardContent>
                 <CardFooter className='justify-between'>
-                  <div className='text-xs text-slate-500'>
+                  <div className='text-slate-500'>
                     <span className='hidden md:inline'>
                       {t('example.responsive.lastUpdated')}: 2025-04-10
                     </span>

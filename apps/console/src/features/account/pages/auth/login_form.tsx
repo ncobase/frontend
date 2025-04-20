@@ -34,7 +34,7 @@ const LoginHint = ({ setValue }: LoginHintProps) => {
   };
 
   const classess = cn(
-    'px-3.5 py-2 text-center rounded-xl text-slate-500 text-xs',
+    'px-3.5 py-2 text-center rounded-xl text-slate-500',
     {
       'bg-warning-50': !isProd
     },

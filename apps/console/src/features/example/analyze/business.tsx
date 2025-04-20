@@ -154,7 +154,7 @@ export const BusinessDashboard = () => {
                   key={filter.id}
                   className={`px-3 py-1.5 rounded-md text-sm ${
                     activeFilter === filter.id
-                      ? 'bg-white shadow-sm text-blue-600'
+                      ? 'bg-white shadow-xs text-blue-600'
                       : 'text-slate-600 hover:bg-slate-200'
                   }`}
                   onClick={() => setActiveFilter(filter.id)}
@@ -181,7 +181,7 @@ export const BusinessDashboard = () => {
             return (
               <div
                 key={item.metric}
-                className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'
+                className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'
               >
                 <div className='flex justify-between items-start'>
                   <div>
@@ -197,7 +197,7 @@ export const BusinessDashboard = () => {
                     {isPositive ? '↑' : '↓'} {Math.abs(Number(changePercent))}%
                   </div>
                 </div>
-                <div className='text-xs text-slate-400 mt-2'>
+                <div className='text-slate-400 mt-2'>
                   vs previous period: {item.previous.toLocaleString()}
                 </div>
               </div>
@@ -208,7 +208,7 @@ export const BusinessDashboard = () => {
         {/* Charts Row 1 */}
         <div className='grid lg:grid-cols-2 gap-6 mb-6'>
           {/* Revenue Over Time */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2'>Revenue & Profit Trend</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -262,7 +262,7 @@ export const BusinessDashboard = () => {
           </div>
 
           {/* Sales by Region */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-2'>Sales by Region</h2>
             <div className='h-72 flex items-center'>
               <ResponsiveContainer width='100%' height='80%'>
@@ -292,7 +292,7 @@ export const BusinessDashboard = () => {
         {/* Charts Row 2 */}
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
           {/* Sales by Channel */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200 col-span-2'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 col-span-2'>
             <h2 className='text-lg font-semibold mb-2'>Sales by Channel</h2>
             <div className='h-72'>
               <ResponsiveContainer width='100%' height='100%'>
@@ -316,36 +316,36 @@ export const BusinessDashboard = () => {
           </div>
 
           {/* Recent Activity / Notes */}
-          <div className='bg-white rounded-lg p-4 shadow-sm border border-slate-200'>
+          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
             <h2 className='text-lg font-semibold mb-4'>Recent Activity</h2>
             <div className='space-y-4'>
               <div className='border-l-4 border-blue-500 pl-3 py-1'>
                 <p className='text-sm text-slate-600'>
                   Sales team exceeded quarterly targets by 12%
                 </p>
-                <span className='text-xs text-slate-400'>Today, 9:45 AM</span>
+                <span className='text-slate-400'>Today, 9:45 AM</span>
               </div>
               <div className='border-l-4 border-green-500 pl-3 py-1'>
                 <p className='text-sm text-slate-600'>
                   New product launch generated $125k in first week
                 </p>
-                <span className='text-xs text-slate-400'>Yesterday, 2:30 PM</span>
+                <span className='text-slate-400'>Yesterday, 2:30 PM</span>
               </div>
               <div className='border-l-4 border-yellow-500 pl-3 py-1'>
                 <p className='text-sm text-slate-600'>APAC region continues strong growth trend</p>
-                <span className='text-xs text-slate-400'>Apr 14, 10:15 AM</span>
+                <span className='text-slate-400'>Apr 14, 10:15 AM</span>
               </div>
               <div className='border-l-4 border-purple-500 pl-3 py-1'>
                 <p className='text-sm text-slate-600'>
                   Marketing campaign results: 24% increase in site traffic
                 </p>
-                <span className='text-xs text-slate-400'>Apr 12, 4:45 PM</span>
+                <span className='text-slate-400'>Apr 12, 4:45 PM</span>
               </div>
               <div className='border-l-4 border-red-500 pl-3 py-1'>
                 <p className='text-sm text-slate-600'>
                   Supply chain disruption resolved, production resumed
                 </p>
-                <span className='text-xs text-slate-400'>Apr 10, 1:20 PM</span>
+                <span className='text-slate-400'>Apr 10, 1:20 PM</span>
               </div>
             </div>
           </div>
