@@ -1,36 +1,16 @@
 import { memo, useState } from 'react';
 
 import { Button, Icons, Modal, ModalProps } from '@ncobase/react';
-import { ExplicitAny } from '@ncobase/types';
 import { useTranslation } from 'react-i18next';
 
-export interface ModalViewProps<T extends object> extends ModalProps<T> {
-  type?: string; // 'create' | 'view' | 'edit';
-  createComponent?: React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  viewComponent?: (record: object | T | null) => React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  editComponent?: (record: object | T | null) => React.ReactNode;
+import { CommonViewComponent, CommonViewProps, isCreateType, isEditType } from './common';
+
+export interface ModalViewProps<T extends object>
+  extends Omit<ModalProps<T>, 'record'>,
+    CommonViewProps<T> {
+  record?: T | null;
+  onConfirm?: () => void;
 }
-
-const isCreateType = (type: string): type is 'create' => type === 'create';
-const isEditType = (type: string): type is 'edit' => type === 'edit';
-
-const ViewComponent = memo<{
-  record: ExplicitAny;
-  type: ModalViewProps<any>['type'];
-  createComponent: ModalViewProps<any>['createComponent'];
-  viewComponent: ModalViewProps<any>['viewComponent'];
-  editComponent: ModalViewProps<any>['editComponent'];
-}>(({ record, type, createComponent, viewComponent, editComponent }) => {
-  const components = {
-    create: createComponent,
-    view: viewComponent?.(record as ExplicitAny),
-    edit: editComponent?.(record as ExplicitAny)
-  };
-
-  return components[type] || null;
-});
 
 export const ModalView = memo(
   <T extends object>({
@@ -38,7 +18,9 @@ export const ModalView = memo(
     createComponent,
     viewComponent,
     editComponent,
+    record,
     isMaximized: defaultIsMaximized = false,
+    onConfirm,
     ...rest
   }: ModalViewProps<T>) => {
     const { t } = useTranslation();
@@ -73,7 +55,7 @@ export const ModalView = memo(
         confirmText={getConfirmText()}
         cancelText={t('actions.cancel')}
         isOpen={!!type}
-        className={isMaximized && maximizedClasses}
+        className={isMaximized ? maximizedClasses : ''}
         toolbar={
           <Button
             variant='unstyle'
@@ -84,10 +66,12 @@ export const ModalView = memo(
             <Icons name={isMaximized ? 'IconWindowMinimize' : 'IconWindowMaximize'} size={16} />
           </Button>
         }
+        onConfirm={onConfirm}
+        record={record}
         {...rest}
       >
-        <ViewComponent
-          record={rest.record}
+        <CommonViewComponent
+          record={record}
           type={type}
           createComponent={createComponent}
           viewComponent={viewComponent}

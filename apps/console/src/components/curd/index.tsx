@@ -4,10 +4,13 @@ import { Button, Form, Icons, TableView, TableViewProps } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { FlattenView, FlattenViewProps } from './flatten';
-import { ModalView, ModalViewProps } from './modal';
+import { CommonViewProps } from './common';
+import { FlattenView } from './flatten';
+import { ModalView } from './modal';
 
 import { Page, Topbar, useLayoutContext } from '@/components/layout';
+import { PREFERENCES_VIEW_MODE_KEY } from '@/components/preferences';
+import { useLocalStorage } from '@/hooks/use_local_storage';
 
 export interface CommonProps<T extends object> {
   viewMode?: 'modal' | 'flatten';
@@ -32,13 +35,18 @@ export interface CommonProps<T extends object> {
   }[];
   // eslint-disable-next-line no-unused-vars
   onQuery?: (query: any) => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
   onResetQuery?: () => void;
   fetchData?: TableViewProps['fetchData'];
   loading?: boolean;
 }
 
+// Merge common props with either ModalViewProps or FlattenViewProps
 export type CurdProps<T extends object> = CommonProps<T> &
-  (ModalViewProps<T> | FlattenViewProps<T>);
+  CommonViewProps<T> & {
+    record?: T | null;
+  };
 
 const QueryBar = ({
   queryFields = [],
@@ -128,15 +136,6 @@ const PaginationTexts = (t: any) => ({
   perPageText: t('pagination.per_page_text')
 });
 
-const renderTopbar = (mode: string, type: string | undefined) =>
-  mode === 'modal' || (mode === 'flatten' && !type);
-
-const renderQueryBar = (mode: string, queryFieldsLength: number, type: string | undefined) =>
-  queryFieldsLength > 0 && (mode === 'modal' || (mode === 'flatten' && !type));
-
-const renderTableView = (mode: string, type: string | undefined) =>
-  mode === 'modal' || (mode === 'flatten' && !type);
-
 export const CurdView = <T extends object>({
   viewMode,
   type,
@@ -159,11 +158,19 @@ export const CurdView = <T extends object>({
   expandComponent,
   maxTreeLevel,
   isAllExpanded,
+  onConfirm,
+  record,
+  createComponent,
+  viewComponent,
+  editComponent,
   ...rest
 }: CurdProps<T>) => {
   const { t } = useTranslation();
   const { vmode } = useLayoutContext();
-  const mode = viewMode || vmode;
+
+  // Use the stored preference or fallback to the context value
+  const { storedValue: preferredViewMode } = useLocalStorage(PREFERENCES_VIEW_MODE_KEY, null);
+  const mode = viewMode || preferredViewMode || vmode || 'flatten';
 
   const tableViewProps = useMemo(
     () => ({
@@ -201,15 +208,29 @@ export const CurdView = <T extends object>({
     ]
   );
 
-  const renderMode = (mode: string) => {
+  const shouldRenderTopbar = mode === 'modal' || (mode === 'flatten' && !type);
+  const shouldRenderQueryBar =
+    queryFields.length > 0 && (mode === 'modal' || (mode === 'flatten' && !type));
+  const shouldRenderTableView = mode === 'modal' || (mode === 'flatten' && !type);
+
+  // Prepare common view props that will be shared by both ModalView and FlattenView
+  const commonViewProps = {
+    type,
+    createComponent,
+    viewComponent,
+    editComponent,
+    record,
+    onConfirm
+  };
+
+  const renderViewComponent = () => {
     switch (mode) {
       case 'modal':
-        return <ModalView type={type} {...(rest as ModalViewProps<T>)} />;
+        // @ts-expect-error
+        return <ModalView {...commonViewProps} {...rest} />;
       case 'flatten':
-        return <FlattenView type={type} {...(rest as FlattenViewProps<T>)} />;
-      case 'default':
       default:
-        return <FlattenView type={type} {...(rest as FlattenViewProps<T>)} />;
+        return <FlattenView {...commonViewProps} />;
     }
   };
 
@@ -218,16 +239,16 @@ export const CurdView = <T extends object>({
       sidebar
       title={title}
       topbar={
-        renderTopbar(mode, type) && (
+        shouldRenderTopbar && (
           <Topbar title={topbarTitle || title} left={topbarLeft} right={topbarRight} />
         )
       }
     >
-      {renderQueryBar(mode, queryFields.length, type) && (
+      {shouldRenderQueryBar && (
         <QueryBar queryFields={queryFields} onQuery={onQuery} onResetQuery={onResetQuery} t={t} />
       )}
-      {renderTableView(mode, type) && <TableView {...tableViewProps} />}
-      {renderMode(mode)}
+      {shouldRenderTableView && <TableView {...tableViewProps} />}
+      {renderViewComponent()}
     </Page>
   );
 };

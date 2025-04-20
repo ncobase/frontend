@@ -2,6 +2,7 @@ import '@/lib/setup';
 
 import React from 'react';
 
+import { ToastContainer, ToastProvider } from '@ncobase/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from 'react-dom/client';
 
@@ -30,11 +31,14 @@ const mount = () => {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <AuthProvider>
-            <Router />
-          </AuthProvider>
-          <AppDevHint />
-          <LoadingIndicator />
+          <ToastProvider>
+            <AuthProvider>
+              <Router />
+            </AuthProvider>
+            <AppDevHint />
+            <LoadingIndicator />
+            <ToastContainer position='bottom-right' />
+          </ToastProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </React.StrictMode>

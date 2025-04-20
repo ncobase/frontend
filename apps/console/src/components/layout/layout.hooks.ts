@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 
 import { useLayoutContext } from './layout.context';
 
+import { PREFERENCES_VIEW_MODE_KEY } from '@/components/preferences';
 import { Menu } from '@/features/system/menu/menu';
+import { useLocalStorage } from '@/hooks/use_local_storage';
 
 /**
  * set focus mode
@@ -23,10 +25,19 @@ export const useFocusMode = (enabled = true) => {
  */
 export const useVmode = (vmode: 'modal' | 'flatten') => {
   const { setVmode = () => {} } = useLayoutContext();
+  const { setValue: setPreferredViewMode } = useLocalStorage(PREFERENCES_VIEW_MODE_KEY, null);
+
   useEffect(() => {
+    // Update both context and stored preference
     setVmode(vmode);
-    return () => setVmode('flatten');
-  }, [setVmode, vmode]);
+    setPreferredViewMode(vmode);
+
+    return () => {
+      // Reset to flatten on unmount
+      setVmode('flatten');
+      setPreferredViewMode('flatten');
+    };
+  }, [setVmode, setPreferredViewMode, vmode]);
 };
 
 /**
@@ -39,5 +50,5 @@ export const useMenus = (): [Menu[], (menus: Menu[]) => void] => {
   if (!setMenus) {
     throw new Error('setMenus function is not provided');
   }
-  return [menus, setMenus];
+  return [menus || [], setMenus];
 };

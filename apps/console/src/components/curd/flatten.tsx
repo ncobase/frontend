@@ -1,47 +1,28 @@
-import { ExplicitAny } from '@ncobase/types';
 import { useParams } from 'react-router';
 
-import { CommonProps } from '.';
+import { CommonViewComponent, CommonViewProps } from './common';
 
-export interface FlattenViewProps<T extends object> extends CommonProps<T> {
-  type?: string; // 'create' | 'view' | 'edit';
-  createComponent?: React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  viewComponent?: (record: T | null) => React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  editComponent?: (record: T | null) => React.ReactNode;
+export interface FlattenViewProps<T extends object> extends CommonViewProps<T> {
   record?: T | null;
   onConfirm?: () => void;
 }
-
-const ViewComponent = <T extends object>({
-  record,
-  type,
-  createComponent,
-  viewComponent,
-  editComponent
-}: FlattenViewProps<T>) => {
-  const components = {
-    create: createComponent,
-    view: viewComponent?.(record as ExplicitAny),
-    edit: editComponent?.(record as ExplicitAny)
-  };
-
-  return components[type] || null;
-};
 
 export const FlattenView = <T extends object>({
   createComponent,
   viewComponent,
   editComponent,
-  record
+  record,
+  type: providedType
 }: FlattenViewProps<T>) => {
   const { mode } = useParams<{ mode: string }>();
+  const type = providedType || mode;
+
+  if (!type) return null;
 
   return (
-    <ViewComponent
-      record={record}
-      type={mode}
+    <CommonViewComponent<T>
+      record={record || null}
+      type={type}
       createComponent={createComponent}
       viewComponent={viewComponent}
       editComponent={editComponent}
