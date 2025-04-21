@@ -2,8 +2,8 @@ import { Card, Button, Icons } from '@ncobase/react';
 
 import { CardLayout } from '../layout';
 
-import { PermissionGuard } from '@/components/permission_guard';
 import { useAuthContext } from '@/features/account/context';
+import { Guard } from '@/router/helpers';
 
 export const PermissionPage = () => {
   const { isAdmin, roles, permissions, hasPermission, hasRole } = useAuthContext();
@@ -54,21 +54,18 @@ export const PermissionPage = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
         <Card className='p-4'>
           <h4 className='font-medium mb-2'>Admin Actions</h4>
-          <PermissionGuard
-            // eslint-disable-next-line jsx-a11y/aria-role
-            role='admin'
-            fallback={<div className='text-red-500'>Admin access required</div>}
-          >
+          {/* eslint-disable-next-line jsx-a11y/aria-role */}
+          <Guard role='admin' fallback={<div className='text-red-500'>Admin access required</div>}>
             <Button className='w-full'>
               <Icons name='IconShieldLock' className='mr-2' />
               Admin Panel
             </Button>
-          </PermissionGuard>
+          </Guard>
         </Card>
 
         <Card className='p-4'>
           <h4 className='font-medium mb-2'>User Management</h4>
-          <PermissionGuard
+          <Guard
             permission='create:user'
             fallback={<div className='text-red-500'>Missing create:user permission</div>}
           >
@@ -76,12 +73,12 @@ export const PermissionPage = () => {
               <Icons name='IconUserPlus' className='mr-2' />
               Create User
             </Button>
-          </PermissionGuard>
+          </Guard>
         </Card>
 
         <Card className='p-4'>
           <h4 className='font-medium mb-2'>Role Management</h4>
-          <PermissionGuard
+          <Guard
             permissions={['read:role', 'update:role']}
             fallback={<div className='text-red-500'>Missing role permissions</div>}
           >
@@ -89,12 +86,12 @@ export const PermissionPage = () => {
               <Icons name='IconUsers' className='mr-2' />
               Manage Roles
             </Button>
-          </PermissionGuard>
+          </Guard>
         </Card>
 
         <Card className='p-4'>
           <h4 className='font-medium mb-2'>Multiple Roles Check</h4>
-          <PermissionGuard
+          <Guard
             roles={['admin', 'editor']}
             any={true}
             fallback={<div className='text-red-500'>Need admin or editor role</div>}
@@ -103,7 +100,7 @@ export const PermissionPage = () => {
               <Icons name='IconEdit' className='mr-2' />
               Edit Content
             </Button>
-          </PermissionGuard>
+          </Guard>
         </Card>
       </div>
 

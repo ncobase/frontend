@@ -11,8 +11,7 @@ import { useRedirectFromUrl } from '@/router/router.hooks';
 
 interface TenantOptionProps extends Tenant {
   isSelected: boolean;
-  // eslint-disable-next-line no-unused-vars
-  onSelect: (id: string) => void;
+  onSelect: (_id: string) => void;
 }
 
 const TenantOption = React.memo(
@@ -51,8 +50,7 @@ export const TenantSwitcher = ({
 }: {
   opened?: boolean;
   tenants?: Tenant[];
-  // eslint-disable-next-line no-unused-vars
-  onVisible?: (visible: boolean) => void;
+  onVisible?: (_visible: boolean) => void;
 }) => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuthContext();

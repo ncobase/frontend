@@ -1,75 +1,108 @@
-import { useEffect } from 'react';
+import React from 'react';
 
-import { Navigate, useLocation, useNavigate } from 'react-router';
+import { Navigate, useLocation } from 'react-router';
 
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Error403 } from '@/components/errors/403';
 import { Spinner } from '@/components/loading/spinner';
 import { useAuthContext } from '@/features/account/context';
+import { Permission } from '@/features/account/permissions';
 import { useAccount } from '@/features/account/service';
 
-interface GuardProps extends React.PropsWithChildren {
-  /**
-   * Is public route
-   */
-  public?: boolean;
-  /**
-   * Requires admin privileges
-   */
-  admin?: boolean;
-  /**
-   * Requires super admin privileges
-   */
-  super?: boolean;
+interface GuardProps {
+  // Role-based access control
+  public?: boolean; // Public route - no auth required
+  admin?: boolean; // Requires admin role
+  super?: boolean; // Requires super admin role
+
+  // Permission-based access control
+  permission?: string;
+  role?: string;
+  any?: boolean;
+  permissions?: string[];
+  roles?: string[];
+
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+  redirectTo?: string; // Where to redirect if access denied
 }
 
+/**
+ * Unified permission guard component
+ * Handles both role-based route protection and granular permission checks
+ */
 export const Guard: React.FC<GuardProps> = ({
-  children,
+  // Route access props
   public: isPublic = false,
-  admin: isAdmin = false,
-  super: isSuper = false
+  admin: requiresAdmin = false,
+  super: requiresSuper = false,
+
+  // Granular permission props
+  permission,
+  role,
+  any = false,
+  permissions = [],
+  roles = [],
+
+  children,
+  fallback = null,
+  redirectTo = '/login'
 }) => {
-  const { isAuthenticated } = useAuthContext();
-  const { isAdmin: hasAdminPrivileges, isSuperAdmin, isLoading, isError } = useAccount();
+  const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAdmin: hasAdminPrivileges, isSuperAdmin, isLoading: isAccountLoading } = useAccount();
   const { pathname, search } = useLocation();
-  const navigate = useNavigate();
 
-  // Check if more than one condition is set
-  const isInvalidConfig = [isPublic, isAdmin, isSuper].filter(Boolean).length > 1;
+  // Determine if access should be granted
+  const canAccess = (): boolean => {
+    // Route level access control
 
-  if (isInvalidConfig) {
-    console.warn('Guard: Only one of public, admin, or super should be true.');
-    return null;
-  }
+    // Public routes are always accessible
+    if (isPublic) return true;
 
-  useEffect(() => {
-    if (isError) {
-      // Handle error (e.g., show toast message, navigate to an error page, etc.)
-      navigate(`/login?redirect=${encodeURIComponent(pathname + search)}`, { replace: true });
-    } else if (!isPublic && !isAuthenticated && !isLoading) {
-      navigate(`/login?redirect=${encodeURIComponent(pathname + search)}`, { replace: true });
-    }
-  }, [isPublic, isAuthenticated, navigate, pathname, search, isLoading, isError]);
+    // Non-public routes require authentication
+    if (!isAuthenticated) return false;
 
-  if (isLoading) {
+    // Admin routes require admin privileges
+    if (requiresAdmin && !hasAdminPrivileges) return false;
+
+    // Super admin routes require super admin privileges
+    if (requiresSuper && !isSuperAdmin) return false;
+
+    // Granular permission checks using Permission Service
+    return Permission.canAccess({
+      permission,
+      role,
+      any,
+      permissions,
+      roles
+    });
+  };
+
+  // Show loading state
+  if (isLoading || isAccountLoading) {
     return <Spinner />;
   }
 
+  // Handle public routes - redirect if already authenticated
   if (isPublic && isAuthenticated) {
     return <Navigate to='/' replace />;
   }
 
-  if (!isPublic && !isAuthenticated) {
-    return null;
+  // Access denied - show fallback or redirect
+  if (!canAccess()) {
+    if (fallback) {
+      return <>{fallback}</>;
+    } else if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      return (
+        <Navigate to={`${redirectTo}?redirect=${encodeURIComponent(pathname + search)}`} replace />
+      );
+    } else {
+      // Show 403 error if authenticated but not authorized
+      return <Error403 />;
+    }
   }
 
-  if (isAdmin && !hasAdminPrivileges) {
-    return <Error403 />;
-  }
-
-  if (isSuper && !isSuperAdmin) {
-    return <Error403 />;
-  }
-
+  // Wrap children in error boundary
   return <ErrorBoundary>{children}</ErrorBoundary>;
 };

@@ -8,8 +8,7 @@ import remarkGfm from 'remark-gfm';
 
 interface MarkdownEditorProps {
   value?: string;
-  // eslint-disable-next-line no-unused-vars
-  onChange?: (value: string) => void;
+  onChange?: (_value: string) => void;
   placeholder?: string;
   className?: string;
   minHeight?: string;
@@ -23,8 +22,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   minHeight = '300px'
 }) => {
   const [content, setContent] = useState(value);
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
+  const [_activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {

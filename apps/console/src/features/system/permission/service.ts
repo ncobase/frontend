@@ -14,15 +14,12 @@ import {
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];
-  // eslint-disable-next-line no-unused-vars
-  get: (options?: {
+  get: (_options?: {
     permission?: string;
   }) => ['permissionService', 'permission', { permission?: string }];
-  // eslint-disable-next-line no-unused-vars
-  tree: (options?: AnyObject) => ['permissionService', 'tree', AnyObject];
+  tree: (_options?: AnyObject) => ['permissionService', 'tree', AnyObject];
   update: ['permissionService', 'update'];
-  // eslint-disable-next-line no-unused-vars
-  list: (options?: QueryFormParams) => ['permissionService', 'permissions', QueryFormParams];
+  list: (_options?: QueryFormParams) => ['permissionService', 'permissions', QueryFormParams];
 }
 
 export const permissionKeys: PermissionKeys = {

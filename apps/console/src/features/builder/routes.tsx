@@ -10,3 +10,5 @@ export const BuilderRoutes = () => {
   ];
   return renderRoutes(routes);
 };
+
+export default BuilderRoutes;

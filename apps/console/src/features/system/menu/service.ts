@@ -16,15 +16,11 @@ import {
 
 interface MenuKeys {
   create: ['menuService', 'create'];
-  // eslint-disable-next-line no-unused-vars
-  get: (options?: { menu?: string }) => ['menuService', 'menu', { menu?: string }];
-  // eslint-disable-next-line no-unused-vars
-  tree: (options?: AnyObject) => ['menuService', 'tree', AnyObject];
+  get: (_options?: { menu?: string }) => ['menuService', 'menu', { menu?: string }];
+  tree: (_options?: AnyObject) => ['menuService', 'tree', AnyObject];
   update: ['menuService', 'update'];
-  // eslint-disable-next-line no-unused-vars
-  delete: (options?: { menu?: string }) => ['menuService', 'delete', { menu?: string }];
-  // eslint-disable-next-line no-unused-vars
-  list: (options?: QueryFormParams) => ['menuService', 'menus', QueryFormParams];
+  delete: (_options?: { menu?: string }) => ['menuService', 'delete', { menu?: string }];
+  list: (_options?: QueryFormParams) => ['menuService', 'menus', QueryFormParams];
 }
 
 export const menuKeys: MenuKeys = {

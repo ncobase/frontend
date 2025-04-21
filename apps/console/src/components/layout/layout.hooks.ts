@@ -44,8 +44,7 @@ export const useVmode = (vmode: 'modal' | 'flatten') => {
  * set page header menus
  * @param menus {Menu[]}
  */
-// eslint-disable-next-line no-unused-vars
-export const useMenus = (): [Menu[], (menus: Menu[]) => void] => {
+export const useMenus = (): [Menu[], (_menus: Menu[]) => void] => {
   const { menus, setMenus } = useLayoutContext();
   if (!setMenus) {
     throw new Error('setMenus function is not provided');

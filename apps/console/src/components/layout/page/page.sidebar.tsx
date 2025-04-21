@@ -35,10 +35,8 @@ const MenuItem = React.memo(
     disabled
   }: {
     link: Menu;
-    // eslint-disable-next-line no-unused-vars
-    isActive: (path: string) => boolean;
-    // eslint-disable-next-line no-unused-vars
-    handleLinkClick: (link: Menu) => void;
+    isActive: (_path: string) => boolean;
+    handleLinkClick: (_link: Menu) => void;
     className?: string;
     disabled?: boolean;
   }) => {
@@ -67,16 +65,13 @@ const MenuItem = React.memo(
 
 const ExpandedLink: React.FC<{
   link: MenuTree;
-  // eslint-disable-next-line no-unused-vars
-  isActive: (to: string, depth?: number) => boolean;
-  // eslint-disable-next-line no-unused-vars
-  handleLinkClick: (link: Menu) => void;
+  isActive: (_to: string, _depth?: number) => boolean;
+  handleLinkClick: (_link: Menu) => void;
   className?: string;
   depth?: number;
   isInsideAccordion?: boolean;
   expandedAccordions: Record<string, boolean>;
-  // eslint-disable-next-line no-unused-vars
-  toggleAccordion: (id: string) => void;
+  toggleAccordion: (_id: string) => void;
   collapseAll: () => void;
 }> = React.memo(
   ({
@@ -162,10 +157,8 @@ const ExpandedLink: React.FC<{
 
 const CollapsedLink: React.FC<{
   link: Menu;
-  // eslint-disable-next-line no-unused-vars
-  isActive: (to: string) => boolean;
-  // eslint-disable-next-line no-unused-vars
-  handleLinkClick: (link: Menu) => void;
+  isActive: (_to: string) => boolean;
+  handleLinkClick: (_link: Menu) => void;
 }> = React.memo(({ link, isActive, handleLinkClick }) => {
   const { t } = useTranslation();
 

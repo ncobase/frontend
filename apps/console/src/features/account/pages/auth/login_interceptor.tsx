@@ -7,9 +7,9 @@ import { useLocation } from 'react-router';
 
 import { useAuthContext } from '@/features/account/context';
 import { LoginForm } from '@/features/account/pages/auth/login_form';
+import { Permission } from '@/features/account/permissions';
 import { eventEmitter } from '@/lib/events';
 import { useRedirectFromUrl } from '@/router/router.hooks';
-import { publicRoutes } from '@/router/routes';
 
 interface LoginInterceptorContextValue {
   opened: boolean;
@@ -47,14 +47,14 @@ export const LoginInterceptorProvider = () => {
       open();
     };
 
-    if (!publicRoutes.includes(location.pathname)) {
+    if (!Permission.isPublicRoute(location.pathname)) {
       eventEmitter.on('unauthorized', handleUnauthenticated);
     }
 
     return () => {
       eventEmitter.off('unauthorized', handleUnauthenticated);
     };
-  }, []);
+  }, [location.pathname]);
 
   const handleLogin = () => {
     queryClient.resetQueries();

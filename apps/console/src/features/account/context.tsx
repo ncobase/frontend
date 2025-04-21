@@ -12,6 +12,7 @@ import { ExplicitAny } from '@ncobase/types';
 import { isBrowser, locals } from '@ncobase/utils';
 import { jwtDecode } from 'jwt-decode';
 
+import { Permission } from './permissions';
 import { TokenPayload, tokenService } from './token_service';
 
 import { TenantProvider } from '@/features/system/tenant/context';
@@ -27,12 +28,16 @@ interface AuthContextValue {
   isAdmin: boolean;
   roles: string[];
   permissions: string[];
-  // eslint-disable-next-line no-unused-vars
-  updateTokens: (accessToken?: string, refreshToken?: string) => void;
-  // eslint-disable-next-line no-unused-vars
-  hasPermission: (permission: string) => boolean;
-  // eslint-disable-next-line no-unused-vars
-  hasRole: (role: string | string[]) => boolean;
+  updateTokens: (_accessToken?: string, _refreshToken?: string) => void;
+  hasPermission: (_permission: string) => boolean;
+  hasRole: (_role: string | string[]) => boolean;
+  canAccess: (_options: {
+    permission?: string;
+    role?: string;
+    any?: boolean;
+    permissions?: string[];
+    roles?: string[];
+  }) => boolean;
 }
 
 // Create context with default values
@@ -44,7 +49,8 @@ const AuthContext = React.createContext<AuthContextValue>({
   permissions: [],
   updateTokens: () => undefined,
   hasPermission: () => false,
-  hasRole: () => false
+  hasRole: () => false,
+  canAccess: () => false
 });
 
 // Update tokens in storage
@@ -177,46 +183,12 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     }
 
     setIsLoading(false);
+
+    // Notify the Permission Service about token changes
+    Permission.refreshState();
   }, []);
 
-  // Permission checking functions
-  const hasPermission = useCallback(
-    (permission: string): boolean => {
-      if (!isTokenValid) return false;
-      if (tokenInfo.isAdmin) return true;
-
-      // Check for exact match
-      if (tokenInfo.permissions.includes(permission)) return true;
-
-      // Check for wildcard permissions
-      const [action, resource] = permission.split(':');
-
-      // Action wildcard (e.g. "*:users")
-      if (tokenInfo.permissions.includes(`*:${resource}`)) return true;
-
-      // Resource wildcard (e.g. "read:*")
-      if (tokenInfo.permissions.includes(`${action}:*`)) return true;
-
-      // Full wildcard
-      if (tokenInfo.permissions.includes('*')) return true;
-
-      return false;
-    },
-    [isTokenValid, tokenInfo]
-  );
-
-  const hasRole = useCallback(
-    (role: string | string[]): boolean => {
-      if (Array.isArray(role)) {
-        return role.some(r => hasRole(r));
-      }
-      if (!isTokenValid) return false;
-      return tokenInfo.roles.includes(role);
-    },
-    [isTokenValid, tokenInfo]
-  );
-
-  // Context value
+  // Create memoized context value to avoid unnecessary re-renders
   const authContextValue = useMemo<AuthContextValue>(
     () => ({
       isAuthenticated: !!accessToken && isTokenValid,
@@ -225,10 +197,27 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       roles: tokenInfo.roles,
       permissions: tokenInfo.permissions,
       updateTokens: handleTokens,
-      hasPermission,
-      hasRole
+      // Use the Permission methods directly
+      hasPermission: (permission: string): boolean => {
+        if (!isTokenValid) return false;
+        return Permission.hasPermission(permission);
+      },
+      hasRole: (role: string | string[]): boolean => {
+        if (!isTokenValid) return false;
+        return Permission.hasRole(role);
+      },
+      canAccess: (options: {
+        permission?: string;
+        role?: string;
+        any?: boolean;
+        permissions?: string[];
+        roles?: string[];
+      }): boolean => {
+        if (!isTokenValid) return false;
+        return Permission.canAccess(options);
+      }
     }),
-    [accessToken, isTokenValid, isLoading, tokenInfo, handleTokens, hasPermission, hasRole]
+    [accessToken, isTokenValid, isLoading, tokenInfo, handleTokens]
   );
 
   return (

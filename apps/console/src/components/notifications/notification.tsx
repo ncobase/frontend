@@ -49,8 +49,7 @@ export interface NotificationsProps {
   /**
    * Called when notification push settings are toggled
    */
-  // eslint-disable-next-line no-unused-vars
-  onTogglePushSettings?: (enabled: boolean) => void;
+  onTogglePushSettings?: (_enabled: boolean) => void;
 
   /**
    * Whether push notifications are enabled
@@ -122,8 +121,7 @@ export const Notifications = ({
   }, []);
 
   // Get notification type icon
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const getTypeIcon = (type: NotificationItem['type'] = 'info') => {
+  const _getTypeIcon = (type: NotificationItem['type'] = 'info') => {
     const icons = {
       info: 'IconInfo',
       success: 'IconCheck',

@@ -13,11 +13,9 @@ import {
 
 interface TopicKeys {
   create: ['topicService', 'create'];
-  // eslint-disable-next-line no-unused-vars
-  get: (options?: { topic?: string }) => ['topicService', 'topic', { topic?: string }];
+  get: (_options?: { topic?: string }) => ['topicService', 'topic', { topic?: string }];
   update: ['topicService', 'update'];
-  // eslint-disable-next-line no-unused-vars
-  list: (options?: QueryFormParams) => ['topicService', 'topics', QueryFormParams];
+  list: (_options?: QueryFormParams) => ['topicService', 'topics', QueryFormParams];
 }
 
 export const topicKeys: TopicKeys = {

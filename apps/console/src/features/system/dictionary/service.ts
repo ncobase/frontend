@@ -13,13 +13,11 @@ import {
 
 interface DictionaryKeys {
   create: ['dictionaryService', 'create'];
-  // eslint-disable-next-line no-unused-vars
-  get: (options?: {
+  get: (_options?: {
     dictionary?: string;
   }) => ['dictionaryService', 'dictionary', { dictionary?: string }];
   update: ['dictionaryService', 'update'];
-  // eslint-disable-next-line no-unused-vars
-  list: (options?: QueryFormParams) => ['dictionaryService', 'dictionaries', QueryFormParams];
+  list: (_options?: QueryFormParams) => ['dictionaryService', 'dictionaries', QueryFormParams];
 }
 
 export const dictionaryKeys: DictionaryKeys = {

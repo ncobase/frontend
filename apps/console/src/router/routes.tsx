@@ -1,49 +1,81 @@
+import { lazy } from 'react';
+
 import { Navigate, Route } from 'react-router';
 
 import { Guard, renderRoutes } from './helpers';
 
 import { AnimatedSwitch } from '@/components/animate/switch';
+// eslint-disable-next-line import/order
 import { ErrorPage } from '@/components/errors';
+
+// Auth pages
 import { ForgetPassword } from '@/features/account/pages/auth/forget_password';
 import { Login } from '@/features/account/pages/auth/login';
 import { Logout } from '@/features/account/pages/logout';
 import { Register } from '@/features/account/pages/register';
-// TODO: use react lazy loading
-//  - Question 1: 是否有必要？存在页面刷新的问题，导致切换不流畅
-//  - Question 2: 有没有更好的方法？主要目的是分割代码
-// const AccountRoutes = lazy(() => import('@/features/account/routes'));
-// const ContentRoutes = lazy(() => import('@/features/content/routes'));
-// const DashRoutes = lazy(() => import('@/features/dash/routes'));
-// const ExampleRoutes = lazy(() => import('@/features/example/routes'));
-// const SystemRoutes = lazy(() => import('@/features/system/routes'));
-import { AccountRoutes } from '@/features/account/routes';
-import { BuilderRoutes } from '@/features/builder/routes';
-import { ContentRoutes } from '@/features/content/routes';
-import { DashRoutes } from '@/features/dash/routes';
-import { ExampleRoutes } from '@/features/example/routes';
-import { SystemRoutes } from '@/features/system/routes';
+
+const AccountRoutes = lazy(() => import('@/features/account/routes'));
+const BuilderRoutes = lazy(() => import('@/features/builder/routes'));
+const ContentRoutes = lazy(() => import('@/features/content/routes'));
+const DashRoutes = lazy(() => import('@/features/dash/routes'));
+const ExampleRoutes = lazy(() => import('@/features/example/routes'));
+const SystemRoutes = lazy(() => import('@/features/system/routes'));
+
+// import { AccountRoutes } from '@/features/account/routes';
+// import { BuilderRoutes } from '@/features/builder/routes';
+// import { ContentRoutes } from '@/features/content/routes';
+// import { DashRoutes } from '@/features/dash/routes';
+// import { ExampleRoutes } from '@/features/example/routes';
+// import { SystemRoutes } from '@/features/system/routes';
 
 const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
-  { path: '/register', element: <Register /> },
-  { path: '/login', element: <Login /> },
-  { path: '/forget-password', element: <ForgetPassword /> },
-  { path: '/logout', element: <Logout /> },
-  { path: '/dash/*', element: <Guard children={<DashRoutes />} /> },
-  { path: '/account/*', element: <Guard children={<AccountRoutes />} /> },
-  { path: '/content/*', element: <Guard children={<ContentRoutes />} /> },
+  {
+    path: '/register',
+    element: <Guard public>{<Register />}</Guard>
+  },
+  {
+    path: '/login',
+    element: <Guard public>{<Login />}</Guard>
+  },
+  {
+    path: '/forget-password',
+    element: <Guard public>{<ForgetPassword />}</Guard>
+  },
+  {
+    path: '/logout',
+    element: <Guard public>{<Logout />}</Guard>
+  },
+  {
+    path: '/dash/*',
+    element: <Guard>{<DashRoutes />}</Guard>
+  },
+  {
+    path: '/account/*',
+    element: <Guard>{<AccountRoutes />}</Guard>
+  },
+  {
+    path: '/content/*',
+    element: <Guard>{<ContentRoutes />}</Guard>
+  },
   {
     path: '/system/*',
-    element: <Guard admin children={<SystemRoutes />} />
+    element: <Guard admin>{<SystemRoutes />}</Guard>
   },
   {
     path: '/builder/*',
-    element: <Guard admin children={<BuilderRoutes />} />
+    element: <Guard permissions={['read:builder', 'write:builder']}>{<BuilderRoutes />}</Guard>
   },
-  { path: '/example/*', element: <Guard children={<ExampleRoutes />} /> }
+  // Example of a route with granular permission control
+  {
+    path: '/example/*',
+    element: (
+      <Guard permissions={['read:example', 'write:example']} any>
+        {<ExampleRoutes />}
+      </Guard>
+    )
+  }
 ];
-
-export const publicRoutes = ['/login', '/register', '/forget-password', '/logout'];
 
 export const Routes = () => {
   return (

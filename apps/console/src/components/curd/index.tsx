@@ -33,8 +33,7 @@ export interface CommonProps<T extends object> {
     label: string;
     component: React.ReactNode;
   }[];
-  // eslint-disable-next-line no-unused-vars
-  onQuery?: (query: any) => void;
+  onQuery?: (_query: any) => void;
   onConfirm?: () => void;
   onCancel?: () => void;
   onResetQuery?: () => void;
@@ -59,8 +58,7 @@ const QueryBar = ({
     label: string;
     component: React.ReactNode;
   }[];
-  // eslint-disable-next-line no-unused-vars
-  onQuery?: (query: any) => void;
+  onQuery?: (_query: any) => void;
   onResetQuery?: () => void;
   t: any;
 }) => {

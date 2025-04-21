@@ -11,8 +11,7 @@ import { locals } from '@ncobase/utils';
 export const useLocalStorage = <T>(
   key: string,
   initialValue: T
-  // eslint-disable-next-line no-unused-vars
-): { storedValue: T; setValue: (value: T) => void; clearValue: () => void; getValue: () => T } => {
+): { storedValue: T; setValue: (_value: T) => void; clearValue: () => void; getValue: () => T } => {
   // Getter function that reads from localStorage
   const getValue = useCallback(() => {
     try {

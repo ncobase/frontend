@@ -14,10 +14,8 @@ interface AccountKeys {
   login: ['accountService', 'login'];
   register: ['accountService', 'register'];
   currentUser: ['accountService', 'currentUser'];
-  // eslint-disable-next-line no-unused-vars
-  tenants: (options?: AnyObject) => ['accountService', 'tenants', AnyObject];
-  // eslint-disable-next-line no-unused-vars
-  tenant: (options?: AnyObject) => ['accountService', 'tenant', AnyObject];
+  tenants: (_options?: AnyObject) => ['accountService', 'tenants', AnyObject];
+  tenant: (_options?: AnyObject) => ['accountService', 'tenant', AnyObject];
 }
 
 export const accountKeys: AccountKeys = {

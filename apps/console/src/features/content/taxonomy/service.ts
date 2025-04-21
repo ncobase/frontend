@@ -13,11 +13,9 @@ import {
 
 interface TaxonomyKeys {
   create: ['taxonomyService', 'create'];
-  // eslint-disable-next-line no-unused-vars
-  get: (options?: { taxonomy?: string }) => ['taxonomyService', 'taxonomy', { taxonomy?: string }];
+  get: (_options?: { taxonomy?: string }) => ['taxonomyService', 'taxonomy', { taxonomy?: string }];
   update: ['taxonomyService', 'update'];
-  // eslint-disable-next-line no-unused-vars
-  list: (options?: QueryFormParams) => ['taxonomyService', 'taxonomies', QueryFormParams];
+  list: (_options?: QueryFormParams) => ['taxonomyService', 'taxonomies', QueryFormParams];
 }
 
 export const taxonomyKeys: TaxonomyKeys = {

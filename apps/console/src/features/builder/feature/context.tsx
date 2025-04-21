@@ -17,40 +17,30 @@ import {
 // Context interface
 interface FeatureBuilderContextType {
   featureConfig: FeatureConfig;
-  // eslint-disable-next-line no-unused-vars
-  updateFeatureConfig: (updates: Partial<FeatureConfig>) => void;
+  updateFeatureConfig: (_updates: Partial<FeatureConfig>) => void;
 
   // Field management
   entityFields: EntityField[];
   addEntityField: () => string;
-  // eslint-disable-next-line no-unused-vars
-  updateEntityField: (fieldId: string, updates: Partial<EntityField>) => void;
-  // eslint-disable-next-line no-unused-vars
-  removeEntityField: (fieldId: string) => void;
-  // eslint-disable-next-line no-unused-vars
-  reorderEntityFields: (startIndex: number, endIndex: number) => void;
+  updateEntityField: (_fieldId: string, _updates: Partial<EntityField>) => void;
+  removeEntityField: (_fieldId: string) => void;
+  reorderEntityFields: (_startIndex: number, _endIndex: number) => void;
   activeFieldId: string | null;
-  // eslint-disable-next-line no-unused-vars
-  setActiveFieldId: (fieldId: string | null) => void;
+  setActiveFieldId: (_fieldId: string | null) => void;
 
   // Relation management
   entityRelations: EntityRelation[];
   addEntityRelation: () => string;
-  // eslint-disable-next-line no-unused-vars
-  updateEntityRelation: (relationId: string, updates: Partial<EntityRelation>) => void;
-  // eslint-disable-next-line no-unused-vars
-  removeEntityRelation: (relationId: string) => void;
+  updateEntityRelation: (_relationId: string, _updates: Partial<EntityRelation>) => void;
+  removeEntityRelation: (_relationId: string) => void;
   activeRelationId: string | null;
-  // eslint-disable-next-line no-unused-vars
-  setActiveRelationId: (relationId: string | null) => void;
+  setActiveRelationId: (_relationId: string | null) => void;
 
   // Tab management
   activeTab: string;
-  // eslint-disable-next-line no-unused-vars
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (_tab: string) => void;
   previewTab: string;
-  // eslint-disable-next-line no-unused-vars
-  setPreviewTab: (tab: string) => void;
+  setPreviewTab: (_tab: string) => void;
 
   // Code generation
   generateCode: () => Record<string, string>;

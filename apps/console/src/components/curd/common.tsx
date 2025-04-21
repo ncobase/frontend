@@ -3,10 +3,8 @@ import React from 'react';
 export interface CommonViewProps<T extends object> {
   type?: string; // 'create' | 'view' | 'edit';
   createComponent?: React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  viewComponent?: (record: T | null) => React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  editComponent?: (record: T | null) => React.ReactNode;
+  viewComponent?: (_record: T | null) => React.ReactNode;
+  editComponent?: (_record: T | null) => React.ReactNode;
 }
 
 export const isCreateType = (type: string): type is 'create' => type === 'create';
@@ -17,10 +15,8 @@ interface CommonViewComponentProps<T extends object> {
   record: T | null;
   type: string | undefined;
   createComponent: React.ReactNode;
-  // eslint-disable-next-line no-unused-vars
-  viewComponent: ((record: T | null) => React.ReactNode) | undefined;
-  // eslint-disable-next-line no-unused-vars
-  editComponent: ((record: T | null) => React.ReactNode) | undefined;
+  viewComponent: ((_record: T | null) => React.ReactNode) | undefined;
+  editComponent: ((_record: T | null) => React.ReactNode) | undefined;
 }
 
 export const CommonViewComponent = <T extends object>({

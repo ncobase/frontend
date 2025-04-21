@@ -32,8 +32,7 @@ export const Register = () => {
   const onError = error => {
     const { reason, message } = error?._data || ({} as ExplicitAny);
     // TODO: Notification
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    const notificationProps = {
+    const _notificationProps = {
       title: reason,
       message: message || t(`componnets:errorPage.${reason?.toLowerCase() || 'unknown.label'}`),
       color: 'red',

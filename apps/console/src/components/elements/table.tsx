@@ -12,8 +12,7 @@ import { Button } from './form/button';
 
 import { filterDays } from '@/lib/enums';
 
-// eslint-disable-next-line no-unused-vars
-export const DropdownControl = ({ onChange }: { onChange?: (value: string) => void }) => {
+export const DropdownControl = ({ onChange }: { onChange?: (_value: string) => void }) => {
   const { t } = useTranslation();
   return (
     <Select defaultValue={filterDays[0].value} onValueChange={onChange}>

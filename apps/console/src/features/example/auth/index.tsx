@@ -110,7 +110,7 @@ const users: User[] = [
   }
 ];
 
-const PermissionGuard = ({ requiredPermission, currentRole, children }) => {
+const Guard = ({ requiredPermission, currentRole, children }) => {
   const hasPermission = () => {
     if (!currentRole) return false;
     const role = roles.find(r => r.id === currentRole);
@@ -193,12 +193,12 @@ export const AuthExample = () => {
                     <p className='text-sm text-slate-600 mb-3'>
                       {t('example.auth.allRolesCanAccess')}
                     </p>
-                    <PermissionGuard requiredPermission='view_dashboard' currentRole={currentRole}>
+                    <Guard requiredPermission='view_dashboard' currentRole={currentRole}>
                       <Button variant='primary' size='sm'>
                         <Icons name='IconLayoutDashboard' className='mr-1' />
                         {t('example.auth.permissions.viewDashboard')}
                       </Button>
-                    </PermissionGuard>
+                    </Guard>
                   </CardContent>
                 </Card>
 
@@ -213,15 +213,12 @@ export const AuthExample = () => {
                       {t('example.auth.adminAndManagerCanManage')}
                     </p>
                     <div className='space-x-2'>
-                      <PermissionGuard
-                        requiredPermission='create_project'
-                        currentRole={currentRole}
-                      >
+                      <Guard requiredPermission='create_project' currentRole={currentRole}>
                         <Button variant='primary' size='sm'>
                           <Icons name='IconPlus' className='mr-1' />
                           {t('example.auth.permissions.createProject')}
                         </Button>
-                      </PermissionGuard>
+                      </Guard>
 
                       {!roles
                         .find(r => r.id === currentRole)
@@ -250,12 +247,12 @@ export const AuthExample = () => {
                       {t('example.auth.onlyAdminCanManageUsers')}
                     </p>
                     <div className='space-x-2'>
-                      <PermissionGuard requiredPermission='edit_users' currentRole={currentRole}>
+                      <Guard requiredPermission='edit_users' currentRole={currentRole}>
                         <Button variant='primary' size='sm'>
                           <Icons name='IconUserEdit' className='mr-1' />
                           {t('example.auth.permissions.manageUsers')}
                         </Button>
-                      </PermissionGuard>
+                      </Guard>
 
                       {!roles
                         .find(r => r.id === currentRole)
@@ -284,7 +281,7 @@ export const AuthExample = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className='p-0'>
-            <PermissionGuard requiredPermission='view_users' currentRole={currentRole}>
+            <Guard requiredPermission='view_users' currentRole={currentRole}>
               <TableView
                 visibleControl
                 header={[
@@ -314,22 +311,19 @@ export const AuthExample = () => {
                     accessorKey: 'operation-column',
                     parser: (_, _record) => (
                       <div className='flex space-x-2'>
-                        <PermissionGuard requiredPermission='edit_users' currentRole={currentRole}>
+                        <Guard requiredPermission='edit_users' currentRole={currentRole}>
                           <Button variant='outline-primary' size='sm'>
                             <Icons name='IconPencil' size={14} className='mr-1' />
                             {t('actions.edit')}
                           </Button>
-                        </PermissionGuard>
+                        </Guard>
 
-                        <PermissionGuard
-                          requiredPermission='assign_roles'
-                          currentRole={currentRole}
-                        >
+                        <Guard requiredPermission='assign_roles' currentRole={currentRole}>
                           <Button variant='outline-secondary' size='sm'>
                             <Icons name='IconUserCheck' size={14} className='mr-1' />
                             {t('example.auth.permissions.assignRoles')}
                           </Button>
-                        </PermissionGuard>
+                        </Guard>
 
                         {!roles
                           .find(r => r.id === currentRole)
@@ -349,7 +343,7 @@ export const AuthExample = () => {
                 ]}
                 data={users}
               />
-            </PermissionGuard>
+            </Guard>
 
             {!roles.find(r => r.id === currentRole)?.permissions.includes('view_users') && (
               <div className='p-4 text-center'>
@@ -367,7 +361,7 @@ export const AuthExample = () => {
           </CardContent>
         </Card>
 
-        <PermissionGuard requiredPermission='manage_roles' currentRole={currentRole}>
+        <Guard requiredPermission='manage_roles' currentRole={currentRole}>
           <Card>
             <CardHeader>
               <CardTitle className='text-lg font-normal'>
@@ -449,7 +443,7 @@ export const AuthExample = () => {
               </div>
             </CardContent>
           </Card>
-        </PermissionGuard>
+        </Guard>
 
         {!roles.find(r => r.id === currentRole)?.permissions.includes('manage_roles') && (
           <Card>

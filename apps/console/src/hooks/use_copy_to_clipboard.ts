@@ -2,8 +2,7 @@ import { useCallback, useState } from 'react';
 
 type Copied = string | null;
 
-// eslint-disable-next-line no-unused-vars
-type CopyFn = (text: string) => Promise<boolean>;
+type CopyFn = (_text: string) => Promise<boolean>;
 
 /**
  * Use copy to clipboard

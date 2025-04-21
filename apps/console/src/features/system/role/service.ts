@@ -7,11 +7,9 @@ import { createRole, deleteRole, getRole, getRoles, updateRole } from '@/feature
 
 interface RoleKeys {
   create: ['roleService', 'create'];
-  // eslint-disable-next-line no-unused-vars
-  get: (options?: { role?: string }) => ['roleService', 'role', { role?: string }];
+  get: (_options?: { role?: string }) => ['roleService', 'role', { role?: string }];
   update: ['roleService', 'update'];
-  // eslint-disable-next-line no-unused-vars
-  list: (options?: QueryFormParams) => ['roleService', 'roles', QueryFormParams];
+  list: (_options?: QueryFormParams) => ['roleService', 'roles', QueryFormParams];
 }
 
 export const roleKeys: RoleKeys = {

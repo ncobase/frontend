@@ -708,9 +708,9 @@ import {
 
 interface ${featureConfig.name}Keys {
   create: [string, string];
-  get: (options?: { id?: string }) => [string, string, { id?: string }];
+  get: (_options?: { id?: string }) => [string, string, { id?: string }];
   update: [string, string];
-  list: (options?: QueryFormParams) => [string, string, QueryFormParams];
+  list: (_options?: QueryFormParams) => [string, string, QueryFormParams];
   ${entityRelations
     .map(rel => {
       // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
@@ -1144,8 +1144,7 @@ export const ${featureConfig.name}ViewerPage = ({ viewMode, record: initialRecor
 
             ${entityRelations
               .map(rel => {
-                // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-                const relationCapitalized = rel.name.charAt(0).toUpperCase() + rel.name.slice(1);
+                const _relationCapitalized = rel.name.charAt(0).toUpperCase() + rel.name.slice(1);
                 return `<TabsContent value="${rel.name}">
               <${rel.name.charAt(0).toUpperCase() + rel.name.slice(1)}RelationshipTab recordId={recordId} />
             </TabsContent>`;
@@ -1444,8 +1443,7 @@ export const ${featureConfig.name}ListPage = () => {
   };
 };
 
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-export const generateTopbarConfig = (featureConfig: FeatureConfig): string => {
+export const generateTopbarConfig = (_featureConfig: FeatureConfig): string => {
   const code = `import { Button, DropdownControl, LayoutControl, ScreenControl } from '@/components/elements';
 import { useTranslation } from 'react-i18next';
 

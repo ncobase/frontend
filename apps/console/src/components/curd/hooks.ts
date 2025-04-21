@@ -13,31 +13,22 @@ import { useNavigate, useParams } from 'react-router';
 
 // Types
 type CrudParams<T> = {
-  // eslint-disable-next-line no-unused-vars
-  fetchList: (query?: { [key: string]: any }) => Promise<T[]>;
-  // eslint-disable-next-line no-unused-vars
-  fetchItem: (id: string) => Promise<T>;
-  // eslint-disable-next-line no-unused-vars
-  createItem: (data: T) => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
-  updateItem: (id: string, data: T) => Promise<void>;
-  // eslint-disable-next-line no-unused-vars
-  deleteItem: (id: string) => Promise<void>;
+  fetchList: (_query?: { [key: string]: any }) => Promise<T[]>;
+  fetchItem: (_id: string) => Promise<T>;
+  createItem: (_data: T) => Promise<void>;
+  updateItem: (_id: string, _data: T) => Promise<void>;
+  deleteItem: (_id: string) => Promise<void>;
 };
 
 type CrudHooks<T, Q> = {
   items: T[];
   selectedItem: T | null;
   viewType: 'view' | 'edit' | 'create' | undefined;
-  // eslint-disable-next-line no-unused-vars
-  handleDialogView: (record: T | null, type: string) => void;
+  handleDialogView: (_record: T | null, _type: string) => void;
   handleDialogClose: () => void;
-  // eslint-disable-next-line no-unused-vars
-  handleCreate: (data: T) => void;
-  // eslint-disable-next-line no-unused-vars
-  handleUpdate: (data: T) => void;
-  // eslint-disable-next-line no-unused-vars
-  handleDelete: (id: string) => void;
+  handleCreate: (_data: T) => void;
+  handleUpdate: (_data: T) => void;
+  handleDelete: (_id: string) => void;
   queryControl: Control<Q>;
   queryErrors: FieldErrors<Q>;
   handleQuerySubmit: UseFormHandleSubmit<Q>;
