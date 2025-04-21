@@ -189,7 +189,6 @@ export const Notifications = ({
             </div>
           ) : (
             items.slice(0, maxItems).map(notification => (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events
               <div
                 key={notification.id}
                 className='grid grid-cols-[22px_1fr] items-start last:mb-0 last:pb-0 cursor-pointer hover:bg-slate-50 p-1 rounded-md'

@@ -17,6 +17,7 @@ import { Register } from '@/features/account/pages/register';
 // const ExampleRoutes = lazy(() => import('@/features/example/routes'));
 // const SystemRoutes = lazy(() => import('@/features/system/routes'));
 import { AccountRoutes } from '@/features/account/routes';
+import { BuilderRoutes } from '@/features/builder/routes';
 import { ContentRoutes } from '@/features/content/routes';
 import { DashRoutes } from '@/features/dash/routes';
 import { ExampleRoutes } from '@/features/example/routes';
@@ -34,6 +35,10 @@ const routes = [
   {
     path: '/system/*',
     element: <Guard admin children={<SystemRoutes />} />
+  },
+  {
+    path: '/builder/*',
+    element: <Guard admin children={<BuilderRoutes />} />
   },
   { path: '/example/*', element: <Guard children={<ExampleRoutes />} /> }
 ];

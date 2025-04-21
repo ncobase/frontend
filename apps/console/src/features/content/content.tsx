@@ -185,7 +185,6 @@ export const ContentPage = () => {
 
           <div className='space-y-3'>
             {recentTopics.map(topic => (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <div
                 key={topic.id}
                 className='flex items-center p-2 border border-slate-300/65 rounded-md hover:bg-gray-50 cursor-pointer'
@@ -236,7 +235,6 @@ export const ContentPage = () => {
 
           <div className='space-y-3'>
             {recentTaxonomies.map(taxonomy => (
-              // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
               <div
                 key={taxonomy.id}
                 className='flex items-center p-2 border border-slate-300/65 rounded-md hover:bg-gray-50 cursor-pointer'
