@@ -1160,13 +1160,13 @@ export const Elements = ({ ...rest }) => {
                   <div className='flex items-center gap-4'>
                     <div className='inline-flex'>
                       <Checkbox id='ha-unchecked' />
-                      <Label className='ms-2' htmlFor='ha-unchecked'>
+                      <Label className='pl-2' htmlFor='ha-unchecked'>
                         unchecked
                       </Label>
                     </div>
                     <div className='inline-flex'>
                       <Checkbox id='ha-checked' defaultChecked />
-                      <Label className='ms-2' htmlFor='ha-checked'>
+                      <Label className='pl-2' htmlFor='ha-checked'>
                         checked
                       </Label>
                     </div>
@@ -1217,13 +1217,13 @@ export const Elements = ({ ...rest }) => {
                   <div className='flex items-center gap-4'>
                     <div className='inline-flex'>
                       <Checkbox id='ha-disabled-unchecked' disabled />
-                      <Label className='ms-2' htmlFor='ha-disabled-unchecked'>
+                      <Label className='pl-2' htmlFor='ha-disabled-unchecked'>
                         disabled unchecked
                       </Label>
                     </div>
                     <div className='inline-flex'>
                       <Checkbox id='ha-disabled-checked' disabled defaultChecked />
-                      <Label className='ms-2' htmlFor='ha-disabled-checked'>
+                      <Label className='pl-2' htmlFor='ha-disabled-checked'>
                         disabled checked
                       </Label>
                     </div>

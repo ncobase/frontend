@@ -247,7 +247,7 @@ export const EditorPage = () => {
                 </div>
                 <div className='col-span-full inline-flex items-center'>
                   <Checkbox id='hs-default-checkbox' defaultChecked />
-                  <Label className='ms-2' htmlFor='hs-default-checkbox'>
+                  <Label className='pl-2' htmlFor='hs-default-checkbox'>
                     Email me news and special offers
                   </Label>
                 </div>

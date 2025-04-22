@@ -51,31 +51,31 @@ const QueryBar = () => {
             <div className='flex-1 flex gap-x-4 pl-4'>
               <div className='inline-flex'>
                 <Checkbox id='hs-default-checkbox1' />
-                <Label htmlFor='hs-default-checkbox1' className='ms-2'>
+                <Label htmlFor='hs-default-checkbox1' className='pl-2'>
                   指标
                 </Label>
               </div>
               <div className='inline-flex'>
                 <Checkbox id='hs-default-checkbox2' defaultChecked />
-                <Label htmlFor='hs-default-checkbox2' className='ms-2'>
+                <Label htmlFor='hs-default-checkbox2' className='pl-2'>
                   指标
                 </Label>
               </div>
               <div className='inline-flex'>
                 <Checkbox id='hs-default-checkbox3' defaultChecked />
-                <Label htmlFor='hs-default-checkbox3' className='ms-2'>
+                <Label htmlFor='hs-default-checkbox3' className='pl-2'>
                   指标
                 </Label>
               </div>
               <div className='inline-flex'>
                 <Checkbox id='hs-default-checkbox4' />
-                <Label htmlFor='hs-default-checkbox4' className='ms-2'>
+                <Label htmlFor='hs-default-checkbox4' className='pl-2'>
                   指标
                 </Label>
               </div>
               <div className='inline-flex'>
                 <Checkbox id='hs-default-checkbox5' defaultChecked />
-                <Label htmlFor='hs-default-checkbox5' className='ms-2'>
+                <Label htmlFor='hs-default-checkbox5' className='pl-2'>
                   指标
                 </Label>
               </div>

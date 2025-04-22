@@ -164,7 +164,7 @@ export const ViewerPage = () => {
                 </div>
                 <div className='col-span-full inline-flex items-center'>
                   <Checkbox defaultChecked disabled />
-                  <label htmlFor='hs-default-checkbox' className='ms-2'>
+                  <label htmlFor='hs-default-checkbox' className='pl-2'>
                     Email me news and special offers
                   </label>
                 </div>

@@ -81,8 +81,8 @@ importers:
         specifier: latest
         version: 0.0.1-alpha.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ncobase/react':
-        specifier: ^0.1.7-alpha.2
-        version: 0.1.7-alpha.2(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)
+        specifier: ^0.1.7-alpha.3
+        version: 0.1.7-alpha.3(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)
       '@ncobase/utils':
         specifier: latest
         version: 0.1.0
@@ -827,8 +827,8 @@ packages:
   '@ncobase/flows@0.0.1-alpha.1':
     resolution: {integrity: sha512-f2mGhM1IAY6c5F8SaauqRvDcsRBHfeJkDxmlgHDno9UqbNgGRWY5/VEVP3fwZ5JLnWel6QoHbPkeipYS0iSeCw==}
 
-  '@ncobase/react@0.1.7-alpha.2':
-    resolution: {integrity: sha512-orbI/euvtZG4VM+o1s+noW2Pbg3/UXwLvyoqMDKwaqNWSubBplt7XJph9IFpILlQq9SYrrADril6LXntZfZCmg==}
+  '@ncobase/react@0.1.7-alpha.3':
+    resolution: {integrity: sha512-4KRZKbR8YSynxbU6W3cPP4K0/8avd1SJZOWokkdp/Ht8LA0G1+kY+WCFobdaZMwCn9GjYeXzP/c3bF6k2EWZ2A==}
 
   '@ncobase/tsconfig@0.1.0':
     resolution: {integrity: sha512-r0SLfOEKZHnLlXZFVFgHRgZv6mV5wOae52amQBDUMRTJSiPUXxvTiltquWibZdSRnd4CweYDWBwLgp+tP0OqAA==}
@@ -5141,7 +5141,7 @@ snapshots:
       - react
       - react-dom
 
-  '@ncobase/react@0.1.7-alpha.2(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)':
+  '@ncobase/react@0.1.7-alpha.3(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)':
     dependencies:
       '@hello-pangea/dnd': 18.0.1(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ncobase/utils': 0.1.1
