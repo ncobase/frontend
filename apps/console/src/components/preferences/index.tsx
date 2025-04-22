@@ -11,10 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
+  Switch
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
@@ -103,22 +100,16 @@ export const Preferences = () => {
 
   return (
     <Popover>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PopoverTrigger asChild>
-            <Button
-              variant='unstyle'
-              size='xs'
-              className='relative text-slate-400/70 [&>svg]:stroke-slate-400/70'
-            >
-              <Icons name='IconSettings' className='stroke-slate-500/85' />
-            </Button>
-          </PopoverTrigger>
-        </TooltipTrigger>
-        <TooltipContent side='bottom'>{t('preferences.title')}</TooltipContent>
-      </Tooltip>
-
-      <PopoverContent className='w-80 mt-4 p-4 bg-white z-999'>
+      <PopoverTrigger asChild>
+        <Button
+          variant='unstyle'
+          size='xs'
+          className='relative text-slate-400/70 [&>svg]:stroke-slate-400/70'
+        >
+          <Icons name='IconSettings' className='stroke-slate-500/85' />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className='w-80 mt-3.5 p-4 bg-white z-999'>
         <h3 className='text-lg font-medium mb-4'>{t('preferences.title')}</h3>
 
         <div className='space-y-4'>
