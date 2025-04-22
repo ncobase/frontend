@@ -9,6 +9,7 @@ import ReactDOM from 'react-dom/client';
 import { setupStyles } from '@/assets/styles';
 import { AppDevHint } from '@/components/app_dev_hint';
 import { LoadingIndicator } from '@/components/loading/indicator';
+import { ErrorNotification } from '@/components/notifications';
 import { ThemeProvider } from '@/components/theme';
 import { AuthProvider } from '@/features/account/context';
 import { Router } from '@/router';
@@ -37,6 +38,7 @@ const mount = () => {
             </AuthProvider>
             <AppDevHint />
             <LoadingIndicator />
+            <ErrorNotification />
             <ToastContainer position='bottom-right' />
           </ToastProvider>
         </ThemeProvider>

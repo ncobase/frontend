@@ -15,20 +15,24 @@ import { jwtDecode } from 'jwt-decode';
 import { Permission } from './permissions';
 import { TokenPayload, tokenService } from './token_service';
 
-import { TenantProvider } from '@/features/system/tenant/context';
-
 // Keys for local storage
 export const ACCESS_TOKEN_KEY = 'app.access.token';
 export const REFRESH_TOKEN_KEY = 'app.access.refresh';
+export const TENANT_KEY = 'app.tenant.id';
 
-// Authentication context interface with permission info
+import { eventEmitter } from '@/lib/events';
+
+// Authentication context interface with permission and tenant info
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   isAdmin: boolean;
   roles: string[];
   permissions: string[];
+  tenantId: string;
+  tokenTenantId: string;
   updateTokens: (_accessToken?: string, _refreshToken?: string) => void;
+  switchTenant: (_tenantId: string) => void;
   hasPermission: (_permission: string) => boolean;
   hasRole: (_role: string | string[]) => boolean;
   canAccess: (_options: {
@@ -47,7 +51,10 @@ const AuthContext = React.createContext<AuthContextValue>({
   isAdmin: false,
   roles: [],
   permissions: [],
+  tenantId: '',
+  tokenTenantId: '',
   updateTokens: () => undefined,
+  switchTenant: () => undefined,
   hasPermission: () => false,
   hasRole: () => false,
   canAccess: () => false
@@ -104,6 +111,12 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | undefined>(
     isBrowser ? locals.get(ACCESS_TOKEN_KEY) : undefined
   );
+
+  // Initialize with the tenant from localStorage if available
+  const [activeTenantId, setActiveTenantId] = useState<string>(
+    isBrowser ? locals.get(TENANT_KEY) || '' : ''
+  );
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isTokenValid, setIsTokenValid] = useState<boolean>(false);
   const [tokenInfo, setTokenInfo] = useState<{
@@ -138,7 +151,16 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         const isExpired = tokenService.isTokenExpired(accessToken);
         setIsTokenValid(!isExpired);
         if (!isExpired) {
-          setTokenInfo(parseToken(accessToken));
+          const parsedToken = parseToken(accessToken);
+          setTokenInfo(parsedToken);
+
+          // If no active tenant is set, use the one from token
+          if (!activeTenantId && parsedToken.tenantId) {
+            setActiveTenantId(parsedToken.tenantId);
+            if (isBrowser) {
+              locals.set(TENANT_KEY, parsedToken.tenantId);
+            }
+          }
         }
         setIsLoading(false);
       } catch (error) {
@@ -154,38 +176,69 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     const interval = setInterval(validateToken, 60 * 1000); // Check every minute
 
     return () => clearInterval(interval);
-  }, [accessToken]);
+  }, [accessToken, activeTenantId]);
 
   // Handle token updates
-  const handleTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
-    setAccessToken(newAccessToken);
-    updateTokens(newAccessToken, newRefreshToken);
+  const handleTokens = useCallback(
+    (newAccessToken?: string, newRefreshToken?: string) => {
+      setAccessToken(newAccessToken);
+      updateTokens(newAccessToken, newRefreshToken);
 
-    if (newAccessToken) {
-      try {
-        const isExpired = tokenService.isTokenExpired(newAccessToken);
-        setIsTokenValid(!isExpired);
-        if (!isExpired) {
-          setTokenInfo(parseToken(newAccessToken));
+      if (newAccessToken) {
+        try {
+          const isExpired = tokenService.isTokenExpired(newAccessToken);
+          setIsTokenValid(!isExpired);
+          if (!isExpired) {
+            const parsedToken = parseToken(newAccessToken);
+            setTokenInfo(parsedToken);
+
+            // If no active tenant is set, use the one from token
+            if (!activeTenantId && parsedToken.tenantId) {
+              setActiveTenantId(parsedToken.tenantId);
+              if (isBrowser) {
+                locals.set(TENANT_KEY, parsedToken.tenantId);
+              }
+            }
+          }
+        } catch (error: ExplicitAny) {
+          console.error('Token validation failed:', error);
+          setIsTokenValid(false);
         }
-      } catch (error: ExplicitAny) {
-        console.error('Token validation failed:', error);
+      } else {
+        // Clear all auth state when tokens are removed
         setIsTokenValid(false);
+        setTokenInfo({
+          isAdmin: false,
+          roles: [],
+          permissions: [],
+          tenantId: ''
+        });
+        setActiveTenantId('');
+        if (isBrowser) {
+          locals.remove(TENANT_KEY);
+        }
       }
-    } else {
-      setIsTokenValid(false);
-      setTokenInfo({
-        isAdmin: false,
-        roles: [],
-        permissions: [],
-        tenantId: ''
-      });
+
+      setIsLoading(false);
+
+      // Notify the Permission Service about token changes
+      Permission.refreshState();
+    },
+    [activeTenantId]
+  );
+
+  // Handle tenant switching
+  const handleSwitchTenant = useCallback((tenantId: string) => {
+    setActiveTenantId(tenantId);
+    if (isBrowser) {
+      locals.set(TENANT_KEY, tenantId);
     }
 
-    setIsLoading(false);
-
-    // Notify the Permission Service about token changes
+    // Refresh permission state when tenant changes
     Permission.refreshState();
+
+    // Emit event for tenant change
+    eventEmitter.emit('tenant:changed', { tenantId });
   }, []);
 
   // Create memoized context value to avoid unnecessary re-renders
@@ -196,7 +249,10 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       isAdmin: tokenInfo.isAdmin,
       roles: tokenInfo.roles,
       permissions: tokenInfo.permissions,
+      tenantId: activeTenantId,
+      tokenTenantId: tokenInfo.tenantId,
       updateTokens: handleTokens,
+      switchTenant: handleSwitchTenant,
       // Use the Permission methods directly
       hasPermission: (permission: string): boolean => {
         if (!isTokenValid) return false;
@@ -217,14 +273,18 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         return Permission.canAccess(options);
       }
     }),
-    [accessToken, isTokenValid, isLoading, tokenInfo, handleTokens]
+    [
+      accessToken,
+      isTokenValid,
+      isLoading,
+      tokenInfo,
+      activeTenantId,
+      handleTokens,
+      handleSwitchTenant
+    ]
   );
 
-  return (
-    <AuthContext.Provider value={authContextValue}>
-      <TenantProvider>{children}</TenantProvider>
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
 };
 
 // Hook to access authentication context

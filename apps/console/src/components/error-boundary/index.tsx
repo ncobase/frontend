@@ -4,6 +4,8 @@ import { Button, CodeHighlighter, Container, Dialog } from '@ncobase/react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
+import { ErrorPage } from '../errors';
+
 import { eventEmitter } from '@/lib/events';
 
 const FallbackComponent = ({
@@ -37,13 +39,11 @@ const FallbackComponent = ({
 
 export const ErrorBoundary: React.FC<React.PropsWithChildren> = props => {
   const handlerServerError = () => {
-    console.log('request error event: server-error');
-    // return <FallbackComponent children={<ErrorPage code={500} />} />;
+    return <FallbackComponent children={<ErrorPage code={500} />} />;
   };
 
   const handlerForbidden = () => {
-    console.log('request error event: forbidden');
-    // return <FallbackComponent children={<ErrorPage code={403} />} />;
+    return <FallbackComponent children={<ErrorPage code={403} />} />;
   };
 
   useEffect(() => {

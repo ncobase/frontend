@@ -1,15 +1,12 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext } from 'react';
 
-import { isBrowser, locals } from '@ncobase/utils';
+import { useAuthContext } from '@/features/account/context';
 
 interface TenantContextValue {
-  tenant_id?: string;
+  tenant_id: string;
   hasTenant: boolean;
-  // eslint-disable-next-line no-unused-vars
-  updateTenant(id?: string | null): void;
+  updateTenant: (_id: string) => void;
 }
-
-export const TENANT_KEY = 'app.tenant.id';
 
 const TenantContext = React.createContext<TenantContextValue>({
   tenant_id: '',
@@ -17,37 +14,22 @@ const TenantContext = React.createContext<TenantContextValue>({
   updateTenant: () => undefined
 });
 
-const updateTenant = (id?: string | null) => {
-  if (!isBrowser) return;
-  return id ? locals.set(TENANT_KEY, id) : locals.remove(TENANT_KEY);
-};
-
-export const clearTenant = () => {
-  if (!isBrowser) return;
-  locals.remove(TENANT_KEY);
-};
-
 export const TenantProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [tenant, setTenant] = useState<string | undefined>(
-    (isBrowser && locals.get(TENANT_KEY)) ?? undefined
-  );
+  const { tenantId, switchTenant, isAuthenticated } = useAuthContext();
 
+  // Simplified tenant update method that calls the AuthContext's switchTenant
   const handleUpdateTenant = useCallback(
     (id: string) => {
-      setTenant(id);
-      updateTenant(id);
+      switchTenant(id);
     },
-    [setTenant]
+    [switchTenant]
   );
 
-  const value = useMemo(
-    () => ({
-      tenant_id: tenant,
-      hasTenant: !!tenant,
-      updateTenant: handleUpdateTenant
-    }),
-    [tenant, handleUpdateTenant]
-  );
+  const value = {
+    tenant_id: tenantId,
+    hasTenant: isAuthenticated && !!tenantId,
+    updateTenant: handleUpdateTenant
+  };
 
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;
 };

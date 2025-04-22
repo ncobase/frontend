@@ -5,7 +5,6 @@ import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useAuthContext } from '@/features/account/context';
-import { useTenantContext } from '@/features/system/tenant/context';
 import { Tenant } from '@/features/system/tenant/tenant';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
@@ -53,28 +52,31 @@ export const TenantSwitcher = ({
   onVisible?: (_visible: boolean) => void;
 }) => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuthContext();
-  const { hasTenant, tenant_id, updateTenant } = useTenantContext();
+  const { isAuthenticated, tenantId, switchTenant } = useAuthContext();
   const redirect = useRedirectFromUrl();
+
+  const hasTenant = !!tenantId;
 
   const onSelect = useCallback(
     (id: string) => {
-      if (id !== tenant_id) {
-        updateTenant(id);
+      if (id !== tenantId) {
+        switchTenant(id);
         redirect();
       }
-      onVisible?.(false);
+      if (onVisible) {
+        onVisible(false);
+      }
     },
-    [tenant_id, redirect, onVisible, updateTenant]
+    [tenantId, redirect, onVisible, switchTenant]
   );
 
   useEffect(() => {
-    if (isAuthenticated && !hasTenant && tenants.length > 1) {
+    if (isAuthenticated && !hasTenant && tenants.length > 1 && onVisible) {
       onVisible(true);
     } else if (isAuthenticated && !hasTenant && tenants.length === 1) {
       onSelect(tenants[0].id);
     }
-  }, [isAuthenticated, hasTenant, tenants, onSelect]);
+  }, [isAuthenticated, hasTenant, tenants.length, onSelect]);
 
   if (!tenants.length || !isAuthenticated) return null;
 
@@ -83,21 +85,23 @@ export const TenantSwitcher = ({
       title={t('tenant_switcher.title')}
       isOpen={opened}
       onChange={() => {
-        onVisible?.(!opened);
+        if (onVisible) {
+          onVisible(!opened);
+        }
       }}
       className='max-w-80 max-h-40'
     >
       <div
         className={cn(
           'grid gap-2',
-          tenants.filter((tenant: Tenant) => tenant.id !== tenant_id).length > 1 && 'grid-cols-2'
+          tenants.filter((tenant: Tenant) => tenant.id !== tenantId).length > 1 && 'grid-cols-2'
         )}
       >
         {tenants.map((tenant: Tenant) => (
           <TenantOption
             key={tenant.id}
             {...tenant}
-            isSelected={tenant.id === tenant_id}
+            isSelected={tenant.id === tenantId}
             onSelect={onSelect}
           />
         ))}

@@ -2,9 +2,8 @@ import { ExplicitAny } from '@ncobase/types';
 import { isBrowser, locals } from '@ncobase/utils';
 import { $Fetch, $fetch, FetchError, FetchOptions } from 'ofetch';
 
-import { ACCESS_TOKEN_KEY } from '@/features/account/context';
+import { ACCESS_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
 import { checkAndRefreshToken } from '@/features/account/token_service';
-import { TENANT_KEY } from '@/features/system/tenant/context';
 import { BearerKey, XMdTenantKey } from '@/lib/constants';
 import { eventEmitter } from '@/lib/events';
 
@@ -12,6 +11,11 @@ export class Request {
   private readonly $fetch: $Fetch;
   private readonly defaultHeaders: Record<string, string | undefined>;
   private readonly csrfToken: string | null = null;
+  private requestsInProgress: Map<string, Promise<ExplicitAny>> = new Map();
+  private readonly failedEndpoints: Map<string, { timestamp: number; retryCount: number }> =
+    new Map();
+  private readonly MAX_RETRY_COUNT = 3;
+  private readonly RETRY_RESET_TIME = 60000; // 1 minute
 
   static baseConfig: FetchOptions = {
     baseURL:
@@ -51,7 +55,47 @@ export class Request {
     };
   }
 
-  private async handleErrors(err: Error | Response, method: string, url: string): Promise<void> {
+  private shouldRetry(endpoint: string): boolean {
+    const failedInfo = this.failedEndpoints.get(endpoint);
+
+    // If no record, it's the first attempt
+    if (!failedInfo) return true;
+
+    const now = Date.now();
+
+    // Reset retry count if enough time has passed
+    if (now - failedInfo.timestamp > this.RETRY_RESET_TIME) {
+      this.failedEndpoints.set(endpoint, { timestamp: now, retryCount: 1 });
+      return true;
+    }
+
+    // Check if we've hit the retry limit
+    if (failedInfo.retryCount >= this.MAX_RETRY_COUNT) {
+      return false;
+    }
+
+    // Increment retry count
+    this.failedEndpoints.set(endpoint, {
+      timestamp: now,
+      retryCount: failedInfo.retryCount + 1
+    });
+
+    return true;
+  }
+
+  // Helper method to extract the base endpoint from a URL
+  private getEndpointKey(url: string): string {
+    // Remove query parameters and timestamps
+    return url.split('?')[0];
+  }
+
+  private async handleErrors(
+    err: Error | Response | FetchError,
+    method: string,
+    url: string
+  ): Promise<never> {
+    const endpoint = this.getEndpointKey(url);
+
     // Network error handling
     if (err instanceof Error && !(err instanceof FetchError)) {
       console.error(`Network error [${method} ${url}]: ${err.message}`);
@@ -59,39 +103,69 @@ export class Request {
       throw err;
     }
 
-    // Fetch error or Response error
-    if (err instanceof Response) {
-      const { status } = err;
+    let status: number | undefined;
+    let errorData: any = null;
+    let errorMessage = 'Unknown error occurred';
 
-      // Try to parse error response
-      let errorData = null;
+    // Handle FetchError
+    if (err instanceof FetchError) {
+      status = err.status;
       try {
-        errorData = await err.json();
-      } catch (e: ExplicitAny) {
-        console.error(`Error parsing error response [${method} ${url}]: ${e.message}`);
-        // Error response is not JSON
+        errorData = err.data;
+        errorMessage = errorData?.message || err.message || 'Unknown error occurred';
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+      } catch (e: any) {
+        errorMessage = err.message || 'Unknown error occurred';
       }
+    } else if (err instanceof Response) {
+      status = err.status;
 
-      const errorMessage = errorData?.message || 'Unknown error occurred';
-
-      // Handle different error scenarios
-      if (status === 401) {
-        eventEmitter.emit('unauthorized', errorMessage);
-      } else if (status === 403) {
-        eventEmitter.emit('forbidden', errorMessage);
-      } else if (status === 404) {
-        eventEmitter.emit('not-found', { url, message: errorMessage });
-      } else if (status === 422) {
-        eventEmitter.emit('validation-error', errorData?.errors || {});
-      } else if (status >= 500) {
-        eventEmitter.emit('server-error', { status, message: errorMessage });
+      // Only try to parse JSON if it hasn't been read yet
+      if (err.bodyUsed === false) {
+        try {
+          errorData = await err.json();
+          errorMessage = errorData?.message || 'Unknown error occurred';
+        } catch (e) {
+          // Body stream already read or not JSON
+          console.error(
+            `Error parsing error response [${method} ${url}]: ${e instanceof Error ? e.message : String(e)}`
+          );
+        }
       }
-
-      console.error(`HTTP Error [${method} ${url}]: ${status} - ${errorMessage}`);
-      throw err;
     }
 
-    throw err; // Rethrow any other errors
+    // Store information about this failed endpoint for retry limiting
+    if (status === 500 || status === 503) {
+      const existingInfo = this.failedEndpoints.get(endpoint);
+      this.failedEndpoints.set(endpoint, {
+        timestamp: Date.now(),
+        retryCount: (existingInfo?.retryCount || 0) + 1
+      });
+    }
+
+    // Handle different error scenarios
+    if (status === 401) {
+      eventEmitter.emit('unauthorized', errorMessage);
+    } else if (status === 403) {
+      eventEmitter.emit('forbidden', errorMessage);
+    } else if (status === 404) {
+      eventEmitter.emit('not-found', { url, message: errorMessage });
+    } else if (status === 422) {
+      eventEmitter.emit('validation-error', errorData?.errors || {});
+    } else if (status && status >= 500) {
+      eventEmitter.emit('server-error', {
+        status,
+        message: errorMessage,
+        url: endpoint
+      });
+    } else if (status && status >= 400) {
+      eventEmitter.emit('request-error', {
+        status,
+        message: errorMessage,
+        url: endpoint
+      });
+    }
+    throw err;
   }
 
   protected async request(
@@ -100,6 +174,27 @@ export class Request {
     data?: ExplicitAny,
     fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
+    const endpoint = this.getEndpointKey(url);
+
+    // Check if we should retry this endpoint
+    if (!this.shouldRetry(endpoint)) {
+      console.warn(`Request to ${endpoint} has failed multiple times. Skipping request.`);
+      eventEmitter.emit('request-blocked', {
+        method,
+        url: endpoint,
+        message: 'Request has failed multiple times and is temporarily blocked'
+      });
+      throw new Error(`Request to ${endpoint} is temporarily blocked due to multiple failures`);
+    }
+
+    // Generate a request key for deduplication
+    const requestKey = `${method}:${url}:${JSON.stringify(data || {})}`;
+
+    // Check if this exact request is already in progress
+    if (this.requestsInProgress.has(requestKey)) {
+      return this.requestsInProgress.get(requestKey)!;
+    }
+
     try {
       // Skip token refresh for auth endpoints to avoid infinite loops
       if (
@@ -136,9 +231,18 @@ export class Request {
         }
       };
 
-      return await this.$fetch(finalUrl, options);
+      // Create the request promise and store it
+      const requestPromise = this.$fetch(finalUrl, options).finally(() => {
+        // Remove from in-progress requests when done
+        this.requestsInProgress.delete(requestKey);
+      });
+
+      this.requestsInProgress.set(requestKey, requestPromise);
+      return await requestPromise;
     } catch (err) {
-      await this.handleErrors(err as Error, method, url);
+      // Clean up the in-progress request on error
+      this.requestsInProgress.delete(requestKey);
+      return await this.handleErrors(err as Error, method, url);
     }
   }
 

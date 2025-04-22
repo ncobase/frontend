@@ -14,25 +14,32 @@ import { useNavigate } from 'react-router';
 import { useMenus } from '../layout.hooks';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';
+import { useAuthContext } from '@/features/account/context';
 import { TenantSwitcher } from '@/features/account/pages/tenant_switcher';
 import { useAccount } from '@/features/account/service';
 import { MenuTree } from '@/features/system/menu/menu';
-import { useTenantContext } from '@/features/system/tenant/context';
 import { Tenant } from '@/features/system/tenant/tenant';
 
 export const TenantDropdown = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { hasTenant } = useTenantContext();
+  const { tenantId } = useAuthContext();
   const [relatedTenants, setRelatedTenants] = useState<Tenant[]>([]);
   const [currentTenant, setCurrentTenant] = useState<Tenant>();
-  const { tenants } = useAccount();
+  const { tenants = [] } = useAccount();
+
+  const hasTenant = !!tenantId;
 
   useEffect(() => {
-    if (!tenants.length) return;
+    if (!tenants || tenants.length === 0) return;
     setRelatedTenants(tenants);
-    setCurrentTenant(tenants[0]);
-  }, [tenants]);
+    const current = tenants.find(t => t.id === tenantId);
+    if (current) {
+      setCurrentTenant(current);
+    } else if (tenants.length > 0) {
+      setCurrentTenant(tenants[0]);
+    }
+  }, [tenants, tenantId]);
 
   const [opened, setOpened] = useState(false);
 
@@ -98,7 +105,7 @@ export const TenantDropdown = () => {
 
   return (
     <>
-      {hasTenant && relatedTenants?.length > 1 && <MenuList />}
+      {hasTenant && relatedTenants.length > 1 && <MenuList />}
       <TenantSwitcher opened={opened} onVisible={setOpened} tenants={relatedTenants} />
     </>
   );

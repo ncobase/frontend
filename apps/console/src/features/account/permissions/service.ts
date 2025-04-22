@@ -1,7 +1,7 @@
 import { locals } from '@ncobase/utils';
 import { jwtDecode } from 'jwt-decode';
 
-import { ACCESS_TOKEN_KEY } from '../context';
+import { ACCESS_TOKEN_KEY, TENANT_KEY } from '../context';
 import { TokenPayload } from '../token_service';
 
 import { eventEmitter } from '@/lib/events';
@@ -63,7 +63,8 @@ export class Permission {
       isAuthenticated: !!token,
       permissions: this.getPermissions(),
       roles: this.getRoles(),
-      isAdmin: this.isAdmin()
+      isAdmin: this.isAdmin(),
+      tenantId: this.getCurrentTenantId()
     });
 
     // Log state refresh for debugging
@@ -72,7 +73,8 @@ export class Permission {
         hasToken: !!token,
         permissions: this.getPermissions().length,
         roles: this.getRoles().length,
-        isAdmin: this.isAdmin()
+        isAdmin: this.isAdmin(),
+        tenantId: this.getCurrentTenantId()
       });
     }
   }
@@ -170,9 +172,14 @@ export class Permission {
   }
 
   /**
-   * Get current tenant ID
+   * Get current tenant ID - prioritize active tenant from localStorage
    */
   static getCurrentTenantId(): string {
+    // First check for active tenant ID in localStorage
+    const activeTenantId = locals.get(TENANT_KEY);
+    if (activeTenantId) return activeTenantId;
+
+    // Fallback to token tenant ID if no active tenant is set
     const decoded = this.getDecodedToken();
     if (!decoded) return '';
 
