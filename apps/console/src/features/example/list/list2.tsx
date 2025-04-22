@@ -13,11 +13,12 @@ import {
   TooltipTrigger
 } from '@ncobase/react';
 import { ExplicitAny } from '@ncobase/types';
-import { cn, formatDateTime } from '@ncobase/utils';
+import { formatDateTime } from '@ncobase/utils';
 import { Control, Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { QueryBar } from '@/components/curd/querybar';
 import { Page, Topbar } from '@/components/layout';
 import { useListMenus } from '@/features/system/menu/service';
 import { parseStatus } from '@/lib/status';
@@ -82,62 +83,6 @@ const queryFields = ({ queryControl }: { queryControl: Control<QueryFormParams, 
     component: <DatePicker mode='range' className='py-1.5' />
   }
 ];
-
-const QueryBar = ({ queryFields = [] }) => {
-  const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-  return (
-    <div className='flex bg-white shadow-xs -mx-4 -mt-4 p-4 relative'>
-      <div className='flex-1 items-center justify-between grid grid-cols-12 gap-x-4'>
-        <div
-          className={cn(
-            'col-span-full md:col-span-11 grid gap-4',
-            queryFields.length === 2 && 'sm:grid-cols-2',
-            queryFields.length === 3 && 'sm:grid-cols-2 md:grid-cols-3',
-            queryFields.length >= 4 && 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-          )}
-        >
-          {queryFields
-            .slice(0, isExpanded ? queryFields.length : 3)
-            .map(({ name, label, component }) => (
-              <div key={name} className='inline-flex items-center'>
-                <div className='flex text-slate-800'>{label}：</div>
-                <div className='flex-1 gap-x-4 pl-4'>{component}</div>
-              </div>
-            ))}
-          {queryFields.length > 3 && (
-            <Button
-              variant='unstyle'
-              size='ratio'
-              className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
-              title={t(isExpanded ? 'query.collapse' : 'query.expand')}
-              onClick={toggleExpand}
-            >
-              <Icons name={isExpanded ? 'IconChevronUp' : 'IconChevronDown'} size={12} />
-            </Button>
-          )}
-
-          <Button
-            variant='unstyle'
-            size='ratio'
-            className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
-            title={t(isExpanded ? 'query.collapse' : 'query.expand')}
-            onClick={toggleExpand}
-          >
-            <Icons name={isExpanded ? 'IconChevronUp' : 'IconChevronDown'} size={12} />
-          </Button>
-        </div>
-        <div className='col-span-1 flex flex-row items-center justify-start gap-x-4 flex-wrap'>
-          <Button>{t('query.search')}</Button>
-          <Button variant='outline-slate'>{t('query.reset')}</Button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export const ListPage2 = () => {
   const { t } = useTranslation();
@@ -241,7 +186,7 @@ export const ListPage2 = () => {
 
   return (
     <Page sidebar topbar={topbar}>
-      <QueryBar queryFields={queryFields({ queryControl })} />
+      <QueryBar queryFields={queryFields({ queryControl })} t={t} />
       <div className='flex-1 mt-4 overflow-y-auto'>
         <TableView
           pageSize={8}
@@ -287,7 +232,10 @@ export const ListPage2 = () => {
             {
               title: '状态',
               accessorKey: 'disabled',
-              parser: value => parseStatus(!value),
+              parser: value => {
+                const status = parseStatus(!value);
+                return typeof status === 'bigint' ? status.toString() : status;
+              },
               icon: 'IconFlagCog'
             },
             {
@@ -368,7 +316,10 @@ export const ListPage2 = () => {
             {
               title: '状态',
               accessorKey: 'disabled',
-              parser: value => parseStatus(!value),
+              parser: value => {
+                const status = parseStatus(!value);
+                return typeof status === 'bigint' ? status.toString() : status;
+              },
               icon: 'IconFlagCog'
             },
             {

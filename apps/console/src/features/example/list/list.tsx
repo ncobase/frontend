@@ -285,7 +285,10 @@ export const ListPage = () => {
           {
             title: 'Status',
             accessorKey: 'disabled',
-            parser: value => parseStatus(!value),
+            parser: value => {
+              const status = parseStatus(!value);
+              return typeof status === 'bigint' ? status.toString() : status;
+            },
             icon: 'IconFlagCog'
           },
           {

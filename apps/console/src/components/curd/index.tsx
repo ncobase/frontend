@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import { Button, Form, Icons, TableView, TableViewProps } from '@ncobase/react';
+import { TableView, TableViewProps } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { CommonViewProps } from './common';
 import { FlattenView } from './flatten';
 import { ModalView } from './modal';
+import { QueryBar } from './querybar';
 
 import { Page, Topbar, useLayoutContext } from '@/components/layout';
 import { PREFERENCES_VIEW_MODE_KEY } from '@/components/preferences';
@@ -41,85 +43,12 @@ export interface CommonProps<T extends object> {
   loading?: boolean;
 }
 
-// Merge common props with either ModalViewProps or FlattenViewProps
 export type CurdProps<T extends object> = CommonProps<T> &
   CommonViewProps<T> & {
     record?: T | null;
   };
 
-const QueryBar = ({
-  queryFields = [],
-  onQuery,
-  onResetQuery,
-  t
-}: {
-  queryFields: {
-    name: string;
-    label: string;
-    component: React.ReactNode;
-  }[];
-  onQuery?: (_query: any) => void;
-  onResetQuery?: () => void;
-  t: any;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  if (!queryFields.length) return null;
-
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <Form
-      id='querybar-form'
-      onSubmit={onQuery}
-      noValidate
-      className='flex bg-white shadow-xs -mx-4 -mt-4 p-4 relative'
-    >
-      <div className='flex-1 items-start justify-between grid grid-cols-12 gap-4'>
-        <div
-          className={cn(
-            'col-span-full md:col-span-11 grid gap-4',
-            queryFields.length === 2 && 'sm:grid-cols-2',
-            queryFields.length === 3 && 'sm:grid-cols-2 md:grid-cols-3',
-            queryFields.length >= 4 && 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-          )}
-        >
-          {queryFields
-            .slice(0, isExpanded ? queryFields.length : 3)
-            .map(({ name, label, component }) => (
-              <div key={name} className='inline-flex items-center'>
-                <div className='flex text-slate-800'>{label}：</div>
-                <div className='flex-1 gap-x-4 pl-4'>{component}</div>
-              </div>
-            ))}
-          {queryFields.length > 3 && (
-            <Button
-              variant='unstyle'
-              size='ratio'
-              className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
-              title={t(isExpanded ? 'query.collapse' : 'query.expand')}
-              onClick={toggleExpand}
-            >
-              <Icons name={isExpanded ? 'IconChevronUp' : 'IconChevronDown'} size={12} />
-            </Button>
-          )}
-        </div>
-        <div className='col-span-full md:col-span-1 flex flex-row items-start pt-[5.5px] justify-start gap-x-4 flex-wrap'>
-          <Button onClick={onQuery} type='submit'>
-            {t('query.search')}
-          </Button>
-          <Button onClick={onResetQuery} variant='outline-slate'>
-            {t('query.reset')}
-          </Button>
-        </div>
-      </div>
-    </Form>
-  );
-};
-
-const PaginationTexts = (t: any) => ({
+const PaginationTexts = (t: TFunction) => ({
   firstPage: t('pagination.first_page'),
   previousPage: t('pagination.previous_page'),
   nextPage: t('pagination.next_page'),
