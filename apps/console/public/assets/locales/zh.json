@@ -1,4 +1,29 @@
 {
+  "enums": {
+    "status": {
+      "normal": "正常",
+      "disabled": "禁用",
+      "unknown": "未知"
+    },
+    "processStatus": {
+      "normal": "正常",
+      "pending": "待处理",
+      "inProgress": "进行中",
+      "cancelled": "已取消",
+      "rejected": "已拒绝",
+      "recalled": "已撤回",
+      "completed": "已完成",
+      "submitted": "已提交",
+      "unknown": "未知"
+    },
+    "publishStatus": {
+      "published": "已发布",
+      "unpublished": "未发布",
+      "draft": "草稿",
+      "deleted": "已删除",
+      "unknown": "未知"
+    }
+  },
   "account.forget_password.title": "找回密码",
   "account.login.feedbacks.login_error.title": "登录失败",
   "account.login.title": "登录",

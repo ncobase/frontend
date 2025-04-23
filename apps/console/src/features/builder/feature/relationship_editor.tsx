@@ -59,7 +59,7 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
     setActiveRelationId(id);
   };
 
-  // Helper function to generate field name - Not a Hook
+  // Generate field name - Not a Hook
   const generateFieldName = rel => {
     if (rel && rel.fieldName === '' && rel.targetEntity) {
       let fieldName = '';

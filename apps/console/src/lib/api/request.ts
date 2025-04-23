@@ -83,7 +83,7 @@ export class Request {
     return true;
   }
 
-  // Helper method to extract the base endpoint from a URL
+  // Extract the base endpoint from a URL
   private getEndpointKey(url: string): string {
     // Remove query parameters and timestamps
     return url.split('?')[0];

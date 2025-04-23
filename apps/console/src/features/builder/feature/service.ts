@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 
-// Types
 export interface FeatureConfig {
   name: string;
   displayName: string;
@@ -71,7 +70,6 @@ export interface GeneratedCode {
   relationsService: string;
 }
 
-// Helper functions
 export const getTypeScriptType = (fieldType: string): string => {
   const typeMap: Record<string, string> = {
     text: 'string',
@@ -114,7 +112,6 @@ export const getIconForType = (fieldType: string): string => {
   return iconMap[fieldType] || 'IconForms';
 };
 
-// Code generation functions
 export const generateEntityCode = (
   featureConfig: FeatureConfig,
   entityFields: EntityField[],

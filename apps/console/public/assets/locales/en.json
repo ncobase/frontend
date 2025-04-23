@@ -1,4 +1,29 @@
 {
+  "enums": {
+    "status": {
+      "normal": "Normal",
+      "disabled": "Disabled",
+      "unknown": "Unknown"
+    },
+    "processStatus": {
+      "normal": "Normal",
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected",
+      "recalled": "Recalled",
+      "completed": "Completed",
+      "submitted": "Submitted",
+      "unknown": "Unknown"
+    },
+    "publishStatus": {
+      "published": "Published",
+      "unpublished": "Unpublished",
+      "draft": "Draft",
+      "deleted": "Deleted",
+      "unknown": "Unknown"
+    }
+  },
   "account.forget_password.title": "Forgot Password",
   "account.login.feedbacks.login_error.title": "Login Failed",
   "account.login.title": "Login",

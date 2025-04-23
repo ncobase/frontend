@@ -1,4 +1,29 @@
 {
+  "enums": {
+    "status": {
+      "normal": "عادي",
+      "disabled": "معطل",
+      "unknown": "غير معروف"
+    },
+    "processStatus": {
+      "normal": "عادي",
+      "pending": "قيد الانتظار",
+      "inProgress": "قيد التنفيذ",
+      "cancelled": "ملغي",
+      "rejected": "مرفوض",
+      "recalled": "مسترجع",
+      "completed": "مكتمل",
+      "submitted": "مقدم",
+      "unknown": "غير معروف"
+    },
+    "publishStatus": {
+      "published": "منشور",
+      "unpublished": "غير منشور",
+      "draft": "مسودة",
+      "deleted": "محذوف",
+      "unknown": "غير معروف"
+    }
+  },
   "account.forget_password.title": "استعادة كلمة المرور",
   "account.login.feedbacks.login_error.title": "فشل تسجيل الدخول",
   "account.login.title": "تسجيل الدخول",

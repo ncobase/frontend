@@ -1,73 +1,153 @@
-import { ExplicitAny } from '@ncobase/types';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
-type StatusType = '正常' | '禁用' | '未知' | unknown;
-type ProcessStatusType =
-  | '正常'
-  | '待审批'
-  | '审批中'
-  | '已取消'
-  | '驳回'
-  | '召回'
-  | '审批完成'
-  | '已提交';
+type StatusValue = 'Normal' | 'Disabled' | 'Unknown';
+type ProcessStatusValue =
+  | 'Normal'
+  | 'Pending'
+  | 'InProgress'
+  | 'Cancelled'
+  | 'Rejected'
+  | 'Recalled'
+  | 'Completed'
+  | 'Submitted'
+  | 'Unknown';
+type PublishStatusValue = 'Published' | 'Unpublished' | 'Draft' | 'Deleted' | 'Unknown';
 
-type PublishStatusType = '已发布' | '未发布' | '草稿' | '已删除';
+type InputStatusType = StatusValue | boolean | number | string | null | undefined;
+type InputProcessStatusType = number;
+type InputPublishStatusType = number | boolean | Date;
 
-const statusMap: Record<ExplicitAny, string> = {
-  '': '未知',
-  undefined: '未知',
-  false: '禁用',
-  0: '禁用',
-  true: '正常',
-  1: '正常'
+const getStatusMap = (t: TFunction): Record<string, StatusValue> => ({
+  '': t('enums.status.unknown') as StatusValue,
+  undefined: t('enums.status.unknown') as StatusValue,
+  false: t('enums.status.disabled') as StatusValue,
+  0: t('enums.status.disabled') as StatusValue,
+  true: t('enums.status.normal') as StatusValue,
+  1: t('enums.status.normal') as StatusValue
+});
+
+const getProcessStatusMap = (t: TFunction): Record<number, ProcessStatusValue> => ({
+  0: t('enums.processStatus.normal') as ProcessStatusValue,
+  1: t('enums.processStatus.pending') as ProcessStatusValue,
+  2: t('enums.processStatus.inProgress') as ProcessStatusValue,
+  3: t('enums.processStatus.cancelled') as ProcessStatusValue,
+  4: t('enums.processStatus.rejected') as ProcessStatusValue,
+  5: t('enums.processStatus.recalled') as ProcessStatusValue,
+  6: t('enums.processStatus.completed') as ProcessStatusValue,
+  7: t('enums.processStatus.submitted') as ProcessStatusValue
+});
+
+const getPublishStatusMap = (t: TFunction): Record<string, PublishStatusValue> => ({
+  published: t('enums.publishStatus.published') as PublishStatusValue,
+  unpublished: t('enums.publishStatus.unpublished') as PublishStatusValue,
+  draft: t('enums.publishStatus.draft') as PublishStatusValue,
+  deleted: t('enums.publishStatus.deleted') as PublishStatusValue,
+  unknown: t('enums.publishStatus.unknown') as PublishStatusValue
+});
+
+const parseBaseValue = (t: TFunction, value: unknown): StatusValue => {
+  if (value === null || value === undefined || value === '')
+    return t('enums.status.unknown') as StatusValue;
+  if (typeof value === 'boolean')
+    return value
+      ? (t('enums.status.normal') as StatusValue)
+      : (t('enums.status.disabled') as StatusValue);
+  if (typeof value === 'number')
+    return value > 0
+      ? (t('enums.status.normal') as StatusValue)
+      : (t('enums.status.disabled') as StatusValue);
+  // For strings, direct return may not be expected behavior unless it's exactly 'Normal' or 'Disabled'
+  // Here we assume non-boolean/number/empty values are treated as Unknown
+  return t('enums.status.unknown') as StatusValue;
 };
 
-const processStatusMap: Record<number, ProcessStatusType> = {
-  0: '正常',
-  1: '待审批',
-  2: '审批中',
-  3: '已取消',
-  4: '驳回',
-  5: '召回',
-  6: '审批完成',
-  7: '已提交'
-};
-
-const publishStatusMap = (value: number | bigint | Date | boolean): PublishStatusType => {
+const parsePublishValue = (t: TFunction, value: InputPublishStatusType): PublishStatusValue => {
+  const map = getPublishStatusMap(t);
   if (typeof value === 'boolean') {
-    return value ? '已发布' : '未发布';
-  } else if (typeof value === 'number') {
-    if (value === 0) {
-      return '草稿';
-    } else if (value === 1) {
-      return '已删除';
-    } else {
+    return value ? map.published : map.unpublished;
+  }
+  if (typeof value === 'number') {
+    if (value === 0) return map.draft;
+    if (value === 1) return map.deleted;
+    // Assume other positive numbers (possibly timestamps) indicate published status
+    if (value > 1) {
       const date = new Date(value);
-      if (!isNaN(date.getTime())) {
-        return '已发布'; // formatDateTime(date, 'dateTime');
+      // Check if it's a valid timestamp
+      if (!isNaN(date.getTime()) && date.getTime() > 0) {
+        return map.published;
       }
     }
   }
+  // Handle Date objects (though not in type definition, included in original logic)
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    return map.published;
+  }
+
+  return map.unknown; // Default to unknown
+};
+
+type StatusParserType = 'status' | 'publishStatus' | 'processStatus';
+
+/**
+ * Custom Hook for parsing various status values and returning localized strings.
+ * @param value - The status value to parse.
+ * @param type - Type of status ('status', 'publishStatus', 'processStatus').
+ * @returns Localized status string.
+ */
+export const useParseStatus = () => {
+  const { t } = useTranslation();
+
+  const parseStatus = (
+    value: InputStatusType | InputProcessStatusType | InputPublishStatusType,
+    type: StatusParserType = 'status'
+  ): string => {
+    const unknownString = t('enums.status.unknown');
+
+    switch (type) {
+      case 'status': {
+        const map = getStatusMap(t);
+        // Handle ExplicitAny case, prioritize mapping
+        const stringValue = String(value);
+        if (stringValue in map) {
+          return map[stringValue];
+        }
+        // If not in mapping, try basic parsing
+        return parseBaseValue(t, value);
+      }
+      case 'processStatus': {
+        const map = getProcessStatusMap(t);
+        return map[value as number] || unknownString;
+      }
+      case 'publishStatus': {
+        return parsePublishValue(t, value as InputPublishStatusType);
+      }
+      default:
+        // For unknown types, use basic parsing logic
+        return parseBaseValue(t, value);
+    }
+  };
+
+  return { parseStatus };
 };
 
 /**
- * 解析状态值
- * @param value 状态值
- * @param type 状态类型
- * @returns 状态字符串
+ * Function for parsing various status values and returning localized strings.
+ * @param value - The status value to parse.
+ * @param type - Type of status ('status', 'publishStatus', 'processStatus').
+ * @returns Localized status string.
  */
-export const parseStatus = (
-  value: StatusType,
-  type: 'status' | 'publishStatus' | 'processStatus' = 'status'
-): string | number | bigint => {
-  switch (type) {
-    case 'status':
-      return statusMap[value as ExplicitAny] || '未知';
-    case 'processStatus':
-      return processStatusMap[value as number] || '未知';
-    case 'publishStatus':
-      return publishStatusMap(value as bigint) || '未知';
-    default:
-      return '未知';
-  }
+export const parseStatus = (value: any, type: StatusParserType = 'status'): string => {
+  const parser = useParseStatus();
+  return parser.parseStatus(value, type);
+};
+
+export type {
+  StatusValue,
+  ProcessStatusValue,
+  PublishStatusValue,
+  InputStatusType,
+  InputProcessStatusType,
+  InputPublishStatusType,
+  StatusParserType
 };
