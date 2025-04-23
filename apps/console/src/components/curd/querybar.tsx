@@ -116,7 +116,7 @@ export const QueryBar = ({
       </div>
 
       {/* Expand/Collapse button */}
-      {queryFields.length > 3 && (
+      {queryFields.length > 3 ? (
         <Button
           variant='unstyle'
           size='ratio'
@@ -126,7 +126,7 @@ export const QueryBar = ({
         >
           <Icons name={isExpanded ? 'IconChevronUp' : 'IconChevronDown'} size={12} />
         </Button>
-      )}
+      ) : null}
     </Form>
   );
 };
