@@ -85,7 +85,7 @@ importers:
         version: 0.1.8(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react@18.3.1)
       '@ncobase/utils':
         specifier: latest
-        version: 0.1.0
+        version: 0.1.1
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8
@@ -162,8 +162,8 @@ importers:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@18.3.20)(react@18.3.1)
       react-router:
-        specifier: ^7.5.1
-        version: 7.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^7.5.2
+        version: 7.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
         specifier: ^2.15.3
         version: 2.15.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -191,7 +191,7 @@ importers:
         version: 0.1.0
       '@ncobase/types':
         specifier: latest
-        version: 0.1.0(@types/react@18.3.20)
+        version: 0.1.1(@types/react@18.3.20)
       '@tailwindcss/postcss':
         specifier: ^4.1.4
         version: 4.1.4
@@ -833,13 +833,10 @@ packages:
   '@ncobase/tsconfig@0.1.0':
     resolution: {integrity: sha512-r0SLfOEKZHnLlXZFVFgHRgZv6mV5wOae52amQBDUMRTJSiPUXxvTiltquWibZdSRnd4CweYDWBwLgp+tP0OqAA==}
 
-  '@ncobase/types@0.1.0':
-    resolution: {integrity: sha512-Kqa9+QiOBlQyzUMWCtKbvMWl0zEO4R3x/wHY79ivklu/8uiuw5GEHTiH3GiNbYXYN2zIMSfxV7DCCU+oumrw3Q==}
+  '@ncobase/types@0.1.1':
+    resolution: {integrity: sha512-9Hy6jvY1Pgf14qYoq16wiBRNpYQF6nnc38U1vh8RH9fpSULCcgx9K092Oz+MTfTJYmRuNGt6ZXN1v7b8H9rkaQ==}
     peerDependencies:
-      '@types/react': ^18.3.1
-
-  '@ncobase/utils@0.1.0':
-    resolution: {integrity: sha512-WPlQ6gRaBftD+p0fSQPLjZ6szKCQtOXv3RYqMNkPv86UDdH/uiiebM0xpfjXWW1IK5DUTqHnJ7caoJ8msvZ4Hw==}
+      '@types/react': ^18.3.20
 
   '@ncobase/utils@0.1.1':
     resolution: {integrity: sha512-yGW84otf2s0LtAiCivoVwxHyMF2JrzEFaKevvRgb6XLvil3Ze5uUe7pdUwA2ywig6d0OjOZUkBNbeQJCOJAZBA==}
@@ -3498,11 +3495,6 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.0:
-    resolution: {integrity: sha512-zDAl/llz8Ue/EblwSYwdxGBYfj46IM1dhjVi8dyp9LQffoIGxJEAHj2oeZ4uNcgycSRcQ83CnfcZqEJzVDLcDw==}
-    engines: {node: ^18 || >=20}
-    hasBin: true
-
   nanoid@5.1.5:
     resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
     engines: {node: ^18 || >=20}
@@ -3862,8 +3854,8 @@ packages:
       '@types/react':
         optional: true
 
-  react-router@7.5.1:
-    resolution: {integrity: sha512-/jjU3fcYNd2bwz9Q0xt5TwyiyoO8XjSEFXJY4O/lMAlkGTHWuHRAbR9Etik+lSDqMC7A7mz3UlXzgYT6Vl58sA==}
+  react-router@7.5.2:
+    resolution: {integrity: sha512-9Rw8r199klMnlGZ8VAsV/I8WrIF6IyJ90JQUdboupx1cdkgYqwnrYjH+I/nY/7cA1X5zia4mDJqH36npP7sxGQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -5206,17 +5198,9 @@ snapshots:
 
   '@ncobase/tsconfig@0.1.0': {}
 
-  '@ncobase/types@0.1.0(@types/react@18.3.20)':
+  '@ncobase/types@0.1.1(@types/react@18.3.20)':
     dependencies:
       '@types/react': 18.3.20
-
-  '@ncobase/utils@0.1.0':
-    dependencies:
-      clsx: 2.1.1
-      date-fns: 4.1.0
-      jsencrypt: 3.3.2
-      nanoid: 5.1.0
-      tailwind-merge: 3.2.0
 
   '@ncobase/utils@0.1.1':
     dependencies:
@@ -8282,8 +8266,6 @@ snapshots:
 
   nanoid@3.3.8: {}
 
-  nanoid@5.1.0: {}
-
   nanoid@5.1.5: {}
 
   natural-compare@1.4.0: {}
@@ -8631,7 +8613,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.20
 
-  react-router@7.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router@7.5.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       cookie: 1.0.2
       react: 18.3.1
