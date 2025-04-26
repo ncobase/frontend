@@ -6,16 +6,11 @@
   "tailwind": {
     "config": "",
     "css": "src/assets/styles/globals.css",
-    "baseColor": "primary",
-    "cssVariables": true,
-    "prefix": ""
+    "baseColor": "neutral",
+    "cssVariables": true
   },
   "aliases": {
     "components": "@/components",
-    "utils": "@ncobase/utils",
-    "ui": "@ncobase/react",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
-  },
-  "iconLibrary": "lucide"
+    "utils": "@ncobase/utils"
+  }
 }
