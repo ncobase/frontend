@@ -30,19 +30,19 @@ const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
   {
     path: '/register',
-    element: <Guard public>{<Register />}</Guard>
+    element: <Register />
   },
   {
     path: '/login',
-    element: <Guard public>{<Login />}</Guard>
+    element: <Login />
   },
   {
     path: '/forget-password',
-    element: <Guard public>{<ForgetPassword />}</Guard>
+    element: <ForgetPassword />
   },
   {
     path: '/logout',
-    element: <Guard public>{<Logout />}</Guard>
+    element: <Logout />
   },
   {
     path: '/dash/*',
