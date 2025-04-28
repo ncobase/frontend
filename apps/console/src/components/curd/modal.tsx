@@ -55,7 +55,9 @@ export const ModalView = memo(
         confirmText={getConfirmText()}
         cancelText={t('actions.cancel')}
         isOpen={!!type}
-        className={isMaximized ? maximizedClasses : ''}
+        className={
+          isMaximized ? maximizedClasses : 'w-[78lvw]! h-[76lvh]! max-w-[90lvw]! max-h-[86lvh]!'
+        }
         toolbar={
           <Button
             variant='unstyle'
