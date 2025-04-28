@@ -1,13 +1,6 @@
 import { forwardRef } from 'react';
 
-import {
-  Button as StdButton,
-  ButtonProps,
-  Icons,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from '@ncobase/react';
+import { Button as StdButton, ButtonProps, Icons, Tooltip } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 
 interface Props extends ButtonProps {
@@ -52,9 +45,8 @@ export const Button: React.FC<Props> = forwardRef<HTMLButtonElement, Props>(
     );
     if (!tooltip) return button;
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
-        <TooltipContent side={tooltipPosition}>{tooltip}</TooltipContent>
+      <Tooltip side={tooltipPosition} content={tooltip}>
+        {button}
       </Tooltip>
     );
   }

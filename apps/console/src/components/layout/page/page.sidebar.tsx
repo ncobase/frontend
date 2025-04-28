@@ -8,9 +8,7 @@ import {
   Button,
   Icons,
   ShellSidebar,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
+  Tooltip
 } from '@ncobase/react';
 import { cn, getInitials, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
@@ -167,26 +165,23 @@ const CollapsedLink: React.FC<{
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant='unstyle'
-          size='ratio'
-          className={cn('my-2.5 hover:bg-slate-100/85', {
-            'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(link.path)
-          })}
-          onClick={() => handleLinkClick(link)}
-          aria-label={t(link.label) as string}
-          aria-current={isActive(link.path) ? 'page' : undefined}
-        >
-          {link.icon ? (
-            <Icons size={18} name={link.icon} aria-hidden='true' />
-          ) : (
-            <span aria-hidden='true'>{getInitials(link.name || link.label || link.id)}</span>
-          )}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side='right'>{t(link.label)}</TooltipContent>
+    <Tooltip side='right' content={t(link.label)}>
+      <Button
+        variant='unstyle'
+        size='ratio'
+        className={cn('my-2.5 hover:bg-slate-100/85', {
+          'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(link.path)
+        })}
+        onClick={() => handleLinkClick(link)}
+        aria-label={t(link.label) as string}
+        aria-current={isActive(link.path) ? 'page' : undefined}
+      >
+        {link.icon ? (
+          <Icons size={18} name={link.icon} aria-hidden='true' />
+        ) : (
+          <span aria-hidden='true'>{getInitials(link.name || link.label || link.id)}</span>
+        )}
+      </Button>
     </Tooltip>
   );
 });

@@ -14,7 +14,7 @@ import { CardLayout } from './layout';
 
 const QueryBar = () => {
   return (
-    <div className='sticky -top-[0.9rem] z-666 bg-white shadow-xs flex-col grid -mx-4 -mt-4 px-4 divide-y divide-slate-100'>
+    <div className='sticky -top-[1rem] z-666 bg-white shadow-xs flex-col grid -mx-4 -mt-4 px-4 divide-y divide-slate-100'>
       <div className='py-4 flex items-center justify-start'>
         <div className='flex items-center text-slate-800'>类别：</div>
         <div className='flex-1 flex gap-x-4 pl-4'>

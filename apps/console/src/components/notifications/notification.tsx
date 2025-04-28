@@ -13,9 +13,7 @@ import {
   HoverCardTrigger,
   Icons,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
+  Tooltip
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
@@ -172,11 +170,8 @@ export const Notifications = ({
             </CardDescription>
           </div>
           {onTogglePushSettings && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Switch checked={pushEnabled} onCheckedChange={onTogglePushSettings} />
-              </TooltipTrigger>
-              <TooltipContent side='bottom'>{t('notification.push_setting')}</TooltipContent>
+            <Tooltip side='bottom' content={t('notification.push_setting')}>
+              <Switch checked={pushEnabled} onCheckedChange={onTogglePushSettings} />
             </Tooltip>
           )}
         </CardHeader>

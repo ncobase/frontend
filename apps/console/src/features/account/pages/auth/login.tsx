@@ -1,4 +1,4 @@
-import { Button, Divider, Icons, Tooltip, TooltipContent, TooltipTrigger } from '@ncobase/react';
+import { Button, Divider, Icons, Tooltip } from '@ncobase/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
@@ -29,29 +29,20 @@ export const Login = () => {
           <LoginForm onSuccess={onLogin} />
           <Divider label='OR' style='dashed' className='my-2' />
           <div className='flex gap-x-8 items-center mb-5 justify-center'>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                  <Icons name='IconBrandGoogle' className='stroke-white! stroke-2!' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side='bottom'>Google</TooltipContent>
+            <Tooltip side='bottom' content='Google'>
+              <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
+                <Icons name='IconBrandGoogle' className='stroke-white! stroke-2!' />
+              </Button>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                  <Icons name='IconBrandGithub' className='stroke-white! stroke-2!' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side='bottom'>Github</TooltipContent>
+            <Tooltip side='bottom' content='Github'>
+              <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
+                <Icons name='IconBrandGithub' className='stroke-white! stroke-2!' />
+              </Button>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                  <Icons name='IconBrandTiktok' className='stroke-white! stroke-2!' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side='bottom'>Tiktok</TooltipContent>
+            <Tooltip side='bottom' content='Tiktok'>
+              <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
+                <Icons name='IconBrandTiktok' className='stroke-white! stroke-2!' />
+              </Button>
             </Tooltip>
           </div>
         </div>
