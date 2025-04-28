@@ -14,11 +14,11 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { Page, Topbar } from '@/components/layout';
-import { useLanguageSwitcher } from '@/hooks/use_language_switcher';
+import { useLanguage } from '@/hooks/use_language';
 
 export const I18nExample = () => {
   const { t } = useTranslation();
-  const { currentLanguage, switchLanguage, availableLanguages } = useLanguageSwitcher();
+  const { currentLanguage, switchLanguage, availableLanguages } = useLanguage();
 
   const topbarElement = {
     title: t('example.i18n.title'),

@@ -1,37 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
 
-import i18n from 'i18next';
-
 import { AVAILABLE_LANGUAGES, LANGUAGE_CONFIG, LanguageOption } from '@/lib/constants';
+import { i18n } from '@/lib/i18n';
 
 /**
  * Language switcher hook
  * Manages application language state and switching logic
  */
-export const useLanguageSwitcher = () => {
-  /**
-   * Get current language
-   * Priority: Local storage > Browser language > Default language
-   */
-  const getCurrentLanguage = useCallback((): string => {
-    // Try to get language from local storage
-    const storedLang = localStorage.getItem(LANGUAGE_CONFIG.STORAGE_KEY);
-    if (storedLang) return storedLang;
-
-    // Get browser language
-    const browserLang = navigator.language.split('-')[0];
-
-    // Match available languages
-    const matchedLang = AVAILABLE_LANGUAGES.find(lang => lang.key === browserLang);
-
-    return matchedLang?.key || LANGUAGE_CONFIG.DEFAULT_LANGUAGE;
-  }, []);
-
+export const useLanguage = () => {
   /**
    * Initialize current language state
    */
   const [currentLanguage, setCurrentLanguage] = useState<LanguageOption>(() => {
-    const langKey = getCurrentLanguage();
+    const langKey = i18n.language || LANGUAGE_CONFIG.DEFAULT_LANGUAGE;
     return (
       AVAILABLE_LANGUAGES.find(lang => lang.key === langKey) ||
       AVAILABLE_LANGUAGES.find(lang => lang.key === LANGUAGE_CONFIG.DEFAULT_LANGUAGE)!
@@ -52,34 +33,41 @@ export const useLanguageSwitcher = () => {
 
   /**
    * Switch language
-   * Update i18n, local storage and document properties
+   * Update i18n and document properties
    */
-  const switchLanguage = useCallback(
-    (languageKey: string) => {
-      const newLanguage = AVAILABLE_LANGUAGES.find(lang => lang.key === languageKey);
+  const switchLanguage = useCallback((languageKey: string) => {
+    const newLanguage = AVAILABLE_LANGUAGES.find(lang => lang.key === languageKey);
 
-      if (newLanguage) {
-        // Update i18n language
-        i18n.changeLanguage(languageKey);
+    if (newLanguage) {
+      // Update i18n language
+      i18n.changeLanguage(languageKey);
 
-        // Update local storage
-        localStorage.setItem(LANGUAGE_CONFIG.STORAGE_KEY, languageKey);
-
-        // Update current language state
-        setCurrentLanguage(newLanguage);
-
-        // Update document properties
-        updateDocumentLanguageProperties(newLanguage);
-      }
-    },
-    [updateDocumentLanguageProperties]
-  );
+      // No need to update localStorage here as it's handled by i18n event listener
+    }
+  }, []);
 
   /**
-   * Update document language properties on initialization
+   * Listen for language changes from i18n
    */
   useEffect(() => {
+    const handleLanguageChanged = (lng: string) => {
+      const newLanguage = AVAILABLE_LANGUAGES.find(lang => lang.key === lng);
+      if (newLanguage) {
+        setCurrentLanguage(newLanguage);
+        updateDocumentLanguageProperties(newLanguage);
+      }
+    };
+
+    // Set initial document properties
     updateDocumentLanguageProperties(currentLanguage);
+
+    // Listen for language change events
+    i18n.on('languageChanged', handleLanguageChanged);
+
+    // Cleanup function
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged);
+    };
   }, [currentLanguage, updateDocumentLanguageProperties]);
 
   return {

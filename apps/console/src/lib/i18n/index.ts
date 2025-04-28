@@ -71,3 +71,5 @@ i18n.on('languageChanged', lng => {
 });
 
 export { i18n };
+
+export { I18nextProvider as I18nProvider, useTranslation } from 'react-i18next';

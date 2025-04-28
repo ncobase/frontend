@@ -10,14 +10,14 @@ import {
 } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 
-import { useLanguageSwitcher } from '@/hooks/use_language_switcher';
+import { useLanguage } from '@/hooks/use_language';
 
 /**
  * Language Switcher Component
  * Provides a dropdown menu for language selection
  */
 export const LanguageSwitcher: React.FC = () => {
-  const { currentLanguage, switchLanguage, availableLanguages } = useLanguageSwitcher();
+  const { currentLanguage, switchLanguage, availableLanguages } = useLanguage();
 
   /**
    * Render language trigger button
