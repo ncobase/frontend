@@ -1,4 +1,4 @@
-import { FormBuilder } from '@ncobase/react';
+import { FormBuilder } from './builder';
 
 import { Page } from '@/components/layout';
 

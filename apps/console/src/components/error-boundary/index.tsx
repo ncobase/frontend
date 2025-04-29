@@ -20,6 +20,7 @@ const FallbackComponent = ({
   return (
     <Container className='flex items-center justify-center w-lvw h-lvh'>
       <Dialog
+        className='w-[78lvw]! h-[76lvh]! max-w-[90lvw]! max-h-[86lvh]!'
         trigger={
           <Button variant='outline-danger' title={t('actions.expand')}>
             {t('errors.boundary.label')}

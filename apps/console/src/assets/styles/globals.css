@@ -497,7 +497,3 @@
 @utility group-gradient-hover {
   @apply group-hover:bg-linear-to-r from-primary-600/75 to-purple-500/75 text-white;
 }
-
-::selection {
-  background-color: var(--editor-selection);
-}
