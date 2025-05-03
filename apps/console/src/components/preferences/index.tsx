@@ -128,7 +128,7 @@ export const Preferences = () => {
           </div>
 
           {/* Color Mode Preference */}
-          <div className='hidden items-center justify-between'>
+          <div className='flex items-center justify-between'>
             <label className='text-sm font-medium'>{t('preferences.color_mode')}</label>
             <Select value={colorMode} onValueChange={handleColorModeChange as any}>
               <SelectTrigger className='w-[140px]'>

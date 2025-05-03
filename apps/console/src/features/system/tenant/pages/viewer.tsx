@@ -1,8 +1,8 @@
-import { Button, Icons, ScrollView, Container } from '@ncobase/react';
+import { Button, Icons, ScrollView } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { TenantViewerForms } from '../forms/viewer';
+import { TenantViewerForm } from '../forms/viewer';
 
 import { useLayoutContext } from '@/components/layout';
 
@@ -16,7 +16,7 @@ export const TenantViewerPage = ({ viewMode, record: initialRecord, handleView }
     return null;
   }
   if (mode === 'modal') {
-    return <TenantViewerForms record={record} />;
+    return <TenantViewerForm record={record} />;
   }
 
   const { t } = useTranslation();
@@ -36,24 +36,22 @@ export const TenantViewerPage = ({ viewMode, record: initialRecord, handleView }
             <Button
               variant='outline-primary'
               prependIcon={<Icons name='IconEdit' className='w-4 h-4' />}
-              onClick={() => handleView({ id: record }, '../edit')}
+              onClick={() => handleView({ slug: record }, '../edit')}
             >
               {t('actions.edit')}
             </Button>
             <Button
               variant='outline-danger'
               prependIcon={<Icons name='IconPrinter' className='w-4 h-4' />}
-              onClick={() => handleView({ id: record }, '../printer')}
+              onClick={() => handleView({ slug: record }, '../printer')}
             >
               {t('actions.printer')}
             </Button>
           </div>
         </div>
       </div>
-      <ScrollView className='bg-white'>
-        <Container>
-          <TenantViewerForms record={record} />
-        </Container>
+      <ScrollView className='bg-white p-4'>
+        <TenantViewerForm record={record} />
       </ScrollView>
     </>
   );

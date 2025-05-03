@@ -1,8 +1,8 @@
-import { Button, Icons, ScrollView, Container } from '@ncobase/react';
+import { Button, Icons, ScrollView } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { EditorTenantForms } from '../forms/editor';
+import { EditTenantForm } from '../forms/editor';
 
 import { useLayoutContext } from '@/components/layout';
 
@@ -24,7 +24,7 @@ export const EditorTenantPage = ({
   }
   if (mode === 'modal') {
     return (
-      <EditorTenantForms
+      <EditTenantForm
         record={record}
         onSubmit={onSubmit}
         control={control}
@@ -55,16 +55,14 @@ export const EditorTenantPage = ({
           </div>
         </div>
       </div>
-      <ScrollView className='bg-white'>
-        <Container>
-          <EditorTenantForms
-            record={record}
-            onSubmit={onSubmit}
-            control={control}
-            setValue={setValue}
-            errors={errors}
-          />
-        </Container>
+      <ScrollView className='bg-white p-4'>
+        <EditTenantForm
+          record={record}
+          onSubmit={onSubmit}
+          control={control}
+          setValue={setValue}
+          errors={errors}
+        />
       </ScrollView>
     </>
   );

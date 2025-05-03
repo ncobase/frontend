@@ -111,7 +111,7 @@ export class Request {
     if (err instanceof FetchError) {
       status = err.status;
       try {
-        errorData = err.data;
+        errorData = err['data'] ?? err['_data'];
         errorMessage = errorData?.message || err.message || 'Unknown error occurred';
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       } catch (e: any) {

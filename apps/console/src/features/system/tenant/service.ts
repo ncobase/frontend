@@ -1,39 +1,72 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { PaginationParams } from '@ncobase/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { QueryFormParams } from '../menu/config/query';
-
+import { createTenant, deleteTenant, getTenant, getTenants, updateTenant } from './apis';
 import { Tenant } from './tenant';
-
-import { createTenant, getTenant, getTenants, updateTenant } from '@/features/system/tenant/apis';
 
 interface TenantKeys {
   create: ['tenantService', 'create'];
-  get: (_options?: { tenant?: string }) => ['tenantService', 'tenant', { tenant?: string }];
+  get: (_options?: { slug?: string }) => ['tenantService', 'tenant', { slug?: string }];
   update: ['tenantService', 'update'];
-  list: (_options?: QueryFormParams) => ['tenantService', 'tenants', QueryFormParams];
+  delete: ['tenantService', 'delete'];
+  list: (_options?: PaginationParams) => ['tenantService', 'tenants', PaginationParams];
 }
 
 export const tenantKeys: TenantKeys = {
   create: ['tenantService', 'create'],
-  get: ({ tenant } = {}) => ['tenantService', 'tenant', { tenant }],
+  get: ({ slug } = {}) => ['tenantService', 'tenant', { slug }],
   update: ['tenantService', 'update'],
+  delete: ['tenantService', 'delete'],
   list: (queryParams = {}) => ['tenantService', 'tenants', queryParams]
 };
 
-// Hook to query a specific tenant by ID or Slug
-export const useQueryTenant = (tenant: string) =>
-  useQuery({ queryKey: tenantKeys.get({ tenant }), queryFn: () => getTenant(tenant) });
+// Hook to query a specific tenant by ID
+export const useQueryTenant = (slug: string) =>
+  useQuery({
+    queryKey: tenantKeys.get({ slug }),
+    queryFn: () => getTenant(slug),
+    enabled: !!slug
+  });
 
 // Hook for create tenant mutation
-export const useCreateTenant = () =>
-  useMutation({ mutationFn: (payload: Pick<Tenant, keyof Tenant>) => createTenant(payload) });
+export const useCreateTenant = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Tenant) => createTenant(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.list() });
+    }
+  });
+};
 
 // Hook for update tenant mutation
-export const useUpdateTenant = () =>
-  useMutation({ mutationFn: (payload: Pick<Tenant, keyof Tenant>) => updateTenant(payload) });
+export const useUpdateTenant = () => {
+  const queryClient = useQueryClient();
 
-// Hook to list tenants
-export const useListTenants = (queryParams: QueryFormParams) => {
+  return useMutation({
+    mutationFn: (payload: Tenant) => updateTenant(payload),
+    onSuccess: data => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.get({ slug: data.slug }) });
+      queryClient.invalidateQueries({ queryKey: tenantKeys.list() });
+    }
+  });
+};
+
+// Hook for delete tenant mutation
+export const useDeleteTenant = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (slug: string) => deleteTenant(slug),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tenantKeys.list() });
+    }
+  });
+};
+
+// Hook to list tenants with pagination
+export const useListTenants = (queryParams: PaginationParams) => {
   return useQuery({
     queryKey: tenantKeys.list(queryParams),
     queryFn: () => getTenants(queryParams)

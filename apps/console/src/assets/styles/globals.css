@@ -108,8 +108,8 @@
 :root {
   --radius: 0.5rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.32 0 0);
+  --background: var(--color-white);
+  --foreground: var(--color-slate-950);
 
   --card: var(--background);
   --card-foreground: var(--foreground);
@@ -201,8 +201,10 @@
 }
 
 .dark {
-  --background: oklch(0.2 0 0);
-  --foreground: oklch(0.92 0 0);
+  --radius: 0.5rem;
+
+  --background: var(--color-slate-950);
+  --foreground: var(--color-white);
 
   --card: var(--background);
   --card-foreground: var(--foreground);
@@ -361,7 +363,7 @@
   }
 
   * {
-    @apply outline-hidden!;
+    @apply outline-hidden! border-border outline-ring/50;
   }
 
   *:focus {
@@ -395,25 +397,13 @@
     @apply outline-hidden!;
   }
 
-  body {
-    font-size: var(--text-xs);
-    color: var(--text-color);
-    background-color: var(--background-color);
-    background-size: cover;
-    background-image: var(--background-image);
-    font-family:
-      -apple-system, 'Noto Sans', 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial,
-      'Liberation Sans', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC',
-      'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'Wenquanyi Micro Hei',
-      'WenQuanYi Zen Hei', 'ST Heiti', SimHei, 'WenQuanYi Zen Hei Sharp', sans-serif;
-    transition:
-      background-color 0.3s,
-      color 0.3s;
-  }
-
   html,
   body {
     @apply h-full overflow-hidden;
+  }
+
+  body {
+    @apply bg-background text-foreground overflow-auto text-xs;
   }
 
   .overflow-y-auto::-webkit-scrollbar {
@@ -421,12 +411,11 @@
   }
 
   .overflow-y-auto::-webkit-scrollbar-track {
-    @apply bg-transparent rounded-[3px];
+    @apply bg-transparent;
   }
 
   .overflow-y-auto::-webkit-scrollbar-thumb {
-    @apply bg-clip-content rounded-[3px] border-2 border-solid border-transparent;
-    background-color: var(--scrollbar-thumb-color);
+    @apply bg-black/20 rounded-sm;
   }
 
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
@@ -437,21 +426,43 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
-
-  input[type='number']::-webkit-inner-spin-button,
-  input[type='number']::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  :focus-visible {
-    @apply outline-0 outline-offset-0;
-  }
 }
 
 @utility container {
   margin-inline: auto;
   padding-inline: 1rem;
+}
+
+@utility sidebar-transition {
+  transition-property: transform, width, opacity;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility fade-enter {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+@utility fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 300ms,
+    transform 300ms;
+}
+
+@utility fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@utility fade-exit-active {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity 200ms,
+    transform 200ms;
 }
 
 @utility always-show-scrollbar {
