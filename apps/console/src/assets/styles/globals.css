@@ -171,7 +171,7 @@
   --cyan: oklch(0.7 0.15 200);
   --cyan-foreground: oklch(1 0 0);
 
-  --border: oklch(0.9 0.01 270);
+  --border: var(--color-gray-100);
   --input: var(--border);
   --ring: var(--color-primary-600);
 
@@ -359,7 +359,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
+    border-color: var(--color-gray-100, currentColor);
   }
 
   * {
@@ -399,11 +399,11 @@
 
   html,
   body {
-    @apply h-full overflow-hidden;
+    @apply h-full bg-background text-foreground overflow-hidden;
   }
 
   body {
-    @apply bg-background text-foreground overflow-auto text-xs;
+    @apply overflow-auto text-[0.8125rem];
   }
 
   .overflow-y-auto::-webkit-scrollbar {

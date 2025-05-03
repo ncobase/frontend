@@ -13,18 +13,19 @@ interface AvatarButtonProps {
 }
 
 export const AvatarButton = React.forwardRef<HTMLDivElement, AvatarButtonProps>(
-  ({ isLoading, className, ...rest }, ref) => {
+  ({ isLoading, className, src, title, alt, ...rest }, ref) => {
     const classes = cn(
       'inline-flex items-center justify-center size-[1.75rem] font-medium rounded-full bg-slate-50',
       className
     );
+    const shouldRenderImage = src && src.trim() !== '';
     return (
       <div ref={ref}>
-        {rest.src ? (
-          <img src={rest.src} title={rest.title} alt={rest.alt} className={classes} />
+        {shouldRenderImage ? (
+          <img src={src} title={title} alt={alt} className={classes} />
         ) : (
           <span className={classes} {...rest}>
-            {isLoading ? <Icons name='IconLoader' /> : getInitials(rest.title || rest.alt)}
+            {isLoading ? <Icons name='IconLoader' /> : getInitials(title || alt)}
           </span>
         )}
       </div>
