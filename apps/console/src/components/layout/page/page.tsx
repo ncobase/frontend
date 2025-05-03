@@ -33,7 +33,7 @@ export const Page: React.FC<PageProps> = ({
   title,
   layout = true,
   ...rest
-}): JSX.Element => {
+}) => {
   useFocusMode();
   const { t } = useTranslation();
 

@@ -1,10 +1,12 @@
+import { ReactNode } from 'react';
+
 import { Route, Routes } from 'react-router';
 
 import { ErrorPage } from '@/components/errors';
 
 interface RouteData {
   path: string;
-  element: JSX.Element;
+  element: ReactNode;
   children?: RouteData[];
 }
 

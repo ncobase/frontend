@@ -8,10 +8,7 @@ interface PageTitleProps {
   children?: string;
 }
 
-export const PageTitle: React.FC<PageTitleProps> = ({
-  suffix = '',
-  children = ''
-}): JSX.Element => {
+export const PageTitle: React.FC<PageTitleProps> = ({ suffix = '', children = '' }) => {
   const { t } = useTranslation();
   const title = useMemo(
     () => `${children ? `${children} | ` : ''}${suffix || t('application_title')}`,

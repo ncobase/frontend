@@ -1,4 +1,6 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "plugins/*"
+  - apps/*
+  - packages/*
+  - plugins/*
+onlyBuiltDependencies:
+  - esbuild
