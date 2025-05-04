@@ -2,7 +2,7 @@ import { Button, Icons, ScrollView, Container } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { EditorTopicForms } from '../forms/editor';
+import { EditorTopicForm } from '../forms/editor';
 
 import { useLayoutContext } from '@/components/layout';
 
@@ -24,7 +24,7 @@ export const EditorTopicPage = ({
   }
   if (mode === 'modal') {
     return (
-      <EditorTopicForms
+      <EditorTopicForm
         record={record}
         onSubmit={onSubmit}
         control={control}
@@ -57,7 +57,7 @@ export const EditorTopicPage = ({
       </div>
       <ScrollView className='bg-white'>
         <Container>
-          <EditorTopicForms
+          <EditorTopicForm
             record={record}
             onSubmit={onSubmit}
             control={control}

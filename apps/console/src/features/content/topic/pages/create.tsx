@@ -2,7 +2,7 @@ import { Button, Container, Icons, ScrollView } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { CreateTopicForms } from '../forms/create';
+import { CreateTopicForm } from '../forms/create';
 
 import { useLayoutContext } from '@/components/layout';
 
@@ -10,7 +10,7 @@ export const CreateTopicPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();
   const mode = viewMode || vmode || 'flatten';
   if (mode === 'modal') {
-    return <CreateTopicForms onSubmit={onSubmit} control={control} errors={errors} />;
+    return <CreateTopicForm onSubmit={onSubmit} control={control} errors={errors} />;
   }
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export const CreateTopicPage = ({ viewMode, onSubmit, control, errors }) => {
       </div>
       <ScrollView className='bg-white'>
         <Container>
-          <CreateTopicForms onSubmit={onSubmit} control={control} errors={errors} />
+          <CreateTopicForm onSubmit={onSubmit} control={control} errors={errors} />
         </Container>
       </ScrollView>
     </>

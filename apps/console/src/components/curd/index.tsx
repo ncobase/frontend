@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 
 import { TableView, TableViewProps } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
@@ -84,7 +84,7 @@ export const CurdView = <T extends object>({
   loading,
   expandComponent,
   maxTreeLevel,
-  isAllExpanded,
+  isAllExpanded: propIsAllExpanded,
   onConfirm,
   record,
   createComponent,
@@ -99,6 +99,16 @@ export const CurdView = <T extends object>({
   const { storedValue: preferredViewMode } = useLocalStorage(PREFERENCES_VIEW_MODE_KEY, null);
   const mode = viewMode || preferredViewMode || vmode || 'flatten';
 
+  const [isAllExpanded, setIsAllExpanded] = useState(!!propIsAllExpanded);
+
+  useEffect(() => {
+    if (propIsAllExpanded !== undefined) {
+      setIsAllExpanded(!!propIsAllExpanded);
+    }
+  }, [propIsAllExpanded]);
+
+  const memoizedExpandComponent = useMemo(() => expandComponent, [expandComponent]);
+
   const tableViewProps = useMemo(
     () => ({
       data,
@@ -111,7 +121,7 @@ export const CurdView = <T extends object>({
       className: cn(queryFields.length && 'mt-4'),
       fetchData,
       loading,
-      expandComponent,
+      expandComponent: memoizedExpandComponent,
       maxTreeLevel,
       isAllExpanded,
       paginationTexts: PaginationTexts(t),
@@ -128,7 +138,7 @@ export const CurdView = <T extends object>({
       queryFields.length,
       fetchData,
       loading,
-      expandComponent,
+      memoizedExpandComponent,
       maxTreeLevel,
       isAllExpanded,
       t
@@ -141,16 +151,19 @@ export const CurdView = <T extends object>({
   const shouldRenderTableView = mode === 'modal' || (mode === 'flatten' && !type);
 
   // Prepare common view props that will be shared by both ModalView and FlattenView
-  const commonViewProps = {
-    type,
-    createComponent,
-    viewComponent,
-    editComponent,
-    record,
-    onConfirm
-  };
+  const commonViewProps = useMemo(
+    () => ({
+      type,
+      createComponent,
+      viewComponent,
+      editComponent,
+      record,
+      onConfirm
+    }),
+    [type, createComponent, viewComponent, editComponent, record, onConfirm]
+  );
 
-  const renderViewComponent = () => {
+  const renderViewComponent = useCallback(() => {
     switch (mode) {
       case 'modal':
         // @ts-expect-error
@@ -159,7 +172,7 @@ export const CurdView = <T extends object>({
       default:
         return <FlattenView {...commonViewProps} />;
     }
-  };
+  }, [mode, commonViewProps, rest]);
 
   return (
     <Page

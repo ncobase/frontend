@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import { Form } from '@ncobase/react';
+import { Form, Section } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useQueryTopic } from '../service';
 
-import { FieldConfigProps } from '@/components/form';
+import { createTopicFormSections, createSystemSection } from './form';
+
 import { MarkdownEditor } from '@/components/markdown/editor';
 import { useListTaxonomies } from '@/features/content/taxonomy/service';
 
-export const EditorTopicForms = ({ record, onSubmit, control, setValue, errors }) => {
+export const EditorTopicForm = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryTopic(record);
+  const { data = {}, isLoading } = useQueryTopic(record);
   const [taxonomyOptions, setTaxonomyOptions] = useState([]);
 
   // Fetch taxonomies for dropdown
@@ -32,127 +33,9 @@ export const EditorTopicForms = ({ record, onSubmit, control, setValue, errors }
     }
   }, [taxonomiesData]);
 
-  const fields: FieldConfigProps[] = [
-    // Basic Info Section
-    {
-      title: 'Topic Name',
-      name: 'name',
-      defaultValue: '',
-      placeholder: 'Enter topic name',
-      type: 'text',
-      rules: { required: t('forms.input_required') }
-    },
-    {
-      title: 'Title',
-      name: 'title',
-      defaultValue: '',
-      placeholder: 'Enter topic title',
-      type: 'text',
-      rules: { required: t('forms.input_required') }
-    },
-    {
-      title: 'Slug',
-      name: 'slug',
-      defaultValue: '',
-      placeholder: 'Enter URL slug',
-      type: 'text'
-    },
-    {
-      title: 'Taxonomy',
-      name: 'taxonomy_id',
-      defaultValue: '',
-      type: 'select',
-      options: taxonomyOptions,
-      rules: { required: t('forms.input_required') }
-    },
-    {
-      title: 'Thumbnail',
-      name: 'thumbnail',
-      defaultValue: '',
-      placeholder: 'Enter thumbnail URL',
-      type: 'text'
-    },
-
-    // Content Section
-    {
-      title: 'Content',
-      name: 'content',
-      defaultValue: '',
-      placeholder: 'Enter content',
-      type: 'markdown',
-      fullWidth: true,
-      component: ({ field }) => (
-        <MarkdownEditor {...field} className='min-h-[300px] border rounded-md' />
-      )
-    },
-
-    // Publishing Options Section
-    {
-      title: 'Use Markdown',
-      name: 'markdown',
-      defaultValue: true,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    {
-      title: 'Is Private',
-      name: 'private',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    {
-      title: 'Is Temporary',
-      name: 'temp',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    {
-      title: 'Status',
-      name: 'status',
-      defaultValue: 0,
-      type: 'select',
-      options: [
-        { label: 'Draft', value: 0 },
-        { label: 'Published', value: 1 },
-        { label: 'Archived', value: 2 }
-      ]
-    },
-    {
-      title: 'Release Date',
-      name: 'released',
-      defaultValue: Date.now(),
-      type: 'datetime'
-    },
-
-    // System Information
-    {
-      title: 'Created At',
-      name: 'created_at',
-      defaultValue: '',
-      type: 'text',
-      disabled: true
-    },
-    {
-      title: 'Updated At',
-      name: 'updated_at',
-      defaultValue: '',
-      type: 'text',
-      disabled: true
-    },
-
-    // Hidden fields
-    {
-      title: 'ID',
-      name: 'id',
-      defaultValue: '',
-      type: 'hidden'
-    }
-  ];
-
+  // Set form values when data is loaded
   useEffect(() => {
-    if (!data || Object.keys(data).length === 0) return;
+    if (!data || Object.keys(data).length === 0 || isLoading) return;
 
     // Set values from fetched data
     setValue('id', data.id);
@@ -169,16 +52,69 @@ export const EditorTopicForms = ({ record, onSubmit, control, setValue, errors }
     setValue('released', data.released);
     setValue('created_at', formatDateTime(data.created_at));
     setValue('updated_at', formatDateTime(data.updated_at));
-  }, [setValue, data]);
+  }, [setValue, data, isLoading]);
+
+  if (isLoading) {
+    return <div className='p-4 text-center'>Loading topic data...</div>;
+  }
+
+  // Create form sections
+  const formSections = [
+    ...createTopicFormSections(t, taxonomyOptions, data),
+    createSystemSection(t, {
+      created_at: formatDateTime(data.created_at),
+      updated_at: formatDateTime(data.updated_at),
+      id: data.id
+    })
+  ];
+
+  // Custom render for markdown editor to ensure proper value binding
+  const fields = section => {
+    if (section.id === 'content') {
+      return {
+        ...section,
+        fields: section.fields.map(field => {
+          if (field.type === 'markdown') {
+            return {
+              ...field,
+              component: ({ field: inputField }) => (
+                <MarkdownEditor
+                  {...inputField}
+                  className='min-h-[300px] border rounded-md'
+                  value={inputField.value || ''}
+                />
+              )
+            };
+          }
+          return field;
+        })
+      };
+    }
+    return section;
+  };
+
+  const sections = formSections.map(fields);
 
   return (
-    <Form
-      id='edit-topic'
-      className='my-4 md:grid-cols-2'
-      onSubmit={onSubmit}
-      control={control}
-      errors={errors}
-      fields={fields}
-    />
+    <div className='space-y-6 my-4'>
+      {sections.map(section => (
+        <Section
+          key={section.id}
+          title={section.title}
+          icon={section.icon}
+          collapsible={section.collapsible}
+          className='mb-6'
+        >
+          <Form
+            id={`edit-topic-${section.id}`}
+            className='md:grid-cols-2'
+            onSubmit={onSubmit}
+            control={control}
+            errors={errors}
+            fields={section.fields}
+          />
+        </Section>
+      ))}
+    </div>
   );
 };

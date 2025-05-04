@@ -2,7 +2,7 @@ import { Button, Icons, ScrollView, Container } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { TopicViewerForms } from '../forms/viewer';
+import { TopicViewerForm } from '../forms/viewer';
 
 import { useLayoutContext } from '@/components/layout';
 
@@ -16,7 +16,7 @@ export const TopicViewerPage = ({ viewMode, record: initialRecord, handleView })
     return null;
   }
   if (mode === 'modal') {
-    return <TopicViewerForms record={record} />;
+    return <TopicViewerForm record={record} />;
   }
 
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export const TopicViewerPage = ({ viewMode, record: initialRecord, handleView })
       </div>
       <ScrollView className='bg-white'>
         <Container>
-          <TopicViewerForms record={record} />
+          <TopicViewerForm record={record} />
         </Container>
       </ScrollView>
     </>

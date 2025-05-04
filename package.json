@@ -12,7 +12,7 @@
     "prepare": "husky",
     "clean": "npx rimraf --glob '**/{node_modules,.next,dist,.turbo,.eslintcache}'",
     "dev": "turbo run dev",
-    "dev:console": "pnpm dev --filter=@ncobase/console --filter='./packages/*' --filter='./plugins/*'",
+    "dev:console": "pnpm dev --filter=@ncobase/console --filter='./packages/react' --filter='./packages/utils' --filter='./plugins/*'",
     "lint": "turbo run lint",
     "lint:fix": "pnpm lint -- --fix && pnpm prettier --write",
     "prettier": "prettier \"**/*.{js,jsx,ts,tsx}\"",
