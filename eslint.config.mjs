@@ -122,7 +122,8 @@ export default [
         }
       ],
 
-      'space-before-function-paren': 'off'
+      'space-before-function-paren': 'off',
+      'no-useless-catch': 'off'
     }
   }
 ];

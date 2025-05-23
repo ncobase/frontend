@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Navigate, useLocation } from 'react-router';
 
@@ -8,6 +8,7 @@ import { Spinner } from '@/components/loading/spinner';
 import { useAuthContext } from '@/features/account/context';
 import { Permission } from '@/features/account/permissions';
 import { useAccount } from '@/features/account/service';
+import { eventEmitter } from '@/lib/events';
 
 interface GuardProps {
   // Role-based access control
@@ -51,9 +52,33 @@ export const Guard: React.FC<GuardProps> = ({
   const { isAuthenticated, isLoading } = useAuthContext();
   const { isAdmin: hasAdminPrivileges, isSuperAdmin, isLoading: isAccountLoading } = useAccount();
   const { pathname, search } = useLocation();
+  const [accessDenied, setAccessDenied] = useState(false);
+
+  // Listen for forbidden events from the request interceptor
+  useEffect(() => {
+    const handleForbidden = () => {
+      if (isAuthenticated && !isPublic) {
+        setAccessDenied(true);
+      }
+    };
+
+    eventEmitter.on('forbidden', handleForbidden);
+
+    return () => {
+      eventEmitter.off('forbidden', handleForbidden);
+    };
+  }, [isAuthenticated, isPublic]);
+
+  // Reset access denied when route changes
+  useEffect(() => {
+    setAccessDenied(false);
+  }, [pathname]);
 
   // Determine if access should be granted
   const canAccess = (): boolean => {
+    // If we've received a forbidden response from the server, deny access
+    if (accessDenied) return false;
+
     // Route level access control
 
     // Public routes are always accessible

@@ -30,35 +30,66 @@ export const useLoginInterceptor = (): LoginInterceptorContextValue => {
 export const LoginInterceptorProvider = () => {
   const { t } = useTranslation();
   const [opened, setOpened] = useState(false);
-  const { updateTokens } = useAuthContext();
+  const { updateTokens, isAuthenticated } = useAuthContext();
   const queryClient = useQueryClient();
   const redirect = useRedirectFromUrl();
   const location = useLocation();
 
+  // Prevent multiple simultaneous modal openings
+  const [isHandlingAuth, setIsHandlingAuth] = useState(false);
+
   const open = () => {
-    setOpened(true);
-    queryClient.cancelQueries({ type: 'all' }, { revert: true, silent: true });
+    if (!isHandlingAuth && !opened) {
+      setOpened(true);
+      setIsHandlingAuth(true);
+      queryClient.cancelQueries({ type: 'all' }, { revert: true, silent: true });
+    }
   };
 
-  const close = () => setOpened(false);
+  const close = () => {
+    setOpened(false);
+    setIsHandlingAuth(false);
+  };
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const handleUnauthenticated = () => {
-      open();
+      // Only show login modal for non-public routes and when not already authenticated
+      if (!Permission.isPublicRoute(location.pathname) && !isAuthenticated) {
+        // Add a small delay to prevent rapid-fire modal openings
+        timeoutId = setTimeout(() => {
+          open();
+        }, 100);
+      }
     };
 
-    if (!Permission.isPublicRoute(location.pathname)) {
+    const handleForbidden = () => {
+      // For 403 errors, don't show login modal - the Guard component will handle this
+      console.warn('Access forbidden - user is authenticated but lacks permissions');
+    };
+
+    // Only listen for unauthorized events if user is not authenticated
+    if (!isAuthenticated && !Permission.isPublicRoute(location.pathname)) {
       eventEmitter.on('unauthorized', handleUnauthenticated);
     }
 
+    // Always listen for forbidden events but don't open modal
+    eventEmitter.on('forbidden', handleForbidden);
+
     return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       eventEmitter.off('unauthorized', handleUnauthenticated);
+      eventEmitter.off('forbidden', handleForbidden);
     };
-  }, [location.pathname]);
+  }, [location.pathname, isAuthenticated]);
 
   const handleLogin = () => {
     queryClient.resetQueries();
     close();
+    redirect();
   };
 
   const handleVisible = () => {
@@ -66,7 +97,7 @@ export const LoginInterceptorProvider = () => {
       updateTokens();
       close();
       redirect();
-    } else {
+    } else if (!isHandlingAuth) {
       open();
     }
   };

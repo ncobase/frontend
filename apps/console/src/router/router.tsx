@@ -8,6 +8,7 @@ import { AnimatedSwitch } from '@/components/animate/switch';
 import { ErrorPage } from '@/components/errors';
 import { Layout } from '@/components/layout';
 import { Spinner } from '@/components/loading/spinner';
+import { ErrorNotification } from '@/components/notifications';
 // Auth pages
 import { ForgetPassword } from '@/features/account/pages/auth/forget_password';
 import { Login } from '@/features/account/pages/auth/login';
@@ -19,12 +20,6 @@ const ContentRoutes = lazy(() => import('@/features/content/routes'));
 const DashRoutes = lazy(() => import('@/features/dash/routes'));
 const ExampleRoutes = lazy(() => import('@/features/example/routes'));
 const SystemRoutes = lazy(() => import('@/features/system/routes'));
-// import { AccountRoutes } from '@/features/account/routes';
-// import { BuilderRoutes } from '@/features/builder/routes';
-// import { ContentRoutes } from '@/features/content/routes';
-// import { DashRoutes } from '@/features/dash/routes';
-// import { ExampleRoutes } from '@/features/example/routes';
-// import { SystemRoutes } from '@/features/system/routes';
 
 const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
@@ -85,6 +80,7 @@ export const Router = () => {
             <Route path='*' element={<ErrorPage code={404} />} />
           </AnimatedSwitch>
         </Suspense>
+        <ErrorNotification />
       </Layout>
     </BrowserRouter>
   );

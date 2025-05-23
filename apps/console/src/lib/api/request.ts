@@ -17,6 +17,10 @@ export class Request {
   private readonly MAX_RETRY_COUNT = 3;
   private readonly RETRY_RESET_TIME = 60000; // 1 minute
 
+  // Throttling for error events
+  private errorEventThrottler: Map<string, number> = new Map();
+  private readonly ERROR_EVENT_THROTTLE_TIME = 1000; // 1 second
+
   static baseConfig: FetchOptions = {
     baseURL:
       import.meta.env.VITE_API_PROXY &&
@@ -89,6 +93,18 @@ export class Request {
     return url.split('?')[0];
   }
 
+  private shouldEmitErrorEvent(eventType: string): boolean {
+    const now = Date.now();
+    const lastEmitted = this.errorEventThrottler.get(eventType);
+
+    if (!lastEmitted || now - lastEmitted > this.ERROR_EVENT_THROTTLE_TIME) {
+      this.errorEventThrottler.set(eventType, now);
+      return true;
+    }
+
+    return false;
+  }
+
   private async handleErrors(
     err: Error | Response | FetchError,
     method: string,
@@ -99,7 +115,9 @@ export class Request {
     // Network error handling
     if (err instanceof Error && !(err instanceof FetchError)) {
       console.error(`Network error [${method} ${url}]: ${err.message}`);
-      eventEmitter.emit('network-error', { method, url, message: err.message });
+      if (this.shouldEmitErrorEvent('network-error')) {
+        eventEmitter.emit('network-error', { method, url, message: err.message });
+      }
       throw err;
     }
 
@@ -143,28 +161,48 @@ export class Request {
       });
     }
 
-    // Handle different error scenarios
+    // Handle different error scenarios with throttling
     if (status === 401) {
-      eventEmitter.emit('unauthorized', errorMessage);
+      if (this.shouldEmitErrorEvent('unauthorized')) {
+        eventEmitter.emit('unauthorized', errorMessage);
+      }
     } else if (status === 403) {
-      eventEmitter.emit('forbidden', errorMessage);
+      // Forbidden error handling
+      console.warn(`Access forbidden [${method} ${url}]: ${errorMessage}`);
+      if (this.shouldEmitErrorEvent('forbidden')) {
+        eventEmitter.emit('forbidden', {
+          method,
+          url: endpoint,
+          message: errorMessage,
+          data: errorData
+        });
+      }
     } else if (status === 404) {
-      eventEmitter.emit('not-found', { url, message: errorMessage });
+      if (this.shouldEmitErrorEvent('not-found')) {
+        eventEmitter.emit('not-found', { url, message: errorMessage });
+      }
     } else if (status === 422) {
-      eventEmitter.emit('validation-error', errorData?.errors || {});
+      if (this.shouldEmitErrorEvent('validation-error')) {
+        eventEmitter.emit('validation-error', errorData?.errors || {});
+      }
     } else if (status && status >= 500) {
-      eventEmitter.emit('server-error', {
-        status,
-        message: errorMessage,
-        url: endpoint
-      });
+      if (this.shouldEmitErrorEvent('server-error')) {
+        eventEmitter.emit('server-error', {
+          status,
+          message: errorMessage,
+          url: endpoint
+        });
+      }
     } else if (status && status >= 400) {
-      eventEmitter.emit('request-error', {
-        status,
-        message: errorMessage,
-        url: endpoint
-      });
+      if (this.shouldEmitErrorEvent('request-error')) {
+        eventEmitter.emit('request-error', {
+          status,
+          message: errorMessage,
+          url: endpoint
+        });
+      }
     }
+
     throw err;
   }
 
@@ -179,11 +217,13 @@ export class Request {
     // Check if we should retry this endpoint
     if (!this.shouldRetry(endpoint)) {
       console.warn(`Request to ${endpoint} has failed multiple times. Skipping request.`);
-      eventEmitter.emit('request-blocked', {
-        method,
-        url: endpoint,
-        message: 'Request has failed multiple times and is temporarily blocked'
-      });
+      if (this.shouldEmitErrorEvent('request-blocked')) {
+        eventEmitter.emit('request-blocked', {
+          method,
+          url: endpoint,
+          message: 'Request has failed multiple times and is temporarily blocked'
+        });
+      }
       throw new Error(`Request to ${endpoint} is temporarily blocked due to multiple failures`);
     }
 
@@ -196,12 +236,13 @@ export class Request {
     }
 
     try {
-      // Skip token refresh for auth endpoints to avoid infinite loops
-      if (
-        !url.includes('/iam/login') &&
-        !url.includes('/iam/refresh-token') &&
-        !url.includes('/iam/token-status')
-      ) {
+      // Skip token refresh for auth endpoints and forbidden requests to avoid infinite loops
+      const isAuthEndpoint =
+        url.includes('/iam/login') ||
+        url.includes('/iam/refresh-token') ||
+        url.includes('/iam/token-status');
+
+      if (!isAuthEndpoint) {
         // Only attempt to refresh if not already doing an auth request
         await checkAndRefreshToken();
       }

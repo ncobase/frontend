@@ -27,6 +27,9 @@ export class Permission {
   // List of routes that are public (can be accessed without authentication)
   private static PUBLIC_ROUTES = ['/login', '/register', '/forget-password', '/logout'];
 
+  // Track if we're currently in an error state to prevent loops
+  private static isInErrorState = false;
+
   /**
    * Refresh the permission state
    * This should be called when the token changes (login, logout, token refresh)
@@ -38,6 +41,9 @@ export class Permission {
       decoded: null,
       timestamp: 0
     };
+
+    // Clear error state when refreshing
+    this.isInErrorState = false;
 
     // Get current token
     const token = locals.get(ACCESS_TOKEN_KEY);
@@ -53,6 +59,7 @@ export class Permission {
         };
       } catch (error) {
         console.error('Failed to decode token during refresh:', error);
+        this.isInErrorState = true;
       }
     }
 
@@ -60,7 +67,7 @@ export class Permission {
     // Components that rely on permissions can listen for this event
     // and update their state accordingly
     eventEmitter.emit(PERMISSION_STATE_CHANGED, {
-      isAuthenticated: !!token,
+      isAuthenticated: !!token && !this.isInErrorState,
       permissions: this.getPermissions(),
       roles: this.getRoles(),
       isAdmin: this.isAdmin(),
@@ -74,7 +81,8 @@ export class Permission {
         permissions: this.getPermissions().length,
         roles: this.getRoles().length,
         isAdmin: this.isAdmin(),
-        tenantId: this.getCurrentTenantId()
+        tenantId: this.getCurrentTenantId(),
+        isInErrorState: this.isInErrorState
       });
     }
   }
@@ -83,6 +91,9 @@ export class Permission {
    * Get decoded token from local storage with caching
    */
   static getDecodedToken(): TokenPayload | null {
+    // If we're in an error state, don't try to decode
+    if (this.isInErrorState) return null;
+
     const token = locals.get(ACCESS_TOKEN_KEY);
 
     // If no token exists, return null
@@ -110,9 +121,14 @@ export class Permission {
         decoded,
         timestamp: Date.now()
       };
+      // Clear error state if decoding succeeds
+      this.isInErrorState = false;
       return decoded;
     } catch (error) {
       console.error('Failed to decode token:', error);
+      this.isInErrorState = true;
+      // Clear invalid token
+      locals.remove(ACCESS_TOKEN_KEY);
       return null;
     }
   }
@@ -156,7 +172,7 @@ export class Permission {
     if (decoded.payload.permissions.includes(`${action}:*`)) return true;
 
     // Check for full wildcard
-    if (decoded.payload.permissions.includes('*')) return true;
+    if (decoded.payload.permissions.includes('*:*')) return true;
 
     return false;
   }
@@ -218,6 +234,9 @@ export class Permission {
     permissions?: string[];
     roles?: string[];
   }): boolean {
+    // If in error state, deny access
+    if (this.isInErrorState) return false;
+
     // Admin has access to everything
     if (this.isAdmin()) return true;
 
@@ -284,7 +303,22 @@ export class Permission {
    */
   static clearState(): void {
     locals.remove(ACCESS_TOKEN_KEY);
+    this.isInErrorState = false;
     this.refreshState();
+  }
+
+  /**
+   * Check if currently in error state
+   */
+  static isInError(): boolean {
+    return this.isInErrorState;
+  }
+
+  /**
+   * Clear error state manually
+   */
+  static clearErrorState(): void {
+    this.isInErrorState = false;
   }
 }
 
