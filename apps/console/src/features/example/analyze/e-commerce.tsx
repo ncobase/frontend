@@ -254,7 +254,7 @@ export const ECommerceDashboard = () => {
           <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
-                <p className='text-sm text-slate-500 font-medium'>Total Sales</p>
+                <p className='text-slate-500 font-medium'>Total Sales</p>
                 <p className='text-2xl font-bold mt-1'>${totalSales.toLocaleString()}</p>
               </div>
               <div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center'>
@@ -275,7 +275,7 @@ export const ECommerceDashboard = () => {
               </div>
             </div>
             <div className='flex items-center mt-4'>
-              <span className='text-green-500 font-medium text-sm flex items-center'>
+              <span className='text-green-500 font-medium flex items-center'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   className='h-4 w-4 mr-1'
@@ -292,7 +292,7 @@ export const ECommerceDashboard = () => {
                 </svg>
                 8.4%
               </span>
-              <span className='text-slate-500 text-sm ml-2'>vs. previous period</span>
+              <span className='text-slate-500 ml-2'>vs. previous period</span>
             </div>
           </div>
 
@@ -300,7 +300,7 @@ export const ECommerceDashboard = () => {
           <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
-                <p className='text-sm text-slate-500 font-medium'>Total Orders</p>
+                <p className='text-slate-500 font-medium'>Total Orders</p>
                 <p className='text-2xl font-bold mt-1'>{totalOrders.toLocaleString()}</p>
               </div>
               <div className='w-10 h-10 rounded-full bg-green-100 flex items-center justify-center'>
@@ -321,7 +321,7 @@ export const ECommerceDashboard = () => {
               </div>
             </div>
             <div className='flex items-center mt-4'>
-              <span className='text-green-500 font-medium text-sm flex items-center'>
+              <span className='text-green-500 font-medium flex items-center'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   className='h-4 w-4 mr-1'
@@ -338,7 +338,7 @@ export const ECommerceDashboard = () => {
                 </svg>
                 5.3%
               </span>
-              <span className='text-slate-500 text-sm ml-2'>vs. previous period</span>
+              <span className='text-slate-500 ml-2'>vs. previous period</span>
             </div>
           </div>
 
@@ -346,7 +346,7 @@ export const ECommerceDashboard = () => {
           <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
-                <p className='text-sm text-slate-500 font-medium'>Avg. Order Value</p>
+                <p className='text-slate-500 font-medium'>Avg. Order Value</p>
                 <p className='text-2xl font-bold mt-1'>${(totalSales / totalOrders).toFixed(2)}</p>
               </div>
               <div className='w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center'>
@@ -367,7 +367,7 @@ export const ECommerceDashboard = () => {
               </div>
             </div>
             <div className='flex items-center mt-4'>
-              <span className='text-green-500 font-medium text-sm flex items-center'>
+              <span className='text-green-500 font-medium flex items-center'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   className='h-4 w-4 mr-1'
@@ -384,7 +384,7 @@ export const ECommerceDashboard = () => {
                 </svg>
                 3.7%
               </span>
-              <span className='text-slate-500 text-sm ml-2'>vs. previous period</span>
+              <span className='text-slate-500 ml-2'>vs. previous period</span>
             </div>
           </div>
 
@@ -392,7 +392,7 @@ export const ECommerceDashboard = () => {
           <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-start'>
               <div>
-                <p className='text-sm text-slate-500 font-medium'>Return Rate</p>
+                <p className='text-slate-500 font-medium'>Return Rate</p>
                 <p className='text-2xl font-bold mt-1'>{returnRate.toFixed(1)}%</p>
               </div>
               <div className='w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center'>
@@ -413,7 +413,7 @@ export const ECommerceDashboard = () => {
               </div>
             </div>
             <div className='flex items-center mt-4'>
-              <span className='text-red-500 font-medium text-sm flex items-center'>
+              <span className='text-red-500 font-medium flex items-center'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   className='h-4 w-4 mr-1'
@@ -430,7 +430,7 @@ export const ECommerceDashboard = () => {
                 </svg>
                 0.8%
               </span>
-              <span className='text-slate-500 text-sm ml-2'>vs. previous period</span>
+              <span className='text-slate-500 ml-2'>vs. previous period</span>
             </div>
           </div>
         </div>
@@ -610,7 +610,7 @@ export const ECommerceDashboard = () => {
                       ></div>
                       <span className='text-slate-600'>{item.name}</span>
                     </div>
-                    <span className='text-sm font-medium'>{item.value}%</span>
+                    <span className='font-medium'>{item.value}%</span>
                   </div>
                 ))}
               </div>
@@ -658,7 +658,7 @@ export const ECommerceDashboard = () => {
                       ></div>
                       <span className='text-slate-600'>{item.name}</span>
                     </div>
-                    <span className='text-sm font-medium'>{item.value}%</span>
+                    <span className='font-medium'>{item.value}%</span>
                   </div>
                 ))}
               </div>
@@ -732,7 +732,7 @@ export const ECommerceDashboard = () => {
           <div className='bg-white p-4 rounded-lg shadow-xs border border-slate-200'>
             <div className='flex justify-between items-center mb-4'>
               <h2 className='text-lg font-semibold'>Top Selling Products</h2>
-              <button className='text-sm text-blue-600 hover:text-blue-800'>View All</button>
+              <button className='text-blue-600 hover:text-blue-800'>View All</button>
             </div>
             <div className='overflow-x-auto'>
               <table className='min-w-full'>

@@ -56,11 +56,12 @@ export const Register = () => {
 
   return (
     <Page title={t('account.register.title')} layout={false}>
+      <div className='fixed inset-0 bg-gradient-to-br from-red-50 via-primary-100 to-success-50 opacity-25' />
       <div className='absolute top-4 right-4'>
         <LanguageSwitcher />
       </div>
-      <div className='flex items-center justify-center flex-col min-h-lvh min-w-full'>
-        <div className='p-6 bg-white shadow-xs max-w-2xl w-[38rem] -mt-14 rounded-md'>
+      <div className='relative flex flex-col items-center justify-center min-h-lvh z-10 px-4'>
+        <div className='bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 w-full max-w-xl'>
           <div className='flex justify-center mb-3 mt-2'>
             <Logo type='full' height='2.25rem' />
           </div>

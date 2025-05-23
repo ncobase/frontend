@@ -190,9 +190,7 @@ export const AuthExample = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className='text-sm text-slate-600 mb-3'>
-                      {t('example.auth.allRolesCanAccess')}
-                    </p>
+                    <p className='text-slate-600 mb-3'>{t('example.auth.allRolesCanAccess')}</p>
                     <Guard requiredPermission='view_dashboard' currentRole={currentRole}>
                       <Button variant='primary' size='sm'>
                         <Icons name='IconLayoutDashboard' className='mr-1' />
@@ -209,7 +207,7 @@ export const AuthExample = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className='text-sm text-slate-600 mb-3'>
+                    <p className='text-slate-600 mb-3'>
                       {t('example.auth.adminAndManagerCanManage')}
                     </p>
                     <div className='space-x-2'>
@@ -243,7 +241,7 @@ export const AuthExample = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className='text-sm text-slate-600 mb-3'>
+                    <p className='text-slate-600 mb-3'>
                       {t('example.auth.onlyAdminCanManageUsers')}
                     </p>
                     <div className='space-x-2'>
@@ -428,9 +426,7 @@ export const AuthExample = () => {
                         {permissions.map(permission => (
                           <div key={permission.id} className='flex items-center'>
                             <input type='checkbox' id={`perm-${permission.id}`} className='mr-2' />
-                            <label htmlFor={`perm-${permission.id}`} className='text-sm'>
-                              {permission.name}
-                            </label>
+                            <label htmlFor={`perm-${permission.id}`}>{permission.name}</label>
                           </div>
                         ))}
                       </div>

@@ -152,7 +152,7 @@ export const BusinessDashboard = () => {
               {timeFilters.map(filter => (
                 <button
                   key={filter.id}
-                  className={`px-3 py-1.5 rounded-md text-sm ${
+                  className={`px-3 py-1.5 rounded-md ${
                     activeFilter === filter.id
                       ? 'bg-white shadow-xs text-blue-600'
                       : 'text-slate-600 hover:bg-slate-200'
@@ -164,7 +164,7 @@ export const BusinessDashboard = () => {
               ))}
             </div>
             <button
-              className='px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded-md text-sm'
+              className='px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded-md'
               onClick={toggleTheme}
             >
               {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
@@ -185,14 +185,14 @@ export const BusinessDashboard = () => {
               >
                 <div className='flex justify-between items-start'>
                   <div>
-                    <h3 className='text-sm text-slate-500 font-medium'>{item.metric}</h3>
+                    <h3 className='text-slate-500 font-medium'>{item.metric}</h3>
                     <p className='text-2xl font-bold mt-1'>
                       {item.metric === 'Avg Order Value' ? '$' : ''}
                       {item.current.toLocaleString()}
                     </p>
                   </div>
                   <div
-                    className={`flex items-center text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}
+                    className={`flex items-center font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}
                   >
                     {isPositive ? '↑' : '↓'} {Math.abs(Number(changePercent))}%
                   </div>
@@ -320,29 +320,25 @@ export const BusinessDashboard = () => {
             <h2 className='text-lg font-semibold mb-4'>Recent Activity</h2>
             <div className='space-y-4'>
               <div className='border-l-4 border-blue-500 pl-3 py-1'>
-                <p className='text-sm text-slate-600'>
-                  Sales team exceeded quarterly targets by 12%
-                </p>
+                <p className='text-slate-600'>Sales team exceeded quarterly targets by 12%</p>
                 <span className='text-slate-400'>Today, 9:45 AM</span>
               </div>
               <div className='border-l-4 border-green-500 pl-3 py-1'>
-                <p className='text-sm text-slate-600'>
-                  New product launch generated $125k in first week
-                </p>
+                <p className='text-slate-600'>New product launch generated $125k in first week</p>
                 <span className='text-slate-400'>Yesterday, 2:30 PM</span>
               </div>
               <div className='border-l-4 border-yellow-500 pl-3 py-1'>
-                <p className='text-sm text-slate-600'>APAC region continues strong growth trend</p>
+                <p className='text-slate-600'>APAC region continues strong growth trend</p>
                 <span className='text-slate-400'>Apr 14, 10:15 AM</span>
               </div>
               <div className='border-l-4 border-purple-500 pl-3 py-1'>
-                <p className='text-sm text-slate-600'>
+                <p className='text-slate-600'>
                   Marketing campaign results: 24% increase in site traffic
                 </p>
                 <span className='text-slate-400'>Apr 12, 4:45 PM</span>
               </div>
               <div className='border-l-4 border-red-500 pl-3 py-1'>
-                <p className='text-sm text-slate-600'>
+                <p className='text-slate-600'>
                   Supply chain disruption resolved, production resumed
                 </p>
                 <span className='text-slate-400'>Apr 10, 1:20 PM</span>

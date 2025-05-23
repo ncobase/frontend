@@ -40,9 +40,7 @@ export const FeaturePreview: React.FC = () => {
           <div className='p-8 text-center'>
             <Icons name='IconInfoCircle' className='mx-auto mb-2 text-blue-500' size={32} />
             <p className='text-slate-600 mb-2'>{t('feature_builder.preview.configure_first')}</p>
-            <p className='text-slate-500 text-sm'>
-              {t('feature_builder.preview.complete_config_hint')}
-            </p>
+            <p className='text-slate-500'>{t('feature_builder.preview.complete_config_hint')}</p>
           </div>
         </CardContent>
       </Card>
@@ -192,7 +190,7 @@ export const FeaturePreview: React.FC = () => {
   const renderDetailField = (field: any) => {
     return (
       <div key={field.id} className={field.type === 'textarea' ? 'col-span-2' : ''}>
-        <div className='text-sm font-medium text-slate-500'>{field.label}</div>
+        <div className='font-medium text-slate-500'>{field.label}</div>
         <div className='mt-1'>
           {field.type === 'select' && field.options && field.options.length > 0
             ? field.options.find((o: any) => o.value === field.defaultValue)?.label || '-'
@@ -206,7 +204,7 @@ export const FeaturePreview: React.FC = () => {
   const renderRelationField = (relation: any) => {
     return (
       <div key={relation.id} className='col-span-2'>
-        <div className='text-sm font-medium text-slate-500'>{relation.name}</div>
+        <div className='font-medium text-slate-500'>{relation.name}</div>
         <div className='mt-1 flex items-center'>
           {relation.type === 'oneToOne' ? (
             <div className='text-blue-600 hover:underline cursor-pointer'>
@@ -222,7 +220,7 @@ export const FeaturePreview: React.FC = () => {
                 </Button>
               </div>
               <div className='space-y-1'>
-                <div className='flex justify-between text-sm bg-slate-50 p-1 rounded'>
+                <div className='flex justify-between bg-slate-50 p-1 rounded'>
                   <span className='text-blue-600 hover:underline cursor-pointer'>
                     {relation.targetEntity} #1
                   </span>
@@ -230,7 +228,7 @@ export const FeaturePreview: React.FC = () => {
                     <Icons name='IconTrash' size={14} />
                   </Button>
                 </div>
-                <div className='flex justify-between text-sm bg-slate-50 p-1 rounded'>
+                <div className='flex justify-between bg-slate-50 p-1 rounded'>
                   <span className='text-blue-600 hover:underline cursor-pointer'>
                     {relation.targetEntity} #2
                   </span>
@@ -283,7 +281,7 @@ export const FeaturePreview: React.FC = () => {
               {[1, 2, 3].map(item => (
                 <tr key={item} className='hover:bg-slate-50'>
                   {tableFields.map(field => (
-                    <td key={field.id} className='px-4 py-3 text-sm'>
+                    <td key={field.id} className='px-4 py-3'>
                       {field.isPrimary ? (
                         <a href='#' className='text-blue-600 hover:underline'>
                           {field.name === 'id' ? `${item}` : `Example ${field.name} ${item}`}
@@ -297,7 +295,7 @@ export const FeaturePreview: React.FC = () => {
                       )}
                     </td>
                   ))}
-                  <td className='px-4 py-3 text-sm text-right space-x-1'>
+                  <td className='px-4 py-3 text-right space-x-1'>
                     <Button variant='outline-slate' size='xs'>
                       <Icons name='IconEye' size={14} />
                     </Button>
@@ -315,7 +313,7 @@ export const FeaturePreview: React.FC = () => {
         </div>
 
         <div className='bg-slate-50 p-3 flex justify-between items-center border-t border-slate-200'>
-          <div className='text-sm text-slate-500'>
+          <div className='text-slate-500'>
             {t('feature_builder.preview.showing')} 1-3 {t('feature_builder.preview.of')} 3{' '}
             {t('feature_builder.preview.items')}
           </div>

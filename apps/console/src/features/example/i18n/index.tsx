@@ -77,7 +77,7 @@ export const I18nExample = () => {
               <div className='space-y-2'>
                 <h3 className='font-medium'>{t('example.i18n.formExamples')}</h3>
                 <div className='space-y-2'>
-                  <label className='block text-sm font-medium'>{t('example.i18n.username')}</label>
+                  <label className='block font-medium'>{t('example.i18n.username')}</label>
                   <input
                     type='text'
                     className='w-full p-2 border border-gray-300 rounded-md'

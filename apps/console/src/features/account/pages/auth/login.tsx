@@ -18,35 +18,42 @@ export const Login = () => {
     queryClient.clear();
     redirect();
   };
+
   return (
     <Page title={t('account.login.title')} layout={false}>
-      <div className='absolute top-4 right-4'>
+      <div className='fixed inset-0 bg-gradient-to-br from-blue-50 via-primary-100 to-success-50 opacity-25' />
+      <div className='absolute top-4 right-4 z-10'>
         <LanguageSwitcher />
       </div>
-      <div className='flex items-center justify-center flex-col min-h-lvh min-w-full'>
-        <div className='p-6 bg-white shadow-xs max-w-2xl w-[38rem] -mt-14 rounded-md'>
-          <Logo className='mx-auto mt-6 mb-12 py-1.5 drop-shadow-xl shadow-slate-900' type='full' />
+      <div className='relative flex flex-col items-center justify-center min-h-lvh z-10 px-4'>
+        <div className='bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 w-full max-w-xl'>
+          <Logo
+            className='mx-auto mt-4 mb-10 py-1.5 drop-shadow-xl shadow-slate-900 w-40'
+            type='full'
+          />
           <LoginForm onSuccess={onLogin} />
-          <Divider label='OR' style='dashed' className='my-2' />
-          <div className='flex gap-x-8 items-center mb-5 justify-center'>
-            <Tooltip side='bottom' content='Google'>
-              <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                <Icons name='IconBrandGoogle' className='stroke-white! stroke-2!' />
-              </Button>
-            </Tooltip>
-            <Tooltip side='bottom' content='Github'>
-              <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                <Icons name='IconBrandGithub' className='stroke-white! stroke-2!' />
-              </Button>
-            </Tooltip>
-            <Tooltip side='bottom' content='Tiktok'>
-              <Button variant='unstyle' className='rounded-full bg-gray-600 p-2' size='ratio'>
-                <Icons name='IconBrandTiktok' className='stroke-white! stroke-2!' />
-              </Button>
-            </Tooltip>
+          <Divider label='OR' style='dashed' className='my-6' />
+          <div className='flex justify-center gap-6'>
+            {[
+              { name: 'Google', icon: 'IconBrandGoogle' },
+              { name: 'Github', icon: 'IconBrandGithub' },
+              { name: 'Tiktok', icon: 'IconBrandTiktok' }
+            ].map(({ name, icon }) => (
+              <Tooltip key={name} side='bottom' content={name}>
+                <Button
+                  variant='unstyle'
+                  className='rounded-full bg-gray-700 hover:bg-gray-800 transition-all p-3 shadow-md'
+                  size='ratio'
+                >
+                  <Icons name={icon} className='stroke-white! stroke-2!' />
+                </Button>
+              </Tooltip>
+            ))}
           </div>
         </div>
-        <Footer />
+        <div className='mt-10 text-gray-600'>
+          <Footer />
+        </div>
       </div>
     </Page>
   );

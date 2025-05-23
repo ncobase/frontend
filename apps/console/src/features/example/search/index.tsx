@@ -525,7 +525,7 @@ export const AdvancedSearchExample = () => {
             return (
               <div
                 key={key}
-                className='flex items-center bg-blue-50 text-blue-700 rounded-full px-3 py-1 text-sm'
+                className='flex items-center bg-blue-50 text-blue-700 rounded-full px-3 py-1'
               >
                 <span>
                   {displayKey}: {displayValue}
@@ -549,7 +549,7 @@ export const AdvancedSearchExample = () => {
           {Object.values(filters).some(
             v => v && (typeof v === 'string' ? v.length > 0 : v !== null)
           ) && (
-            <button className='text-sm text-blue-600 hover:text-blue-800' onClick={resetFilters}>
+            <button className='text-blue-600 hover:text-blue-800' onClick={resetFilters}>
               {t('example.search.filters.clearAll')}
             </button>
           )}

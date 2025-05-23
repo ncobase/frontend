@@ -166,7 +166,7 @@ export const ResponsiveDesignExample = () => {
             <form className='space-y-4'>
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>{t('example.i18n.username')}</label>
+                  <label className='font-medium'>{t('example.i18n.username')}</label>
                   <input
                     type='text'
                     className='w-full p-2 border border-slate-300 rounded-md'
@@ -174,7 +174,7 @@ export const ResponsiveDesignExample = () => {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label className='text-sm font-medium'>Email</Label>
+                  <Label className='font-medium'>Email</Label>
                   <input
                     type='email'
                     className='w-full p-2 border border-slate-300 rounded-md'
@@ -182,7 +182,7 @@ export const ResponsiveDesignExample = () => {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>{t('example.i18n.role')}</label>
+                  <label className='font-medium'>{t('example.i18n.role')}</label>
                   <input
                     type='text'
                     className='w-full p-2 border border-slate-300 rounded-md'
@@ -191,7 +191,7 @@ export const ResponsiveDesignExample = () => {
                 </div>
               </div>
               <div className='space-y-2'>
-                <label className='text-sm font-medium'>{t('example.i18n.department')}</label>
+                <label className='font-medium'>{t('example.i18n.department')}</label>
                 <input
                   type='text'
                   className='w-full p-2 border border-slate-300 rounded-md'

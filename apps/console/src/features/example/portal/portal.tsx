@@ -32,7 +32,7 @@ export const PortalExample: React.FC = () => {
             <CardDescription>{t('example.basic_portal_description')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <p className='text-sm'>{t('example.basic_portal_explanation')}</p>
+            <p>{t('example.basic_portal_explanation')}</p>
 
             <div className='overflow-hidden border border-slate-200 rounded-md p-4 h-32 relative'>
               <p className='text-slate-500'>{t('example.parent_container')}</p>
@@ -47,9 +47,7 @@ export const PortalExample: React.FC = () => {
                 <Portal>
                   <div className='fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-lg border border-slate-200 z-50 min-w-[300px]'>
                     <h3 className='text-lg font-medium mb-2'>{t('example.portal_content')}</h3>
-                    <p className='mb-4 text-sm text-slate-600'>
-                      {t('example.portal_renders_outside')}
-                    </p>
+                    <p className='mb-4 text-slate-600'>{t('example.portal_renders_outside')}</p>
                     <Button onClick={() => setShowBasicPortal(false)} className='w-full'>
                       {t('example.close')}
                     </Button>
@@ -71,7 +69,7 @@ export const PortalExample: React.FC = () => {
             <CardDescription>{t('example.custom_container_description')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <p className='text-sm'>{t('example.custom_container_explanation')}</p>
+            <p>{t('example.custom_container_explanation')}</p>
 
             <div className='overflow-hidden border border-slate-200 rounded-md p-4 h-32 relative'>
               <p className='text-slate-500'>{t('example.parent_container')}</p>
@@ -94,7 +92,7 @@ export const PortalExample: React.FC = () => {
                 <Portal container={customContainerRef.current}>
                   <div className='absolute inset-0 flex items-center justify-center bg-blue-100 rounded-sm'>
                     <div className='bg-white p-3 rounded-sm shadow-md text-center'>
-                      <p className='text-sm font-medium'>{t('example.custom_portal_content')}</p>
+                      <p className='font-medium'>{t('example.custom_portal_content')}</p>
                       <Button
                         size='sm'
                         variant='outline-primary'
@@ -119,7 +117,7 @@ export const PortalExample: React.FC = () => {
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='flex items-center justify-between'>
-              <p className='text-sm'>{t('example.disable_portal_explanation')}</p>
+              <p>{t('example.disable_portal_explanation')}</p>
               <Switch checked={disablePortal} onCheckedChange={setDisablePortal} />
             </div>
 
@@ -131,7 +129,7 @@ export const PortalExample: React.FC = () => {
 
                 <Portal disablePortal={disablePortal}>
                   <div className='bg-emerald-100 border border-emerald-300 p-3 rounded-md my-3'>
-                    <p className='text-sm font-medium text-emerald-800'>
+                    <p className='font-medium text-emerald-800'>
                       {disablePortal
                         ? t('example.rendering_inline')
                         : t('example.rendering_in_portal')}

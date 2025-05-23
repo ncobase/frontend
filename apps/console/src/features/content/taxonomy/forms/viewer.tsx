@@ -76,7 +76,7 @@ export const TaxonomyViewerForms = ({ record }) => {
         <div className='grid grid-cols-2 gap-4'>
           {data.cover && (
             <div>
-              <h3 className='text-sm font-medium mb-2'>Cover Image</h3>
+              <h3 className='font-medium mb-2'>Cover Image</h3>
               <img
                 src={data.cover}
                 alt={`Cover for ${data.name}`}
@@ -87,7 +87,7 @@ export const TaxonomyViewerForms = ({ record }) => {
 
           {data.thumbnail && (
             <div>
-              <h3 className='text-sm font-medium mb-2'>Thumbnail</h3>
+              <h3 className='font-medium mb-2'>Thumbnail</h3>
               <img
                 src={data.thumbnail}
                 alt={`Thumbnail for ${data.name}`}
@@ -142,7 +142,7 @@ export const TaxonomyViewerForms = ({ record }) => {
           </h2>
 
           <div className='border rounded-md p-4 bg-gray-50'>
-            <pre className='text-sm overflow-auto whitespace-pre-wrap'>
+            <pre className='overflow-auto whitespace-pre-wrap'>
               {JSON.stringify(data.extras, null, 2)}
             </pre>
           </div>

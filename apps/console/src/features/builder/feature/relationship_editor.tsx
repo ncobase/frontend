@@ -307,7 +307,7 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
                     )}
                   </div>
 
-                  <div className='mt-4 text-sm text-slate-600'>
+                  <div className='mt-4 text-slate-600'>
                     <h4 className='font-medium mb-2'>
                       {t('feature_builder.relations.relationship_description')}:
                     </h4>
@@ -344,7 +344,7 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
 
               <TabsContent value='code'>
                 <div className='p-4 border border-slate-200 rounded-md bg-slate-50 mt-2'>
-                  <div className='text-sm font-mono'>
+                  <div className='font-mono'>
                     <div className='mb-2'>
                       <span className='font-medium text-slate-600'>
                         // {t('feature_builder.relations.entity_definition')}:

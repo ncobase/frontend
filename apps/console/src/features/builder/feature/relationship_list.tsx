@@ -114,9 +114,7 @@ export const RelationshipList: React.FC = () => {
                                   </span>
                                 )}
                               </h3>
-                              <p className='text-sm text-slate-500'>
-                                {getRelationDescription(relation)}
-                              </p>
+                              <p className='text-slate-500'>{getRelationDescription(relation)}</p>
                             </div>
                           </div>
                           <div className='flex gap-2'>

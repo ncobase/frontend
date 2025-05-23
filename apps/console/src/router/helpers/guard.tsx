@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import { Navigate, useLocation } from 'react-router';
 
@@ -54,30 +54,51 @@ export const Guard: React.FC<GuardProps> = ({
   const { pathname, search } = useLocation();
   const [accessDenied, setAccessDenied] = useState(false);
 
+  // Prevent duplicate forbidden event handling
+  const lastForbiddenEvent = useRef<number>(0);
+  const FORBIDDEN_EVENT_COOLDOWN = 2000; // 2 seconds
+
   // Listen for forbidden events from the request interceptor
   useEffect(() => {
-    const handleForbidden = () => {
+    const handleForbidden = (data: { method?: string; url?: string; message?: string }) => {
+      const now = Date.now();
+
+      // Skip if within cooldown period
+      if (now - lastForbiddenEvent.current < FORBIDDEN_EVENT_COOLDOWN) {
+        return;
+      }
+
+      lastForbiddenEvent.current = now;
+
+      // Set access denied only for authenticated users on protected routes
       if (isAuthenticated && !isPublic) {
+        console.warn('Access forbidden by server:', data);
         setAccessDenied(true);
       }
     };
 
-    eventEmitter.on('forbidden', handleForbidden);
+    // Listen for forbidden events only on protected routes
+    if (isAuthenticated && !isPublic) {
+      eventEmitter.on('forbidden', handleForbidden);
+    }
 
     return () => {
       eventEmitter.off('forbidden', handleForbidden);
     };
   }, [isAuthenticated, isPublic]);
 
-  // Reset access denied when route changes
+  // Reset access denied when route changes or authentication state changes
   useEffect(() => {
     setAccessDenied(false);
-  }, [pathname]);
+    lastForbiddenEvent.current = 0;
+  }, [pathname, isAuthenticated]);
 
   // Determine if access should be granted
   const canAccess = (): boolean => {
     // If we've received a forbidden response from the server, deny access
-    if (accessDenied) return false;
+    if (accessDenied) {
+      return false;
+    }
 
     // Route level access control
 
@@ -94,13 +115,18 @@ export const Guard: React.FC<GuardProps> = ({
     if (requiresSuper && !isSuperAdmin) return false;
 
     // Granular permission checks using Permission Service
-    return Permission.canAccess({
-      permission,
-      role,
-      any,
-      permissions,
-      roles
-    });
+    try {
+      return Permission.canAccess({
+        permission,
+        role,
+        any,
+        permissions,
+        roles
+      });
+    } catch (error) {
+      console.error('Permission check failed:', error);
+      return false;
+    }
   };
 
   // Show loading state
@@ -108,9 +134,13 @@ export const Guard: React.FC<GuardProps> = ({
     return <Spinner />;
   }
 
-  // Handle public routes - redirect if already authenticated
+  // Handle public routes - redirect if already authenticated (optional)
   if (isPublic && isAuthenticated) {
-    return <Navigate to='/' replace />;
+    // For login/register pages, redirect to home if already authenticated
+    if (pathname === '/login' || pathname === '/register') {
+      return <Navigate to='/' replace />;
+    }
+    // For other public routes, allow access even if authenticated
   }
 
   // Access denied - show fallback or redirect

@@ -270,11 +270,11 @@ export const OperationsDashboard = () => {
         <div className='flex justify-between items-center mb-4'>
           <div>
             <h1 className='text-2xl font-bold text-slate-800'>Operations Monitoring</h1>
-            <p className='text-sm text-slate-500'>Last updated: {currentTime.toLocaleString()}</p>
+            <p className='text-slate-500'>Last updated: {currentTime.toLocaleString()}</p>
           </div>
           <div className='flex gap-4'>
             <select
-              className='bg-white border border-slate-300 rounded-sm px-3 py-1.5 text-sm'
+              className='bg-white border border-slate-300 rounded-sm px-3 py-1.5'
               value={dataPoints}
               onChange={e => setDataPoints(Number(e.target.value))}
             >
@@ -283,7 +283,7 @@ export const OperationsDashboard = () => {
               <option value={30}>Last 30 points</option>
               <option value={60}>Last 60 points</option>
             </select>
-            <button className='bg-blue-600 text-white px-4 py-1.5 rounded-sm text-sm hover:bg-blue-700 transition-colors'>
+            <button className='bg-blue-600 text-white px-4 py-1.5 rounded-sm hover:bg-blue-700 transition-colors'>
               Refresh Data
             </button>
           </div>
@@ -632,101 +632,85 @@ export const OperationsDashboard = () => {
               </thead>
               <tbody className='bg-white divide-y divide-slate-200'>
                 <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Today 10:15 AM
-                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 10:15 AM</td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
                       Critical
                     </span>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>Database 2</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Database 2</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     CPU usage exceeded 90% threshold for 5 minutes
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>
                 </tr>
                 <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Today 09:42 AM
-                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 09:42 AM</td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
                       Warning
                     </span>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    API Server 1
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>API Server 1</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     High 5xx error rate detected
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>
                 </tr>
                 <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Today 09:15 AM
-                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 09:15 AM</td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
                       Critical
                     </span>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Cache Server
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Cache Server</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     Memory usage at 95%, potential memory leak
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
                       Investigating
                     </span>
                   </td>
                 </tr>
                 <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Yesterday 11:52 PM
-                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Yesterday 11:52 PM</td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
                       Warning
                     </span>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Web Server 2
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Web Server 2</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     Response time increased by 40%
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>
                   </td>
                 </tr>
                 <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
-                    Yesterday 10:23 PM
-                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Yesterday 10:23 PM</td>
                   <td className='px-6 py-4 whitespace-nowrap'>
                     <span className='px-2 py-1 font-medium bg-slate-100 text-slate-800 rounded-full'>
                       Info
                     </span>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>Job Queue</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Job Queue</td>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     Queue depth exceeding normal patterns
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-sm text-slate-600'>
+                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
                     <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
                       Resolved
                     </span>

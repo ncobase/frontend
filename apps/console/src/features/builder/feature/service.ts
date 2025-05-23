@@ -1231,12 +1231,12 @@ const ${relationCapitalized}RelationshipTab = ({ recordId }) => {
           <tbody className='divide-y divide-slate-200'>
             {relatedItems.map((item, index) => (
               <tr key={item.id || index} className='hover:bg-slate-50'>
-                <td className='px-4 py-3 text-sm'>
+                <td className='px-4 py-3'>
                   <a href='#' className='text-blue-600 hover:underline'>
                     {item.name || item.title || item.id}
                   </a>
                 </td>
-                <td className='px-4 py-3 text-sm text-right space-x-1'>
+                <td className='px-4 py-3 text-right space-x-1'>
                   <Button variant='outline-slate' size='xs'>
                     <Icons name='IconEye' size={14} />
                   </Button>

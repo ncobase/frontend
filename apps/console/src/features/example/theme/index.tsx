@@ -104,7 +104,7 @@ export const ThemeSwitcherExample = () => {
                 </h3>
                 <div className='space-y-2'>
                   <label
-                    className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}
+                    className={`block font-medium ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`}
                   >
                     {t('example.i18n.username')}
                   </label>

@@ -153,7 +153,7 @@ export const NotificationExample: React.FC = () => {
           </CardHeader>
           <CardContent className='space-y-4'>
             <div>
-              <label className='block text-sm font-medium mb-1' htmlFor='toast-message'>
+              <label className='block font-medium mb-1' htmlFor='toast-message'>
                 {t('example.message')}
               </label>
               <Input
@@ -165,7 +165,7 @@ export const NotificationExample: React.FC = () => {
             </div>
 
             <div>
-              <label className='block text-sm font-medium mb-1' htmlFor='toast-description'>
+              <label className='block font-medium mb-1' htmlFor='toast-description'>
                 {t('example.description')}
               </label>
               <Textarea
@@ -179,7 +179,7 @@ export const NotificationExample: React.FC = () => {
 
             <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label className='block text-sm font-medium mb-1' htmlFor='toast-type'>
+                <label className='block font-medium mb-1' htmlFor='toast-type'>
                   {t('example.type')}
                 </label>
                 <Select value={toastType} onValueChange={(value: any) => setToastType(value)}>
@@ -196,7 +196,7 @@ export const NotificationExample: React.FC = () => {
               </div>
 
               <div>
-                <label className='block text-sm font-medium mb-1' htmlFor='toast-duration'>
+                <label className='block font-medium mb-1' htmlFor='toast-duration'>
                   {t('example.duration')} (ms)
                 </label>
                 <Input
@@ -218,7 +218,7 @@ export const NotificationExample: React.FC = () => {
             </div>
 
             <div className='pt-2'>
-              <p className='text-sm font-medium mb-2'>{t('example.preset_toasts')}</p>
+              <p className='font-medium mb-2'>{t('example.preset_toasts')}</p>
               <div className='grid grid-cols-2 gap-2'>
                 <Button
                   variant='outline-primary'
@@ -265,7 +265,7 @@ export const NotificationExample: React.FC = () => {
           </CardHeader>
           <CardContent className='space-y-4'>
             <div>
-              <label className='block text-sm font-medium mb-1' htmlFor='notification-title'>
+              <label className='block font-medium mb-1' htmlFor='notification-title'>
                 {t('example.title')}
               </label>
               <Input
@@ -277,7 +277,7 @@ export const NotificationExample: React.FC = () => {
             </div>
 
             <div>
-              <label className='block text-sm font-medium mb-1' htmlFor='notification-description'>
+              <label className='block font-medium mb-1' htmlFor='notification-description'>
                 {t('example.description')}
               </label>
               <Textarea
@@ -290,7 +290,7 @@ export const NotificationExample: React.FC = () => {
             </div>
 
             <div>
-              <label className='block text-sm font-medium mb-1' htmlFor='notification-type'>
+              <label className='block font-medium mb-1' htmlFor='notification-type'>
                 {t('example.type')}
               </label>
               <Select
@@ -326,7 +326,7 @@ export const NotificationExample: React.FC = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
                 <h3 className='text-lg font-medium mb-2'>{t('example.toast_usage')}</h3>
-                <ul className='list-disc pl-5 space-y-1 text-sm'>
+                <ul className='list-disc pl-5 space-y-1'>
                   <li>{t('example.toast_tip_1')}</li>
                   <li>{t('example.toast_tip_2')}</li>
                   <li>{t('example.toast_tip_3')}</li>
@@ -349,7 +349,7 @@ export const NotificationExample: React.FC = () => {
 
               <div>
                 <h3 className='text-lg font-medium mb-2'>{t('example.notification_usage')}</h3>
-                <ul className='list-disc pl-5 space-y-1 text-sm'>
+                <ul className='list-disc pl-5 space-y-1'>
                   <li>{t('example.notification_tip_1')}</li>
                   <li>{t('example.notification_tip_2')}</li>
                   <li>{t('example.notification_tip_3')}</li>

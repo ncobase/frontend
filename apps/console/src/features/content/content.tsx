@@ -22,7 +22,7 @@ const StatsCard = ({ title, value, icon, color, onClick }) => (
   <Card className='h-full'>
     <div className='flex justify-between items-center p-4'>
       <div>
-        <div className='text-sm text-gray-500 mb-1'>{title}</div>
+        <div className='text-gray-500 mb-1'>{title}</div>
         <div className='text-2xl font-semibold'>{value}</div>
       </div>
       <div

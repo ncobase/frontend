@@ -145,7 +145,7 @@ export const TenantExportForm = ({ onSubmit, onCancel, tenantCount }) => {
                 )}
               />
 
-              <div className='text-sm text-slate-500 bg-slate-50 p-3 rounded'>
+              <div className='text-slate-500 bg-slate-50 p-3 rounded'>
                 <p className='flex items-center'>
                   <Icons name='IconInfoCircle' className='mr-2 text-blue-500' />
                   {tenantCount

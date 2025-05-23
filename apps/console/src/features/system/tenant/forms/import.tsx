@@ -126,7 +126,7 @@ export const TenantImportForm = ({ onSubmit, onCancel }) => {
                       placeholder={t('tenant.import.json_placeholder', 'Paste your JSON data here')}
                       rows={8}
                       disabled={control._formValues.format !== 'json'}
-                      className='font-mono text-sm'
+                      className='font-mono'
                     />
                   </div>
                 )}

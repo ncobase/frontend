@@ -333,7 +333,7 @@ export const FeatureBuilder = () => {
                       </span>
                     )}
                   </h3>
-                  <p className='text-sm text-slate-500'>
+                  <p className='text-slate-500'>
                     {t(`feature_builder.fields.types.${field.type}`, field.type)} - {field.name}
                   </p>
                 </div>

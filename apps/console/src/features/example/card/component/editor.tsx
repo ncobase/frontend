@@ -84,7 +84,7 @@ export const EditorPage = () => {
             </Button>
             {savingStatus && (
               <span
-                className={`text-sm ${savingStatus.includes('success') ? 'text-green-500' : 'text-blue-500'}`}
+                className={`${savingStatus.includes('success') ? 'text-green-500' : 'text-blue-500'}`}
               >
                 {savingStatus}
               </span>
@@ -211,17 +211,17 @@ export const EditorPage = () => {
         <h3 className='font-medium mb-2'>Current Document Stats:</h3>
         <div className='flex flex-wrap gap-4'>
           <div className='bg-white dark:bg-slate-700 p-3 rounded-md border border-slate-200 dark:border-slate-600'>
-            <span className='text-sm text-slate-500 dark:text-slate-400'>Word Count</span>
+            <span className='text-slate-500 dark:text-slate-400'>Word Count</span>
             <p className='text-xl font-semibold'>
               {content.split(/\s+/).filter(word => word.length > 0).length}
             </p>
           </div>
           <div className='bg-white dark:bg-slate-700 p-3 rounded-md border border-slate-200 dark:border-slate-600'>
-            <span className='text-sm text-slate-500 dark:text-slate-400'>Character Count</span>
+            <span className='text-slate-500 dark:text-slate-400'>Character Count</span>
             <p className='text-xl font-semibold'>{content.replace(/<[^>]*>/g, '').length}</p>
           </div>
           <div className='bg-white dark:bg-slate-700 p-3 rounded-md border border-slate-200 dark:border-slate-600'>
-            <span className='text-sm text-slate-500 dark:text-slate-400'>Last Edited</span>
+            <span className='text-slate-500 dark:text-slate-400'>Last Edited</span>
             <p className='text-xl font-semibold'>{new Date().toLocaleTimeString()}</p>
           </div>
         </div>

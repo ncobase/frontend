@@ -406,7 +406,7 @@ export const LoadingStatesExample = () => {
                     <CardContent className='flex-1'>
                       <div className='space-y-4'>
                         <div>
-                          <div className='text-sm text-slate-500 mb-1'>{t('example.progress')}</div>
+                          <div className='text-slate-500 mb-1'>{t('example.progress')}</div>
                           <div className='w-full bg-slate-200 rounded-full h-2.5'>
                             <div
                               className='bg-blue-600 h-2.5 rounded-full'
@@ -417,7 +417,7 @@ export const LoadingStatesExample = () => {
                         </div>
 
                         <div>
-                          <div className='text-sm text-slate-500'>{t('example.lastUpdated')}</div>
+                          <div className='text-slate-500'>{t('example.lastUpdated')}</div>
                           <div>{item.updatedAt.toLocaleDateString()}</div>
                         </div>
                       </div>
@@ -500,7 +500,7 @@ export const LoadingStatesExample = () => {
                       <div className='text-primary-600 font-medium'>
                         {t('example.loading.states.loadingMessage')}
                       </div>
-                      <div className='text-slate-500 text-sm'>
+                      <div className='text-slate-500'>
                         {t('example.loading.states.estimatedTime', {
                           seconds: Math.ceil(loadingDelay / 1000)
                         })}

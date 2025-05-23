@@ -23,7 +23,7 @@ export const PermissionPage = () => {
           <div className='mt-1 flex flex-wrap gap-2'>
             {roles.length > 0 ? (
               roles.map(role => (
-                <span key={role} className='px-2 py-1 bg-slate-200 rounded-md text-sm'>
+                <span key={role} className='px-2 py-1 bg-slate-200 rounded-md'>
                   {role}
                 </span>
               ))
@@ -38,7 +38,7 @@ export const PermissionPage = () => {
           <div className='mt-1 flex flex-wrap gap-2'>
             {permissions.length > 0 ? (
               permissions.map(perm => (
-                <span key={perm} className='px-2 py-1 bg-slate-200 rounded-md text-sm'>
+                <span key={perm} className='px-2 py-1 bg-slate-200 rounded-md'>
                   {perm}
                 </span>
               ))

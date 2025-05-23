@@ -11,15 +11,31 @@ export class Request {
   private readonly $fetch: $Fetch;
   private readonly defaultHeaders: Record<string, string | undefined>;
   private readonly csrfToken: string | null = null;
-  private requestsInProgress: Map<string, Promise<ExplicitAny>> = new Map();
-  private readonly failedEndpoints: Map<string, { timestamp: number; retryCount: number }> =
-    new Map();
-  private readonly MAX_RETRY_COUNT = 3;
-  private readonly RETRY_RESET_TIME = 60000; // 1 minute
 
-  // Throttling for error events
+  // Tracks ongoing requests to prevent duplicates
+  private requestsInProgress: Map<string, Promise<ExplicitAny>> = new Map();
+
+  // Tracks failed endpoints to limit retries
+  private readonly failedEndpoints: Map<
+    string,
+    {
+      timestamp: number;
+      retryCount: number;
+      lastError: string;
+    }
+  > = new Map();
+
+  // Throttles repeated error events
   private errorEventThrottler: Map<string, number> = new Map();
-  private readonly ERROR_EVENT_THROTTLE_TIME = 1000; // 1 second
+
+  // Flag to prevent concurrent token refreshes
+  private isRefreshingToken = false;
+
+  // Config constants
+  private readonly MAX_RETRY_COUNT = 3;
+  private readonly RETRY_RESET_TIME = 60000; // ms
+  private readonly ERROR_EVENT_THROTTLE_TIME = 1000; // ms
+  private readonly REQUEST_DEDUP_TIME = 100; // ms
 
   static baseConfig: FetchOptions = {
     baseURL:
@@ -27,7 +43,8 @@ export class Request {
       (import.meta.env.VITE_API_PROXY === 'true' || import.meta.env.VITE_API_PROXY === '1')
         ? '/api'
         : import.meta.env.VITE_API_URL || '/api',
-    timeout: 30000
+    timeout: 30000,
+    retry: false // Disable ofetch's built-in retry logic
   };
 
   constructor(fetcher: $Fetch, defaultHeaders: Record<string, string | undefined> = {}) {
@@ -59,38 +76,62 @@ export class Request {
     };
   }
 
-  private shouldRetry(endpoint: string): boolean {
+  private getEndpointKey(url: string): string {
+    // Remove query parameters and timestamps to get base endpoint
+    return url.split('?')[0];
+  }
+
+  private getRequestKey(method: string, url: string, data?: ExplicitAny): string {
+    // Create a unique key for request deduplication
+    const dataHash = data ? JSON.stringify(data) : '';
+    return `${method}:${this.getEndpointKey(url)}:${dataHash}`;
+  }
+
+  private shouldRetry(endpoint: string, errorType: string): boolean {
     const failedInfo = this.failedEndpoints.get(endpoint);
+    const now = Date.now();
 
     // If no record, it's the first attempt
-    if (!failedInfo) return true;
-
-    const now = Date.now();
+    if (!failedInfo) {
+      this.recordFailure(endpoint, errorType);
+      return true;
+    }
 
     // Reset retry count if enough time has passed
     if (now - failedInfo.timestamp > this.RETRY_RESET_TIME) {
-      this.failedEndpoints.set(endpoint, { timestamp: now, retryCount: 1 });
+      this.recordFailure(endpoint, errorType);
       return true;
     }
 
     // Check if we've hit the retry limit
     if (failedInfo.retryCount >= this.MAX_RETRY_COUNT) {
+      console.warn(
+        `Endpoint ${endpoint} has failed ${this.MAX_RETRY_COUNT} times, blocking further requests`
+      );
       return false;
     }
 
     // Increment retry count
     this.failedEndpoints.set(endpoint, {
+      ...failedInfo,
+      retryCount: failedInfo.retryCount + 1,
       timestamp: now,
-      retryCount: failedInfo.retryCount + 1
+      lastError: errorType
     });
 
     return true;
   }
 
-  // Extract the base endpoint from a URL
-  private getEndpointKey(url: string): string {
-    // Remove query parameters and timestamps
-    return url.split('?')[0];
+  private recordFailure(endpoint: string, errorType: string): void {
+    this.failedEndpoints.set(endpoint, {
+      timestamp: Date.now(),
+      retryCount: 1,
+      lastError: errorType
+    });
+  }
+
+  private clearFailureRecord(endpoint: string): void {
+    this.failedEndpoints.delete(endpoint);
   }
 
   private shouldEmitErrorEvent(eventType: string): boolean {
@@ -105,70 +146,71 @@ export class Request {
     return false;
   }
 
+  private isAuthEndpoint(url: string): boolean {
+    return (
+      url.includes('/iam/login') ||
+      url.includes('/iam/refresh-token') ||
+      url.includes('/iam/token-status') ||
+      url.includes('/iam/register') ||
+      url.includes('/iam/logout')
+    );
+  }
+
   private async handleErrors(
     err: Error | Response | FetchError,
     method: string,
     url: string
   ): Promise<never> {
     const endpoint = this.getEndpointKey(url);
-
-    // Network error handling
-    if (err instanceof Error && !(err instanceof FetchError)) {
-      console.error(`Network error [${method} ${url}]: ${err.message}`);
-      if (this.shouldEmitErrorEvent('network-error')) {
-        eventEmitter.emit('network-error', { method, url, message: err.message });
-      }
-      throw err;
-    }
-
     let status: number | undefined;
     let errorData: any = null;
     let errorMessage = 'Unknown error occurred';
 
-    // Handle FetchError
+    // Parse error information
     if (err instanceof FetchError) {
       status = err.status;
       try {
         errorData = err['data'] ?? err['_data'];
         errorMessage = errorData?.message || err.message || 'Unknown error occurred';
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-      } catch (e: any) {
+      } catch (e) {
         errorMessage = err.message || 'Unknown error occurred';
       }
     } else if (err instanceof Response) {
       status = err.status;
-
-      // Only try to parse JSON if it hasn't been read yet
       if (err.bodyUsed === false) {
         try {
           errorData = await err.json();
           errorMessage = errorData?.message || 'Unknown error occurred';
         } catch (e) {
-          // Body stream already read or not JSON
-          console.error(
-            `Error parsing error response [${method} ${url}]: ${e instanceof Error ? e.message : String(e)}`
-          );
+          console.error(`Error parsing error response: ${e}`);
         }
       }
+    } else if (err instanceof Error) {
+      errorMessage = err.message;
     }
 
-    // Store information about this failed endpoint for retry limiting
-    if (status === 500 || status === 503) {
-      const existingInfo = this.failedEndpoints.get(endpoint);
-      this.failedEndpoints.set(endpoint, {
-        timestamp: Date.now(),
-        retryCount: (existingInfo?.retryCount || 0) + 1
-      });
+    // Log error for debugging
+    console.error(`Request failed [${method} ${url}]:`, {
+      status,
+      message: errorMessage,
+      data: errorData
+    });
+
+    // Handle different error scenarios
+    const errorType = `${status || 'network'}`;
+
+    // Record failure for retry logic (only for server errors)
+    if (status && status >= 500) {
+      this.recordFailure(endpoint, errorType);
     }
 
-    // Handle different error scenarios with throttling
+    // Emit appropriate events with throttling
     if (status === 401) {
       if (this.shouldEmitErrorEvent('unauthorized')) {
         eventEmitter.emit('unauthorized', errorMessage);
       }
     } else if (status === 403) {
-      // Forbidden error handling
-      console.warn(`Access forbidden [${method} ${url}]: ${errorMessage}`);
       if (this.shouldEmitErrorEvent('forbidden')) {
         eventEmitter.emit('forbidden', {
           method,
@@ -179,7 +221,7 @@ export class Request {
       }
     } else if (status === 404) {
       if (this.shouldEmitErrorEvent('not-found')) {
-        eventEmitter.emit('not-found', { url, message: errorMessage });
+        eventEmitter.emit('not-found', { url: endpoint, message: errorMessage });
       }
     } else if (status === 422) {
       if (this.shouldEmitErrorEvent('validation-error')) {
@@ -201,6 +243,11 @@ export class Request {
           url: endpoint
         });
       }
+    } else if (!status) {
+      // Network error
+      if (this.shouldEmitErrorEvent('network-error')) {
+        eventEmitter.emit('network-error', { method, url: endpoint, message: errorMessage });
+      }
     }
 
     throw err;
@@ -213,46 +260,51 @@ export class Request {
     fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     const endpoint = this.getEndpointKey(url);
+    const requestKey = this.getRequestKey(method, url, data);
 
     // Check if we should retry this endpoint
-    if (!this.shouldRetry(endpoint)) {
-      console.warn(`Request to ${endpoint} has failed multiple times. Skipping request.`);
+    if (!this.shouldRetry(endpoint, 'blocked')) {
+      const error = new Error(
+        `Request to ${endpoint} is temporarily blocked due to multiple failures`
+      );
       if (this.shouldEmitErrorEvent('request-blocked')) {
         eventEmitter.emit('request-blocked', {
           method,
           url: endpoint,
-          message: 'Request has failed multiple times and is temporarily blocked'
+          message: error.message
         });
       }
-      throw new Error(`Request to ${endpoint} is temporarily blocked due to multiple failures`);
+      throw error;
     }
 
-    // Generate a request key for deduplication
-    const requestKey = `${method}:${url}:${JSON.stringify(data || {})}`;
-
-    // Check if this exact request is already in progress
+    // Check if this exact request is already in progress (deduplication)
     if (this.requestsInProgress.has(requestKey)) {
+      console.debug(`Deduplicating request: ${requestKey}`);
       return this.requestsInProgress.get(requestKey)!;
     }
 
     try {
-      // Skip token refresh for auth endpoints and forbidden requests to avoid infinite loops
-      const isAuthEndpoint =
-        url.includes('/iam/login') ||
-        url.includes('/iam/refresh-token') ||
-        url.includes('/iam/token-status');
+      // Only attempt token refresh for non-auth endpoints and when we have a token
+      const shouldRefreshToken =
+        !this.isAuthEndpoint(url) && !this.isRefreshingToken && locals.get(ACCESS_TOKEN_KEY);
 
-      if (!isAuthEndpoint) {
-        // Only attempt to refresh if not already doing an auth request
-        await checkAndRefreshToken();
+      if (shouldRefreshToken) {
+        this.isRefreshingToken = true;
+        try {
+          await checkAndRefreshToken();
+        } catch (refreshError) {
+          console.warn('Token refresh failed:', refreshError);
+          // Don't throw here, let the original request proceed
+        } finally {
+          this.isRefreshingToken = false;
+        }
       }
 
       const headers = this.getHeaders();
       const body = data ? { body: JSON.stringify(data) } : {};
 
       let finalUrl = url;
-      const AUT = true; // always use timestamp;
-      if (fetchOptions?.timestamp || AUT) {
+      if (fetchOptions?.timestamp !== false) {
         const separator = url.includes('?') ? '&' : '?';
         finalUrl = `${url}${separator}_t=${Date.now()}`;
       }
@@ -262,28 +314,30 @@ export class Request {
         method,
         headers,
         ...body,
-        ...fetchOptions,
-        onRequestError: ({ error }) => this.handleErrors(error, method, finalUrl),
-        onResponseError: ({ response }) => this.handleErrors(response, method, finalUrl),
-        onResponse: async ({ response }) => {
-          if (!response.ok) {
-            await this.handleErrors(response, method, finalUrl);
-          }
-        }
+        ...fetchOptions
       };
 
-      // Create the request promise and store it
-      const requestPromise = this.$fetch(finalUrl, options).finally(() => {
-        // Remove from in-progress requests when done
-        this.requestsInProgress.delete(requestKey);
-      });
+      // Create the request promise and store it for deduplication
+      const requestPromise = this.$fetch(finalUrl, options)
+        .then(response => {
+          // Clear failure record on success
+          this.clearFailureRecord(endpoint);
+          return response;
+        })
+        .catch(async error => {
+          return this.handleErrors(error, method, finalUrl);
+        })
+        .finally(() => {
+          // Remove from in-progress requests when done
+          this.requestsInProgress.delete(requestKey);
+        });
 
       this.requestsInProgress.set(requestKey, requestPromise);
       return await requestPromise;
     } catch (err) {
       // Clean up the in-progress request on error
       this.requestsInProgress.delete(requestKey);
-      return await this.handleErrors(err as Error, method, url);
+      throw err;
     }
   }
 
@@ -319,6 +373,27 @@ export class Request {
     fetchOptions?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
     return this.request('DELETE', url, undefined, fetchOptions);
+  }
+
+  // Reset the state
+  public reset(): void {
+    this.requestsInProgress.clear();
+    this.failedEndpoints.clear();
+    this.errorEventThrottler.clear();
+    this.isRefreshingToken = false;
+  }
+
+  // Get the current status
+  public getStatus(): {
+    pendingRequests: number;
+    failedEndpoints: number;
+    isRefreshingToken: boolean;
+  } {
+    return {
+      pendingRequests: this.requestsInProgress.size,
+      failedEndpoints: this.failedEndpoints.size,
+      isRefreshingToken: this.isRefreshingToken
+    };
   }
 }
 

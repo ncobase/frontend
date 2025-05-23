@@ -196,7 +196,7 @@ export const Notifications = ({
                 />
                 <div className='space-y-1'>
                   <p
-                    className={`text-sm text-slate-700 px-0 leading-5 text-justify text-wrap font-medium ${
+                    className={`text-slate-700 px-0 leading-5 text-justify text-wrap font-medium ${
                       !notification.read ? 'font-semibold' : ''
                     }`}
                   >

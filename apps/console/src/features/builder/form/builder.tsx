@@ -1064,8 +1064,7 @@ export default MyForm;`;
                 </div>
                 <Icons name={field.prependIcon || 'IconForms'} className='mr-2' />
                 <h3 className='font-medium'>
-                  {field.title || 'Field'}{' '}
-                  <span className='text-slate-400 text-sm'>({field.type})</span>
+                  {field.title || 'Field'} <span className='text-slate-400'>({field.type})</span>
                 </h3>
               </div>
               <div className='flex gap-2'>
@@ -1129,7 +1128,7 @@ export default MyForm;`;
                   <Icons name={section.icon || 'IconFolders'} className='mr-2' />
                   <div>
                     <h3 className='font-medium'>{section.title}</h3>
-                    <p className='text-sm text-slate-500'>{section.subtitle}</p>
+                    <p className='text-slate-500'>{section.subtitle}</p>
                   </div>
                 </div>
                 <div className='flex gap-2'>

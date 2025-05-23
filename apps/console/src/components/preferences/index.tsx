@@ -115,7 +115,7 @@ export const Preferences = () => {
         <div className='space-y-4'>
           {/* View Mode Preference */}
           <div className='flex items-center justify-between'>
-            <label className='text-sm font-medium'>{t('preferences.view_mode')}</label>
+            <label className='font-medium'>{t('preferences.view_mode')}</label>
             <Select value={viewMode} onValueChange={handleViewModeChange as any}>
               <SelectTrigger className='w-[140px]'>
                 <SelectValue placeholder={t('preferences.select_view_mode')} />
@@ -129,7 +129,7 @@ export const Preferences = () => {
 
           {/* Color Mode Preference */}
           <div className='flex items-center justify-between'>
-            <label className='text-sm font-medium'>{t('preferences.color_mode')}</label>
+            <label className='font-medium'>{t('preferences.color_mode')}</label>
             <Select value={colorMode} onValueChange={handleColorModeChange as any}>
               <SelectTrigger className='w-[140px]'>
                 <SelectValue placeholder={t('preferences.select_color_mode')} />
@@ -144,7 +144,7 @@ export const Preferences = () => {
 
           {/* Sidebar Expanded Preference */}
           <div className='hidden items-center justify-between'>
-            <label className='text-sm font-medium'>{t('preferences.sidebar_expanded')}</label>
+            <label className='font-medium'>{t('preferences.sidebar_expanded')}</label>
             <Switch checked={sidebarExpanded} onCheckedChange={handleSidebarToggle} />
           </div>
         </div>
