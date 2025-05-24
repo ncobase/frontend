@@ -1,9 +1,8 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { createRole, deleteRole, getRole, getRoles, updateRole } from './apis';
 import { QueryFormParams } from './config/query';
 import { Role } from './role';
-
-import { createRole, deleteRole, getRole, getRoles, updateRole } from '@/features/system/role/apis';
 
 interface RoleKeys {
   create: ['roleService', 'create'];
@@ -19,25 +18,79 @@ export const roleKeys: RoleKeys = {
   list: (queryParams = {}) => ['roleService', 'roles', queryParams]
 };
 
-// Hook to query a specific role by ID or Slug
+// Query a specific role by ID or Slug
 export const useQueryRole = (role: string) =>
-  useQuery({ queryKey: roleKeys.get({ role }), queryFn: () => getRole(role) });
+  useQuery({
+    queryKey: roleKeys.get({ role }),
+    queryFn: () => getRole(role),
+    enabled: !!role
+  });
 
-// Hook for create role mutation
-export const useCreateRole = () =>
-  useMutation({ mutationFn: (payload: Pick<Role, keyof Role>) => createRole(payload) });
-
-// Hook for update role mutation
-export const useUpdateRole = () =>
-  useMutation({ mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload) });
-
-// Hook for delete role mutation
-export const useDeleteRole = () => useMutation({ mutationFn: (id: string) => deleteRole(id) });
-
-// Hook to list roles
+// List roles with query params
 export const useListRoles = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: roleKeys.list(queryParams),
-    queryFn: () => getRoles(queryParams)
+    queryFn: () => getRoles(queryParams),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000 // 10 minutes
+  });
+};
+
+// Create role mutation
+export const useCreateRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Pick<Role, keyof Role>) => createRole(payload),
+    onSuccess: () => {
+      // Invalidate and refetch roles list
+      queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
+    },
+    onError: error => {
+      console.error('Failed to create role:', error);
+      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Update role mutation
+export const useUpdateRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload),
+    onSuccess: (_, variables) => {
+      // Invalidate specific role and roles list
+      queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
+      if (variables.id) {
+        queryClient.invalidateQueries({
+          queryKey: roleKeys.get({ role: variables.id })
+        });
+      }
+    },
+    onError: error => {
+      console.error('Failed to update role:', error);
+      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Delete role mutation
+export const useDeleteRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteRole(id),
+    onSuccess: (_, deletedId) => {
+      // Remove from cache and invalidate roles list
+      queryClient.removeQueries({
+        queryKey: roleKeys.get({ role: deletedId })
+      });
+      queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
+    },
+    onError: error => {
+      console.error('Failed to delete role:', error);
+      // Handle error (toast notification, etc.)
+    }
   });
 };

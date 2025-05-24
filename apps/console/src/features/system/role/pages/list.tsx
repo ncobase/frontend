@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { isEqual } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
@@ -8,8 +7,9 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { useRoleList } from '../hooks';
 import { Role } from '../role';
-import { useCreateRole, useDeleteRole, useListRoles, useUpdateRole } from '../service';
+import { useCreateRole, useDeleteRole, useUpdateRole } from '../service';
 
 import { CreateRolePage } from './create';
 import { EditorRolePage } from './editor';
@@ -21,47 +21,19 @@ import { useLayoutContext } from '@/components/layout';
 export const RoleListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
-  const { data, refetch } = useListRoles(queryParams);
+  const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
+
+  const { data, fetchData, loading, refetch } = useRoleList();
+
+  const [viewType, setViewType] = useState<string | undefined>(mode);
+  const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
   } = useForm<QueryFormParams>();
-
-  const onQuery = handleQuerySubmit(async data => {
-    setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
-    await refetch();
-  });
-
-  const onResetQuery = () => {
-    queryReset();
-  };
-
-  const [viewType, setViewType] = useState<string | undefined>();
-  const { mode } = useParams<{ mode: string; slug: string }>();
-  useEffect(() => {
-    if (mode) {
-      setViewType(mode);
-    } else {
-      setViewType(undefined);
-    }
-  }, [mode]);
-
-  const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
-
-  const handleView = useCallback(
-    (record: Role | null, type: string) => {
-      setSelectedRecord(record);
-      setViewType(type);
-      if (vmode === 'flatten') {
-        navigate(`${type}${record ? `/${record.id}` : ''}`);
-      }
-    },
-    [navigate, vmode]
-  );
 
   const {
     control: formControl,
@@ -71,18 +43,48 @@ export const RoleListPage = () => {
     handleSubmit: handleFormSubmit
   } = useForm<Role>();
 
+  const createRoleMutation = useCreateRole();
+  const updateRoleMutation = useUpdateRole();
+  const deleteRoleMutation = useDeleteRole();
+
+  useEffect(() => {
+    if (mode) {
+      setViewType(mode);
+    } else {
+      setViewType(undefined);
+    }
+  }, [mode]);
+
+  const onQuery = handleQuerySubmit(async queryData => {
+    await fetchData({ ...queryData, cursor: '' });
+    await refetch();
+  });
+
+  const onResetQuery = () => {
+    queryReset();
+  };
+
+  const handleView = useCallback(
+    (record: Role | null, type: string) => {
+      setSelectedRecord(record);
+      setViewType(type);
+
+      if (vmode === 'flatten') {
+        navigate(`${type}${record?.id ? `/${record.id}` : ''}`);
+      }
+    },
+    [navigate, vmode]
+  );
+
   const handleClose = useCallback(() => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+
     if (vmode === 'flatten' && viewType) {
       navigate(-1);
     }
   }, [formReset, navigate, vmode, viewType]);
-
-  const createRoleMutation = useCreateRole();
-  const updateRoleMutation = useUpdateRole();
-  const deleteRoleMutation = useDeleteRole();
 
   const onSuccess = useCallback(() => {
     handleClose();
@@ -104,7 +106,9 @@ export const RoleListPage = () => {
 
   const handleDelete = useCallback(
     (record: Role) => {
-      deleteRoleMutation.mutate(record.id, { onSuccess });
+      if (record.id) {
+        deleteRoleMutation.mutate(record.id, { onSuccess });
+      }
     },
     [deleteRoleMutation, onSuccess]
   );
@@ -116,32 +120,27 @@ export const RoleListPage = () => {
     [handleFormSubmit, viewType, handleCreate, handleUpdate]
   );
 
-  const fetchData = useCallback(
-    async (newQueryParams: QueryFormParams) => {
-      const mergedQueryParams = { ...queryParams, ...newQueryParams };
-      if (
-        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
-        isEqual(newQueryParams, queryParams)
-      ) {
-        return data;
-      }
-      setQueryParams({ ...mergedQueryParams });
-    },
-    [queryParams, data]
-  );
+  const tableConfig = {
+    columns: tableColumns({ handleView, handleDelete }),
+    topbarLeft: topbarLeftSection({ handleView }),
+    topbarRight: topbarRightSection,
+    title: t('system.role.title')
+  };
 
   return (
     <CurdView
       viewMode={vmode}
-      title={t('system.role.title')}
-      topbarLeft={topbarLeftSection({ handleView })}
-      topbarRight={topbarRightSection}
-      columns={tableColumns({ handleView, handleDelete })}
+      title={tableConfig.title}
+      topbarLeft={tableConfig.topbarLeft}
+      topbarRight={tableConfig.topbarRight}
+      columns={tableConfig.columns}
+      data={data?.items || []}
       selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
+      loading={loading}
       createComponent={
         <CreateRolePage
           viewMode={vmode}

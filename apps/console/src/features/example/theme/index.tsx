@@ -203,7 +203,6 @@ export const ThemeSwitcherExample = () => {
                   <Button variant={color} className='w-full'>
                     {t('actions.button')}
                   </Button>
-                  {/* @ts-expect-error */}
                   <Button variant={`outline-${color}`} className='w-full'>
                     {t('actions.outline')}
                   </Button>

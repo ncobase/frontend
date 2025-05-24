@@ -7,13 +7,9 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { usePermissionList } from '../hooks';
 import { Permission } from '../permission';
-import {
-  useCreatePermission,
-  useDeletePermission,
-  useListPermissions,
-  useUpdatePermission
-} from '../service';
+import { useCreatePermission, useDeletePermission, useUpdatePermission } from '../service';
 
 import { CreatePermissionPage } from './create';
 import { EditorPermissionPage } from './editor';
@@ -25,50 +21,19 @@ import { useLayoutContext } from '@/components/layout';
 export const PermissionListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>();
-  const { data, refetch, isLoading } = useListPermissions(queryParams);
-
-  // const vmode = useMemo(() => 'flatten', []) as 'flatten' | 'modal';
-
+  const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
+
+  const { data, fetchData, loading, refetch } = usePermissionList();
+
+  const [viewType, setViewType] = useState<string | undefined>(mode);
+  const [selectedRecord, setSelectedRecord] = useState<Permission | null>(null);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
   } = useForm<QueryFormParams>();
-
-  const onQuery = handleQuerySubmit(async data => {
-    setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
-    await refetch();
-  });
-
-  const onResetQuery = () => {
-    queryReset();
-  };
-
-  const [viewType, setViewType] = useState<string | undefined>();
-  const { mode } = useParams<{ mode: string; slug: string }>();
-  useEffect(() => {
-    if (mode) {
-      setViewType(mode);
-    } else {
-      setViewType(undefined);
-    }
-  }, [mode]);
-
-  const [selectedRecord, setSelectedRecord] = useState<Permission | null>(null);
-
-  const handleView = useCallback(
-    (record: Permission | null, type: string) => {
-      setSelectedRecord(record);
-      setViewType(type);
-      if (vmode === 'flatten') {
-        navigate(`${type}${record ? `/${record.id}` : ''}`);
-      }
-    },
-    [navigate, vmode]
-  );
 
   const {
     control: formControl,
@@ -78,18 +43,48 @@ export const PermissionListPage = () => {
     handleSubmit: handleFormSubmit
   } = useForm<Permission>();
 
+  const createPermissionMutation = useCreatePermission();
+  const updatePermissionMutation = useUpdatePermission();
+  const deletePermissionMutation = useDeletePermission();
+
+  useEffect(() => {
+    if (mode) {
+      setViewType(mode);
+    } else {
+      setViewType(undefined);
+    }
+  }, [mode]);
+
+  const onQuery = handleQuerySubmit(async queryData => {
+    await fetchData({ ...queryData, cursor: '' });
+    await refetch();
+  });
+
+  const onResetQuery = () => {
+    queryReset();
+  };
+
+  const handleView = useCallback(
+    (record: Permission | null, type: string) => {
+      setSelectedRecord(record);
+      setViewType(type);
+
+      if (vmode === 'flatten') {
+        navigate(`${type}${record?.id ? `/${record.id}` : ''}`);
+      }
+    },
+    [navigate, vmode]
+  );
+
   const handleClose = useCallback(() => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+
     if (vmode === 'flatten' && viewType) {
       navigate(-1);
     }
   }, [formReset, navigate, vmode, viewType]);
-
-  const createPermissionMutation = useCreatePermission();
-  const updatePermissionMutation = useUpdatePermission();
-  const deletePermissionMutation = useDeletePermission();
 
   const onSuccess = useCallback(() => {
     handleClose();
@@ -111,7 +106,9 @@ export const PermissionListPage = () => {
 
   const handleDelete = useCallback(
     (record: Permission) => {
-      deletePermissionMutation.mutate(record.id, { onSuccess });
+      if (record.id) {
+        deletePermissionMutation.mutate(record.id, { onSuccess });
+      }
     },
     [deletePermissionMutation, onSuccess]
   );
@@ -123,33 +120,27 @@ export const PermissionListPage = () => {
     [handleFormSubmit, viewType, handleCreate, handleUpdate]
   );
 
-  // const fetchData = useCallback(
-  //   async (newQueryParams: QueryFormParams) => {
-  //     const mergedQueryParams = { ...queryParams, ...newQueryParams };
-  //     if (
-  //       (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
-  //       isEqual(newQueryParams, queryParams)
-  //     ) {
-  //       return data;
-  //     }
-  //     setQueryParams({ ...mergedQueryParams });
-  //   },
-  //   [queryParams, data]
-  // );
+  const tableConfig = {
+    columns: tableColumns({ handleView, handleDelete }),
+    topbarLeft: topbarLeftSection({ handleView }),
+    topbarRight: topbarRightSection,
+    title: t('system.permission.title')
+  };
 
   return (
     <CurdView
       viewMode={vmode}
-      title={t('system.permission.title')}
-      topbarLeft={topbarLeftSection({ handleView })}
-      topbarRight={topbarRightSection}
-      columns={tableColumns({ handleView, handleDelete })}
+      title={tableConfig.title}
+      topbarLeft={tableConfig.topbarLeft}
+      topbarRight={tableConfig.topbarRight}
+      columns={tableConfig.columns}
+      data={data?.items || []}
       selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
-      data={data?.items}
-      loading={isLoading}
+      fetchData={fetchData}
+      loading={loading}
       createComponent={
         <CreatePermissionPage
           viewMode={vmode}

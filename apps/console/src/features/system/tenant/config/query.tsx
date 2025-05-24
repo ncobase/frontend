@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 export type QueryFormParams = {
   name?: string;
   type?: string;
-  disabled?: boolean;
+  disabled?: boolean | string;
   search?: string;
 } & PaginationParams;
 
@@ -68,6 +68,7 @@ export const queryFields = ({
         <Controller
           name='disabled'
           control={queryControl}
+          defaultValue=''
           render={({ field }) => (
             <SelectField
               allowClear

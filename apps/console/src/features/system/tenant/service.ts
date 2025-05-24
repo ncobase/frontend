@@ -1,7 +1,7 @@
-import { PaginationParams } from '@ncobase/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { createTenant, deleteTenant, getTenant, getTenants, updateTenant } from './apis';
+import { QueryFormParams } from './config/query';
 import { Tenant } from './tenant';
 
 interface TenantKeys {
@@ -9,7 +9,7 @@ interface TenantKeys {
   get: (_options?: { slug?: string }) => ['tenantService', 'tenant', { slug?: string }];
   update: ['tenantService', 'update'];
   delete: ['tenantService', 'delete'];
-  list: (_options?: PaginationParams) => ['tenantService', 'tenants', PaginationParams];
+  list: (_options?: QueryFormParams) => ['tenantService', 'tenants', QueryFormParams];
 }
 
 export const tenantKeys: TenantKeys = {
@@ -20,7 +20,7 @@ export const tenantKeys: TenantKeys = {
   list: (queryParams = {}) => ['tenantService', 'tenants', queryParams]
 };
 
-// Hook to query a specific tenant by ID
+// Query a specific tenant by slug
 export const useQueryTenant = (slug: string) =>
   useQuery({
     queryKey: tenantKeys.get({ slug }),
@@ -28,47 +28,71 @@ export const useQueryTenant = (slug: string) =>
     enabled: !!slug
   });
 
-// Hook for create tenant mutation
+// List tenants with query params
+export const useListTenants = (queryParams: QueryFormParams) => {
+  return useQuery({
+    queryKey: tenantKeys.list(queryParams),
+    queryFn: () => getTenants(queryParams),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000 // 10 minutes
+  });
+};
+
+// Create tenant mutation
 export const useCreateTenant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: Tenant) => createTenant(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: tenantKeys.list() });
+      // Invalidate and refetch tenants list
+      queryClient.invalidateQueries({ queryKey: ['tenantService', 'tenants'] });
+    },
+    onError: error => {
+      console.error('Failed to create tenant:', error);
+      // Handle error (toast notification, etc.)
     }
   });
 };
 
-// Hook for update tenant mutation
+// Update tenant mutation
 export const useUpdateTenant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: Tenant) => updateTenant(payload),
     onSuccess: data => {
-      queryClient.invalidateQueries({ queryKey: tenantKeys.get({ slug: data.slug }) });
-      queryClient.invalidateQueries({ queryKey: tenantKeys.list() });
+      // Invalidate specific tenant and tenants list
+      queryClient.invalidateQueries({ queryKey: ['tenantService', 'tenants'] });
+      if (data?.slug) {
+        queryClient.invalidateQueries({
+          queryKey: tenantKeys.get({ slug: data.slug })
+        });
+      }
+    },
+    onError: error => {
+      console.error('Failed to update tenant:', error);
+      // Handle error (toast notification, etc.)
     }
   });
 };
 
-// Hook for delete tenant mutation
+// Delete tenant mutation
 export const useDeleteTenant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (slug: string) => deleteTenant(slug),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: tenantKeys.list() });
+    onSuccess: (_, deletedSlug) => {
+      // Remove from cache and invalidate tenants list
+      queryClient.removeQueries({
+        queryKey: tenantKeys.get({ slug: deletedSlug })
+      });
+      queryClient.invalidateQueries({ queryKey: ['tenantService', 'tenants'] });
+    },
+    onError: error => {
+      console.error('Failed to delete tenant:', error);
+      // Handle error (toast notification, etc.)
     }
-  });
-};
-
-// Hook to list tenants with pagination
-export const useListTenants = (queryParams: PaginationParams) => {
-  return useQuery({
-    queryKey: tenantKeys.list(queryParams),
-    queryFn: () => getTenants(queryParams)
   });
 };

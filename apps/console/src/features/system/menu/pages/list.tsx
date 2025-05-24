@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { isEqual } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
@@ -8,8 +7,9 @@ import { useNavigate, useParams } from 'react-router';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
+import { useMenuList } from '../hooks';
 import { Menu } from '../menu';
-import { useCreateMenu, useDeleteMenu, useListMenus, useUpdateMenu } from '../service';
+import { useCreateMenu, useDeleteMenu, useUpdateMenu } from '../service';
 
 import { CreateMenuPage } from './create';
 import { EditorMenuPage } from './editor';
@@ -20,49 +20,18 @@ import { CurdView } from '@/components/curd';
 export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ children: true });
-  const { data, refetch } = useListMenus(queryParams);
+  const { mode } = useParams<{ mode: string; slug: string }>();
 
-  // manually set the view type, the vmode in the layout context should be used by default.
-  const vmode = 'flatten' as 'flatten' | 'modal';
+  const { data, fetchData, loading, refetch } = useMenuList();
+
+  const [viewType, setViewType] = useState<string | undefined>(mode);
+  const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
 
   const {
     handleSubmit: handleQuerySubmit,
     control: queryControl,
     reset: queryReset
   } = useForm<QueryFormParams>();
-
-  const onQuery = handleQuerySubmit(async data => {
-    setQueryParams(prev => ({ ...prev, ...data, cursor: '' }));
-    await refetch();
-  });
-
-  const onResetQuery = () => {
-    queryReset();
-  };
-
-  const [viewType, setViewType] = useState<string | undefined>();
-  const { mode } = useParams<{ mode: string }>();
-  useEffect(() => {
-    if (mode) {
-      setViewType(mode);
-    } else {
-      setViewType(undefined);
-    }
-  }, [mode]);
-
-  const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
-
-  const handleView = useCallback(
-    (record: Menu | null, type: string) => {
-      setSelectedRecord(record);
-      setViewType(type);
-      if (vmode === 'flatten') {
-        navigate(`${type}${record ? `/${record.id}` : ''}`);
-      }
-    },
-    [navigate, vmode]
-  );
 
   const {
     control: formControl,
@@ -72,18 +41,50 @@ export const MenuListPage = () => {
     handleSubmit: handleFormSubmit
   } = useForm<Menu>();
 
+  const createMenuMutation = useCreateMenu();
+  const updateMenuMutation = useUpdateMenu();
+  const deleteMenuMutation = useDeleteMenu();
+
+  const vmode = 'flatten' as 'flatten' | 'modal';
+
+  useEffect(() => {
+    if (mode) {
+      setViewType(mode);
+    } else {
+      setViewType(undefined);
+    }
+  }, [mode]);
+
+  const onQuery = handleQuerySubmit(async queryData => {
+    await fetchData({ ...queryData, cursor: '' });
+    await refetch();
+  });
+
+  const onResetQuery = () => {
+    queryReset();
+  };
+
+  const handleView = useCallback(
+    (record: Menu | null, type: string) => {
+      setSelectedRecord(record);
+      setViewType(type);
+
+      if (vmode === 'flatten') {
+        navigate(`${type}${record?.id ? `/${record.id}` : ''}`);
+      }
+    },
+    [navigate, vmode]
+  );
+
   const handleClose = useCallback(() => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+
     if (vmode === 'flatten' && viewType) {
       navigate(-1);
     }
   }, [formReset, navigate, vmode, viewType]);
-
-  const createMenuMutation = useCreateMenu();
-  const updateMenuMutation = useUpdateMenu();
-  const deleteMenuMutation = useDeleteMenu();
 
   const onSuccess = useCallback(() => {
     handleClose();
@@ -105,7 +106,9 @@ export const MenuListPage = () => {
 
   const handleDelete = useCallback(
     (record: Menu) => {
-      deleteMenuMutation.mutate(record.id, { onSuccess });
+      if (record.id) {
+        deleteMenuMutation.mutate(record.id, { onSuccess });
+      }
     },
     [deleteMenuMutation, onSuccess]
   );
@@ -117,34 +120,29 @@ export const MenuListPage = () => {
     [handleFormSubmit, viewType, handleCreate, handleUpdate]
   );
 
-  const fetchData = useCallback(
-    async (newQueryParams: QueryFormParams) => {
-      const mergedQueryParams = { ...queryParams, ...newQueryParams };
-      if (
-        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
-        isEqual(newQueryParams, queryParams)
-      ) {
-        return data;
-      }
-      setQueryParams({ ...mergedQueryParams });
-    },
-    [queryParams, data]
-  );
+  const tableConfig = {
+    columns: tableColumns({ handleView, handleDelete }),
+    topbarLeft: topbarLeftSection({ handleView }),
+    topbarRight: topbarRightSection,
+    title: t('system.menu.title')
+  };
 
   return (
     <CurdView
       viewMode={vmode}
-      title={t('system.menu.title')}
-      topbarLeft={topbarLeftSection({ handleView })}
-      topbarRight={topbarRightSection}
-      columns={tableColumns({ handleView, handleDelete })}
+      title={tableConfig.title}
+      topbarLeft={tableConfig.topbarLeft}
+      topbarRight={tableConfig.topbarRight}
+      columns={tableConfig.columns}
+      data={data?.items || []}
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
+      onResetQuery={onResetQuery}
       maxTreeLevel={-1}
       isAllExpanded
       paginated={false}
-      onResetQuery={onResetQuery}
       fetchData={fetchData}
+      loading={loading}
       createComponent={
         <CreateMenuPage
           viewMode={vmode}

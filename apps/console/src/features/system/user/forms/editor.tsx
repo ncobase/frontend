@@ -4,82 +4,123 @@ import { FieldConfigProps, Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { useQueryUserMeshes } from '../service';
-// import { useForm } from 'react-hook-form';
 
 export const EditorUserForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data } = useQueryUserMeshes(record);
+  const { data, isLoading } = useQueryUserMeshes(record);
   const { user, profile } = data || {};
 
   const fields: FieldConfigProps[] = [
     {
-      title: '编号',
+      title: 'ID',
       name: 'user.id',
-      defaultValue: false,
+      defaultValue: '',
       type: 'text',
       disabled: true
     },
     {
-      title: '用户名',
+      title: 'Username',
       name: 'user.username',
-      defaultValue: false,
+      defaultValue: '',
       type: 'text',
       rules: { required: t('forms.input_required') }
     },
     {
-      title: '邮箱',
+      title: 'Email',
       name: 'user.email',
-      defaultValue: false,
+      defaultValue: '',
       type: 'email'
     },
     {
-      title: '手机',
+      title: 'Phone',
       name: 'user.phone',
-      defaultValue: false,
+      defaultValue: '',
       type: 'text'
     },
-    { title: '姓', name: 'profile.first_name', defaultValue: false, type: 'text' },
-    { title: '名', name: 'profile.last_name', defaultValue: false, type: 'text' },
     {
-      title: '状态',
+      title: 'First Name',
+      name: 'profile.first_name',
+      defaultValue: '',
+      type: 'text'
+    },
+    {
+      title: 'Last Name',
+      name: 'profile.last_name',
+      defaultValue: '',
+      type: 'text'
+    },
+    {
+      title: 'Display Name',
+      name: 'profile.display_name',
+      defaultValue: '',
+      type: 'text'
+    },
+    {
+      title: 'Status',
       name: 'user.status',
-      defaultValue: false,
+      defaultValue: '0',
       type: 'select',
       options: [
-        { label: '激活', value: '0' },
-        { label: '未激活', value: '1' },
-        { label: '禁用', value: '2' }
+        { label: 'Active', value: '0' },
+        { label: 'Inactive', value: '1' },
+        { label: 'Disabled', value: '2' }
       ],
       rules: { required: t('forms.select_required') }
     },
     {
-      title: '关于',
+      title: 'Short Bio',
+      name: 'profile.short_bio',
+      defaultValue: '',
+      type: 'textarea'
+    },
+    {
+      title: 'About',
       name: 'profile.about',
-      defaultValue: false,
+      defaultValue: '',
       type: 'textarea',
       className: 'col-span-full'
+    },
+    {
+      title: 'Language',
+      name: 'profile.language',
+      defaultValue: 'en',
+      type: 'select',
+      options: [
+        { label: 'English', value: 'en' },
+        { label: '中文', value: 'zh' },
+        { label: 'Español', value: 'es' },
+        { label: 'Français', value: 'fr' }
+      ]
     }
   ];
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || isLoading) return;
+
+    // Set user fields
     setValue('user.id', user?.id);
     setValue('user.username', user?.username);
     setValue('user.email', user?.email);
     setValue('user.phone', user?.phone);
+    setValue('user.status', user?.status?.toString() || '0');
+
+    // Set profile fields
     setValue('profile.first_name', profile?.first_name);
     setValue('profile.last_name', profile?.last_name);
-    setValue('profile.about', profile?.about);
-    setValue('user.status', user?.status);
-    setValue('profile.language', profile?.language);
-    setValue('profile.links', profile?.links);
-    setValue('profile.short_bio', profile?.short_bio);
     setValue('profile.display_name', profile?.display_name);
-  }, [setValue, data]);
+    setValue('profile.short_bio', profile?.short_bio);
+    setValue('profile.about', profile?.about);
+    setValue('profile.language', profile?.language || 'en');
+    setValue('profile.links', profile?.links || []);
+  }, [setValue, data, user, profile, isLoading]);
+
+  if (isLoading) {
+    return <div className='p-4 text-center'>Loading user data...</div>;
+  }
 
   return (
     <Form
-      id='create-user'
+      id='edit-user'
       className='my-4 md:grid-cols-2'
       onSubmit={onSubmit}
       control={control}

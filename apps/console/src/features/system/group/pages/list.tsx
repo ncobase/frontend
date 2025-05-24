@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { isEqual } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { QueryFormParams } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { Group } from '../group';
-import { useCreateGroup, useDeleteGroup, useListGroups, useUpdateGroup } from '../service';
+import { useGroupList } from '../hooks';
+import { useCreateGroup, useDeleteGroup, useUpdateGroup } from '../service';
 
 import { CreateGroupPage } from './create';
 import { EditorGroupPage } from './editor';
@@ -20,33 +19,14 @@ import { useLayoutContext } from '@/components/layout';
 
 export const GroupListPage = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [queryParams, setQueryParams] = useState<QueryFormParams>({ children: true });
-  const { data } = useListGroups(queryParams);
   const { vmode } = useLayoutContext();
-
-  const [viewType, setViewType] = useState<string | undefined>();
+  const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
-  useEffect(() => {
-    if (mode) {
-      setViewType(mode);
-    } else {
-      setViewType(undefined);
-    }
-  }, [mode]);
 
+  const { data, fetchData, loading } = useGroupList();
+
+  const [viewType, setViewType] = useState<string | undefined>(mode);
   const [selectedRecord, setSelectedRecord] = useState<Group | null>(null);
-
-  const handleView = useCallback(
-    (record: Group | null, type: string) => {
-      setSelectedRecord(record);
-      setViewType(type);
-      if (vmode === 'flatten') {
-        navigate(`${type}${record ? `/${record.id}` : ''}`);
-      }
-    },
-    [navigate, vmode]
-  );
 
   const {
     control: formControl,
@@ -56,18 +36,39 @@ export const GroupListPage = () => {
     handleSubmit: handleFormSubmit
   } = useForm<Group>();
 
+  const createGroupMutation = useCreateGroup();
+  const updateGroupMutation = useUpdateGroup();
+  const deleteGroupMutation = useDeleteGroup();
+
+  useEffect(() => {
+    if (mode) {
+      setViewType(mode);
+    } else {
+      setViewType(undefined);
+    }
+  }, [mode]);
+
+  const handleView = useCallback(
+    (record: Group | null, type: string) => {
+      setSelectedRecord(record);
+      setViewType(type);
+
+      if (vmode === 'flatten') {
+        navigate(`${type}${record?.id ? `/${record.id}` : ''}`);
+      }
+    },
+    [navigate, vmode]
+  );
+
   const handleClose = useCallback(() => {
     setSelectedRecord(null);
     setViewType(undefined);
     formReset();
+
     if (vmode === 'flatten' && viewType) {
       navigate(-1);
     }
   }, [formReset, navigate, vmode, viewType]);
-
-  const createGroupMutation = useCreateGroup();
-  const updateGroupMutation = useUpdateGroup();
-  const deleteGroupMutation = useDeleteGroup();
 
   const onSuccess = useCallback(() => {
     handleClose();
@@ -89,7 +90,9 @@ export const GroupListPage = () => {
 
   const handleDelete = useCallback(
     (record: Group) => {
-      deleteGroupMutation.mutate(record.id, { onSuccess });
+      if (record.id) {
+        deleteGroupMutation.mutate(record.id, { onSuccess });
+      }
     },
     [deleteGroupMutation, onSuccess]
   );
@@ -101,30 +104,25 @@ export const GroupListPage = () => {
     [handleFormSubmit, viewType, handleCreate, handleUpdate]
   );
 
-  const fetchData = useCallback(
-    async (newQueryParams: QueryFormParams) => {
-      const mergedQueryParams = { ...queryParams, ...newQueryParams };
-      if (
-        (isEqual(mergedQueryParams, queryParams) && Object.keys(data || {}).length) ||
-        isEqual(newQueryParams, queryParams)
-      ) {
-        return data;
-      }
-      setQueryParams({ ...mergedQueryParams });
-    },
-    [queryParams, data]
-  );
+  const tableConfig = {
+    columns: tableColumns({ handleView, handleDelete }),
+    topbarLeft: topbarLeftSection({ handleView }),
+    topbarRight: topbarRightSection,
+    title: t('system.group.title')
+  };
 
   return (
     <CurdView
       viewMode={vmode}
-      title={t('system.group.title')}
-      topbarLeft={topbarLeftSection({ handleView })}
-      topbarRight={topbarRightSection}
-      columns={tableColumns({ handleView, handleDelete })}
+      title={tableConfig.title}
+      topbarLeft={tableConfig.topbarLeft}
+      topbarRight={tableConfig.topbarRight}
+      columns={tableConfig.columns}
+      data={data?.items || []}
       paginated={false}
       selected
       fetchData={fetchData}
+      loading={loading}
       maxTreeLevel={-1}
       isAllExpanded
       createComponent={

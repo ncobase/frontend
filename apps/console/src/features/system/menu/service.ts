@@ -1,18 +1,10 @@
 import { AnyObject } from '@ncobase/types';
 import { sortTree } from '@ncobase/utils';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { createMenu, deleteMenu, getMenu, getMenus, getMenuTree, updateMenu } from './apis';
 import { QueryFormParams } from './config/query';
 import { Menu } from './menu';
-
-import {
-  getMenu,
-  getMenuTree,
-  createMenu,
-  updateMenu,
-  deleteMenu,
-  getMenus
-} from '@/features/system/menu/apis';
 
 interface MenuKeys {
   create: ['menuService', 'create'];
@@ -32,11 +24,15 @@ export const menuKeys: MenuKeys = {
   list: (queryParams = {}) => ['menuService', 'menus', queryParams]
 };
 
-// Hook to query a specific menu by ID or Slug
+// Query a specific menu by ID or Slug
 export const useQueryMenu = (menu: string) =>
-  useQuery({ queryKey: menuKeys.get({ menu }), queryFn: () => getMenu(menu) });
+  useQuery({
+    queryKey: menuKeys.get({ menu }),
+    queryFn: () => getMenu(menu),
+    enabled: !!menu
+  });
 
-// Hook to query menu tree
+// Query menu tree with sorting
 export const useQueryMenuTreeData = (queryParams = {}) => {
   return useQuery({
     queryKey: menuKeys.tree(queryParams),
@@ -50,23 +46,74 @@ export const useQueryMenuTreeData = (queryParams = {}) => {
   });
 };
 
-// Hook for create menu mutation
-export const useCreateMenu = () =>
-  useMutation({ mutationFn: (payload: Pick<Menu, keyof Menu>) => createMenu(payload) });
-
-// Hook for update menu mutation
-export const useUpdateMenu = () =>
-  useMutation({
-    mutationFn: (payload: Pick<Menu, keyof Menu>) => updateMenu(payload)
-  });
-
-// Hook for delete menu mutation
-export const useDeleteMenu = () => useMutation({ mutationFn: (id: string) => deleteMenu(id) });
-
-// Hook to list menus
+// List menus with query params
 export const useListMenus = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: menuKeys.list(queryParams),
-    queryFn: () => getMenus(queryParams)
+    queryFn: () => getMenus(queryParams),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000 // 10 minutes
+  });
+};
+
+// Create menu mutation
+export const useCreateMenu = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Pick<Menu, keyof Menu>) => createMenu(payload),
+    onSuccess: () => {
+      // Invalidate and refetch menus list and tree
+      queryClient.invalidateQueries({ queryKey: ['menuService', 'menus'] });
+      queryClient.invalidateQueries({ queryKey: ['menuService', 'tree'] });
+    },
+    onError: error => {
+      console.error('Failed to create menu:', error);
+      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Update menu mutation
+export const useUpdateMenu = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Pick<Menu, keyof Menu>) => updateMenu(payload),
+    onSuccess: (_, variables) => {
+      // Invalidate specific menu, menus list, and tree
+      queryClient.invalidateQueries({ queryKey: ['menuService', 'menus'] });
+      queryClient.invalidateQueries({ queryKey: ['menuService', 'tree'] });
+      if (variables.id) {
+        queryClient.invalidateQueries({
+          queryKey: menuKeys.get({ menu: variables.id })
+        });
+      }
+    },
+    onError: error => {
+      console.error('Failed to update menu:', error);
+      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Delete menu mutation
+export const useDeleteMenu = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteMenu(id),
+    onSuccess: (_, deletedId) => {
+      // Remove from cache and invalidate menus list and tree
+      queryClient.removeQueries({
+        queryKey: menuKeys.get({ menu: deletedId })
+      });
+      queryClient.invalidateQueries({ queryKey: ['menuService', 'menus'] });
+      queryClient.invalidateQueries({ queryKey: ['menuService', 'tree'] });
+    },
+    onError: error => {
+      console.error('Failed to delete menu:', error);
+      // Handle error (toast notification, etc.)
+    }
   });
 };

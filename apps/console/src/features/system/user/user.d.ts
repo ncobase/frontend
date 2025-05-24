@@ -1,5 +1,6 @@
 import { Role } from '../role/role';
 import { Tenant } from '../tenant/tenant';
+
 /**
  * User entity - Core user information
  */
@@ -56,7 +57,13 @@ export interface UserMeshes {
 /**
  * User list pagination parameters
  */
-export interface UserListParams extends PaginationParams {
+export interface UserListParams {
+  page?: number;
+  limit?: number;
+  cursor?: string;
+  direction?: 'forward' | 'backward';
+  sort?: string;
+  order?: 'asc' | 'desc';
   status?: string | number;
   search?: string;
   role?: string;
@@ -75,7 +82,9 @@ export interface UserListResponse {
   has_more: boolean;
 }
 
-// Add these to your PaginationParams if not already defined
+/**
+ * Pagination parameters interface
+ */
 export interface PaginationParams {
   page?: number;
   limit?: number;

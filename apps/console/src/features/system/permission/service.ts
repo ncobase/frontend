@@ -1,8 +1,5 @@
 import { AnyObject } from '@ncobase/types';
-import { useMutation, useQuery } from '@tanstack/react-query';
-
-import { QueryFormParams } from './config/query';
-import { Permission } from './permission';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   createPermission,
@@ -10,7 +7,9 @@ import {
   getPermission,
   getPermissions,
   updatePermission
-} from '@/features/system/permission/apis';
+} from './apis';
+import { QueryFormParams } from './config/query';
+import { Permission } from './permission';
 
 interface PermissionKeys {
   create: ['permissionService', 'create'];
@@ -30,33 +29,82 @@ export const permissionKeys: PermissionKeys = {
   list: (queryParams = {}) => ['permissionService', 'permissions', queryParams]
 };
 
-// Hook to query a specific permission by ID or Slug
+// Query a specific permission by ID or Slug
 export const useQueryPermission = (permission: string) =>
   useQuery({
     queryKey: permissionKeys.get({ permission }),
-    queryFn: () => getPermission(permission)
+    queryFn: () => getPermission(permission),
+    enabled: !!permission
   });
 
-// Hook for create permission mutation
-export const useCreatePermission = () =>
-  useMutation({
-    mutationFn: (payload: Pick<Permission, keyof Permission>) => createPermission(payload)
-  });
-
-// Hook for update permission mutation
-export const useUpdatePermission = () =>
-  useMutation({
-    mutationFn: (payload: Pick<Permission, keyof Permission>) => updatePermission(payload)
-  });
-
-// Hook for delete permission mutation
-export const useDeletePermission = () =>
-  useMutation({ mutationFn: (id: string) => deletePermission(id) });
-
-// Hook to list permissions
+// List permissions with query params
 export const useListPermissions = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: permissionKeys.list(queryParams),
-    queryFn: () => getPermissions(queryParams)
+    queryFn: () => getPermissions(queryParams),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000 // 10 minutes
+  });
+};
+
+// Create permission mutation
+export const useCreatePermission = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Pick<Permission, keyof Permission>) => createPermission(payload),
+    onSuccess: () => {
+      // Invalidate and refetch permissions list
+      queryClient.invalidateQueries({ queryKey: ['permissionService', 'permissions'] });
+      queryClient.invalidateQueries({ queryKey: ['permissionService', 'tree'] });
+    },
+    onError: error => {
+      console.error('Failed to create permission:', error);
+      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Update permission mutation
+export const useUpdatePermission = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: Pick<Permission, keyof Permission>) => updatePermission(payload),
+    onSuccess: (_, variables) => {
+      // Invalidate specific permission, permissions list, and tree
+      queryClient.invalidateQueries({ queryKey: ['permissionService', 'permissions'] });
+      queryClient.invalidateQueries({ queryKey: ['permissionService', 'tree'] });
+      if (variables.id) {
+        queryClient.invalidateQueries({
+          queryKey: permissionKeys.get({ permission: variables.id })
+        });
+      }
+    },
+    onError: error => {
+      console.error('Failed to update permission:', error);
+      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Delete permission mutation
+export const useDeletePermission = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deletePermission(id),
+    onSuccess: (_, deletedId) => {
+      // Remove from cache and invalidate permissions list and tree
+      queryClient.removeQueries({
+        queryKey: permissionKeys.get({ permission: deletedId })
+      });
+      queryClient.invalidateQueries({ queryKey: ['permissionService', 'permissions'] });
+      queryClient.invalidateQueries({ queryKey: ['permissionService', 'tree'] });
+    },
+    onError: error => {
+      console.error('Failed to delete permission:', error);
+      // Handle error (toast notification, etc.)
+    }
   });
 };
