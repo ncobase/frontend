@@ -8,8 +8,8 @@ import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useMenuList } from '../hooks';
-import { Menu } from '../menu';
-import { useCreateMenu, useDeleteMenu, useUpdateMenu } from '../service';
+import { MenuTree } from '../menu';
+import { useCreateMenu, useDeleteMenu, useUpdateMenu, useToggleMenuStatus } from '../service';
 
 import { CreateMenuPage } from './create';
 import { EditorMenuPage } from './editor';
@@ -25,7 +25,7 @@ export const MenuListPage = () => {
   const { data, fetchData, loading, refetch } = useMenuList();
 
   const [viewType, setViewType] = useState<string | undefined>(mode);
-  const [selectedRecord, setSelectedRecord] = useState<Menu | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<MenuTree | null>(null);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -39,11 +39,12 @@ export const MenuListPage = () => {
     reset: formReset,
     setValue: setFormValue,
     handleSubmit: handleFormSubmit
-  } = useForm<Menu>();
+  } = useForm<MenuTree>();
 
   const createMenuMutation = useCreateMenu();
   const updateMenuMutation = useUpdateMenu();
   const deleteMenuMutation = useDeleteMenu();
+  const toggleStatusMutation = useToggleMenuStatus();
 
   const vmode = 'flatten' as 'flatten' | 'modal';
 
@@ -65,7 +66,7 @@ export const MenuListPage = () => {
   };
 
   const handleView = useCallback(
-    (record: Menu | null, type: string) => {
+    (record: MenuTree | null, type: string) => {
       setSelectedRecord(record);
       setViewType(type);
 
@@ -88,24 +89,25 @@ export const MenuListPage = () => {
 
   const onSuccess = useCallback(() => {
     handleClose();
-  }, [handleClose]);
+    refetch();
+  }, [handleClose, refetch]);
 
   const handleCreate = useCallback(
-    (data: Menu) => {
+    (data: MenuTree) => {
       createMenuMutation.mutate(data, { onSuccess });
     },
     [createMenuMutation, onSuccess]
   );
 
   const handleUpdate = useCallback(
-    (data: Menu) => {
+    (data: MenuTree) => {
       updateMenuMutation.mutate(data, { onSuccess });
     },
     [updateMenuMutation, onSuccess]
   );
 
   const handleDelete = useCallback(
-    (record: Menu) => {
+    (record: MenuTree) => {
       if (record.id) {
         deleteMenuMutation.mutate(record.id, { onSuccess });
       }
@@ -113,15 +115,24 @@ export const MenuListPage = () => {
     [deleteMenuMutation, onSuccess]
   );
 
+  const handleToggleStatus = useCallback(
+    (record: MenuTree, action: 'enable' | 'disable' | 'show' | 'hide') => {
+      if (record.id) {
+        toggleStatusMutation.mutate({ id: record.id, action }, { onSuccess });
+      }
+    },
+    [toggleStatusMutation, onSuccess]
+  );
+
   const handleConfirm = useCallback(
-    handleFormSubmit((data: Menu) => {
+    handleFormSubmit((data: MenuTree) => {
       return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
     }),
     [handleFormSubmit, viewType, handleCreate, handleUpdate]
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete }),
+    columns: tableColumns({ handleView, handleDelete, handleToggleStatus }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
     title: t('system.menu.title')
@@ -138,7 +149,7 @@ export const MenuListPage = () => {
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
-      maxTreeLevel={-1}
+      maxTreeLevel={-1} // Support unlimited nesting
       isAllExpanded
       paginated={false}
       fetchData={fetchData}

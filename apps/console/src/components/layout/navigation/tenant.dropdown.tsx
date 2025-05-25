@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   Button,
@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { useMenus } from '../layout.hooks';
+import { useMenusByType } from '../layout.hooks';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { useAuthContext } from '@/features/account/context';
@@ -19,6 +19,71 @@ import { TenantSwitcher } from '@/features/account/pages/tenant_switcher';
 import { useAccount } from '@/features/account/service';
 import { MenuTree } from '@/features/system/menu/menu';
 import { Tenant } from '@/features/system/tenant/tenant';
+
+const TenantMenuItems = React.memo(
+  ({
+    menuItems,
+    navigate,
+    t,
+    onTenantSwitch,
+    depth = 0
+  }: {
+    menuItems: MenuTree[];
+    navigate: (_path: string) => void;
+    t: (_key: string) => string;
+    onTenantSwitch: () => void;
+    depth?: number;
+  }) => {
+    return (
+      <>
+        {menuItems.map(menu => {
+          if (menu.hidden || menu.disabled) return null;
+
+          const isTenantSwitch = menu.slug?.includes('tenant') && menu.slug?.includes('switch');
+          const isLabel =
+            (menu.slug?.includes('label') || menu.name?.includes('label')) &&
+            menu.path?.includes('-');
+
+          if (isLabel) return null;
+
+          const hasChildren =
+            menu.children && Array.isArray(menu.children) && menu.children.length > 0;
+
+          if (hasChildren) {
+            return (
+              <div key={menu.id || menu.label}>
+                <DropdownItem className='font-medium cursor-default'>
+                  {menu.icon && <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />}
+                  {t(menu.label || '') || menu.name}
+                </DropdownItem>
+                <div className='ml-4'>
+                  <TenantMenuItems
+                    menuItems={menu.children as MenuTree[]}
+                    navigate={navigate}
+                    t={t}
+                    onTenantSwitch={onTenantSwitch}
+                    depth={depth + 1}
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <DropdownItem
+              key={menu.id || menu.label}
+              onClick={() => (isTenantSwitch ? onTenantSwitch() : menu.path && navigate(menu.path))}
+              className={depth > 0 ? 'ml-4' : ''}
+            >
+              {menu.icon && <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />}
+              {t(menu.label || '') || menu.name}
+            </DropdownItem>
+          );
+        })}
+      </>
+    );
+  }
+);
 
 export const TenantDropdown = () => {
   const { t } = useTranslation();
@@ -43,49 +108,24 @@ export const TenantDropdown = () => {
 
   const [opened, setOpened] = useState(false);
 
-  const [menus] = useMenus();
-  const tenantMenus = useMemo(() => menus.filter(menu => menu.type === 'tenant'), [menus]);
+  // Get tenant menus - memoized to prevent unnecessary recalculations
+  const tenantMenus = useMenusByType('tenants');
 
-  const renderLink = useCallback(
-    (menu: MenuTree) => {
-      const isTenantSwitch = menu.slug?.includes('tenant') && menu.slug?.includes('switch');
-      const isLabel =
-        (menu.slug?.includes('label') || menu.name?.includes('label')) && menu.path?.includes('-');
-      if (isLabel) {
-        return null;
-      }
+  const renderMenuDropdown = useMemo(() => {
+    const visibleItems = tenantMenus.filter(item => !item.hidden && !item.disabled);
+    if (!visibleItems.length) return null;
 
-      if (isTenantSwitch) {
-        return (
-          <DropdownItem key={menu.id} onClick={() => setOpened(true)}>
-            <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />
-            {t(menu.label) || menu.name}
-          </DropdownItem>
-        );
-      }
-
-      return (
-        <DropdownItem key={menu.id || menu.label} onClick={() => navigate(menu.path)}>
-          <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />
-          {t(menu.label) || menu.name}
-        </DropdownItem>
-      );
-    },
-    [navigate, t]
-  );
-
-  const renderMenuDropdown = useCallback(
-    (menuItems: MenuTree[]) => {
-      const visibleItems = menuItems.filter(item => !item.hidden || item.disabled);
-      if (!visibleItems.length) return null;
-      return (
-        <DropdownContent align='end' alignOffset={-16}>
-          {visibleItems.map(renderLink)}
-        </DropdownContent>
-      );
-    },
-    [renderLink]
-  );
+    return (
+      <DropdownContent align='end' alignOffset={-16}>
+        <TenantMenuItems
+          menuItems={visibleItems}
+          navigate={navigate}
+          t={t}
+          onTenantSwitch={() => setOpened(true)}
+        />
+      </DropdownContent>
+    );
+  }, [tenantMenus, navigate, t]);
 
   const MenuList = React.memo(() => (
     <Dropdown>
@@ -99,7 +139,7 @@ export const TenantDropdown = () => {
         )}
       </DropdownTrigger>
 
-      {renderMenuDropdown(tenantMenus)}
+      {renderMenuDropdown}
     </Dropdown>
   ));
 

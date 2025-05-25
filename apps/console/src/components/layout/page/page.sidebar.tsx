@@ -14,113 +14,86 @@ import { cn, getInitials, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-import { useMenus } from '../layout.hooks';
+import { useMenusByType } from '../layout.hooks';
 
-import { getMenuByUrl, isDividerLink, isGroup } from './page.helper';
+import { isDividerLink, isGroup } from './page.helper';
 
-import { Menu, MenuTree } from '@/features/system/menu/menu';
+import { MenuTree } from '@/features/system/menu/menu';
 import { useLocalStorage } from '@/hooks/use_local_storage';
 
 export const APP_SIDEBAR_ACCORDION_KEY = 'app.sidebar.expanded_accordions';
 
-// Extract the menu item rendering to a separate component
-const MenuItem = React.memo(
+const MenuItemRecursive = React.memo(
   ({
-    link,
+    menu,
     isActive,
     handleLinkClick,
     className,
-    disabled
-  }: {
-    link: Menu;
-    isActive: (_path: string) => boolean;
-    handleLinkClick: (_link: Menu) => void;
-    className?: string;
-    disabled?: boolean;
-  }) => {
-    return (
-      <Button
-        variant='unstyle'
-        size='ratio'
-        className={cn(
-          'hover:bg-slate-100/85 w-full text-left inline-flex justify-between py-2.5',
-          { 'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(link.path) },
-          disabled && 'cursor-not-allowed opacity-80',
-          className
-        )}
-        onClick={() => handleLinkClick(link)}
-        disabled={disabled}
-        aria-current={isActive(link.path) ? 'page' : undefined}
-      >
-        <div className='flex items-center justify-start'>
-          {link.icon && <Icons size={18} name={link.icon} className='mr-2.5' aria-hidden='true' />}
-          <span>{link.name || link.label}</span>
-        </div>
-      </Button>
-    );
-  }
-);
-
-const ExpandedLink: React.FC<{
-  link: MenuTree;
-  isActive: (_to: string, _depth?: number) => boolean;
-  handleLinkClick: (_link: Menu) => void;
-  className?: string;
-  depth?: number;
-  isInsideAccordion?: boolean;
-  expandedAccordions: Record<string, boolean>;
-  toggleAccordion: (_id: string) => void;
-  collapseAll: () => void;
-}> = React.memo(
-  ({
-    link,
-    isActive,
-    handleLinkClick,
-    className,
-    depth = 2,
-    isInsideAccordion = false,
+    depth = 0,
     expandedAccordions,
     toggleAccordion,
     collapseAll
+  }: {
+    menu: MenuTree;
+    isActive: (_path: string) => boolean;
+    handleLinkClick: (_menu: MenuTree) => void;
+    className?: string;
+    depth?: number;
+    expandedAccordions: Record<string, boolean>;
+    toggleAccordion: (_id: string) => void;
+    collapseAll: () => void;
   }) => {
-    if (isDividerLink(link) || isGroup(link)) {
-      return null;
+    const { t } = useTranslation();
+
+    if (isDividerLink(menu)) {
+      return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
     }
 
-    if (link.children && link.children.length > 0) {
+    if (isGroup(menu)) {
+      return (
+        <div className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'>
+          <span className='font-medium'>{t(menu.label || '') || menu.name}</span>
+        </div>
+      );
+    }
+
+    // Check if menu has children
+    const hasChildren = menu.children && Array.isArray(menu.children) && menu.children.length > 0;
+
+    if (hasChildren) {
       return (
         <Accordion
           type='single'
           collapsible
-          value={expandedAccordions[link.id] ? link.id : ''}
-          onValueChange={() => toggleAccordion(link.id)}
+          value={expandedAccordions[menu.id || ''] ? menu.id : ''}
+          onValueChange={() => toggleAccordion(menu.id || '')}
           className='w-full'
         >
-          <AccordionItem value={link.id} className='border-b border-b-gray-50 py-2.5'>
+          <AccordionItem value={menu.id || ''} className='border-b border-b-gray-50 py-2.5'>
             <AccordionTrigger
               className={cn(
                 'justify-between font-normal no-underline hover:no-underline px-2.5 py-2.5 mx-2.5 text-slate-500 [&>svg]:hover:stroke-slate-400 [&>svg]:focus:stroke-slate-400 hover:opacity-80 focus:opacity-90 hover:bg-slate-100/85 rounded-md',
-                link.disabled && 'cursor-not-allowed opacity-80'
+                menu.disabled && 'cursor-not-allowed opacity-80'
               )}
-              aria-label={`${link.name || link.label} submenu`}
+              style={{ paddingLeft: `${1.25 + depth * 1}rem` }}
+              aria-label={`${menu.name || menu.label} submenu`}
             >
               <div className='flex items-center justify-start'>
-                {link.icon && (
-                  <Icons size={18} name={link.icon} className='mr-2.5' aria-hidden='true' />
+                {menu.icon && (
+                  <Icons size={18} name={menu.icon} className='mr-2.5' aria-hidden='true' />
                 )}
-                <span>{link.name || link.label}</span>
+                <span>{t(menu.label || '') || menu.name}</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className='py-0 bg-slate-50/30 rounded-none'>
-              {link.children?.map(child => (
-                <ExpandedLink
-                  key={child.id}
-                  link={child}
+              {(menu.children as MenuTree[])?.map(child => (
+                <MenuItemRecursive
+                  key={child.id || child.slug}
+                  menu={child}
                   isActive={isActive}
                   handleLinkClick={handleLinkClick}
                   depth={depth + 1}
-                  className={'pl-[2.25rem]!'}
-                  isInsideAccordion={true}
+                  className='pl-4'
                   expandedAccordions={expandedAccordions}
                   toggleAccordion={toggleAccordion}
                   collapseAll={collapseAll}
@@ -132,59 +105,76 @@ const ExpandedLink: React.FC<{
       );
     }
 
-    const handleClick = () => {
-      if (!isInsideAccordion) {
-        collapseAll();
-      }
-      handleLinkClick(link);
-    };
-
+    // Leaf menu item
     return (
       <div className='p-2.5 w-full border-b border-b-gray-50'>
-        <MenuItem
-          link={link}
-          isActive={path => isActive(path, depth)}
-          handleLinkClick={handleClick}
-          className={cn(`pl-[${1.25 + depth * 1}rem]`, className)}
-          disabled={link.disabled}
-        />
+        <Button
+          variant='unstyle'
+          size='ratio'
+          className={cn(
+            'hover:bg-slate-100/85 w-full text-left inline-flex justify-between py-2.5',
+            { 'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '') },
+            menu.disabled && 'cursor-not-allowed opacity-80',
+            className
+          )}
+          style={{ paddingLeft: `${1.25 + depth * 1}rem` }}
+          onClick={() => {
+            if (depth === 0) collapseAll();
+            handleLinkClick(menu);
+          }}
+          disabled={menu.disabled}
+          aria-current={isActive(menu.path || '') ? 'page' : undefined}
+        >
+          <div className='flex items-center justify-start'>
+            {menu.icon && (
+              <Icons size={18} name={menu.icon} className='mr-2.5' aria-hidden='true' />
+            )}
+            <span>{t(menu.label || '') || menu.name}</span>
+          </div>
+        </Button>
       </div>
     );
   }
 );
 
-const CollapsedLink: React.FC<{
-  link: Menu;
-  isActive: (_to: string) => boolean;
-  handleLinkClick: (_link: Menu) => void;
-}> = React.memo(({ link, isActive, handleLinkClick }) => {
-  const { t } = useTranslation();
+const CollapsedMenuItem = React.memo(
+  ({
+    menu,
+    isActive,
+    handleLinkClick
+  }: {
+    menu: MenuTree;
+    isActive: (_path: string) => boolean;
+    handleLinkClick: (_menu: MenuTree) => void;
+  }) => {
+    const { t } = useTranslation();
 
-  if (isDividerLink(link)) {
-    return <div className='h-[0.03125rem] w-1/2 mx-auto! bg-slate-200' role='separator' />;
+    if (isDividerLink(menu)) {
+      return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
+    }
+
+    return (
+      <Tooltip side='right' content={t(menu.label || '') || menu.name}>
+        <Button
+          variant='unstyle'
+          size='ratio'
+          className={cn('my-2.5 hover:bg-slate-100/85', {
+            'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '')
+          })}
+          onClick={() => handleLinkClick(menu)}
+          aria-label={(t(menu.label || '') || menu.name) as string}
+          aria-current={isActive(menu.path || '') ? 'page' : undefined}
+        >
+          {menu.icon ? (
+            <Icons size={18} name={menu.icon} aria-hidden='true' />
+          ) : (
+            <span aria-hidden='true'>{getInitials(menu.name || menu.label || menu.id || 'M')}</span>
+          )}
+        </Button>
+      </Tooltip>
+    );
   }
-
-  return (
-    <Tooltip side='right' content={t(link.label)}>
-      <Button
-        variant='unstyle'
-        size='ratio'
-        className={cn('my-2.5 hover:bg-slate-100/85', {
-          'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(link.path)
-        })}
-        onClick={() => handleLinkClick(link)}
-        aria-label={t(link.label) as string}
-        aria-current={isActive(link.path) ? 'page' : undefined}
-      >
-        {link.icon ? (
-          <Icons size={18} name={link.icon} aria-hidden='true' />
-        ) : (
-          <span aria-hidden='true'>{getInitials(link.name || link.label || link.id)}</span>
-        )}
-      </Button>
-    </Tooltip>
-  );
-});
+);
 
 const SidebarComponent: React.FC<{
   expanded?: boolean;
@@ -193,9 +183,10 @@ const SidebarComponent: React.FC<{
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [menus] = useMenus();
 
-  // Use the custom localStorage hook with the correct structure
+  // Get sidebar menus
+  const sidebarMenus = useMenusByType('sidebars');
+
   const { storedValue: expandedAccordions, setValue: setExpandedAccordions } = useLocalStorage<
     Record<string, boolean>
   >(APP_SIDEBAR_ACCORDION_KEY, {});
@@ -207,7 +198,7 @@ const SidebarComponent: React.FC<{
         [id]: !expandedAccordions[id]
       });
     },
-    [expandedAccordions, setExpandedAccordions]
+    [setExpandedAccordions]
   );
 
   const collapseAll = useCallback(() => {
@@ -218,45 +209,52 @@ const SidebarComponent: React.FC<{
     setExpandedAccordions(newState);
   }, [expandedAccordions, setExpandedAccordions]);
 
-  // Memoize these calculations to prevent unnecessary re-renders
-  const currentHeaderMenu = useMemo(() => getMenuByUrl(menus, pathname), [menus, pathname]);
+  // Find current sidebar menus based on current path
+  const currentPath = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
 
-  const sidebarMenus = useMemo(
-    () => currentHeaderMenu?.children?.filter(menu => !menu.hidden && !menu.disabled) || [],
-    [currentHeaderMenu]
-  );
+  const currentSidebarMenus = useMemo(() => {
+    if (currentPath.length === 0 || !sidebarMenus.length) return sidebarMenus;
 
-  const isActive = useCallback(
-    (to: string, depth?: number) => isPathMatching(to, pathname, depth || 2),
-    [pathname]
-  );
+    // Try to find menus that match the current path
+    const matchingMenus = sidebarMenus.filter(menu => {
+      if (!menu.path) return false;
+      const menuPath = menu.path.split('/').filter(Boolean);
+      return menuPath.length > 0 && currentPath[0] === menuPath[0];
+    });
+
+    return matchingMenus.length > 0 ? matchingMenus : sidebarMenus;
+  }, [sidebarMenus, currentPath]);
+
+  const isActive = useCallback((path: string) => isPathMatching(path, pathname, 2), [pathname]);
 
   const handleLinkClick = useCallback(
-    (link: Menu) => {
-      navigate(link.path);
+    (menu: MenuTree) => {
+      if (menu.path) {
+        navigate(menu.path);
+      }
     },
     [navigate]
   );
 
   return (
     <ShellSidebar className='flex flex-col' navId='app-sidebar'>
-      <div className='flex-1 flex flex-col items-center overflow-x-auto'>
-        {sidebarMenus.map((link: Menu) =>
+      <div className='flex-1 flex flex-col items-center overflow-y-auto'>
+        {currentSidebarMenus.map((menu: MenuTree) =>
           expanded ? (
-            <ExpandedLink
-              key={link.id}
-              link={link}
+            <MenuItemRecursive
+              key={menu.id || menu.slug}
+              menu={menu}
               isActive={isActive}
               handleLinkClick={handleLinkClick}
-              isInsideAccordion={false}
+              depth={0}
               expandedAccordions={expandedAccordions}
               toggleAccordion={toggleAccordion}
               collapseAll={collapseAll}
             />
           ) : (
-            <CollapsedLink
-              key={link.id}
-              link={link}
+            <CollapsedMenuItem
+              key={menu.id || menu.slug}
+              menu={menu}
               isActive={isActive}
               handleLinkClick={handleLinkClick}
             />

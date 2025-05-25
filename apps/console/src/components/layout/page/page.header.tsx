@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ShellHeader, useToastMessage } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useMenus } from '../layout.hooks';
+import { useNavigationMenus } from '../layout.hooks';
 import { AccountDropdown, MainNavigation, TenantDropdown } from '../navigation';
 
 import { LanguageSwitcher } from '@/components/language_switcher';
@@ -11,42 +11,67 @@ import { Logo } from '@/components/logo';
 import { Notifications, NotificationItem } from '@/components/notifications/notification';
 import { Preferences } from '@/components/preferences';
 import { Search } from '@/components/search/search';
-import { useQueryMenuTreeData } from '@/features/system/menu/service';
+import { useQueryNavigationMenus } from '@/features/system/menu/service';
 
 const HeaderComponent = ({ ...rest }) => {
   const { t } = useTranslation();
-  const [menus, setMenus] = useMenus();
-  const { data = [] } = useQueryMenuTreeData({});
+  const [navigationMenus, setNavigationMenus] = useNavigationMenus();
+  const { data: menuTreeData, isLoading, error } = useQueryNavigationMenus();
   const toast = useToastMessage();
   const [pushEnabled, setPushEnabled] = useState(true);
+  const [isMenusSet, setIsMenusSet] = useState(false);
 
   useEffect(() => {
-    if (data?.length) {
-      setMenus(data);
+    if (menuTreeData && typeof menuTreeData === 'object' && !isMenusSet) {
+      // Handle all menu categories
+      const newGroups = {
+        headers: menuTreeData.headers || [],
+        sidebars: menuTreeData.sidebars || [],
+        accounts: menuTreeData.accounts || [],
+        tenants: menuTreeData.tenants || []
+      };
+      setNavigationMenus(newGroups);
+      setIsMenusSet(true);
     }
-  }, [data, setMenus]);
 
-  const headerMenus = useMemo(() => menus.filter(menu => menu.type === 'header'), [menus]);
+    if (error && !isMenusSet) {
+      console.error('Failed to load menu data:', error);
+      toast.error(t('menu.load_error', 'Failed to load navigation menu'));
+      setIsMenusSet(true);
+    }
+  }, [menuTreeData, error, setNavigationMenus, toast, t, isMenusSet]);
+
+  useEffect(() => {
+    if (!menuTreeData && !isLoading) {
+      setIsMenusSet(false);
+    }
+  }, [menuTreeData, isLoading]);
+
+  // Get header menus from the grouped structure
+  const headerMenus = useMemo(() => {
+    if (!navigationMenus.headers) return [];
+    return navigationMenus.headers.filter(menu => !menu.hidden && !menu.disabled);
+  }, [navigationMenus.headers]);
 
   const notifications = useMemo<NotificationItem[]>(
     () => [
       {
         id: '1',
-        title: '您有个待办需要处理。',
+        title: 'You have a task to handle.',
         description: t('datetime.now'),
         type: 'info',
         read: false
       },
       {
         id: '2',
-        title: '您有一条新信息！',
+        title: 'You have a new message!',
         description: t('datetime.minutes_ago_with_value', { minutes: 5 }),
         type: 'success',
         read: false
       },
       {
         id: '3',
-        title: '您的订阅即将到期！',
+        title: 'Your subscription is about to expire!',
         description: t('datetime.days_ago_with_value', { days: 2 }),
         type: 'warning',
         read: false
@@ -56,7 +81,6 @@ const HeaderComponent = ({ ...rest }) => {
   );
 
   const handleMarkAllAsRead = useCallback(() => {
-    // Show a toast when marking all as read
     toast.success(t('notification.marked_all_as_read'), {
       description: t('notification.marked_all_as_read_description')
     });
@@ -65,8 +89,6 @@ const HeaderComponent = ({ ...rest }) => {
   const handleTogglePushSettings = useCallback(
     (enabled: boolean) => {
       setPushEnabled(enabled);
-
-      // Show a toast when changing push settings
       if (enabled) {
         toast.info(t('notification.push_notifications_enabled'));
       } else {
@@ -76,6 +98,33 @@ const HeaderComponent = ({ ...rest }) => {
     [t, toast]
   );
 
+  if (isLoading) {
+    return (
+      <ShellHeader
+        className='flex items-center justify-between bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
+        {...rest}
+      >
+        <div className='inline-flex items-center justify-start'>
+          <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
+          <div className='ml-4 text-white/60 text-sm'>Loading navigation...</div>
+        </div>
+        <div className='inline-flex items-center px-4 gap-x-3'>
+          <Search />
+          <LanguageSwitcher />
+          <Preferences />
+          <Notifications
+            items={notifications}
+            onMarkAllAsRead={handleMarkAllAsRead}
+            onTogglePushSettings={handleTogglePushSettings}
+            pushEnabled={pushEnabled}
+          />
+          <TenantDropdown />
+          <AccountDropdown />
+        </div>
+      </ShellHeader>
+    );
+  }
+
   return (
     <ShellHeader
       className='flex items-center justify-between bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
@@ -83,7 +132,7 @@ const HeaderComponent = ({ ...rest }) => {
     >
       <div className='inline-flex items-center justify-start'>
         <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
-        {headerMenus.length > 0 && <MainNavigation menus={headerMenus} />}
+        {headerMenus.length > 0 && <MainNavigation menus={headerMenus} withSubmenu />}
       </div>
       <div className='inline-flex items-center px-4 gap-x-3'>
         <Search />

@@ -1,3 +1,4 @@
+// ./apps/console/src/components/layout/page/page.submenu.tsx
 import React, { useCallback, useMemo } from 'react';
 
 import { Button, ShellSubmenu } from '@ncobase/react';
@@ -5,74 +6,139 @@ import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-import { useMenus } from '../layout.hooks';
+import { useMenusByType } from '../layout.hooks';
 
-import { getMenuByUrl, isGroup, pathSplit } from './page.helper';
+import { isGroup, pathSplit } from './page.helper';
 
-import { MenuTree, Menu } from '@/features/system/menu/menu';
+import { MenuTree } from '@/features/system/menu/menu';
+
+const SubmenuItemRecursive = React.memo(
+  ({
+    menu,
+    isActive,
+    navigate,
+    depth = 0
+  }: {
+    menu: MenuTree;
+    isActive: (_path: string) => boolean;
+    navigate: (_path: string) => void;
+    depth?: number;
+  }) => {
+    const { t } = useTranslation();
+
+    if (isGroup(menu)) {
+      return (
+        <div
+          className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'
+          key={menu.id}
+        >
+          <span className='font-medium'>{t(menu.label || '') || menu.name}</span>
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className='float-right text-primary-600 p-1'
+            onClick={() => console.log('add events')}
+          />
+        </div>
+      );
+    }
+
+    const hasChildren = menu.children && Array.isArray(menu.children) && menu.children.length > 0;
+
+    return (
+      <div key={menu.id || menu.label}>
+        <Button
+          variant='link'
+          className={cn(
+            'justify-start my-1 text-wrap text-left text-slate-500 hover:text-slate-600 hover:bg-slate-50',
+            isActive(menu.path || '') &&
+              'text-primary-500 bg-primary-50/65 hover:bg-primary-50/65 hover:text-primary-500'
+          )}
+          style={{ paddingLeft: `${depth * 1}rem` }}
+          onClick={() => menu.path && navigate(menu.path)}
+        >
+          <span>{t(menu.label || '') || menu.name}</span>
+        </Button>
+
+        {hasChildren && (
+          <div className='ml-4'>
+            {(menu.children as MenuTree[]).map(child => (
+              <SubmenuItemRecursive
+                key={child.id || child.slug}
+                menu={child}
+                isActive={isActive}
+                navigate={navigate}
+                depth={depth + 1}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
 
 const SubmenuComponent = ({ ...rest }) => {
-  const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const [menus] = useMenus();
-  const currentHeaderMenu = useMemo(() => getMenuByUrl(menus, pathname), [menus, pathname]);
+  // Get sidebar menus - these now include children which are the submenus
+  const sidebarMenus = useMenusByType('sidebars');
 
-  const sidebarMenus: MenuTree[] = useMemo(() => {
-    if (currentHeaderMenu?.children) {
-      return currentHeaderMenu.children.filter(menu => !menu.hidden && !menu.disabled);
-    }
-    return [];
-  }, [currentHeaderMenu]);
+  // Memoize path segments to prevent recalculation
+  const pathSegments = useMemo(() => pathSplit(pathname), [pathname]);
+  const [firstPart] = pathSegments;
 
-  const [firstPart, secondPart] = pathSplit(pathname);
-
+  // Updated logic to find submenus from sidebar children
   const submenus = useMemo(() => {
-    const items = sidebarMenus.find(menu => menu.slug === `${firstPart}-${secondPart}`) || {};
-    return items.children || [];
-  }, [sidebarMenus, firstPart, secondPart]);
+    if (!sidebarMenus.length || !firstPart) return [];
 
-  const isActive = useCallback((to: string) => isPathMatching(to, pathname, 3), [pathname]);
+    // Find the current sidebar menu based on path segments
+    const findMatchingMenu = (menus: MenuTree[], targetPath: string): MenuTree | null => {
+      for (const menu of menus) {
+        if (menu.path && isPathMatching(menu.path, targetPath, 2)) {
+          return menu;
+        }
+        // Also check children recursively
+        if (menu.children && Array.isArray(menu.children)) {
+          const found = findMatchingMenu(menu.children as MenuTree[], targetPath);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
 
+    const currentMenu = findMatchingMenu(sidebarMenus, pathname);
+
+    // Return children of the matched menu as submenus
+    return (currentMenu?.children as MenuTree[]) || [];
+  }, [sidebarMenus, pathname, firstPart]);
+
+  const isActive = useCallback((path: string) => isPathMatching(path, pathname, 3), [pathname]);
+
+  const handleNavigate = useCallback(
+    (path: string) => {
+      navigate(path);
+    },
+    [navigate]
+  );
+
+  // Only show submenu if we have submenus to display
   if (!sidebarMenus.length || !submenus.length) {
     return null;
   }
 
-  const renderLink = (link: Menu) => {
-    return isGroup(link) ? (
-      <div
-        className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'
-        key={link.id}
-      >
-        <span className='font-medium'>{t(link.label)}</span>
-        <Button
-          variant='unstyle'
-          size='ratio'
-          className='float-right text-primary-600 p-1'
-          onClick={() => console.log('add events')}
-          // appendIcon={<Icons name='IconPlus' />}
-        />
-      </div>
-    ) : (
-      <Button
-        key={link.id || link.label}
-        variant='link'
-        className={cn(
-          'justify-start my-1 text-wrap text-left text-slate-500 hover:text-slate-600 hover:bg-slate-50',
-          isActive(link.path) &&
-            'text-primary-500 bg-primary-50/65 hover:bg-primary-50/65 hover:text-primary-500'
-        )}
-        onClick={() => navigate(link.path)}
-      >
-        <span>{t(link.label)}</span>
-      </Button>
-    );
-  };
-
   return (
     <ShellSubmenu className='p-5 overflow-auto text-slate-600 font-normal' {...rest}>
-      {submenus.map(link => renderLink(link))}
+      {submenus.map(menu => (
+        <SubmenuItemRecursive
+          key={menu.id || menu.slug}
+          menu={menu}
+          isActive={isActive}
+          navigate={handleNavigate}
+          depth={0}
+        />
+      ))}
     </ShellSubmenu>
   );
 };

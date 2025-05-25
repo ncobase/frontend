@@ -23,6 +23,60 @@ interface MainNavigationProps {
   withSubmenu?: boolean;
 }
 
+const DropdownMenuItems = React.memo(
+  ({
+    menuItems,
+    navigate,
+    t,
+    depth = 0
+  }: {
+    menuItems: MenuTree[];
+    navigate: (_path: string) => void;
+    t: (_key: string) => string;
+    depth?: number;
+  }) => {
+    return (
+      <>
+        {menuItems.map(menu => {
+          const { id, name, slug, path, label, hidden, disabled, children } = menu;
+
+          if (hidden || disabled || isDividerLink({ name, slug, path })) return null;
+
+          const hasChildren = children && Array.isArray(children) && children.length > 0;
+
+          if (hasChildren) {
+            return (
+              <div key={id || label} className='relative'>
+                <DropdownItem className='font-medium cursor-default'>
+                  <span className={depth > 0 ? 'ml-4' : ''}>{t(label || '') || name}</span>
+                </DropdownItem>
+                <div className='ml-2'>
+                  <DropdownMenuItems
+                    menuItems={children as MenuTree[]}
+                    navigate={navigate}
+                    t={t}
+                    depth={depth + 1}
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <DropdownItem
+              key={id || label}
+              onClick={() => path && navigate(path)}
+              className={depth > 0 ? 'ml-4' : ''}
+            >
+              {t(label || '') || name}
+            </DropdownItem>
+          );
+        })}
+      </>
+    );
+  }
+);
+
 export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], withSubmenu }) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
@@ -36,33 +90,30 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     navigate(path);
   };
 
-  const renderMenuItems = (menuItems: MenuTree[]) =>
-    menuItems.map(({ id, name, slug, path, label, hidden, disabled }) => {
-      if (hidden || disabled || isDividerLink({ name, slug, path })) return null;
-      return (
-        <DropdownItem key={id || label} onClick={() => handleLinkClick(path)}>
-          {t(label)}
-        </DropdownItem>
-      );
-    });
+  const renderLink = (menu: MenuTree) => {
+    const { id, path, label, children, hidden, disabled } = menu;
 
-  const renderLink = ({ id, path, label, children, hidden, disabled }: MenuTree) => {
     if (hidden || disabled) return null;
 
-    const handleClick = event => {
+    const handleClick = (event: React.MouseEvent) => {
       event.preventDefault();
-      handleLinkClick(path);
+      if (path) {
+        handleLinkClick(path);
+      }
     };
 
-    if (children && children.length > 0 && withSubmenu) {
-      const menuItems = renderMenuItems(children!);
+    const hasChildren = children && Array.isArray(children) && children.length > 0;
+
+    if (hasChildren && withSubmenu) {
       return (
         <Dropdown key={id || label}>
           <DropdownTrigger className={classes.link} onClick={handleClick}>
-            <span className={classes.linkLabel}>{t(label)}</span>
+            <span className={classes.linkLabel}>{t(label || '') || 'Menu'}</span>
             <Icons name='IconChevronDown' size='0.9rem' />
           </DropdownTrigger>
-          <DropdownContent className='w-32'>{menuItems}</DropdownContent>
+          <DropdownContent className='w-48 max-h-96 overflow-y-auto'>
+            <DropdownMenuItems menuItems={children as MenuTree[]} navigate={navigate} t={t} />
+          </DropdownContent>
         </Dropdown>
       );
     }
@@ -70,17 +121,18 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     return (
       <Button
         key={id || label}
-        title={t(label) as string}
+        title={(t(label || '') || 'Menu') as string}
         variant='unstyle'
-        className={`${classes.link} ${isActive(path) ? classes.linkActive : ''}`}
+        className={`${classes.link} ${isActive(path || '') ? classes.linkActive : ''}`}
         onClick={handleClick}
       >
-        {t(label)}
+        {t(label || '') || 'Menu'}
       </Button>
     );
   };
 
   if (!menus.length) return null;
+
   return (
     <div className={cn('flex-1 flex items-center gap-4 ml-4', classes.links)}>
       {menus.map(renderLink)}

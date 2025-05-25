@@ -1,14 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
-import { useLayoutContext } from './layout.context';
+import { useLayoutContext, NavigationMenus } from './layout.context';
 
 import { PREFERENCES_VIEW_MODE_KEY } from '@/components/preferences';
-import { Menu } from '@/features/system/menu/menu';
+import { MenuTree } from '@/features/system/menu/menu';
 import { useLocalStorage } from '@/hooks/use_local_storage';
 
 /**
  * set focus mode
- * @param enabled {boolean}
  */
 export const useFocusMode = (enabled = true) => {
   const { setIsFocusMode = () => {} } = useLayoutContext();
@@ -21,19 +20,16 @@ export const useFocusMode = (enabled = true) => {
 
 /**
  * set page view mode
- * @param vmode {('modal' | 'flatten')}
  */
 export const useVmode = (vmode: 'modal' | 'flatten') => {
   const { setVmode = () => {} } = useLayoutContext();
   const { setValue: setPreferredViewMode } = useLocalStorage(PREFERENCES_VIEW_MODE_KEY, null);
 
   useEffect(() => {
-    // Update both context and stored preference
     setVmode(vmode);
     setPreferredViewMode(vmode);
 
     return () => {
-      // Reset to flatten on unmount
       setVmode('flatten');
       setPreferredViewMode('flatten');
     };
@@ -41,13 +37,55 @@ export const useVmode = (vmode: 'modal' | 'flatten') => {
 };
 
 /**
- * set page header menus
- * @param menus {Menu[]}
+ * Get menu groups by type
  */
-export const useMenus = (): [Menu[], (_menus: Menu[]) => void] => {
+export const useNavigationMenus = (): [NavigationMenus, (_groups: NavigationMenus) => void] => {
+  const { navigationMenus, setNavigationMenus } = useLayoutContext();
+
+  if (!setNavigationMenus) {
+    throw new Error('setNavigationMenus function is not provided');
+  }
+
+  // Create a stable callback that doesn't change on every render
+  const stableSetNavigationMenus = useCallback(
+    (groups: NavigationMenus) => {
+      setNavigationMenus(groups);
+    },
+    [setNavigationMenus]
+  );
+
+  return [navigationMenus || ({} as NavigationMenus), stableSetNavigationMenus];
+};
+
+/**
+ * Get specific menu type
+ */
+export const useMenusByType = (type: keyof NavigationMenus): MenuTree[] => {
+  const [navigationMenus] = useNavigationMenus();
+
+  // Use callback to ensure stable reference and prevent unnecessary re-renders
+  return useCallback(() => {
+    return navigationMenus[type] || [];
+  }, [navigationMenus, type])();
+};
+
+/**
+ * Get all menus flattened (for backward compatibility)
+ */
+export const useMenus = (): [MenuTree[], (_menus: MenuTree[]) => void] => {
   const { menus, setMenus } = useLayoutContext();
+
   if (!setMenus) {
     throw new Error('setMenus function is not provided');
   }
-  return [menus || [], setMenus];
+
+  // Create stable callback
+  const stableSetMenus = useCallback(
+    (newMenus: MenuTree[]) => {
+      setMenus(newMenus);
+    },
+    [setMenus]
+  );
+
+  return [menus || [], stableSetMenus];
 };

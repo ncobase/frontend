@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
+import React from 'react';
 
 import { Dropdown, DropdownContent, DropdownItem, DropdownTrigger, Icons } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { useMenus } from '../layout.hooks';
+import { useMenusByType } from '../layout.hooks';
 
 import versionInfo from '@/../version.json';
 import { AvatarButton } from '@/components/avatar/avatar_button';
@@ -13,23 +14,7 @@ import { useAccount } from '@/features/account/service';
 import { MenuTree } from '@/features/system/menu/menu';
 import { useCopyToClipboard } from '@/hooks/use_copy_to_clipboard';
 
-// const AdminMenu = ({ isAdmin = false }) => {
-//   const { t } = useTranslation();
-//   const navigate = useNavigate();
-
-//   if (!isAdmin) return null;
-
-//   return (
-//     <>
-//       <DropdownItem onClick={() => navigate('/system/tenant')}>
-//         <Icons name='IconBuilding' className='-ml-0.5 mr-2.5' />
-//         {t('system.navigation')}
-//       </DropdownItem>
-//     </>
-//   );
-// };
-
-const AppVersion = () => {
+const AppVersion = React.memo(() => {
   const { t } = useTranslation();
   const { copied, copy } = useCopyToClipboard();
 
@@ -50,36 +35,82 @@ const AppVersion = () => {
       {copied ? t('actions.copied') : versionInfo?.version}
     </DropdownItem>
   );
-};
+});
+
+// Recursive menu renderer for account dropdown - memoized
+const AccountMenuItems = React.memo(
+  ({
+    menuItems,
+    navigate,
+    t,
+    depth = 0
+  }: {
+    menuItems: MenuTree[];
+    navigate: (_path: string) => void;
+    t: (_key: string) => string;
+    depth?: number;
+  }) => {
+    return (
+      <>
+        {menuItems.map(menu => {
+          if (menu.hidden || menu.disabled) return null;
+
+          const hasChildren =
+            menu.children && Array.isArray(menu.children) && menu.children.length > 0;
+
+          if (hasChildren) {
+            return (
+              <div key={menu.id || menu.label}>
+                <DropdownItem className='font-medium cursor-default'>
+                  {menu.icon && <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />}
+                  {t(menu.label || '') || menu.name}
+                </DropdownItem>
+                <div className='ml-4'>
+                  <AccountMenuItems
+                    menuItems={menu.children as MenuTree[]}
+                    navigate={navigate}
+                    t={t}
+                    depth={depth + 1}
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <DropdownItem
+              key={menu.id || menu.label}
+              onClick={() => menu.path && navigate(menu.path)}
+              className={depth > 0 ? 'ml-4' : ''}
+            >
+              {menu.icon && <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />}
+              {t(menu.label || '') || menu.name}
+            </DropdownItem>
+          );
+        })}
+      </>
+    );
+  }
+);
 
 export const AccountDropdown = ({ ...rest }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, profile, isLoading } = useAccount();
 
-  const [menus] = useMenus();
-  const accountMenus = useMemo(() => menus.filter(menu => menu.type === 'account'), [menus]);
+  // Get account menus - memoized to prevent unnecessary recalculations
+  const accountMenus = useMenusByType('accounts');
 
-  const renderMenuDropdown = (menuItems: MenuTree[]) => {
-    const visibleItems = menuItems.filter(item => !item.hidden || item.disabled);
-    if (!visibleItems.length) return null;
+  const renderMenuDropdown = useMemo(() => {
+    const visibleItems = accountMenus.filter(item => !item.hidden && !item.disabled);
+
     return (
       <DropdownContent align='end' alignOffset={-16}>
-        {/* <AdminMenu isAdmin={isAdministered} /> */}
-        {visibleItems.map(renderLink)}
+        <AccountMenuItems menuItems={visibleItems} navigate={navigate} t={t} />
         <AppVersion />
       </DropdownContent>
     );
-  };
-
-  const renderLink = (menu: MenuTree) => {
-    return (
-      <DropdownItem onClick={() => navigate(menu.path)} key={menu.id || menu.label}>
-        <Icons name={menu.icon} className='-ml-0.5 mr-2.5' />
-        {t(menu.label) || menu.name}
-      </DropdownItem>
-    );
-  };
+  }, [accountMenus, navigate, t]);
 
   return (
     <Dropdown {...rest}>
@@ -91,7 +122,7 @@ export const AccountDropdown = ({ ...rest }) => {
           alt={profile?.display_name || user?.username || ''}
         />
       </DropdownTrigger>
-      {renderMenuDropdown(accountMenus)}
+      {renderMenuDropdown}
     </Dropdown>
   );
 };

@@ -12,8 +12,8 @@ export interface Menu {
   order?: number;
   disabled?: boolean;
   extras?: object | object[] | null;
-  parent?: string;
-  tenant?: string;
+  parent_id?: string;
+  tenant_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;
@@ -21,7 +21,15 @@ export interface Menu {
 }
 
 export interface MenuTree extends Menu {
-  children?: Menu[];
+  children?: MenuTree[];
+}
+
+// Navigation menus
+export interface NavigationMenus {
+  headers: MenuTree[];
+  sidebars: MenuTree[];
+  accounts: MenuTree[];
+  tenants: MenuTree[];
 }
 
 export interface MenuTrees {

@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
-import { Menu } from '@/features/system/menu/menu';
+import { NavigationMenus, MenuTree } from '@/features/system/menu/menu';
+export type { NavigationMenus } from '@/features/system/menu/menu';
 
 export interface LayoutContextValue {
   /**
@@ -9,27 +10,30 @@ export interface LayoutContextValue {
   vmode?: 'modal' | 'flatten';
   /**
    * set page view mode
-   * @param vmode page view mode
-   * @returns {void}
    */
   setVmode?: (_vmode: 'modal' | 'flatten') => void;
   /**
-   * set page menus
-   * @param menus {Menu[]}
+   * grouped navigation menus
    */
-  menus?: Menu[];
+  navigationMenus?: NavigationMenus;
   /**
-   * set page menus
-   * @param menus {Menu[]}
+   * set grouped navigation menus
    */
-  setMenus?: (_menus: Menu[]) => void;
+  setNavigationMenus?: (_groups: NavigationMenus) => void;
+  /**
+   * all menus flattened
+   */
+  menus?: MenuTree[];
+  /**
+   * set all menus
+   */
+  setMenus?: (_menus: MenuTree[]) => void;
   /**
    * focus mode
    */
   isFocusMode: boolean;
   /**
    * set focus mode
-   * @param isFocusMode focus mode
    */
   setIsFocusMode: React.Dispatch<React.SetStateAction<boolean>> | undefined;
 }

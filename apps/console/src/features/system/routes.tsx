@@ -2,6 +2,7 @@ import { BasicRoutes } from './basic/routes';
 import { DictionaryRoutes } from './dictionary/routes';
 import { GroupRoutes } from './group/routes';
 import { MenuRoutes } from './menu/routes';
+import OptionsRoutes from './options/routes';
 import { PermissionRoutes } from './permission/routes';
 import { RoleRoutes } from './role/routes';
 import { TenantRoutes } from './tenant/routes';
@@ -18,7 +19,8 @@ export const SystemRoutes = () => {
     { path: 'menu/*', element: <MenuRoutes /> },
     { path: 'role/*', element: <RoleRoutes /> },
     { path: 'tenant/*', element: <TenantRoutes /> },
-    { path: 'basic/*', element: <Guard super children={<BasicRoutes />} /> }
+    { path: 'basic/*', element: <Guard super children={<BasicRoutes />} /> },
+    { path: 'options/*', element: <OptionsRoutes /> }
   ];
   return renderRoutes(routes);
 };
