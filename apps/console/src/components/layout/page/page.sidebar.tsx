@@ -18,6 +18,7 @@ import { useMenusByType } from '../layout.hooks';
 
 import { isDividerLink, isGroup } from './page.helper';
 
+import { useMenuPermissions } from '@/features/account/permissions';
 import { MenuTree } from '@/features/system/menu/menu';
 import { useLocalStorage } from '@/hooks/use_local_storage';
 
@@ -32,7 +33,8 @@ const MenuItemRecursive = React.memo(
     depth = 0,
     expandedAccordions,
     toggleAccordion,
-    collapseAll
+    collapseAll,
+    canAccessMenu
   }: {
     menu: MenuTree;
     isActive: (_path: string) => boolean;
@@ -42,8 +44,14 @@ const MenuItemRecursive = React.memo(
     expandedAccordions: Record<string, boolean>;
     toggleAccordion: (_id: string) => void;
     collapseAll: () => void;
+    canAccessMenu: (_menu: MenuTree) => boolean;
   }) => {
     const { t } = useTranslation();
+
+    // Permission check
+    if (!canAccessMenu(menu)) {
+      return null;
+    }
 
     if (isDividerLink(menu)) {
       return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
@@ -57,10 +65,12 @@ const MenuItemRecursive = React.memo(
       );
     }
 
-    // Check if menu has children
-    const hasChildren = menu.children && Array.isArray(menu.children) && menu.children.length > 0;
+    // Check accessible children
+    const accessibleChildren =
+      menu.children?.filter(child => canAccessMenu(child as MenuTree)) || [];
+    const hasAccessibleChildren = accessibleChildren.length > 0;
 
-    if (hasChildren) {
+    if (hasAccessibleChildren) {
       return (
         <Accordion
           type='single'
@@ -86,10 +96,10 @@ const MenuItemRecursive = React.memo(
               </div>
             </AccordionTrigger>
             <AccordionContent className='py-0 bg-slate-50/30 rounded-none'>
-              {(menu.children as MenuTree[])?.map(child => (
+              {accessibleChildren.map(child => (
                 <MenuItemRecursive
                   key={child.id || child.slug}
-                  menu={child}
+                  menu={child as MenuTree}
                   isActive={isActive}
                   handleLinkClick={handleLinkClick}
                   depth={depth + 1}
@@ -97,6 +107,7 @@ const MenuItemRecursive = React.memo(
                   expandedAccordions={expandedAccordions}
                   toggleAccordion={toggleAccordion}
                   collapseAll={collapseAll}
+                  canAccessMenu={canAccessMenu}
                 />
               ))}
             </AccordionContent>
@@ -141,13 +152,20 @@ const CollapsedMenuItem = React.memo(
   ({
     menu,
     isActive,
-    handleLinkClick
+    handleLinkClick,
+    canAccessMenu
   }: {
     menu: MenuTree;
     isActive: (_path: string) => boolean;
     handleLinkClick: (_menu: MenuTree) => void;
+    canAccessMenu: (_menu: MenuTree) => boolean;
   }) => {
     const { t } = useTranslation();
+
+    // Permission check
+    if (!canAccessMenu(menu)) {
+      return null;
+    }
 
     if (isDividerLink(menu)) {
       return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
@@ -184,8 +202,9 @@ const SidebarComponent: React.FC<{
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  // Get sidebar menus
+  // Get sidebar menus and permission check
   const sidebarMenus = useMenusByType('sidebars');
+  const { canAccessMenu, filterMenuTree } = useMenuPermissions();
 
   const { storedValue: expandedAccordions, setValue: setExpandedAccordions } = useLocalStorage<
     Record<string, boolean>
@@ -198,7 +217,7 @@ const SidebarComponent: React.FC<{
         [id]: !expandedAccordions[id]
       });
     },
-    [setExpandedAccordions]
+    [expandedAccordions, setExpandedAccordions]
   );
 
   const collapseAll = useCallback(() => {
@@ -209,37 +228,40 @@ const SidebarComponent: React.FC<{
     setExpandedAccordions(newState);
   }, [expandedAccordions, setExpandedAccordions]);
 
-  // Find current sidebar menus based on current path
+  // Filter menus by permission and current path
   const currentPath = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
 
-  const currentSidebarMenus = useMemo(() => {
-    if (currentPath.length === 0 || !sidebarMenus.length) return sidebarMenus;
+  const filteredSidebarMenus = useMemo(() => {
+    // Apply permission filtering first
+    const permissionFiltered = filterMenuTree(sidebarMenus);
 
-    // Try to find menus that match the current path
-    const matchingMenus = sidebarMenus.filter(menu => {
+    if (currentPath.length === 0) return permissionFiltered;
+
+    // Then filter by current path for context
+    const pathFiltered = permissionFiltered.filter(menu => {
       if (!menu.path) return false;
       const menuPath = menu.path.split('/').filter(Boolean);
       return menuPath.length > 0 && currentPath[0] === menuPath[0];
     });
 
-    return matchingMenus.length > 0 ? matchingMenus : sidebarMenus;
-  }, [sidebarMenus, currentPath]);
+    return pathFiltered.length > 0 ? pathFiltered : permissionFiltered;
+  }, [sidebarMenus, currentPath, filterMenuTree]);
 
   const isActive = useCallback((path: string) => isPathMatching(path, pathname, 2), [pathname]);
 
   const handleLinkClick = useCallback(
     (menu: MenuTree) => {
-      if (menu.path) {
+      if (menu.path && canAccessMenu(menu)) {
         navigate(menu.path);
       }
     },
-    [navigate]
+    [navigate, canAccessMenu]
   );
 
   return (
     <ShellSidebar className='flex flex-col' navId='app-sidebar'>
       <div className='flex-1 flex flex-col items-center overflow-y-auto'>
-        {currentSidebarMenus.map((menu: MenuTree) =>
+        {filteredSidebarMenus.map((menu: MenuTree) =>
           expanded ? (
             <MenuItemRecursive
               key={menu.id || menu.slug}
@@ -250,6 +272,7 @@ const SidebarComponent: React.FC<{
               expandedAccordions={expandedAccordions}
               toggleAccordion={toggleAccordion}
               collapseAll={collapseAll}
+              canAccessMenu={canAccessMenu}
             />
           ) : (
             <CollapsedMenuItem
@@ -257,6 +280,7 @@ const SidebarComponent: React.FC<{
               menu={menu}
               isActive={isActive}
               handleLinkClick={handleLinkClick}
+              canAccessMenu={canAccessMenu}
             />
           )
         )}

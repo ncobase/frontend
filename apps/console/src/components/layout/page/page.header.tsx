@@ -11,6 +11,7 @@ import { Logo } from '@/components/logo';
 import { Notifications, NotificationItem } from '@/components/notifications/notification';
 import { Preferences } from '@/components/preferences';
 import { Search } from '@/components/search/search';
+import { useMenuPermissions } from '@/features/account/permissions';
 import { useQueryNavigationMenus } from '@/features/system/menu/service';
 
 const HeaderComponent = ({ ...rest }) => {
@@ -21,17 +22,27 @@ const HeaderComponent = ({ ...rest }) => {
   const [pushEnabled, setPushEnabled] = useState(true);
   const [isMenusSet, setIsMenusSet] = useState(false);
 
+  // Get permissions hook
+  const { filterMenuTree, canAccessMenu } = useMenuPermissions();
+
   useEffect(() => {
     if (menuTreeData && typeof menuTreeData === 'object' && !isMenusSet) {
-      // Handle all menu categories
-      const newGroups = {
-        headers: menuTreeData.headers || [],
-        sidebars: menuTreeData.sidebars || [],
-        accounts: menuTreeData.accounts || [],
-        tenants: menuTreeData.tenants || []
-      };
-      setNavigationMenus(newGroups);
-      setIsMenusSet(true);
+      try {
+        // Use the filterMenuTree function to apply permissions
+        const filteredGroups = {
+          headers: filterMenuTree(menuTreeData.headers || []),
+          sidebars: filterMenuTree(menuTreeData.sidebars || []),
+          accounts: filterMenuTree(menuTreeData.accounts || []),
+          tenants: filterMenuTree(menuTreeData.tenants || [])
+        };
+
+        setNavigationMenus(filteredGroups);
+        setIsMenusSet(true);
+      } catch (filterError) {
+        console.error('Error applying menu permissions:', filterError);
+        toast.error(t('menu.permission_filter_error', 'Failed to apply menu permissions'));
+        setIsMenusSet(true);
+      }
     }
 
     if (error && !isMenusSet) {
@@ -39,7 +50,7 @@ const HeaderComponent = ({ ...rest }) => {
       toast.error(t('menu.load_error', 'Failed to load navigation menu'));
       setIsMenusSet(true);
     }
-  }, [menuTreeData, error, setNavigationMenus, toast, t, isMenusSet]);
+  }, [menuTreeData, error, setNavigationMenus, toast, t, isMenusSet, filterMenuTree]);
 
   useEffect(() => {
     if (!menuTreeData && !isLoading) {
@@ -47,11 +58,13 @@ const HeaderComponent = ({ ...rest }) => {
     }
   }, [menuTreeData, isLoading]);
 
-  // Get header menus from the grouped structure
+  // Get header menus with additional permission check
   const headerMenus = useMemo(() => {
     if (!navigationMenus.headers) return [];
-    return navigationMenus.headers.filter(menu => !menu.hidden && !menu.disabled);
-  }, [navigationMenus.headers]);
+    return navigationMenus.headers.filter(
+      menu => !menu.hidden && !menu.disabled && canAccessMenu(menu) // Add permission check
+    );
+  }, [navigationMenus.headers, canAccessMenu]);
 
   const notifications = useMemo<NotificationItem[]>(
     () => [
