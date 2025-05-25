@@ -31,6 +31,7 @@ export const CreateDictionaryForms = ({ onSubmit, control, errors }) => {
       placeholder: 'dictionary-key',
       type: 'text',
       rules: {
+        required: t('forms.input_required'),
         pattern: {
           value: /^[a-z0-9-_]+$/,
           message: 'Slug can only contain lowercase letters, numbers, hyphens and underscores'
@@ -47,6 +48,9 @@ export const CreateDictionaryForms = ({ onSubmit, control, errors }) => {
         { label: t('dictionary.types.enum', 'Enumeration'), value: 'enum' },
         { label: t('dictionary.types.constant', 'Constant'), value: 'constant' },
         { label: t('dictionary.types.template', 'Template'), value: 'template' },
+        { label: t('dictionary.types.string', 'String'), value: 'string' },
+        { label: t('dictionary.types.number', 'Number'), value: 'number' },
+        { label: t('dictionary.types.object', 'Object'), value: 'object' },
         { label: t('dictionary.types.other', 'Other'), value: 'other' }
       ],
       rules: { required: t('forms.select_required') }
@@ -55,10 +59,26 @@ export const CreateDictionaryForms = ({ onSubmit, control, errors }) => {
       title: t('dictionary.fields.value', 'Value'),
       name: 'value',
       defaultValue: '',
-      placeholder: 'Enter value (can be JSON, string, number, etc.)',
+      placeholder: 'Enter value (JSON format for object/enum types)',
       type: 'textarea',
       className: 'col-span-full',
-      rules: { required: t('forms.input_required') }
+      rules: {
+        required: t('forms.input_required'),
+        validate: {
+          validJson: value => {
+            const type = control._formValues?.type;
+            if (['object', 'enum'].includes(type)) {
+              try {
+                JSON.parse(value);
+                return true;
+              } catch {
+                return 'Must be valid JSON for object/enum types';
+              }
+            }
+            return true;
+          }
+        }
+      }
     },
     {
       title: t('dictionary.fields.description', 'Description'),
@@ -76,7 +96,7 @@ export const CreateDictionaryForms = ({ onSubmit, control, errors }) => {
     },
     {
       title: 'Tenant ID',
-      name: 'tenant',
+      name: 'tenant_id',
       defaultValue: tenant_id,
       type: 'hidden'
     }

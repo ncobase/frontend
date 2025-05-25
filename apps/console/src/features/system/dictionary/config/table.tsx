@@ -36,7 +36,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: t('dictionary.fields.value', 'Value'),
       accessorKey: 'value',
-      parser: (value: string) => renderDictionaryValue(value),
+      parser: (value: string, record: Dictionary) => renderDictionaryValue(value, record.type),
       icon: 'IconCode'
     },
     {
@@ -79,7 +79,6 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
           title: t('actions.duplicate', 'Duplicate'),
           icon: 'IconCopy',
           onClick: (record: Dictionary) => {
-            // Create a copy without ID for duplication
             const duplicateRecord = {
               ...record,
               id: undefined,
@@ -92,7 +91,27 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.export', 'Export'),
           icon: 'IconDownload',
-          onClick: () => console.log('export dictionary')
+          onClick: (record: Dictionary) => {
+            const dataStr = JSON.stringify(record, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `dictionary-${record.slug}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+          }
+        },
+        {
+          title: t('actions.validate', 'Validate'),
+          icon: 'IconShieldCheck',
+          onClick: (record: Dictionary) => {
+            if (record.type === 'enum') {
+              console.log('Open enum validation dialog for:', record.slug);
+            } else {
+              console.log('Validation not available for type:', record.type);
+            }
+          }
         },
         {
           title: t('actions.delete', 'Delete'),
@@ -113,6 +132,9 @@ const renderDictionaryType = (type: string) => {
     enum: 'bg-green-100 text-green-800',
     constant: 'bg-purple-100 text-purple-800',
     template: 'bg-orange-100 text-orange-800',
+    string: 'bg-cyan-100 text-cyan-800',
+    number: 'bg-yellow-100 text-yellow-800',
+    object: 'bg-pink-100 text-pink-800',
     other: 'bg-slate-100 text-slate-800'
   };
 
@@ -121,6 +143,9 @@ const renderDictionaryType = (type: string) => {
     enum: 'IconList',
     constant: 'IconLock',
     template: 'IconTemplate',
+    string: 'IconText',
+    number: 'IconNumbers',
+    object: 'IconBraces',
     other: 'IconHelp'
   };
 
@@ -137,19 +162,23 @@ const renderDictionaryType = (type: string) => {
 };
 
 // Dictionary value rendering helper
-const renderDictionaryValue = (value: string) => {
+const renderDictionaryValue = (value: string, type: string) => {
   if (!value) return '-';
 
-  // Try to detect if it's JSON
   let displayValue = value;
   let isJson = false;
 
-  try {
-    JSON.parse(value);
-    isJson = true;
-    displayValue = value.length > 50 ? `${value.substring(0, 50)}...` : value;
-  } catch {
-    // Not JSON, display as plain text
+  // Check if it's JSON-like type
+  if (['object', 'enum'].includes(type)) {
+    try {
+      JSON.parse(value);
+      isJson = true;
+      displayValue = value.length > 50 ? `${value.substring(0, 50)}...` : value;
+    } catch {
+      // Not valid JSON, treat as string
+      displayValue = value.length > 50 ? `${value.substring(0, 50)}...` : value;
+    }
+  } else {
     displayValue = value.length > 50 ? `${value.substring(0, 50)}...` : value;
   }
 

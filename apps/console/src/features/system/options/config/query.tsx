@@ -4,10 +4,10 @@ import { Control, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 export type QueryFormParams = {
-  search?: string;
-  type?: string;
-  slug?: string;
   name?: string;
+  type?: string;
+  autoload?: boolean;
+  prefix?: string;
 } & PaginationParams;
 
 export const queryFields = ({
@@ -18,16 +18,16 @@ export const queryFields = ({
   const { t } = useTranslation();
   return [
     {
-      name: 'search',
-      label: t('dictionary.fields.search', 'Search'),
+      name: 'name',
+      label: t('options.fields.name', 'Name'),
       component: (
         <Controller
-          name='search'
+          name='name'
           control={queryControl}
           defaultValue=''
           render={({ field }) => (
             <InputField
-              placeholder={t('dictionary.placeholders.search', 'Search by name or description')}
+              placeholder={t('options.placeholders.name', 'Search by name')}
               prependIcon='IconSearch'
               className='py-1.5'
               {...field}
@@ -37,26 +37,8 @@ export const queryFields = ({
       )
     },
     {
-      name: 'name',
-      label: t('dictionary.fields.name', 'Name'),
-      component: (
-        <Controller
-          name='name'
-          control={queryControl}
-          defaultValue=''
-          render={({ field }) => (
-            <InputField
-              placeholder={t('dictionary.placeholders.name', 'Filter by name')}
-              className='py-1.5'
-              {...field}
-            />
-          )}
-        />
-      )
-    },
-    {
       name: 'type',
-      label: t('dictionary.fields.type', 'Type'),
+      label: t('options.fields.type', 'Type'),
       component: (
         <Controller
           name='type'
@@ -66,14 +48,11 @@ export const queryFields = ({
             <SelectField
               allowClear
               options={[
-                { label: t('dictionary.types.config', 'Configuration'), value: 'config' },
-                { label: t('dictionary.types.enum', 'Enumeration'), value: 'enum' },
-                { label: t('dictionary.types.constant', 'Constant'), value: 'constant' },
-                { label: t('dictionary.types.template', 'Template'), value: 'template' },
-                { label: t('dictionary.types.string', 'String'), value: 'string' },
-                { label: t('dictionary.types.number', 'Number'), value: 'number' },
-                { label: t('dictionary.types.object', 'Object'), value: 'object' },
-                { label: t('dictionary.types.other', 'Other'), value: 'other' }
+                { label: t('options.types.string', 'String'), value: 'string' },
+                { label: t('options.types.number', 'Number'), value: 'number' },
+                { label: t('options.types.boolean', 'Boolean'), value: 'boolean' },
+                { label: t('options.types.object', 'Object'), value: 'object' },
+                { label: t('options.types.array', 'Array'), value: 'array' }
               ]}
               className='[&>button]:py-1.5'
               {...field}
@@ -83,16 +62,38 @@ export const queryFields = ({
       )
     },
     {
-      name: 'slug',
-      label: t('dictionary.fields.slug', 'Slug'),
+      name: 'autoload',
+      label: t('options.fields.autoload', 'Autoload'),
       component: (
         <Controller
-          name='slug'
+          name='autoload'
+          control={queryControl}
+          defaultValue=''
+          render={({ field }) => (
+            <SelectField
+              allowClear
+              options={[
+                { label: t('common.yes', 'Yes'), value: true },
+                { label: t('common.no', 'No'), value: false }
+              ]}
+              className='[&>button]:py-1.5'
+              {...field}
+            />
+          )}
+        />
+      )
+    },
+    {
+      name: 'prefix',
+      label: t('options.fields.prefix', 'Prefix'),
+      component: (
+        <Controller
+          name='prefix'
           control={queryControl}
           defaultValue=''
           render={({ field }) => (
             <InputField
-              placeholder={t('dictionary.placeholders.slug', 'Filter by slug')}
+              placeholder={t('options.placeholders.prefix', 'Filter by name prefix')}
               className='py-1.5'
               {...field}
             />
