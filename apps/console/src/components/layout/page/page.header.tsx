@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ShellHeader, useToastMessage } from '@ncobase/react';
+import { Button, Icons, ShellHeader, useToastMessage } from '@ncobase/react';
+import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useNavigationMenus } from '../layout.hooks';
@@ -14,7 +15,16 @@ import { Search } from '@/components/search/search';
 import { useMenuPermissions } from '@/features/account/permissions';
 import { useQueryNavigationMenus } from '@/features/system/menu/service';
 
-const HeaderComponent = ({ ...rest }) => {
+interface HeaderComponentProps {
+  onMobileMenuToggle?: () => void;
+  showMobileMenuButton?: boolean;
+}
+
+const HeaderComponent = ({
+  onMobileMenuToggle,
+  showMobileMenuButton,
+  ...rest
+}: HeaderComponentProps) => {
   const { t } = useTranslation();
   const [navigationMenus, setNavigationMenus] = useNavigationMenus();
   const { data: menuTreeData, isLoading, error } = useQueryNavigationMenus();
@@ -22,13 +32,11 @@ const HeaderComponent = ({ ...rest }) => {
   const [pushEnabled, setPushEnabled] = useState(true);
   const [isMenusSet, setIsMenusSet] = useState(false);
 
-  // Get permissions hook
   const { filterMenuTree, canAccessMenu } = useMenuPermissions();
 
   useEffect(() => {
     if (menuTreeData && typeof menuTreeData === 'object' && !isMenusSet) {
       try {
-        // Use the filterMenuTree function to apply permissions
         const filteredGroups = {
           headers: filterMenuTree(menuTreeData.headers || []),
           sidebars: filterMenuTree(menuTreeData.sidebars || []),
@@ -58,11 +66,10 @@ const HeaderComponent = ({ ...rest }) => {
     }
   }, [menuTreeData, isLoading]);
 
-  // Get header menus with additional permission check
   const headerMenus = useMemo(() => {
     if (!navigationMenus.headers) return [];
     return navigationMenus.headers.filter(
-      menu => !menu.hidden && !menu.disabled && canAccessMenu(menu) // Add permission check
+      menu => !menu.hidden && !menu.disabled && canAccessMenu(menu)
     );
   }, [navigationMenus.headers, canAccessMenu]);
 
@@ -117,11 +124,83 @@ const HeaderComponent = ({ ...rest }) => {
         className='flex items-center justify-between bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
         {...rest}
       >
-        <div className='inline-flex items-center justify-start'>
+        <div className='flex items-center flex-shrink-0'>
           <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
-          <div className='ml-4 text-white/60 text-sm'>Loading navigation...</div>
+          <div className='ml-4 text-white/60 text-sm hidden sm:block'>Loading navigation...</div>
         </div>
-        <div className='inline-flex items-center px-4 gap-x-3'>
+
+        <div className='flex items-center gap-x-2 sm:gap-x-3 flex-shrink-0 px-4 ml-auto'>
+          {showMobileMenuButton && (
+            <Button
+              variant='unstyle'
+              size='sm'
+              className='md:hidden text-white/70 hover:text-white p-2'
+              onClick={onMobileMenuToggle}
+              aria-label='Toggle mobile menu'
+            >
+              <Icons name='IconMenu2' size='1.25rem' />
+            </Button>
+          )}
+
+          <div className='hidden md:flex items-center gap-x-3'>
+            <Search />
+            <LanguageSwitcher />
+            <Preferences />
+            <Notifications
+              items={notifications}
+              onMarkAllAsRead={handleMarkAllAsRead}
+              onTogglePushSettings={handleTogglePushSettings}
+              pushEnabled={pushEnabled}
+            />
+            <TenantDropdown />
+          </div>
+
+          <AccountDropdown />
+        </div>
+      </ShellHeader>
+    );
+  }
+
+  return (
+    <ShellHeader
+      className='flex items-center bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
+      {...rest}
+    >
+      <div className='flex items-center flex-shrink-0'>
+        <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
+      </div>
+
+      <div className='hidden md:flex flex-1 min-w-0 overflow-hidden'>
+        {headerMenus.length > 0 && <MainNavigation menus={headerMenus} withSubmenu />}
+      </div>
+
+      <div className='flex items-center gap-x-2 sm:gap-x-3 flex-shrink-0 px-4 ml-auto'>
+        {showMobileMenuButton && (
+          <Button
+            variant='unstyle'
+            size='sm'
+            className={cn(
+              'md:hidden text-white/70 hover:text-white p-2',
+              'hover:bg-white/10 rounded-md transition-colors'
+            )}
+            onClick={onMobileMenuToggle}
+            aria-label='Toggle mobile menu'
+          >
+            <Icons name='IconMenu2' size='1.25rem' />
+          </Button>
+        )}
+        <div className='hidden sm:flex md:hidden items-center gap-x-3'>
+          <LanguageSwitcher />
+          <Notifications
+            items={notifications}
+            onMarkAllAsRead={handleMarkAllAsRead}
+            onTogglePushSettings={handleTogglePushSettings}
+            pushEnabled={pushEnabled}
+          />
+          <TenantDropdown />
+        </div>
+
+        <div className='hidden md:flex items-center gap-x-3'>
           <Search />
           <LanguageSwitcher />
           <Preferences />
@@ -132,32 +211,7 @@ const HeaderComponent = ({ ...rest }) => {
             pushEnabled={pushEnabled}
           />
           <TenantDropdown />
-          <AccountDropdown />
         </div>
-      </ShellHeader>
-    );
-  }
-
-  return (
-    <ShellHeader
-      className='flex items-center justify-between bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
-      {...rest}
-    >
-      <div className='inline-flex items-center justify-start'>
-        <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
-        {headerMenus.length > 0 && <MainNavigation menus={headerMenus} withSubmenu />}
-      </div>
-      <div className='inline-flex items-center px-4 gap-x-3'>
-        <Search />
-        <LanguageSwitcher />
-        <Preferences />
-        <Notifications
-          items={notifications}
-          onMarkAllAsRead={handleMarkAllAsRead}
-          onTogglePushSettings={handleTogglePushSettings}
-          pushEnabled={pushEnabled}
-        />
-        <TenantDropdown />
         <AccountDropdown />
       </div>
     </ShellHeader>

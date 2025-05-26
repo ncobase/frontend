@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 
 import {
   Button,
@@ -81,6 +81,97 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const activeMenuRef = useRef<HTMLButtonElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [showScrollButtons, setShowScrollButtons] = useState(false);
+
+  // Auto scroll to active menu when visible
+  const scrollToActiveMenu = useCallback(() => {
+    const container = scrollContainerRef.current;
+    const activeMenu = activeMenuRef.current;
+
+    if (!container || !activeMenu) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const activeRect = activeMenu.getBoundingClientRect();
+
+    // Calculate relative position within scroll container
+    const activeLeft = activeRect.left - containerRect.left + container.scrollLeft;
+    const activeRight = activeLeft + activeRect.width;
+
+    const containerWidth = container.clientWidth;
+    const scrollLeft = container.scrollLeft;
+    const scrollRight = scrollLeft + containerWidth;
+
+    // Check if active menu is not fully visible
+    if (activeLeft < scrollLeft || activeRight > scrollRight) {
+      // Center the active menu in container
+      const targetScroll = activeLeft - (containerWidth - activeRect.width) / 2;
+
+      container.scrollTo({
+        left: Math.max(0, Math.min(targetScroll, container.scrollWidth - containerWidth)),
+        behavior: 'smooth'
+      });
+    }
+  }, []);
+
+  // Check scroll state and update button visibility
+  const checkScrollState = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    setCanScrollLeft(scrollLeft > 5);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    setShowScrollButtons(scrollWidth > clientWidth);
+  }, []);
+
+  // Setup scroll and resize listeners
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => checkScrollState();
+    const handleResize = () => setTimeout(checkScrollState, 100);
+
+    checkScrollState();
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [checkScrollState, menus]);
+
+  // Auto scroll to active menu when route changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollToActiveMenu();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [pathname, scrollToActiveMenu]);
+
+  // Manual scroll handler
+  const scroll = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const containerWidth = container.clientWidth;
+    const scrollAmount = containerWidth * 0.7;
+    const targetScroll =
+      direction === 'left'
+        ? Math.max(0, container.scrollLeft - scrollAmount)
+        : Math.min(container.scrollWidth - containerWidth, container.scrollLeft + scrollAmount);
+
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
+  };
 
   const isActive = (to: string) => {
     return isPathMatching(to, pathname);
@@ -103,7 +194,9 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     };
 
     const hasChildren = children && Array.isArray(children) && children.length > 0;
+    const isMenuActive = isActive(path || '');
 
+    // Render dropdown for menu with children
     if (hasChildren && withSubmenu) {
       return (
         <Dropdown key={id || label}>
@@ -118,12 +211,14 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
       );
     }
 
+    // Render regular menu button
     return (
       <Button
         key={id || label}
+        ref={isMenuActive ? activeMenuRef : undefined}
         title={(t(label || '') || 'Menu') as string}
         variant='unstyle'
-        className={`${classes.link} ${isActive(path || '') ? classes.linkActive : ''}`}
+        className={`${classes.link} ${isMenuActive ? classes.linkActive : ''} flex-shrink-0`}
         onClick={handleClick}
       >
         {t(label || '') || 'Menu'}
@@ -134,8 +229,57 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
   if (!menus.length) return null;
 
   return (
-    <div className={cn('flex-1 flex items-center gap-4 ml-4', classes.links)}>
-      {menus.map(renderLink)}
+    <div className={cn('flex items-center ml-4 relative', classes.navigationContainer)}>
+      {showScrollButtons && canScrollLeft && (
+        <Button
+          variant='unstyle'
+          size='sm'
+          className={cn(
+            'absolute left-0 top-1/2 -translate-y-1/2 z-20',
+            'bg-gradient-to-r from-slate-800/90 via-slate-800/60 to-transparent',
+            'text-white/60 hover:text-white/90',
+            'w-6 h-6 p-0 rounded-r-full rounded-l-none',
+            classes.scrollButton
+          )}
+          onClick={() => scroll('left')}
+          aria-label='Scroll left'
+        >
+          <Icons name='IconChevronLeft' size='0.75rem' />
+        </Button>
+      )}
+      <div
+        ref={scrollContainerRef}
+        className={cn(
+          'flex items-center gap-3 overflow-x-auto scrollbar-hide',
+          'scroll-smooth w-full',
+          classes.scrollContainer,
+          showScrollButtons && canScrollLeft && 'pl-8',
+          showScrollButtons && canScrollRight && 'pr-8'
+        )}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
+        {menus.map(renderLink)}
+      </div>
+      {showScrollButtons && canScrollRight && (
+        <Button
+          variant='unstyle'
+          size='sm'
+          className={cn(
+            'absolute right-0 top-1/2 -translate-y-1/2 z-20',
+            'bg-gradient-to-l from-slate-800/90 via-slate-800/60 to-transparent',
+            'text-white/60 hover:text-white/90',
+            'w-6 h-6 p-0 rounded-l-full rounded-r-none',
+            classes.scrollButton
+          )}
+          onClick={() => scroll('right')}
+          aria-label='Scroll right'
+        >
+          <Icons name='IconChevronRight' size='0.75rem' />
+        </Button>
+      )}
     </div>
   );
 };
