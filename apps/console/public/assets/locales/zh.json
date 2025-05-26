@@ -873,7 +873,7 @@
   "icon_selector.title": "选择图标",
   "interceptor.account.description": "",
   "interceptor.account.title": "请登录后继续...",
-  "login_hint": "数据环境为 \u003cstrong\u003e{{name}}\u003c/strong\u003e，您可以使用 \u003canchor\u003e{{credentials}}\u003c/anchor\u003e 登录",
+  "login_hint": "数据环境为 \u003cstrong\u003e{{name}}\u003c/strong\u003e，您可以使用 \u003canchor\u003e 使用演示账号\u003c/anchor\u003e 登录",
   "notification.activity_notifications": "活动通知",
   "notification.activity_notifications_description": "关于您工作区活动的更新",
   "notification.and_more_notifications": "还有 {{count}} 条通知",

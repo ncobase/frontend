@@ -786,7 +786,7 @@
   "icon_selector.title": "اختيار أيقونة",
   "interceptor.account.description": "",
   "interceptor.account.title": "الرجاء تسجيل الدخول للمتابعة...",
-  "login_hint": "بيئة البيانات هي \u003cstrong\u003e{{name}}\u003c/strong\u003e، يمكنك تسجيل الدخول باستخدام \u003canchor\u003e{{credentials}}\u003c/anchor\u003e",
+  "login_hint": "بيئة البيانات هي \u003cstrong\u003e{{name}}\u003c/strong\u003e، يمكنك \u003canchor\u003eاستخدام حساب تجريبي\u003c/anchor\u003e لتسجيل الدخول",
   "notification.activity_notifications": "إشعارات النشاط",
   "notification.activity_notifications_description": "تحديثات حول الأنشطة في مساحة عملك",
   "notification.and_more_notifications": "و {{count}} إشعارات أخرى",

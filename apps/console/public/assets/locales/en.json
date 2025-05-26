@@ -873,7 +873,7 @@
   "icon_selector.title": "Select Icon",
   "interceptor.account.description": "",
   "interceptor.account.title": "Please log in to continue...",
-  "login_hint": "\u003cstrong\u003e{{name}}\u003c/strong\u003e environment, you can log in using \u003canchor\u003e{{credentials}}\u003c/anchor\u003e",
+  "login_hint": "\u003cstrong\u003e{{name}}\u003c/strong\u003e environment, you can log in using \u003canchor\u003eUse demo account\u003c/anchor\u003e",
   "notification.activity_notifications": "Activity Notifications",
   "notification.activity_notifications_description": "Updates about activities in your workspace",
   "notification.and_more_notifications": "And {{count}} more notifications",

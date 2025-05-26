@@ -25,7 +25,7 @@ const LoginHint = ({ setValue }: LoginHintProps) => {
   }
 
   const username = 'super';
-  const password = 'Ac123456';
+  const password = 'Super123456';
 
   const handleLoginHintClick = () => {
     setValue('username', username);
@@ -47,8 +47,8 @@ const LoginHint = ({ setValue }: LoginHintProps) => {
         t={t}
         i18nKey='login_hint'
         values={{
-          name: upperFirst(envName),
-          credentials: `${username} / ${password}`
+          name: upperFirst(envName)
+          // credentials: `${username} / ${password}`
         }}
         components={{
           anchor: <Button variant='link' className='px-1' onClick={handleLoginHintClick} />
