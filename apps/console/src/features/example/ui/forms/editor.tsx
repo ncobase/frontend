@@ -44,22 +44,22 @@ export const EditorPage = () => {
         <Container className='max-w-7xl'>
           <div className='flex items-center justify-center'>
             <div className='flex-1 flex items-center gap-x-4'>
-              <Button variant='outline-slate' onClick={() => navigate(-1)}>
+              <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
                 <Icons name='IconArrowLeft' />
               </Button>
               <div className='text-slate-600 font-medium'>编辑表单</div>
             </div>
             <div className='flex gap-x-4'>
-              <Button variant='outline-slate' onClick={() => navigate(-1)}>
+              <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
                 {t('actions.cancel')}
               </Button>
-              <Button>{t('actions.submit')}</Button>
+              <Button size='sm'>{t('actions.submit')}</Button>
             </div>
           </div>
         </Container>
       </div>
       <ScrollView className='py-4'>
-        <Container className='max-w-7xl bg-white'>
+        <Container className='max-w-7xl'>
           <Tabs defaultValue='contracts'>
             <TabsList className='flex items-center justify-end gap-x-4'>
               <TabsTrigger

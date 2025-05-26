@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useToastMessage } from '@ncobase/react';
 import { AnyObject } from '@ncobase/types';
 import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
@@ -8,7 +9,6 @@ import { LoginProps, LoginReply, RegisterProps } from './account';
 import { accountApi, loginAccount, logoutAccount, registerAccount } from './apis';
 
 import { useAuthContext } from '@/features/account/context';
-import { eventEmitter } from '@/lib/events';
 
 interface AccountKeys {
   login: ['accountService', 'login'];
@@ -31,6 +31,7 @@ export const useLogin = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, LoginProps>>
 ) => {
   const { updateTokens } = useAuthContext();
+  const toast = useToastMessage();
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isLockedOut, setIsLockedOut] = useState(false);
   const [lockoutEnd, setLockoutEnd] = useState<Date | null>(null);
@@ -64,17 +65,30 @@ export const useLogin = (
         setLoginAttempts(0);
         sessionStorage.removeItem('login_lockout_end');
         sessionStorage.removeItem('login_attempts');
+
+        // Show toast when lockout expires
+        toast.info('Account Unlocked', {
+          description: 'You can now attempt to login again.'
+        });
       }, lockoutEnd.getTime() - Date.now());
 
       return () => clearTimeout(timeoutId);
     }
-  }, [isLockedOut, lockoutEnd]);
+  }, [isLockedOut, lockoutEnd, toast]);
 
   return useMutation({
     mutationFn: async (variables: LoginProps) => {
       // If locked out, prevent login attempt
       if (isLockedOut) {
-        throw new Error('Account is temporarily locked. Please try again later.');
+        const minutesLeft = Math.ceil((lockoutEnd!.getTime() - Date.now()) / (1000 * 60));
+        const lockoutMessage = `Account is temporarily locked. Please try again in ${minutesLeft} minute(s).`;
+
+        toast.warning('Account Locked', {
+          description: lockoutMessage,
+          duration: 6000
+        });
+
+        throw new Error(lockoutMessage);
       }
 
       try {
@@ -83,6 +97,12 @@ export const useLogin = (
         // Reset attempts on successful login
         setLoginAttempts(0);
         sessionStorage.removeItem('login_attempts');
+        sessionStorage.removeItem('login_lockout_end');
+
+        // Show success toast
+        toast.success('Welcome Back', {
+          description: 'You have successfully logged in.'
+        });
 
         // Update tokens in the auth context
         updateTokens(result.access_token, result.refresh_token);
@@ -101,6 +121,17 @@ export const useLogin = (
           setIsLockedOut(true);
           setLockoutEnd(end);
           sessionStorage.setItem('login_lockout_end', end.toISOString());
+
+          toast.error('Account Locked', {
+            description: 'Too many failed login attempts. Account locked for 15 minutes.',
+            duration: 8000
+          });
+        } else {
+          // Show failed attempt toast
+          toast.error('Login Failed', {
+            description: `Invalid credentials. ${5 - newAttempts} attempt(s) remaining.`,
+            duration: 5000
+          });
         }
 
         throw error;
@@ -108,13 +139,7 @@ export const useLogin = (
     },
     ...options,
     onError: (error, variables, context) => {
-      if (isLockedOut) {
-        // Custom error notification for lockout
-        eventEmitter.emit('account-locked', {
-          duration: Math.ceil((lockoutEnd!.getTime() - Date.now()) / (1000 * 60)),
-          message: 'Account is temporarily locked. Please try again later.'
-        });
-      } else {
+      if (!isLockedOut) {
         options?.onError?.(error, variables, context);
       }
     }
@@ -126,14 +151,30 @@ export const useRegisterAccount = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, RegisterProps>>
 ) => {
   const { updateTokens } = useAuthContext();
+  const toast = useToastMessage();
 
   return useMutation({
     mutationFn: registerAccount,
     ...options,
     onSuccess: (data, variables, context) => {
+      // Show success toast
+      toast.success('Registration Successful', {
+        description: 'Welcome! Your account has been created successfully.'
+      });
+
       // Update tokens in auth context
       updateTokens(data?.access_token, data?.refresh_token);
       options?.onSuccess?.(data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // Show error toast
+      const errorMessage = error?.data?.message || 'Registration failed. Please try again.';
+      toast.error('Registration Failed', {
+        description: errorMessage,
+        duration: 6000
+      });
+
+      options?.onError?.(error, variables, context);
     }
   });
 };
@@ -185,17 +226,31 @@ export const useAccount = () => {
 // Hook for user logout
 export const useLogout = () => {
   const { updateTokens } = useAuthContext();
+  const toast = useToastMessage();
 
   const handleLogout = useCallback(async () => {
     try {
       await logoutAccount();
+
+      // Show logout success toast
+      toast.info('Logged Out', {
+        description: 'You have been successfully logged out.'
+      });
+
       updateTokens(); // Clear tokens
     } catch (error) {
       console.error('Logout failed:', error);
+
+      // Show logout error toast
+      toast.warning('Logout Error', {
+        description: 'There was an issue logging out, but your session has been cleared.',
+        duration: 4000
+      });
+
       // Still clear tokens even if the API call fails
       updateTokens();
     }
-  }, [updateTokens]);
+  }, [updateTokens, toast]);
 
   return handleLogout;
 };

@@ -37,7 +37,7 @@ export const FormView: React.FC<FormViewProps> = ({ title, topbar = true, onSubm
         />
       )}
       <ScrollView className='py-4'>
-        <Container className='max-w-7xl bg-white'>
+        <Container className='max-w-7xl'>
           <Form
             control={control}
             fields={fields}

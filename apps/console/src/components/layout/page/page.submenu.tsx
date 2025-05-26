@@ -1,4 +1,3 @@
-// ./apps/console/src/components/layout/page/page.submenu.tsx
 import React, { useCallback, useMemo } from 'react';
 
 import { Button, ShellSubmenu } from '@ncobase/react';

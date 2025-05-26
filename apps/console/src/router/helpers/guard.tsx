@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Navigate, useLocation } from 'react-router';
 
@@ -8,13 +8,11 @@ import { Spinner } from '@/components/loading/spinner';
 import { useAuthContext } from '@/features/account/context';
 import { Permission } from '@/features/account/permissions';
 import { useAccount } from '@/features/account/service';
-import { eventEmitter } from '@/lib/events';
 
 interface GuardProps {
-  // Role-based access control
-  public?: boolean; // Public route - no auth required
-  admin?: boolean; // Requires admin role
-  super?: boolean; // Requires super admin role
+  public?: boolean;
+  admin?: boolean;
+  super?: boolean;
 
   // Permission-based access control
   permission?: string;
@@ -25,26 +23,18 @@ interface GuardProps {
 
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  redirectTo?: string; // Where to redirect if access denied
+  redirectTo?: string;
 }
 
-/**
- * Unified permission guard component
- * Handles both role-based route protection and granular permission checks
- */
 export const Guard: React.FC<GuardProps> = ({
-  // Route access props
   public: isPublic = false,
   admin: requiresAdmin = false,
   super: requiresSuper = false,
-
-  // Granular permission props
   permission,
   role,
   any = false,
   permissions = [],
   roles = [],
-
   children,
   fallback = null,
   redirectTo = '/login'
@@ -54,67 +44,29 @@ export const Guard: React.FC<GuardProps> = ({
   const { pathname, search } = useLocation();
   const [accessDenied, setAccessDenied] = useState(false);
 
-  // Prevent duplicate forbidden event handling
-  const lastForbiddenEvent = useRef<number>(0);
-  const FORBIDDEN_EVENT_COOLDOWN = 2000; // 2 seconds
-
-  // Listen for forbidden events from the request interceptor
-  useEffect(() => {
-    const handleForbidden = (data: { method?: string; url?: string; message?: string }) => {
-      const now = Date.now();
-
-      // Skip if within cooldown period
-      if (now - lastForbiddenEvent.current < FORBIDDEN_EVENT_COOLDOWN) {
-        return;
-      }
-
-      lastForbiddenEvent.current = now;
-
-      // Set access denied only for authenticated users on protected routes
-      if (isAuthenticated && !isPublic) {
-        console.warn('Access forbidden by server:', data);
-        setAccessDenied(true);
-      }
-    };
-
-    // Listen for forbidden events only on protected routes
-    if (isAuthenticated && !isPublic) {
-      eventEmitter.on('forbidden', handleForbidden);
-    }
-
-    return () => {
-      eventEmitter.off('forbidden', handleForbidden);
-    };
-  }, [isAuthenticated, isPublic]);
-
-  // Reset access denied when route changes or authentication state changes
+  // Reset access denied state when route changes
   useEffect(() => {
     setAccessDenied(false);
-    lastForbiddenEvent.current = 0;
-  }, [pathname, isAuthenticated]);
+  }, [pathname]);
 
-  // Determine if access should be granted
+  // Check access permissions
   const canAccess = (): boolean => {
-    // If we've received a forbidden response from the server, deny access
-    if (accessDenied) {
-      return false;
-    }
-
-    // Route level access control
+    // Server-side access denial takes precedence
+    if (accessDenied) return false;
 
     // Public routes are always accessible
     if (isPublic) return true;
 
-    // Non-public routes require authentication
+    // Authentication required for protected routes
     if (!isAuthenticated) return false;
 
-    // Admin routes require admin privileges
+    // Admin role requirement
     if (requiresAdmin && !hasAdminPrivileges) return false;
 
-    // Super admin routes require super admin privileges
+    // Super admin role requirement
     if (requiresSuper && !isSuperAdmin) return false;
 
-    // Granular permission checks using Permission Service
+    // Permission-based access control
     try {
       return Permission.canAccess({
         permission,
@@ -129,35 +81,36 @@ export const Guard: React.FC<GuardProps> = ({
     }
   };
 
-  // Show loading state
+  // Show loading spinner while checking authentication
   if (isLoading || isAccountLoading) {
     return <Spinner />;
   }
 
-  // Handle public routes - redirect if already authenticated (optional)
+  // Handle authenticated users on public routes
   if (isPublic && isAuthenticated) {
-    // For login/register pages, redirect to home if already authenticated
+    // Redirect login/register to home if already authenticated
     if (pathname === '/login' || pathname === '/register') {
       return <Navigate to='/' replace />;
     }
-    // For other public routes, allow access even if authenticated
   }
 
-  // Access denied - show fallback or redirect
+  // Handle access denial
   if (!canAccess()) {
     if (fallback) {
       return <>{fallback}</>;
-    } else if (!isAuthenticated) {
-      // Redirect to login if not authenticated
+    }
+
+    if (!isAuthenticated) {
+      // Redirect to login with return URL
       return (
         <Navigate to={`${redirectTo}?redirect=${encodeURIComponent(pathname + search)}`} replace />
       );
-    } else {
-      // Show 403 error if authenticated but not authorized
-      return <Error403 />;
     }
+
+    // Show 403 error for authenticated but unauthorized users
+    return <Error403 />;
   }
 
-  // Wrap children in error boundary
+  // Grant access with error boundary
   return <ErrorBoundary>{children}</ErrorBoundary>;
 };

@@ -1,4 +1,3 @@
-// ./apps/console/src/features/system/menu/service.ts
 import { AnyObject } from '@ncobase/types';
 import { sortTree } from '@ncobase/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';

@@ -10,7 +10,7 @@ export const Profile = () => {
   return (
     <Page title='Profile' className='p-0'>
       <ScrollView className='py-4'>
-        <Container className='max-w-7xl bg-white'>
+        <Container className='max-w-7xl'>
           <div className='p-6 pb-0 mb-6 bg-white rounded-xl shadow-xs'>
             <div className='flex items-center justify-start gap-x-4'>
               <div className='relative'>

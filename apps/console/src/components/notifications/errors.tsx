@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
 import { useAuthContext } from '@/features/account/context';
-import { eventEmitter } from '@/lib/events';
 
+// ErrorNotification component
 export const ErrorNotification = () => {
   const { t } = useTranslation();
   const toast = useToastMessage();
@@ -14,164 +14,76 @@ export const ErrorNotification = () => {
   const location = useLocation();
   const { isAuthenticated, updateTokens } = useAuthContext();
 
-  // Use refs to prevent multiple simultaneous error handling
-  const handlingError = useRef(false);
-  const lastErrorTime = useRef(0);
-  const ERROR_THROTTLE_TIME = 2000; // 2 seconds
+  // Track last error to prevent duplicates
+  const lastErrorRef = useRef<{ type: string; time: number } | null>(null);
+  const errorCooldown = 2000; // 2 seconds
 
-  const shouldHandleError = (): boolean => {
-    const now = Date.now();
-    if (now - lastErrorTime.current < ERROR_THROTTLE_TIME) {
-      return false;
-    }
-    if (handlingError.current) {
-      return false;
-    }
-    lastErrorTime.current = now;
-    handlingError.current = true;
-    setTimeout(() => {
-      handlingError.current = false;
-    }, ERROR_THROTTLE_TIME);
-    return true;
-  };
-
+  // Handle global error events with debouncing
   useEffect(() => {
-    const handleUnauthorized = (message: string) => {
-      if (!shouldHandleError()) return;
+    const handleGlobalError = (_event: ErrorEvent) => {
+      const now = Date.now();
+      const lastError = lastErrorRef.current;
 
-      console.warn('Unauthorized access detected');
+      // Skip if same error type within cooldown period
+      if (lastError && lastError.type === 'global' && now - lastError.time < errorCooldown) {
+        return;
+      }
 
-      // Only show toast and handle logout if user was previously authenticated
-      if (isAuthenticated) {
-        toast.error(t('errors.unauthorized'), {
-          description: message || t('errors.session_expired')
+      lastErrorRef.current = { type: 'global', time: now };
+
+      // Show generic error toast
+      toast.error(t('errors.unexpected_error'), {
+        description: t('errors.please_try_again')
+      });
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const now = Date.now();
+      const lastError = lastErrorRef.current;
+
+      // Skip if same error type within cooldown period
+      if (lastError && lastError.type === 'rejection' && now - lastError.time < errorCooldown) {
+        return;
+      }
+
+      lastErrorRef.current = { type: 'rejection', time: now };
+
+      // Check if it's a network or authentication error
+      const error = event.reason;
+
+      if (error?.status === 401 && isAuthenticated) {
+        toast.error(t('errors.session_expired'), {
+          description: t('errors.please_login_again')
         });
 
-        // Clear tokens and redirect to login
-        updateTokens();
-        const currentPath = location.pathname + location.search;
-
-        // Delay navigation to allow toast to dismiss
+        // Clear tokens and redirect after short delay
         setTimeout(() => {
+          updateTokens();
+          const currentPath = location.pathname + location.search;
           navigate(`/login?redirect=${encodeURIComponent(currentPath)}`, { replace: true });
         }, 1000);
-      }
-    };
-
-    const handleForbidden = (data: { method?: string; url?: string; message?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.warn('Access forbidden:', data);
-
-      // Show toast notification for forbidden access
-      toast.error(t('errors.forbidden'), {
-        description: data.message || t('errors.insufficient_permissions')
-      });
-
-      // For 403 errors, no redirect is needed as the Guard component handles it
-      // However, redirecting to homepage or other authorized pages can be considered in certain cases
-    };
-
-    const handleServerError = (data: { status?: number; message?: string; url?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.error('Server error:', data);
-
-      toast.error(t('errors.server_error'), {
-        description: data.message || t('errors.something_went_wrong')
-      });
-    };
-
-    const handleNetworkError = (data: { method?: string; url?: string; message?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.error('Network error:', data);
-
-      toast.error(t('errors.network_error'), {
-        description: data.message || t('errors.check_connection')
-      });
-    };
-
-    const handleValidationError = (errors: Record<string, string[]>) => {
-      if (!shouldHandleError()) return;
-
-      console.warn('Validation errors:', errors);
-
-      // Show first validation error
-      const firstError = Object.values(errors)[0]?.[0];
-      if (firstError) {
-        toast.error(t('errors.validation_error'), {
-          description: firstError
+      } else if (error?.status === 403) {
+        toast.error(t('errors.access_denied'), {
+          description: t('errors.insufficient_permissions')
+        });
+      } else if (error?.status >= 500) {
+        toast.error(t('errors.server_error'), {
+          description: t('errors.server_unavailable')
+        });
+      } else if (!error?.status) {
+        toast.error(t('errors.network_error'), {
+          description: t('errors.check_connection')
         });
       }
     };
 
-    const handleRequestBlocked = (data: { method?: string; url?: string; message?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.warn('Request blocked:', data);
-
-      toast.warning(t('errors.request_blocked'), {
-        description: data.message || t('errors.too_many_failures')
-      });
-    };
-
-    const handleNotFound = (data: { url?: string; message?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.warn('Resource not found:', data);
-
-      toast.warning(t('errors.not_found'), {
-        description: data.message || t('errors.resource_not_found')
-      });
-    };
-
-    const handleAccountLocked = (data: { duration?: number; message?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.warn('Account locked:', data);
-
-      const message = data.duration
-        ? t('errors.account_locked_with_duration', { minutes: data.duration })
-        : t('errors.account_locked');
-
-      toast.error(t('errors.account_locked'), {
-        description: message
-      });
-    };
-
-    const handleTenantError = (data: { message?: string }) => {
-      if (!shouldHandleError()) return;
-
-      console.warn('Tenant error:', data);
-
-      toast.error(t('errors.tenant_error'), {
-        description: data.message || t('errors.tenant_access_error')
-      });
-    };
-
-    // Register event listeners
-    eventEmitter.on('unauthorized', handleUnauthorized);
-    eventEmitter.on('forbidden', handleForbidden);
-    eventEmitter.on('server-error', handleServerError);
-    eventEmitter.on('network-error', handleNetworkError);
-    eventEmitter.on('validation-error', handleValidationError);
-    eventEmitter.on('request-blocked', handleRequestBlocked);
-    eventEmitter.on('not-found', handleNotFound);
-    eventEmitter.on('account-locked', handleAccountLocked);
-    eventEmitter.on('tenant-error', handleTenantError);
+    // Add global error listeners
+    window.addEventListener('error', handleGlobalError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
     return () => {
-      // Cleanup event listeners
-      eventEmitter.off('unauthorized', handleUnauthorized);
-      eventEmitter.off('forbidden', handleForbidden);
-      eventEmitter.off('server-error', handleServerError);
-      eventEmitter.off('network-error', handleNetworkError);
-      eventEmitter.off('validation-error', handleValidationError);
-      eventEmitter.off('request-blocked', handleRequestBlocked);
-      eventEmitter.off('not-found', handleNotFound);
-      eventEmitter.off('account-locked', handleAccountLocked);
-      eventEmitter.off('tenant-error', handleTenantError);
+      window.removeEventListener('error', handleGlobalError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   }, [t, toast, navigate, location, isAuthenticated, updateTokens]);
 

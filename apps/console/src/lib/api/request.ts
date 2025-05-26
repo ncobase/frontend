@@ -2,40 +2,77 @@ import { ExplicitAny } from '@ncobase/types';
 import { isBrowser, locals } from '@ncobase/utils';
 import { $Fetch, $fetch, FetchError, FetchOptions } from 'ofetch';
 
-import { ACCESS_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
+import { Permission } from '@/features/account/permissions';
 import { checkAndRefreshToken } from '@/features/account/token_service';
 import { BearerKey, XMdTenantKey } from '@/lib/constants';
 import { eventEmitter } from '@/lib/events';
 
+// Circuit breaker for failed endpoints
+class CircuitBreaker {
+  private static failures = new Map<
+    string,
+    { count: number; blocked: boolean; lastFail: number }
+  >();
+  private static readonly MAX_FAILURES = 3;
+  private static readonly BLOCK_TIME = 30000; // 30s
+
+  static canRequest(endpoint: string): boolean {
+    const state = this.failures.get(endpoint);
+    if (!state) return true;
+
+    if (state.blocked && Date.now() - state.lastFail > this.BLOCK_TIME) {
+      state.blocked = false;
+      state.count = 0;
+    }
+
+    return !state.blocked;
+  }
+
+  static recordFailure(endpoint: string): void {
+    const state = this.failures.get(endpoint) || { count: 0, blocked: false, lastFail: 0 };
+    state.count++;
+    state.lastFail = Date.now();
+
+    if (state.count >= this.MAX_FAILURES) {
+      state.blocked = true;
+    }
+
+    this.failures.set(endpoint, state);
+  }
+
+  static clearFailures(endpoint?: string): void {
+    if (endpoint) {
+      this.failures.delete(endpoint);
+    } else {
+      this.failures.clear();
+    }
+  }
+}
+
+// Event throttling to prevent event storms
+class EventThrottler {
+  private static events = new Map<string, number>();
+  private static readonly THROTTLE_TIME = 2000; // 2s
+
+  static shouldEmit(eventType: string): boolean {
+    const now = Date.now();
+    const lastEmit = this.events.get(eventType);
+
+    if (!lastEmit || now - lastEmit > this.THROTTLE_TIME) {
+      this.events.set(eventType, now);
+      return true;
+    }
+
+    return false;
+  }
+}
+
 export class Request {
   private readonly $fetch: $Fetch;
   private readonly defaultHeaders: Record<string, string | undefined>;
-  private readonly csrfToken: string | null = null;
-
-  // Tracks ongoing requests to prevent duplicates
-  private requestsInProgress: Map<string, Promise<ExplicitAny>> = new Map();
-
-  // Tracks failed endpoints to limit retries
-  private readonly failedEndpoints: Map<
-    string,
-    {
-      timestamp: number;
-      retryCount: number;
-      lastError: string;
-    }
-  > = new Map();
-
-  // Throttles repeated error events
-  private errorEventThrottler: Map<string, number> = new Map();
-
-  // Flag to prevent concurrent token refreshes
+  private pendingRequests = new Map<string, Promise<any>>();
   private isRefreshingToken = false;
-
-  // Config constants
-  private readonly MAX_RETRY_COUNT = 3;
-  private readonly RETRY_RESET_TIME = 60000; // ms
-  private readonly ERROR_EVENT_THROTTLE_TIME = 1000; // ms
-  private readonly REQUEST_DEDUP_TIME = 100; // ms
 
   static baseConfig: FetchOptions = {
     baseURL:
@@ -44,7 +81,7 @@ export class Request {
         ? '/api'
         : import.meta.env.VITE_API_URL || '/api',
     timeout: 30000,
-    retry: false // Disable ofetch's built-in retry logic
+    retry: false
   };
 
   constructor(fetcher: $Fetch, defaultHeaders: Record<string, string | undefined> = {}) {
@@ -54,346 +91,259 @@ export class Request {
       'Content-Type': 'application/json;charset=utf-8',
       ...defaultHeaders
     };
-
-    // Get CSRF token from meta tag if in browser
-    if (isBrowser) {
-      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-      if (csrfMeta) {
-        this.csrfToken = csrfMeta.getAttribute('content');
-      }
-    }
   }
 
-  public getHeaders() {
+  private getHeaders() {
     const token = isBrowser && locals.get(ACCESS_TOKEN_KEY);
     const tenant = isBrowser && locals.get(TENANT_KEY);
 
     return {
       ...this.defaultHeaders,
       ...(token && tenant && { [XMdTenantKey]: tenant }),
-      ...(token && { Authorization: `${BearerKey}${token}` }),
-      ...(this.csrfToken && { 'X-CSRF-Token': this.csrfToken })
+      ...(token && { Authorization: `${BearerKey}${token}` })
     };
   }
 
   private getEndpointKey(url: string): string {
-    // Remove query parameters and timestamps to get base endpoint
     return url.split('?')[0];
-  }
-
-  private getRequestKey(method: string, url: string, data?: ExplicitAny): string {
-    // Create a unique key for request deduplication
-    const dataHash = data ? JSON.stringify(data) : '';
-    return `${method}:${this.getEndpointKey(url)}:${dataHash}`;
-  }
-
-  private shouldRetry(endpoint: string, errorType: string): boolean {
-    const failedInfo = this.failedEndpoints.get(endpoint);
-    const now = Date.now();
-
-    // If no record, it's the first attempt
-    if (!failedInfo) {
-      this.recordFailure(endpoint, errorType);
-      return true;
-    }
-
-    // Reset retry count if enough time has passed
-    if (now - failedInfo.timestamp > this.RETRY_RESET_TIME) {
-      this.recordFailure(endpoint, errorType);
-      return true;
-    }
-
-    // Check if we've hit the retry limit
-    if (failedInfo.retryCount >= this.MAX_RETRY_COUNT) {
-      console.warn(
-        `Endpoint ${endpoint} has failed ${this.MAX_RETRY_COUNT} times, blocking further requests`
-      );
-      return false;
-    }
-
-    // Increment retry count
-    this.failedEndpoints.set(endpoint, {
-      ...failedInfo,
-      retryCount: failedInfo.retryCount + 1,
-      timestamp: now,
-      lastError: errorType
-    });
-
-    return true;
-  }
-
-  private recordFailure(endpoint: string, errorType: string): void {
-    this.failedEndpoints.set(endpoint, {
-      timestamp: Date.now(),
-      retryCount: 1,
-      lastError: errorType
-    });
-  }
-
-  private clearFailureRecord(endpoint: string): void {
-    this.failedEndpoints.delete(endpoint);
-  }
-
-  private shouldEmitErrorEvent(eventType: string): boolean {
-    const now = Date.now();
-    const lastEmitted = this.errorEventThrottler.get(eventType);
-
-    if (!lastEmitted || now - lastEmitted > this.ERROR_EVENT_THROTTLE_TIME) {
-      this.errorEventThrottler.set(eventType, now);
-      return true;
-    }
-
-    return false;
   }
 
   private isAuthEndpoint(url: string): boolean {
     return (
       url.includes('/iam/login') ||
       url.includes('/iam/refresh-token') ||
-      url.includes('/iam/token-status') ||
       url.includes('/iam/register') ||
       url.includes('/iam/logout')
     );
   }
 
-  private async handleErrors(
-    err: Error | Response | FetchError,
-    method: string,
-    url: string
-  ): Promise<never> {
+  private handleError(error: any, method: string, url: string): never {
     const endpoint = this.getEndpointKey(url);
     let status: number | undefined;
-    let errorData: any = null;
-    let errorMessage = 'Unknown error occurred';
+    let message = 'Request failed';
+    let data: any = null;
 
-    // Parse error information
-    if (err instanceof FetchError) {
-      status = err.status;
+    // Parse error details
+    if (error instanceof FetchError) {
+      status = error.status;
+      data = error.data || error['_data'];
+      message = data?.message || error.message || message;
+    } else if (error instanceof Response) {
+      status = error.status;
       try {
-        errorData = err['data'] ?? err['_data'];
-        errorMessage = errorData?.message || err.message || 'Unknown error occurred';
+        data = error.json?.();
+        message = data?.message || message;
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       } catch (e) {
-        errorMessage = err.message || 'Unknown error occurred';
+        // Ignore parse errors
       }
-    } else if (err instanceof Response) {
-      status = err.status;
-      if (err.bodyUsed === false) {
-        try {
-          errorData = await err.json();
-          errorMessage = errorData?.message || 'Unknown error occurred';
-        } catch (e) {
-          console.error(`Error parsing error response: ${e}`);
-        }
-      }
-    } else if (err instanceof Error) {
-      errorMessage = err.message;
+    } else if (error instanceof Error) {
+      message = error.message;
     }
 
-    // Log error for debugging
-    console.error(`Request failed [${method} ${url}]:`, {
+    console.error(`[${method} ${url}] ${status || 'NETWORK'}: ${message}`);
+
+    // Record failures for circuit breaker
+    if (status && status >= 500) {
+      CircuitBreaker.recordFailure(endpoint);
+    }
+
+    // Create enhanced error object
+    const enhancedError = Object.assign(error, {
       status,
-      message: errorMessage,
-      data: errorData
+      message,
+      endpoint,
+      method,
+      data,
+      timestamp: Date.now()
     });
 
-    // Handle different error scenarios
-    const errorType = `${status || 'network'}`;
+    // Emit events for error handling
+    this.emitEvents(status, message, endpoint, data);
 
-    // Record failure for retry logic (only for server errors)
-    if (status && status >= 500) {
-      this.recordFailure(endpoint, errorType);
+    // Handle redirects (skip auth endpoints)
+    if (!this.isAuthEndpoint(url)) {
+      this.handleRedirects(status, message);
     }
 
-    // Emit appropriate events with throttling
-    if (status === 401) {
-      if (this.shouldEmitErrorEvent('unauthorized')) {
-        eventEmitter.emit('unauthorized', errorMessage);
-      }
-    } else if (status === 403) {
-      if (this.shouldEmitErrorEvent('forbidden')) {
-        eventEmitter.emit('forbidden', {
-          method,
-          url: endpoint,
-          message: errorMessage,
-          data: errorData
-        });
-      }
-    } else if (status === 404) {
-      if (this.shouldEmitErrorEvent('not-found')) {
-        eventEmitter.emit('not-found', { url: endpoint, message: errorMessage });
-      }
-    } else if (status === 422) {
-      if (this.shouldEmitErrorEvent('validation-error')) {
-        eventEmitter.emit('validation-error', errorData?.errors || {});
-      }
-    } else if (status && status >= 500) {
-      if (this.shouldEmitErrorEvent('server-error')) {
-        eventEmitter.emit('server-error', {
-          status,
-          message: errorMessage,
-          url: endpoint
-        });
-      }
-    } else if (status && status >= 400) {
-      if (this.shouldEmitErrorEvent('request-error')) {
-        eventEmitter.emit('request-error', {
-          status,
-          message: errorMessage,
-          url: endpoint
-        });
-      }
-    } else if (!status) {
-      // Network error
-      if (this.shouldEmitErrorEvent('network-error')) {
-        eventEmitter.emit('network-error', { method, url: endpoint, message: errorMessage });
+    throw enhancedError;
+  }
+
+  private emitEvents(
+    status: number | undefined,
+    message: string,
+    endpoint: string,
+    data: any
+  ): void {
+    const shouldEmit = EventThrottler.shouldEmit.bind(EventThrottler);
+
+    if (status === 401 && shouldEmit('unauthorized')) {
+      eventEmitter.emit('unauthorized', message);
+    } else if (status === 403 && shouldEmit('forbidden')) {
+      eventEmitter.emit('forbidden', { url: endpoint, message, data });
+    } else if (status === 404 && shouldEmit('not-found')) {
+      eventEmitter.emit('not-found', { url: endpoint, message });
+    } else if (status === 422 && shouldEmit('validation-error')) {
+      eventEmitter.emit('validation-error', data?.errors || {});
+    } else if (status && status >= 500 && shouldEmit('server-error')) {
+      eventEmitter.emit('server-error', { status, message, url: endpoint });
+    } else if (!status && shouldEmit('network-error')) {
+      eventEmitter.emit('network-error', { url: endpoint, message });
+    }
+  }
+
+  private handleRedirects(status: number | undefined, _message?: string): void {
+    if (!isBrowser) return;
+
+    const redirectToError = (errorPath: string, delay = 100) => {
+      if (window.location.pathname.startsWith('/error/')) return; // Already on error page
+
+      setTimeout(() => {
+        try {
+          // Use history API for SPA navigation
+          if (window.history?.pushState) {
+            window.history.pushState(null, '', errorPath);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          } else {
+            window.location.href = errorPath;
+          }
+        } catch (e) {
+          console.warn('Navigation failed:', e);
+          window.location.href = errorPath;
+        }
+      }, delay);
+    };
+
+    // Handle different error types
+    switch (status) {
+      case 401:
+        // Clear tokens and redirect to login for protected routes
+        locals.remove(ACCESS_TOKEN_KEY);
+        locals.remove(REFRESH_TOKEN_KEY);
+
+        if (!Permission.isPublicRoute(window.location.pathname)) {
+          const currentPath = window.location.pathname + window.location.search;
+          const loginUrl = `/login?redirect=${encodeURIComponent(currentPath)}`;
+          redirectToError(loginUrl, 100);
+        }
+        break;
+
+      case 403:
+        // Delayed redirect for forbidden
+        setTimeout(() => redirectToError('/error/403'), 1500);
+        break;
+
+      case 404:
+        // Delayed redirect for not found
+        setTimeout(() => redirectToError('/error/404'), 1500);
+        break;
+
+      case undefined: // Network error
+        // Delayed redirect for network issues
+        setTimeout(() => redirectToError('/error/network'), 2000);
+        break;
+
+      default:
+        if (status && status >= 500) {
+          // Delayed redirect for server errors
+          setTimeout(() => redirectToError('/error/500'), 2000);
+        }
+        break;
+    }
+  }
+
+  private async executeRequest(
+    method: string,
+    url: string,
+    data?: ExplicitAny,
+    options?: FetchOptions & { timestamp?: boolean }
+  ): Promise<ExplicitAny> {
+    const endpoint = this.getEndpointKey(url);
+
+    // Circuit breaker check
+    if (!CircuitBreaker.canRequest(endpoint)) {
+      throw new Error(`Endpoint ${endpoint} temporarily blocked`);
+    }
+
+    // Token refresh for protected endpoints
+    if (!this.isAuthEndpoint(url) && !this.isRefreshingToken && locals.get(ACCESS_TOKEN_KEY)) {
+      this.isRefreshingToken = true;
+      try {
+        await checkAndRefreshToken();
+      } catch (e) {
+        console.warn('Token refresh failed:', e);
+      } finally {
+        this.isRefreshingToken = false;
       }
     }
 
-    throw err;
+    // Prepare request
+    const headers = this.getHeaders();
+    let finalUrl = url;
+
+    if (options?.timestamp !== false) {
+      finalUrl += (url.includes('?') ? '&' : '?') + `_t=${Date.now()}`;
+    }
+
+    const fetchOptions: FetchOptions = {
+      ...Request.baseConfig,
+      method,
+      headers,
+      ...(data && { body: JSON.stringify(data) }),
+      ...options
+    };
+
+    try {
+      const response = await this.$fetch(finalUrl, fetchOptions);
+      CircuitBreaker.clearFailures(endpoint);
+      return response;
+    } catch (error) {
+      this.handleError(error, method, finalUrl);
+    }
   }
 
   protected async request(
     method: string,
     url: string,
     data?: ExplicitAny,
-    fetchOptions?: FetchOptions & { timestamp?: boolean }
+    options?: FetchOptions & { timestamp?: boolean }
   ): Promise<ExplicitAny> {
-    const endpoint = this.getEndpointKey(url);
-    const requestKey = this.getRequestKey(method, url, data);
+    const requestKey = `${method}:${this.getEndpointKey(url)}`;
 
-    // Check if we should retry this endpoint
-    if (!this.shouldRetry(endpoint, 'blocked')) {
-      const error = new Error(
-        `Request to ${endpoint} is temporarily blocked due to multiple failures`
-      );
-      if (this.shouldEmitErrorEvent('request-blocked')) {
-        eventEmitter.emit('request-blocked', {
-          method,
-          url: endpoint,
-          message: error.message
-        });
-      }
-      throw error;
+    // Deduplicate concurrent requests
+    if (this.pendingRequests.has(requestKey)) {
+      return this.pendingRequests.get(requestKey)!;
     }
 
-    // Check if this exact request is already in progress (deduplication)
-    if (this.requestsInProgress.has(requestKey)) {
-      console.debug(`Deduplicating request: ${requestKey}`);
-      return this.requestsInProgress.get(requestKey)!;
-    }
+    const promise = this.executeRequest(method, url, data, options).finally(() =>
+      this.pendingRequests.delete(requestKey)
+    );
 
-    try {
-      // Only attempt token refresh for non-auth endpoints and when we have a token
-      const shouldRefreshToken =
-        !this.isAuthEndpoint(url) && !this.isRefreshingToken && locals.get(ACCESS_TOKEN_KEY);
-
-      if (shouldRefreshToken) {
-        this.isRefreshingToken = true;
-        try {
-          await checkAndRefreshToken();
-        } catch (refreshError) {
-          console.warn('Token refresh failed:', refreshError);
-          // Don't throw here, let the original request proceed
-        } finally {
-          this.isRefreshingToken = false;
-        }
-      }
-
-      const headers = this.getHeaders();
-      const body = data ? { body: JSON.stringify(data) } : {};
-
-      let finalUrl = url;
-      if (fetchOptions?.timestamp !== false) {
-        const separator = url.includes('?') ? '&' : '?';
-        finalUrl = `${url}${separator}_t=${Date.now()}`;
-      }
-
-      const options: FetchOptions = {
-        ...Request.baseConfig,
-        method,
-        headers,
-        ...body,
-        ...fetchOptions
-      };
-
-      // Create the request promise and store it for deduplication
-      const requestPromise = this.$fetch(finalUrl, options)
-        .then(response => {
-          // Clear failure record on success
-          this.clearFailureRecord(endpoint);
-          return response;
-        })
-        .catch(async error => {
-          return this.handleErrors(error, method, finalUrl);
-        })
-        .finally(() => {
-          // Remove from in-progress requests when done
-          this.requestsInProgress.delete(requestKey);
-        });
-
-      this.requestsInProgress.set(requestKey, requestPromise);
-      return await requestPromise;
-    } catch (err) {
-      // Clean up the in-progress request on error
-      this.requestsInProgress.delete(requestKey);
-      throw err;
-    }
+    this.pendingRequests.set(requestKey, promise);
+    return promise;
   }
 
-  public config = {
-    ...Request.baseConfig
-  };
-
-  public async get(
-    url: string,
-    fetchOptions?: FetchOptions & { timestamp?: boolean }
-  ): Promise<ExplicitAny> {
-    return this.request('GET', url, undefined, fetchOptions);
+  // HTTP methods
+  public get(url: string, options?: FetchOptions & { timestamp?: boolean }) {
+    return this.request('GET', url, undefined, options);
   }
 
-  public async post(
-    url: string,
-    data?: ExplicitAny,
-    fetchOptions?: FetchOptions & { timestamp?: boolean }
-  ): Promise<ExplicitAny> {
-    return this.request('POST', url, data, fetchOptions);
+  public post(url: string, data?: ExplicitAny, options?: FetchOptions & { timestamp?: boolean }) {
+    return this.request('POST', url, data, options);
   }
 
-  public async put(
-    url: string,
-    data?: ExplicitAny,
-    fetchOptions?: FetchOptions & { timestamp?: boolean }
-  ): Promise<ExplicitAny> {
-    return this.request('PUT', url, data, fetchOptions);
+  public put(url: string, data?: ExplicitAny, options?: FetchOptions & { timestamp?: boolean }) {
+    return this.request('PUT', url, data, options);
   }
 
-  public async delete(
-    url: string,
-    fetchOptions?: FetchOptions & { timestamp?: boolean }
-  ): Promise<ExplicitAny> {
-    return this.request('DELETE', url, undefined, fetchOptions);
+  public delete(url: string, options?: FetchOptions & { timestamp?: boolean }) {
+    return this.request('DELETE', url, undefined, options);
   }
 
-  // Reset the state
-  public reset(): void {
-    this.requestsInProgress.clear();
-    this.failedEndpoints.clear();
-    this.errorEventThrottler.clear();
-    this.isRefreshingToken = false;
-  }
-
-  // Get the current status
-  public getStatus(): {
-    pendingRequests: number;
-    failedEndpoints: number;
-    isRefreshingToken: boolean;
-  } {
-    return {
-      pendingRequests: this.requestsInProgress.size,
-      failedEndpoints: this.failedEndpoints.size,
-      isRefreshingToken: this.isRefreshingToken
-    };
+  // Utilities
+  public clearState(): void {
+    CircuitBreaker.clearFailures();
+    this.pendingRequests.clear();
   }
 }
 

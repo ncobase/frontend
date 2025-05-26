@@ -27,9 +27,6 @@ export const GroupViewerPage = ({ viewMode, record: initialRecord, handleView })
       <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-x-4'>
-            <Button variant='outline-slate' onClick={() => navigate(-1)}>
-              <Icons name='IconArrowLeft' />
-            </Button>
             <div className='text-slate-600 font-medium'>{t('actions.view')}</div>
           </div>
           <div className='flex gap-x-4'>
@@ -37,6 +34,7 @@ export const GroupViewerPage = ({ viewMode, record: initialRecord, handleView })
               variant='outline-primary'
               prependIcon={<Icons name='IconEdit' className='w-4 h-4' />}
               onClick={() => handleView({ id: record }, '../edit')}
+              size='sm'
             >
               {t('actions.edit')}
             </Button>
@@ -44,6 +42,7 @@ export const GroupViewerPage = ({ viewMode, record: initialRecord, handleView })
               variant='outline-danger'
               prependIcon={<Icons name='IconPrinter' className='w-4 h-4' />}
               onClick={() => handleView({ id: record }, '../printer')}
+              size='sm'
             >
               {t('actions.printer')}
             </Button>

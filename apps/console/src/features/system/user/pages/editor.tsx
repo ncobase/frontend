@@ -42,16 +42,15 @@ export const EditorUserPage = ({
       <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-x-4'>
-            <Button variant='outline-slate' onClick={() => navigate(-1)}>
-              <Icons name='IconArrowLeft' />
-            </Button>
             <div className='text-slate-600 font-medium'>{t('actions.edit')}</div>
           </div>
           <div className='flex gap-x-4'>
-            <Button variant='outline-slate' onClick={() => navigate(-1)}>
+            <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
               {t('actions.cancel')}
             </Button>
-            <Button onClick={onSubmit}>{t('actions.submit')}</Button>
+            <Button onClick={onSubmit} size='sm'>
+              {t('actions.submit')}
+            </Button>
           </div>
         </div>
       </div>
