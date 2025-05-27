@@ -37,7 +37,7 @@ const MenuItemRecursive = React.memo(
     canAccessMenu
   }: {
     menu: MenuTree;
-    isActive: (_path: string) => boolean;
+    isActive: (_path: string, _depth?: number) => boolean;
     handleLinkClick: (_menu: MenuTree) => void;
     className?: string;
     depth?: number;
@@ -57,7 +57,7 @@ const MenuItemRecursive = React.memo(
       return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
     }
 
-    if (isGroup(menu)) {
+    if (isGroup(menu) && !expandedAccordions) {
       return (
         <div className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'>
           <span className='font-medium'>{t(menu.label || '') || menu.name}</span>
@@ -85,12 +85,12 @@ const MenuItemRecursive = React.memo(
                 'justify-between font-normal no-underline hover:no-underline px-2.5 py-2.5 mx-2.5 text-slate-500 [&>svg]:hover:stroke-slate-400 [&>svg]:focus:stroke-slate-400 hover:opacity-80 focus:opacity-90 hover:bg-slate-100/85 rounded-md',
                 menu.disabled && 'cursor-not-allowed opacity-80'
               )}
-              style={{ paddingLeft: `${1.25 + depth * 1}rem` }}
+              style={{ paddingLeft: `${(0.5 + depth) * 1}rem` }}
               aria-label={`${menu.name || menu.label} submenu`}
             >
               <div className='flex items-center justify-start'>
                 {menu.icon && (
-                  <Icons size={18} name={menu.icon} className='mr-2.5' aria-hidden='true' />
+                  <Icons size={18} name={menu.icon} className='mr-1.5' aria-hidden='true' />
                 )}
                 <span>{t(menu.label || '') || menu.name}</span>
               </div>
@@ -103,7 +103,7 @@ const MenuItemRecursive = React.memo(
                   isActive={isActive}
                   handleLinkClick={handleLinkClick}
                   depth={depth + 1}
-                  className='pl-4'
+                  className='pl-2'
                   expandedAccordions={expandedAccordions}
                   toggleAccordion={toggleAccordion}
                   collapseAll={collapseAll}
@@ -118,31 +118,31 @@ const MenuItemRecursive = React.memo(
 
     // Leaf menu item
     return (
-      <div className='p-2.5 w-full border-b border-b-gray-50'>
-        <Button
-          variant='unstyle'
-          size='ratio'
+      <div className='px-2.5 py-1.5 w-full border-b border-b-gray-50 last:border-b-0 last:pb-0'>
+        <button
           className={cn(
-            'hover:bg-slate-100/85 w-full text-left inline-flex justify-between py-2.5',
-            { 'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '') },
+            'hover:bg-slate-100/85 text-slate-500 rounded-lg w-full text-left inline-flex justify-between px-2.5 py-2',
+            { 'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '', 3) },
             menu.disabled && 'cursor-not-allowed opacity-80',
             className
           )}
-          style={{ paddingLeft: `${1.25 + depth * 1}rem` }}
+          style={{ paddingLeft: `${(0.5 + depth) * 1}rem` }}
           onClick={() => {
             if (depth === 0) collapseAll();
             handleLinkClick(menu);
           }}
           disabled={menu.disabled}
-          aria-current={isActive(menu.path || '') ? 'page' : undefined}
+          aria-current={isActive(menu.path || '', 3) ? 'page' : undefined}
         >
           <div className='flex items-center justify-start'>
             {menu.icon && (
-              <Icons size={18} name={menu.icon} className='mr-2.5' aria-hidden='true' />
+              <Icons size={18} name={menu.icon} className='mr-1.5' aria-hidden='true' />
             )}
-            <span>{t(menu.label || '') || menu.name}</span>
+            <span style={{ paddingLeft: `${depth * 0.5}rem` }}>
+              {t(menu.label || '') || menu.name}
+            </span>
           </div>
-        </Button>
+        </button>
       </div>
     );
   }
@@ -173,10 +173,8 @@ const CollapsedMenuItem = React.memo(
 
     return (
       <Tooltip side='right' content={t(menu.label || '') || menu.name}>
-        <Button
-          variant='unstyle'
-          size='ratio'
-          className={cn('my-2.5 hover:bg-slate-100/85', {
+        <button
+          className={cn('px-2.5 py-2 rounded-lg my-1.5 hover:bg-slate-100/85', {
             'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '')
           })}
           onClick={() => handleLinkClick(menu)}
@@ -188,7 +186,7 @@ const CollapsedMenuItem = React.memo(
           ) : (
             <span aria-hidden='true'>{getInitials(menu.name || menu.label || menu.id || 'M')}</span>
           )}
-        </Button>
+        </button>
       </Tooltip>
     );
   }
@@ -247,7 +245,10 @@ const SidebarComponent: React.FC<{
     return pathFiltered.length > 0 ? pathFiltered : permissionFiltered;
   }, [sidebarMenus, currentPath, filterMenuTree]);
 
-  const isActive = useCallback((path: string) => isPathMatching(path, pathname, 2), [pathname]);
+  const isActive = useCallback(
+    (path: string, deep?: number) => isPathMatching(path, pathname, deep || 2),
+    [pathname]
+  );
 
   const handleLinkClick = useCallback(
     (menu: MenuTree) => {

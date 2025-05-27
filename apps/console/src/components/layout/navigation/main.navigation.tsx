@@ -213,16 +213,15 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
 
     // Render regular menu button
     return (
-      <Button
+      <button
         key={id || label}
         ref={isMenuActive ? activeMenuRef : undefined}
         title={(t(label || '') || 'Menu') as string}
-        variant='unstyle'
         className={`${classes.link} ${isMenuActive ? classes.linkActive : ''} flex-shrink-0`}
         onClick={handleClick}
       >
         {t(label || '') || 'Menu'}
-      </Button>
+      </button>
     );
   };
 

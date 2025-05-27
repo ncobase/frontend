@@ -46,18 +46,17 @@ const SubmenuItemRecursive = React.memo(
 
     return (
       <div key={menu.id || menu.label}>
-        <Button
-          variant='link'
+        <button
+          type='button'
           className={cn(
-            'justify-start my-1 text-wrap text-left text-slate-500 hover:text-slate-600 hover:bg-slate-50',
-            isActive(menu.path || '') &&
-              'text-primary-500 bg-primary-50/65 hover:bg-primary-50/65 hover:text-primary-500'
+            'justify-start my-1 px-2.5 py-2 rounded-lg hover:underline text-wrap text-left text-slate-500 hover:text-slate-600',
+            isActive(menu.path || '') && 'text-primary-500  hover:text-primary-500'
           )}
-          style={{ paddingLeft: `${depth * 1}rem` }}
+          style={{ paddingLeft: `${(depth + 1) * 1}rem` }}
           onClick={() => menu.path && navigate(menu.path)}
         >
           <span>{t(menu.label || '') || menu.name}</span>
-        </Button>
+        </button>
 
         {hasChildren && (
           <div className='ml-4'>
