@@ -20,7 +20,6 @@ export const DictionaryViewerPage = ({ viewMode, record: initialRecord, handleVi
   }
 
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <>

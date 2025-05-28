@@ -7,6 +7,7 @@ import { FetchError } from 'ofetch';
 
 import { LoginProps, LoginReply, RegisterProps } from './account';
 import { accountApi, loginAccount, logoutAccount, registerAccount } from './apis';
+import { Permission } from './permissions';
 
 import { useAuthContext } from '@/features/account/context';
 
@@ -26,7 +27,7 @@ export const accountKeys: AccountKeys = {
   tenant: (queryParams = {}) => ['accountService', 'tenant', queryParams]
 };
 
-// Hook for user login
+// Hook for user login with enhanced session support
 export const useLogin = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, LoginProps>>
 ) => {
@@ -66,7 +67,6 @@ export const useLogin = (
         sessionStorage.removeItem('login_lockout_end');
         sessionStorage.removeItem('login_attempts');
 
-        // Show toast when lockout expires
         toast.info('Account Unlocked', {
           description: 'You can now attempt to login again.'
         });
@@ -104,7 +104,7 @@ export const useLogin = (
           description: 'You have successfully logged in.'
         });
 
-        // Update tokens in the auth context
+        // Update tokens in the auth context (session cookie is set by server)
         updateTokens(result.access_token, result.refresh_token);
 
         return result;
@@ -146,7 +146,7 @@ export const useLogin = (
   });
 };
 
-// Hook for user registration
+// Hook for user registration with session support
 export const useRegisterAccount = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, RegisterProps>>
 ) => {
@@ -162,7 +162,7 @@ export const useRegisterAccount = (
         description: 'Welcome! Your account has been created successfully.'
       });
 
-      // Update tokens in auth context
+      // Update tokens in auth context (session cookie is set by server)
       updateTokens(data?.access_token, data?.refresh_token);
       options?.onSuccess?.(data, variables, context);
     },
@@ -187,15 +187,22 @@ export const useAccount = () => {
     staleTime: 1000 * 60 * 15 // 15 minutes
   });
 
+  useEffect(() => {
+    if (data) {
+      Permission.setAccountData(data);
+    }
+  }, [data]);
+
   const userRoles = useMemo(() => {
     if (!data || !data.roles) return { isAdmin: false, isSuperAdmin: false };
+    const roles = data.roles;
     let isAdmin = false;
     let isSuperAdmin = false;
-    for (const role of data.roles) {
-      if (role.slug === 'admin' || role.slug === 'super-admin') {
+    for (const role of roles) {
+      if (role === 'admin' || role === 'super-admin') {
         isAdmin = true;
       }
-      if (role.slug === 'super-admin') {
+      if (role === 'super-admin') {
         isSuperAdmin = true;
       }
     }
@@ -205,31 +212,14 @@ export const useAccount = () => {
   return { ...data, ...userRoles, ...rest };
 };
 
-// // Account related tenant request merged to useAccount hook
-// // Hook to get the current tenant
-// export const useAccountTenant = () => {
-//   const { data: tenant, ...rest } = useQuery({
-//     queryKey: accountKeys.tenant(),
-//     queryFn: getAccountTenant
-//   });
-//   return { tenant, ...rest };
-// };
-
-// // Hook to get the list of tenants
-// export const useAccountTenants = (queryParams: QueryFormParams) => {
-//   return useQuery({
-//     queryKey: accountKeys.tenants(queryParams),
-//     queryFn: getAccountTenants
-//   });
-// };
-
-// Hook for user logout
+// Hook for user logout with session cleanup
 export const useLogout = () => {
-  const { updateTokens } = useAuthContext();
+  const { updateTokens, clearSession } = useAuthContext();
   const toast = useToastMessage();
 
   const handleLogout = useCallback(async () => {
     try {
+      // Call logout API (this will clear server-side session)
       await logoutAccount();
 
       // Show logout success toast
@@ -237,6 +227,8 @@ export const useLogout = () => {
         description: 'You have been successfully logged out.'
       });
 
+      // Clear local tokens and session state
+      clearSession();
       updateTokens(); // Clear tokens
     } catch (error) {
       console.error('Logout failed:', error);
@@ -247,10 +239,11 @@ export const useLogout = () => {
         duration: 4000
       });
 
-      // Still clear tokens even if the API call fails
+      // Still clear tokens and session even if the API call fails
+      clearSession();
       updateTokens();
     }
-  }, [updateTokens, toast]);
+  }, [updateTokens, clearSession, toast]);
 
   return handleLogout;
 };

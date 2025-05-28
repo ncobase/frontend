@@ -81,7 +81,8 @@ export class Request {
         ? '/api'
         : import.meta.env.VITE_API_URL || '/api',
     timeout: 30000,
-    retry: false
+    retry: false,
+    credentials: 'include'
   };
 
   constructor(fetcher: $Fetch, defaultHeaders: Record<string, string | undefined> = {}) {
@@ -266,7 +267,7 @@ export class Request {
     }
 
     // Token refresh for protected endpoints
-    if (!this.isAuthEndpoint(url) && !this.isRefreshingToken && locals.get(ACCESS_TOKEN_KEY)) {
+    if (!this.isAuthEndpoint(url) && !this.isRefreshingToken) {
       this.isRefreshingToken = true;
       try {
         await checkAndRefreshToken();

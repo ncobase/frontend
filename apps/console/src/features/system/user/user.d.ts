@@ -50,8 +50,11 @@ export interface UserSocialLink {
 export interface UserMeshes {
   user: User;
   profile: UserProfile;
-  roles?: Role[];
+  roles?: string[];
   tenants?: Tenant[];
+  permissions?: string[];
+  is_admin?: boolean;
+  tenant_id?: string;
 }
 
 /**

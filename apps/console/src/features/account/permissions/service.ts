@@ -5,6 +5,14 @@ import { ACCESS_TOKEN_KEY, TENANT_KEY } from '../context';
 import { TokenPayload } from '../token_service';
 
 export class Permission {
+  private static accountData: {
+    roles: string[];
+    permissions: string[];
+    isAdmin: boolean;
+    tenantId: string;
+    timestamp: number;
+  } | null = null;
+
   // Token cache to avoid repeated decoding
   private static tokenCache: {
     token: string | null;
@@ -81,79 +89,110 @@ export class Permission {
   }
 
   /**
+   * Set account data from API response
+   */
+  static setAccountData(accountMeshes: any): void {
+    if (!accountMeshes) return;
+
+    this.accountData = {
+      roles: accountMeshes.roles || [],
+      permissions: accountMeshes.permissions || [],
+      isAdmin: accountMeshes.is_admin || false,
+      tenantId: accountMeshes.tenant_id || '',
+      timestamp: Date.now()
+    };
+  }
+
+  /**
+   * Get permissions with account data fallback
+   */
+  static getPermissionsData(): {
+    roles: string[];
+    permissions: string[];
+    isAdmin: boolean;
+    tenantId: string;
+  } | null {
+    // Try token first
+    const decoded = this.getDecodedToken();
+    if (decoded) {
+      return {
+        roles: decoded.payload?.roles || [],
+        permissions: decoded.payload?.permissions || [],
+        isAdmin: decoded.payload?.is_admin || false,
+        tenantId: decoded.payload?.tenant_id || ''
+      };
+    }
+
+    // Fallback to account data
+    if (this.accountData) {
+      return this.accountData;
+    }
+
+    return null;
+  }
+
+  /**
    * Check if user has specific role
    */
   static hasRole(role: string | string[]): boolean {
-    const decoded = this.getDecodedToken();
-    if (!decoded) return false;
+    const permissions = this.getPermissionsData();
+    if (!permissions) return false;
 
     if (Array.isArray(role)) {
-      return role.some(r => this.hasRole(r));
+      return role.some(r => permissions.roles.includes(r));
     }
-
-    return decoded.payload?.roles?.includes(role) || false;
+    return permissions.roles.includes(role);
   }
 
   /**
    * Check if user has specific permission
    */
   static hasPermission(permission: string): boolean {
-    const decoded = this.getDecodedToken();
-    if (!decoded) return false;
+    const permissions = this.getPermissionsData();
+    if (!permissions) return false;
 
-    // Admin users have all permissions
-    if (decoded.payload.is_admin) return true;
+    if (permissions.isAdmin) return true;
 
-    if (!decoded.payload.permissions) return false;
-
-    // Exact match
-    if (decoded.payload.permissions.includes(permission)) return true;
-
-    // Wildcard permission matching
     const [action, resource] = permission.split(':');
-
-    return (
-      decoded.payload.permissions.includes(`*:${resource}`) ||
-      decoded.payload.permissions.includes(`${action}:*`) ||
-      decoded.payload.permissions.includes('*:*')
-    );
+    return permissions.permissions.some(perm => {
+      if (perm === permission) return true;
+      if (perm === `*:${resource}` || perm === `${action}:*` || perm === '*:*') return true;
+      return false;
+    });
   }
 
   /**
    * Check if user is admin
    */
   static isAdmin(): boolean {
-    const decoded = this.getDecodedToken();
-    return decoded?.payload.is_admin || false;
+    const permissions = this.getPermissionsData();
+    return permissions?.isAdmin || false;
   }
 
   /**
    * Get current tenant ID
    */
   static getCurrentTenantId(): string {
-    // Priority: active tenant from localStorage
     const activeTenantId = locals.get(TENANT_KEY);
     if (activeTenantId) return activeTenantId;
-
-    // Fallback: tenant from token
-    const decoded = this.getDecodedToken();
-    return decoded?.payload.tenant_id || '';
+    const permissions = this.getPermissionsData();
+    return permissions?.tenantId || '';
   }
 
   /**
    * Get user roles
    */
   static getRoles(): string[] {
-    const decoded = this.getDecodedToken();
-    return decoded?.payload.roles || [];
+    const permissions = this.getPermissionsData();
+    return permissions?.roles || [];
   }
 
   /**
    * Get user permissions
    */
   static getPermissions(): string[] {
-    const decoded = this.getDecodedToken();
-    return decoded?.payload.permissions || [];
+    const permissions = this.getPermissionsData();
+    return permissions?.permissions || [];
   }
 
   /**
@@ -203,6 +242,13 @@ export class Permission {
   }
 
   /**
+   * Clear account data
+   */
+  static clearAccountData(): void {
+    this.accountData = null;
+  }
+
+  /**
    * Check if route is public
    */
   static isPublicRoute(path: string): boolean {
@@ -233,6 +279,7 @@ export class Permission {
   static clearState(): void {
     locals.remove(ACCESS_TOKEN_KEY);
     this.errorState = false;
+    this.accountData = null;
     this.refreshState();
   }
 

@@ -4,7 +4,8 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useState
+  useState,
+  useRef
 } from 'react';
 
 import { isBrowser, locals } from '@ncobase/utils';
@@ -14,14 +15,12 @@ import { accountApi } from './apis';
 import { Permission } from './permissions';
 import { TokenPayload, tokenService } from './token_service';
 
-// Storage keys
 export const ACCESS_TOKEN_KEY = 'app.access.token';
 export const REFRESH_TOKEN_KEY = 'app.access.refresh';
 export const TENANT_KEY = 'app.tenant.id';
 
 import { Tenant } from '@/features/system/tenant/tenant';
 
-// Auth context interface
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -41,9 +40,10 @@ interface AuthContextValue {
     permissions?: string[];
     roles?: string[];
   }) => boolean;
+  hasValidSession: boolean;
+  clearSession: () => void;
 }
 
-// Create context with default values
 const AuthContext = React.createContext<AuthContextValue>({
   isAuthenticated: false,
   isLoading: true,
@@ -56,35 +56,12 @@ const AuthContext = React.createContext<AuthContextValue>({
   switchTenant: () => undefined,
   hasPermission: () => false,
   hasRole: () => false,
-  canAccess: () => false
+  canAccess: () => false,
+  hasValidSession: false,
+  clearSession: () => undefined
 });
 
-// Token storage helper
-const updateTokenStorage = (accessToken?: string, refreshToken?: string) => {
-  if (!isBrowser) return;
-
-  if (accessToken) {
-    locals.set(ACCESS_TOKEN_KEY, accessToken);
-  } else {
-    locals.remove(ACCESS_TOKEN_KEY);
-  }
-
-  if (refreshToken) {
-    locals.set(REFRESH_TOKEN_KEY, refreshToken);
-  } else {
-    locals.remove(REFRESH_TOKEN_KEY);
-  }
-};
-
-// Token parser with error handling
-const parseTokenSafely = (
-  token: string
-): {
-  isAdmin: boolean;
-  roles: string[];
-  permissions: string[];
-  tenantId: string;
-} => {
+const parseTokenSafely = (token: string) => {
   try {
     const decoded = jwtDecode<TokenPayload>(token);
     return {
@@ -95,314 +72,246 @@ const parseTokenSafely = (
     };
   } catch (error) {
     console.error('Failed to parse token:', error);
-    return {
-      isAdmin: false,
-      roles: [],
-      permissions: [],
-      tenantId: ''
-    };
+    return { isAdmin: false, roles: [], permissions: [], tenantId: '' };
   }
 };
 
-// Auth provider component
+const checkSessionValidity = async (): Promise<boolean> => {
+  if (!isBrowser) return false;
+
+  try {
+    const response = await fetch('/api/iam/token-status', {
+      method: 'GET',
+      credentials: 'include',
+      headers: { Accept: 'application/json' }
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
 export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
-  // State management
+  // Core state
   const [accessToken, setAccessToken] = useState<string | undefined>(
     isBrowser ? locals.get(ACCESS_TOKEN_KEY) : undefined
   );
-
-  const [activeTenantId, setActiveTenantId] = useState<string>(
-    isBrowser ? locals.get(TENANT_KEY) || '' : ''
-  );
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isTokenValid, setIsTokenValid] = useState<boolean>(false);
-  const [isLoadingTenants, setIsLoadingTenants] = useState<boolean>(false);
+  const [tenantId, setTenantId] = useState<string>(isBrowser ? locals.get(TENANT_KEY) || '' : '');
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasValidSession, setHasValidSession] = useState(false);
   const [availableTenants, setAvailableTenants] = useState<Tenant[]>([]);
 
-  const [tokenInfo, setTokenInfo] = useState<{
-    isAdmin: boolean;
-    roles: string[];
-    permissions: string[];
-    tenantId: string;
-  }>({
-    isAdmin: false,
-    roles: [],
-    permissions: [],
-    tenantId: ''
-  });
+  // Prevent duplicate checks
+  const sessionChecked = useRef(false);
+  const tenantSetFromAccount = useRef(false);
 
-  // Fetch available tenants for authenticated user
+  // Derived state
+  const isTokenValid = useMemo(() => {
+    if (!accessToken) return false;
+    return tokenService.isValidToken(accessToken) && !tokenService.isTokenExpired(accessToken);
+  }, [accessToken]);
+
+  const tokenInfo = useMemo(() => {
+    return accessToken && isTokenValid
+      ? parseTokenSafely(accessToken)
+      : {
+          isAdmin: false,
+          roles: [],
+          permissions: [],
+          tenantId: ''
+        };
+  }, [accessToken, isTokenValid]);
+
+  const isAuthenticated = (accessToken && isTokenValid) || hasValidSession;
+
+  // Check session validity once if no token
   useEffect(() => {
-    const fetchTenants = async () => {
-      if (!isTokenValid || !accessToken) {
-        setAvailableTenants([]);
-        return;
-      }
+    if (accessToken || sessionChecked.current) return;
 
-      setIsLoadingTenants(true);
+    sessionChecked.current = true;
+    checkSessionValidity().then(setHasValidSession);
+  }, [accessToken]);
+
+  // Fetch user data and set tenant from account
+  useEffect(() => {
+    if (!isTokenValid || tenantSetFromAccount.current) return;
+
+    const fetchUserData = async () => {
       try {
         const userData = await accountApi.getCurrentUser();
-        if (userData && Array.isArray(userData.tenants)) {
-          setAvailableTenants(userData.tenants);
-        } else {
-          setAvailableTenants([]);
+        const userTenants = userData?.tenants || [];
+
+        setAvailableTenants(userTenants);
+
+        // Set tenant from account data if not set locally
+        if (userTenants.length > 0) {
+          const currentTenant = tenantId && userTenants.find(t => t.id === tenantId);
+          const targetTenant = currentTenant || userTenants[0];
+
+          if (targetTenant.id !== tenantId) {
+            setTenantId(targetTenant.id);
+            locals.set(TENANT_KEY, targetTenant.id);
+          }
         }
+
+        tenantSetFromAccount.current = true;
       } catch (error) {
-        console.error('Failed to fetch user tenants:', error);
-        setAvailableTenants([]);
+        console.error('Failed to fetch user data:', error);
       } finally {
-        setIsLoadingTenants(false);
+        setIsLoading(false);
       }
     };
 
-    fetchTenants();
-  }, [isTokenValid, accessToken]);
+    fetchUserData();
+  }, [isTokenValid, tenantId]);
 
-  // Validate and process tokens
+  // Update loading state
   useEffect(() => {
-    const processToken = () => {
-      if (!accessToken) {
-        // No token - clear everything
-        setIsTokenValid(false);
-        setTokenInfo({
-          isAdmin: false,
-          roles: [],
-          permissions: [],
-          tenantId: ''
-        });
-        setIsLoading(false);
-        return;
-      }
+    if (!accessToken && sessionChecked.current) {
+      setIsLoading(false);
+    }
+  }, [accessToken]);
 
-      try {
-        // Validate token expiration
-        const isExpired = tokenService.isTokenExpired(accessToken);
-        setIsTokenValid(!isExpired);
-
-        if (!isExpired) {
-          // Parse token information
-          const parsedToken = parseTokenSafely(accessToken);
-          setTokenInfo(parsedToken);
-
-          // Handle tenant selection logic
-          if (availableTenants.length > 0) {
-            // Validate current active tenant
-            if (activeTenantId && availableTenants.some(t => t.id === activeTenantId)) {
-              // Current tenant is valid, keep it
-            } else if (
-              parsedToken.tenantId &&
-              availableTenants.some(t => t.id === parsedToken.tenantId)
-            ) {
-              // Use tenant from token if available
-              setActiveTenantId(parsedToken.tenantId);
-              if (isBrowser) {
-                locals.set(TENANT_KEY, parsedToken.tenantId);
-              }
-            } else if (availableTenants.length > 0) {
-              // Fallback to first available tenant
-              const firstTenant = availableTenants[0];
-              setActiveTenantId(firstTenant.id);
-              if (isBrowser) {
-                locals.set(TENANT_KEY, firstTenant.id);
-              }
-            }
-          } else if (!activeTenantId && parsedToken.tenantId) {
-            // No tenants loaded yet, use token tenant temporarily
-            setActiveTenantId(parsedToken.tenantId);
-            if (isBrowser) {
-              locals.set(TENANT_KEY, parsedToken.tenantId);
-            }
-          }
-        } else {
-          // Token expired - clear token info but keep token for refresh attempt
-          setTokenInfo({
-            isAdmin: false,
-            roles: [],
-            permissions: [],
-            tenantId: ''
-          });
-        }
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Token processing failed:', error);
-        setIsTokenValid(false);
-        setTokenInfo({
-          isAdmin: false,
-          roles: [],
-          permissions: [],
-          tenantId: ''
-        });
-        setIsLoading(false);
-
-        // Clear invalid tokens
-        if (isBrowser) {
-          locals.remove(ACCESS_TOKEN_KEY);
-          locals.remove(REFRESH_TOKEN_KEY);
-        }
-      }
-    };
-
-    processToken();
-  }, [accessToken, activeTenantId, availableTenants]);
-
-  // Handle token updates
-  const handleTokenUpdate = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
+  const updateTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
     setAccessToken(newAccessToken);
-    updateTokenStorage(newAccessToken, newRefreshToken);
 
-    if (newAccessToken) {
-      try {
-        // Validate new token
-        const isExpired = tokenService.isTokenExpired(newAccessToken);
-        setIsTokenValid(!isExpired);
-
-        if (!isExpired) {
-          const parsedToken = parseTokenSafely(newAccessToken);
-          setTokenInfo(parsedToken);
-
-          // Set tenant from new token
-          if (parsedToken.tenantId) {
-            setActiveTenantId(parsedToken.tenantId);
-            if (isBrowser) {
-              locals.set(TENANT_KEY, parsedToken.tenantId);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('New token validation failed:', error);
-        setIsTokenValid(false);
-        setTokenInfo({
-          isAdmin: false,
-          roles: [],
-          permissions: [],
-          tenantId: ''
-        });
-
-        // Clear invalid tokens
-        if (isBrowser) {
-          locals.remove(ACCESS_TOKEN_KEY);
-          locals.remove(REFRESH_TOKEN_KEY);
-        }
+    if (isBrowser) {
+      if (newAccessToken) {
+        locals.set(ACCESS_TOKEN_KEY, newAccessToken);
+      } else {
+        locals.remove(ACCESS_TOKEN_KEY);
       }
-    } else {
-      // Clear all authentication state
-      setIsTokenValid(false);
-      setTokenInfo({
-        isAdmin: false,
-        roles: [],
-        permissions: [],
-        tenantId: ''
-      });
-      setActiveTenantId('');
+
+      if (newRefreshToken) {
+        locals.set(REFRESH_TOKEN_KEY, newRefreshToken);
+      } else {
+        locals.remove(REFRESH_TOKEN_KEY);
+      }
+    }
+
+    if (!newAccessToken) {
+      setTenantId('');
       setAvailableTenants([]);
+      setHasValidSession(false);
+      sessionChecked.current = false;
+      tenantSetFromAccount.current = false;
 
       if (isBrowser) {
         locals.remove(TENANT_KEY);
       }
+      Permission.clearAccountData();
     }
 
-    setIsLoading(false);
-
-    // Refresh permission service state
     Permission.refreshState();
   }, []);
 
-  // Handle tenant switching
-  const handleTenantSwitch = useCallback(
-    (tenantId: string) => {
-      // Validate tenant availability
-      const isValidTenant = availableTenants.some(t => t.id === tenantId);
+  const switchTenant = useCallback(
+    (newTenantId: string) => {
+      const isValidTenant = availableTenants.some(t => t.id === newTenantId);
 
       if (!isValidTenant) {
-        console.error(`Cannot switch to tenant ${tenantId}: not available to user`);
+        console.error(`Invalid tenant: ${newTenantId}`);
         return;
       }
 
-      if (tenantId === activeTenantId) {
-        // Already on this tenant
-        return;
-      }
+      if (newTenantId === tenantId) return;
 
-      // Switch tenant
-      setActiveTenantId(tenantId);
+      setTenantId(newTenantId);
+
       if (isBrowser) {
-        locals.set(TENANT_KEY, tenantId);
+        locals.set(TENANT_KEY, newTenantId);
       }
 
-      // Refresh permission state for new tenant
       Permission.refreshState();
     },
-    [availableTenants, activeTenantId]
+    [availableTenants, tenantId]
   );
 
-  // Create context value with memoization
+  const clearSession = useCallback(() => {
+    setHasValidSession(false);
+    sessionChecked.current = false;
+    tenantSetFromAccount.current = false;
+    Permission.clearAccountData();
+    updateTokens();
+  }, [updateTokens]);
+
+  const hasPermission = useCallback(
+    (permission: string): boolean => {
+      if (!isAuthenticated) return false;
+      try {
+        return Permission.hasPermission(permission);
+      } catch {
+        return false;
+      }
+    },
+    [isAuthenticated]
+  );
+
+  const hasRole = useCallback(
+    (role: string | string[]): boolean => {
+      if (!isAuthenticated) return false;
+      try {
+        return Permission.hasRole(role);
+      } catch {
+        return false;
+      }
+    },
+    [isAuthenticated]
+  );
+
+  const canAccess = useCallback(
+    (options: {
+      permission?: string;
+      role?: string;
+      any?: boolean;
+      permissions?: string[];
+      roles?: string[];
+    }): boolean => {
+      if (!isAuthenticated) return false;
+      try {
+        return Permission.canAccess(options);
+      } catch {
+        return false;
+      }
+    },
+    [isAuthenticated]
+  );
+
   const contextValue = useMemo<AuthContextValue>(
     () => ({
-      isAuthenticated: !!accessToken && isTokenValid,
-      isLoading: isLoading || isLoadingTenants,
+      isAuthenticated,
+      isLoading,
       isAdmin: tokenInfo.isAdmin,
       roles: tokenInfo.roles,
       permissions: tokenInfo.permissions,
-      tenantId: activeTenantId,
+      tenantId,
       tokenTenantId: tokenInfo.tenantId,
-      updateTokens: handleTokenUpdate,
-      switchTenant: handleTenantSwitch,
-
-      // Permission checks using Permission service
-      hasPermission: (permission: string): boolean => {
-        if (!isTokenValid) return false;
-        try {
-          return Permission.hasPermission(permission);
-        } catch (error) {
-          console.error('Permission check failed:', error);
-          return false;
-        }
-      },
-
-      hasRole: (role: string | string[]): boolean => {
-        if (!isTokenValid) return false;
-        try {
-          return Permission.hasRole(role);
-        } catch (error) {
-          console.error('Role check failed:', error);
-          return false;
-        }
-      },
-
-      canAccess: (options: {
-        permission?: string;
-        role?: string;
-        any?: boolean;
-        permissions?: string[];
-        roles?: string[];
-      }): boolean => {
-        if (!isTokenValid) return false;
-        try {
-          return Permission.canAccess(options);
-        } catch (error) {
-          console.error('Access check failed:', error);
-          return false;
-        }
-      }
+      updateTokens,
+      switchTenant,
+      hasPermission,
+      hasRole,
+      canAccess,
+      hasValidSession,
+      clearSession
     }),
     [
-      accessToken,
-      isTokenValid,
+      isAuthenticated,
       isLoading,
-      isLoadingTenants,
       tokenInfo,
-      activeTenantId,
-      handleTokenUpdate,
-      handleTenantSwitch
+      tenantId,
+      updateTokens,
+      switchTenant,
+      hasPermission,
+      hasRole,
+      canAccess,
+      hasValidSession,
+      clearSession
     ]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
-// Hook to use auth context
 export const useAuthContext = (): AuthContextValue => {
   const context = useContext(AuthContext);
   if (!context) {

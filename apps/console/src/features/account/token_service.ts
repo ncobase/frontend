@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 import { ExplicitAny } from '@ncobase/types';
 import { locals } from '@ncobase/utils';
 import { jwtDecode } from 'jwt-decode';
@@ -7,7 +6,6 @@ import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from './context';
 
 import { request } from '@/lib/api/request';
 
-// Token payload interface
 export interface TokenPayload {
   exp: number;
   jti: string;
@@ -26,7 +24,6 @@ interface TokenResponse {
   refresh_token: string;
 }
 
-// Global state to prevent multiple simultaneous refreshes
 let refreshingPromise: Promise<TokenResponse> | null = null;
 let lastRefreshAttempt = 0;
 let refreshFailureCount = 0;
@@ -35,43 +32,28 @@ const REFRESH_COOLDOWN_TIME = 5000; // 5 seconds
 const REFRESH_BUFFER_TIME = 5 * 60 * 1000; // 5 minutes
 
 export const tokenService = {
-  /**
-   * Get token expiration time from JWT payload
-   */
   getTokenExpiration: (token: string): number | null => {
     try {
       const decoded = jwtDecode<TokenPayload>(token);
-      return decoded.exp * 1000; // Convert to milliseconds
+      return decoded.exp * 1000;
     } catch (error) {
       console.error('Failed to decode token:', error);
       return null;
     }
   },
 
-  /**
-   * Check if token is expired or will expire soon
-   */
   isTokenExpired: (token: string): boolean => {
     const expiration = tokenService.getTokenExpiration(token);
     if (!expiration) return true;
-
-    // Consider token expired if it expires within the buffer time
     return Date.now() > expiration - REFRESH_BUFFER_TIME;
   },
 
-  /**
-   * Check if token is completely expired (past exp time)
-   */
   isTokenCompletlyExpired: (token: string): boolean => {
     const expiration = tokenService.getTokenExpiration(token);
     if (!expiration) return true;
-
     return Date.now() > expiration;
   },
 
-  /**
-   * Get user ID from token
-   */
   getUserIdFromToken: (token: string): string | null => {
     try {
       const decoded = jwtDecode<TokenPayload>(token);
@@ -82,25 +64,17 @@ export const tokenService = {
     }
   },
 
-  /**
-   * Validate token format and structure
-   */
   isValidToken: (token: string): boolean => {
     if (!token) return false;
-
     try {
       const decoded = jwtDecode<TokenPayload>(token);
       return !!(decoded.payload && decoded.exp);
-      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     } catch (error) {
       return false;
     }
   }
 };
 
-/**
- * Clear all tokens and reset refresh state
- */
 export const clearTokens = (): void => {
   locals.remove(ACCESS_TOKEN_KEY);
   locals.remove(REFRESH_TOKEN_KEY);
@@ -109,19 +83,14 @@ export const clearTokens = (): void => {
   lastRefreshAttempt = 0;
 };
 
-/**
- * Refresh the access token
- */
 export const refreshAccessToken = async (): Promise<TokenResponse> => {
   const now = Date.now();
 
-  // If already refreshing, return the same promise
   if (refreshingPromise) {
     console.debug('Token refresh already in progress, waiting...');
     return refreshingPromise;
   }
 
-  // Check cooldown period after failures
   if (
     refreshFailureCount >= MAX_REFRESH_FAILURES &&
     now - lastRefreshAttempt < REFRESH_COOLDOWN_TIME
@@ -129,41 +98,38 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
     throw new Error('Too many refresh failures, please wait before trying again');
   }
 
+  const accessToken = locals.get(ACCESS_TOKEN_KEY);
   const refreshToken = locals.get(REFRESH_TOKEN_KEY);
-  if (!refreshToken) {
-    throw new Error('No refresh token available');
-  }
-
-  // Validate refresh token format
-  if (!tokenService.isValidToken(refreshToken)) {
-    console.error('Invalid refresh token format');
-    clearTokens();
-    throw new Error('Invalid refresh token');
-  }
-
-  // Check if refresh token is completely expired
-  if (tokenService.isTokenCompletlyExpired(refreshToken)) {
-    console.error('Refresh token is expired');
-    clearTokens();
-    throw new Error('Refresh token expired');
-  }
-
   lastRefreshAttempt = now;
+
+  // Check if we have any tokens to work with
+  if (!accessToken && !refreshToken) {
+    throw new Error('No tokens available for refresh');
+  }
 
   try {
     console.debug('Starting token refresh...');
 
-    // Create a new refresh request and store the promise
-    refreshingPromise = request.post(
-      '/iam/refresh-token',
-      {
-        refresh_token: refreshToken
-      },
-      {
-        timestamp: false, // Don't add timestamp to avoid infinite loops
-        timeout: 10000 // Shorter timeout for refresh requests
-      }
-    );
+    // Try refresh token first if available and valid
+    if (
+      refreshToken &&
+      tokenService.isValidToken(refreshToken) &&
+      !tokenService.isTokenCompletlyExpired(refreshToken)
+    ) {
+      refreshingPromise = request.post(
+        '/iam/refresh-token',
+        { refresh_token: refreshToken },
+        { timestamp: false, timeout: 10000 }
+      );
+    } else {
+      // Try session-based refresh
+      console.debug('No valid refresh token, attempting session-based refresh...');
+      refreshingPromise = request.post(
+        '/iam/refresh-token',
+        {},
+        { timestamp: false, timeout: 10000 }
+      );
+    }
 
     const tokens = await refreshingPromise;
 
@@ -171,7 +137,6 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
       throw new Error('Invalid token response from server');
     }
 
-    // Validate the new tokens
     if (
       !tokenService.isValidToken(tokens.access_token) ||
       !tokenService.isValidToken(tokens.refresh_token)
@@ -179,21 +144,16 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
       throw new Error('Received invalid tokens from server');
     }
 
-    // Update tokens in local storage
     locals.set(ACCESS_TOKEN_KEY, tokens.access_token);
     locals.set(REFRESH_TOKEN_KEY, tokens.refresh_token);
 
-    // Reset failure count on success
     refreshFailureCount = 0;
-
     console.debug('Token refresh successful');
     return tokens;
   } catch (error: ExplicitAny) {
     console.error('Failed to refresh token:', error);
-
     refreshFailureCount++;
 
-    // Clear tokens on specific error conditions
     if (
       error.response?.status === 401 ||
       error.response?.status === 403 ||
@@ -204,7 +164,6 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
       clearTokens();
     }
 
-    // If we've exceeded max failures, clear tokens
     if (refreshFailureCount >= MAX_REFRESH_FAILURES) {
       console.error('Max refresh failures exceeded, clearing tokens');
       clearTokens();
@@ -216,36 +175,37 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
   }
 };
 
-/**
- * Check if token needs refresh and refresh if needed
- */
 export const checkAndRefreshToken = async (): Promise<string | null> => {
   const accessToken = locals.get(ACCESS_TOKEN_KEY);
+  const refreshToken = locals.get(REFRESH_TOKEN_KEY);
 
-  if (!accessToken) {
+  // If no tokens at all, don't attempt refresh
+  if (!accessToken && !refreshToken) {
+    console.debug('No tokens available, skipping refresh');
     return null;
   }
 
-  // Validate token format first
-  if (!tokenService.isValidToken(accessToken)) {
-    console.warn('Invalid access token format, clearing tokens');
-    clearTokens();
-    return null;
-  }
-
-  try {
-    // Check if token needs refresh
-    if (tokenService.isTokenExpired(accessToken)) {
-      console.debug('Token needs refresh, attempting refresh...');
-      const newTokens = await refreshAccessToken();
-      return newTokens.access_token;
+  // If we have an access token, validate it
+  if (accessToken) {
+    if (!tokenService.isValidToken(accessToken)) {
+      console.warn('Invalid access token format, clearing tokens');
+      clearTokens();
+      return null;
     }
 
-    return accessToken;
+    if (!tokenService.isTokenExpired(accessToken)) {
+      return accessToken;
+    }
+  }
+
+  // Try to refresh if we have refresh token or valid session
+  try {
+    console.debug('Token needs refresh, attempting refresh...');
+    const newTokens = await refreshAccessToken();
+    return newTokens.access_token;
   } catch (error: ExplicitAny) {
     console.error('Token refresh failed:', error);
 
-    // Only clear tokens for authentication errors
     if (
       error.response?.status === 401 ||
       error.response?.status === 403 ||
@@ -259,9 +219,6 @@ export const checkAndRefreshToken = async (): Promise<string | null> => {
   }
 };
 
-/**
- * Force refresh token
- */
 export const forceRefreshToken = async (): Promise<TokenResponse | null> => {
   try {
     return await refreshAccessToken();
@@ -271,9 +228,6 @@ export const forceRefreshToken = async (): Promise<TokenResponse | null> => {
   }
 };
 
-/**
- * Get current refresh state for debugging
- */
 export const getRefreshState = () => ({
   isRefreshing: !!refreshingPromise,
   failureCount: refreshFailureCount,

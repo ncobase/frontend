@@ -59,6 +59,7 @@ export const TenantSwitcher = ({
 
   const onSelect = useCallback(
     (id: string) => {
+      if (!id || !tenantId) return;
       if (id !== tenantId) {
         switchTenant(id);
         redirect();
