@@ -56,7 +56,7 @@ export class Permission {
   }
 
   /**
-   * Get decoded token with caching and error handling
+   * Get decoded token
    */
   static getDecodedToken(): TokenPayload | null {
     if (this.errorState) return null;

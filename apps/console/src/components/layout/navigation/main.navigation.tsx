@@ -196,7 +196,7 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     const hasChildren = children && Array.isArray(children) && children.length > 0;
     const isMenuActive = isActive(path || '');
 
-    // Render dropdown for menu with children
+    // Render dropdown for menu
     if (hasChildren && withSubmenu) {
       return (
         <Dropdown key={id || label}>

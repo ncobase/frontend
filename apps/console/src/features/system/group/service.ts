@@ -26,7 +26,7 @@ export const useQueryGroup = (group: string) =>
     enabled: !!group
   });
 
-// List groups with query params
+// List groups
 export const useListGroups = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: groupKeys.list(queryParams),

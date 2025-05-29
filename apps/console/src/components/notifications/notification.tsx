@@ -86,7 +86,7 @@ export interface NotificationsProps {
 }
 
 /**
- * A reusable notifications component with hover card dropdown
+ * A reusable notifications component
  */
 export const Notifications = ({
   items = [],

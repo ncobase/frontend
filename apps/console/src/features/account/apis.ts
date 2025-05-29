@@ -69,7 +69,7 @@ export const authApi = {
   //   return request.post(`${authEndpoint}/request-password-reset`, { email });
   // },
 
-  // Reset password with token
+  // Reset password
   // resetPassword: async (token: string, newPassword: string): Promise<void> => {
   //   return request.post(`${authEndpoint}/reset-password`, { token, newPassword });
   // },

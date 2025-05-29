@@ -37,7 +37,7 @@ export const useQueryUser = (user: string) =>
     enabled: !!user
   });
 
-// Query user meshes (user + profile data)
+// Query user meshes
 export const useQueryUserMeshes = (user: string) => {
   return useQuery({
     queryKey: userKeys.meshes({ user }),
@@ -46,7 +46,7 @@ export const useQueryUserMeshes = (user: string) => {
   });
 };
 
-// List users with query params
+// List users
 export const useListUsers = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: userKeys.list(queryParams),

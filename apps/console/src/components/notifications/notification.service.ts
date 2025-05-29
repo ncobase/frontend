@@ -40,7 +40,7 @@ export const useNotificationService = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>(storedNotifications || []);
   const [settings, setSettings] = useState<NotificationSettings>(storedSettings || defaultSettings);
 
-  // Sync local state with storage
+  // Sync local state
   useEffect(() => {
     setNotifications(storedNotifications || []);
   }, [storedNotifications]);

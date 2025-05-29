@@ -26,7 +26,7 @@ export const useQueryRole = (role: string) =>
     enabled: !!role
   });
 
-// List roles with query params
+// List roles
 export const useListRoles = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: roleKeys.list(queryParams),

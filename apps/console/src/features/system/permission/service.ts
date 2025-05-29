@@ -37,7 +37,7 @@ export const useQueryPermission = (permission: string) =>
     enabled: !!permission
   });
 
-// List permissions with query params
+// List permissions
 export const useListPermissions = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: permissionKeys.list(queryParams),

@@ -66,7 +66,7 @@ export const useBatchOptions = (names: string[]) =>
     enabled: names.length > 0
   });
 
-// List options with query params
+// List options
 export const useListOptions = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: optionsKeys.list(queryParams),

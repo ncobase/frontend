@@ -111,7 +111,7 @@ export const useUserAuthorizedMenus = (userId: string) =>
     enabled: !!userId
   });
 
-// List menus with query params
+// List menus
 export const useListMenus = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: menuKeys.list(queryParams),

@@ -79,7 +79,7 @@ export const useBatchDictionaries = (slugs: string[]) =>
     enabled: slugs.length > 0
   });
 
-// List dictionaries with query params
+// List dictionaries
 export const useListDictionaries = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: dictionaryKeys.list(queryParams),

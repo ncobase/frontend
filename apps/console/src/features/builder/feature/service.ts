@@ -872,7 +872,7 @@ export const generateRelationsServiceCode = (
   const code = `import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-// This is a simple utility hook to manage relations with external entities
+// This is a simple utility hook to manage relations
 export const use${featureConfig.name}Relations = () => {
   // Cache fetched options for selects
   const [cachedOptions, setCachedOptions] = useState<Record<string, any[]>>({});
@@ -1504,7 +1504,7 @@ export const generateAllCodeFiles = (
     featureConfig.hasCustomApi
   );
 
-  // Service layer with React Query hooks
+  // Service layer
   files[`service.ts`] = generateServiceCode(featureConfig, entityFields, entityRelations);
 
   // Relations service if needed

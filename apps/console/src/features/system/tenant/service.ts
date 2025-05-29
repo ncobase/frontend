@@ -28,7 +28,7 @@ export const useQueryTenant = (slug: string) =>
     enabled: !!slug
   });
 
-// List tenants with query params
+// List tenants
 export const useListTenants = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: tenantKeys.list(queryParams),

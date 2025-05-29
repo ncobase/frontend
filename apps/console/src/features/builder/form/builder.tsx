@@ -760,7 +760,7 @@ export const FormBuilder = ({
     const template = fieldTemplates[category].find(t => t.type === templateType)?.template;
     if (!template) return;
 
-    // Create a new field with unique name
+    // Create a new field with a unique name
     const timestamp = Date.now();
     const newField = {
       ...template,

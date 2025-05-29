@@ -2,14 +2,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useToastMessage } from '@ncobase/react';
 import { AnyObject } from '@ncobase/types';
-import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query';
+import { locals } from '@ncobase/utils';
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
+import { useNavigate } from 'react-router';
 
 import { LoginProps, LoginReply, RegisterProps } from './account';
 import { accountApi, loginAccount, logoutAccount, registerAccount } from './apis';
 import { Permission } from './permissions';
+import { clearTokens } from './token_service';
 
-import { useAuthContext } from '@/features/account/context';
+import {
+  ACCESS_TOKEN_KEY,
+  REFRESH_TOKEN_KEY,
+  TENANT_KEY,
+  useAuthContext
+} from '@/features/account/context';
+import { eventEmitter } from '@/lib/events';
 
 interface AccountKeys {
   login: ['accountService', 'login'];
@@ -27,7 +36,7 @@ export const accountKeys: AccountKeys = {
   tenant: (queryParams = {}) => ['accountService', 'tenant', queryParams]
 };
 
-// Hook for user login with enhanced session support
+// Hook for user login
 export const useLogin = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, LoginProps>>
 ) => {
@@ -146,7 +155,7 @@ export const useLogin = (
   });
 };
 
-// Hook for user registration with session support
+// Hook for user registration
 export const useRegisterAccount = (
   options?: Partial<UseMutationOptions<LoginReply, FetchError, RegisterProps>>
 ) => {
@@ -212,38 +221,137 @@ export const useAccount = () => {
   return { ...data, ...userRoles, ...rest };
 };
 
-// Hook for user logout with session cleanup
+// Hook for user logout
 export const useLogout = () => {
   const { updateTokens, clearSession } = useAuthContext();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const toast = useToastMessage();
 
-  const handleLogout = useCallback(async () => {
-    try {
-      // Call logout API (this will clear server-side session)
-      await logoutAccount();
+  const handleLogout = useCallback(
+    async (options?: { skipApi?: boolean; showToast?: boolean; redirectTo?: string }) => {
+      const { skipApi = false, showToast = true, redirectTo = '/login' } = options || {};
 
-      // Show logout success toast
-      toast.info('Logged Out', {
-        description: 'You have been successfully logged out.'
-      });
+      try {
+        if (!skipApi) {
+          try {
+            await logoutAccount();
+          } catch (apiError) {
+            console.warn('Server logout failed, but continuing with local cleanup:', apiError);
+          }
+        }
 
-      // Clear local tokens and session state
-      clearSession();
-      updateTokens(); // Clear tokens
-    } catch (error) {
-      console.error('Logout failed:', error);
+        clearAllLocalData();
 
-      // Show logout error toast
-      toast.warning('Logout Error', {
-        description: 'There was an issue logging out, but your session has been cleared.',
-        duration: 4000
-      });
+        queryClient.clear();
 
-      // Still clear tokens and session even if the API call fails
-      clearSession();
-      updateTokens();
-    }
-  }, [updateTokens, clearSession, toast]);
+        Permission.clearState();
+
+        clearSession();
+        updateTokens();
+
+        eventEmitter.emit('logout', {
+          timestamp: Date.now(),
+          reason: 'user_initiated'
+        });
+
+        if (showToast) {
+          toast.success('Logged Out', {
+            description: 'You have been successfully logged out.',
+            duration: 3000
+          });
+        }
+
+        setTimeout(() => {
+          const currentPath = window.location.pathname + window.location.search;
+          const loginUrl =
+            redirectTo === '/login'
+              ? `/login?redirect=${encodeURIComponent(currentPath)}`
+              : redirectTo;
+
+          navigate(loginUrl, { replace: true });
+        }, 100);
+      } catch (error) {
+        console.error('Logout process failed:', error);
+
+        clearAllLocalData();
+        clearSession();
+        updateTokens();
+        Permission.clearState();
+
+        if (showToast) {
+          toast.warning('Logout Completed', {
+            description: 'There was an issue during logout, but your session has been cleared.',
+            duration: 4000
+          });
+        }
+
+        navigate('/login', { replace: true });
+      }
+    },
+    [updateTokens, clearSession, navigate, queryClient, toast]
+  );
 
   return handleLogout;
+};
+
+const clearAllLocalData = () => {
+  try {
+    locals.remove(ACCESS_TOKEN_KEY);
+    locals.remove(REFRESH_TOKEN_KEY);
+    locals.remove(TENANT_KEY);
+
+    const authKeys = [
+      'app.access.token',
+      'app.access.refresh',
+      'app.tenant.id',
+      'login_attempts',
+      'login_lockout_end'
+    ];
+
+    authKeys.forEach(key => {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    });
+
+    clearTokens();
+  } catch (error) {
+    console.error('Error clearing local data:', error);
+  }
+};
+
+// Global logout function
+export const globalLogout = async (reason: string = 'unknown') => {
+  try {
+    await logoutAccount();
+  } catch (error) {
+    console.warn('Server logout failed during global logout:', error);
+  }
+
+  clearAllLocalData();
+
+  eventEmitter.emit('logout', {
+    timestamp: Date.now(),
+    reason
+  });
+
+  window.location.href = '/login';
+};
+
+// Hook for auto logout
+export const useAutoLogout = () => {
+  const logout = useLogout();
+
+  const autoLogout = useCallback(
+    (reason: string) => {
+      logout({
+        skipApi: reason === 'token_expired',
+        showToast: true,
+        redirectTo: '/login'
+      });
+    },
+    [logout]
+  );
+
+  return autoLogout;
 };

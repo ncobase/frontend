@@ -15,7 +15,7 @@ export const XMdTenantKey = 'x-md-tid';
 // XMdDomainKey - global domain id
 // XMdDomainKey = XMdTenantKey
 export const XMdDomainKey = 'x-md-did';
-// XMdTotalKey - result total with response
+// XMdTotalKey - result total
 export const XMdTotalKey = 'x-md-total';
 
 // --- i18n

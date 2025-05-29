@@ -22,7 +22,7 @@ export const BusinessDashboard = () => {
   const [activeFilter, setActiveFilter] = useState('last_30_days');
   const [theme, setTheme] = useState('light');
 
-  // Color palette consistent with provided code
+  // Color palette consistent
   const chartColors = [
     '#4285F4', // Blue
     '#EA4335', // Red
@@ -34,7 +34,7 @@ export const BusinessDashboard = () => {
     '#8BC34A' // Light Green
   ];
 
-  // Chart configuration with direct color values
+  // Chart configuration
   const chartConfig = {
     sales: {
       label: 'Sales',

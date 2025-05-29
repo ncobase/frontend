@@ -65,7 +65,6 @@ export function findMenuByParentId(menus: MenuTree[], parentId: string, type: st
 
 /**
  * Finds a menu item by its URL path in a hierarchical structure.
- * Enhanced to support deep nested menu structures with proper path matching.
  */
 export function getMenuByUrl(menus: MenuTree[], url: string, depth: number = 0): MenuTree | null {
   if (!menus || !Array.isArray(menus) || menus.length === 0 || !url) {

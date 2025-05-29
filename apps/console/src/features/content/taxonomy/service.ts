@@ -26,7 +26,7 @@ export const useQueryTaxonomy = (taxonomy: string) =>
     enabled: !!taxonomy
   });
 
-// List taxonomies with query params
+// List taxonomies
 export const useListTaxonomies = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: taxonomyKeys.list(queryParams),

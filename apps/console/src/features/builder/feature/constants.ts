@@ -18,7 +18,7 @@ export const FIELD_TYPES = [
   { value: 'hidden', label: 'Hidden Field', icon: 'IconEyeOff' }
 ];
 
-// Relationship types with descriptions
+// Relationship types
 export const RELATION_TYPES = [
   {
     value: 'oneToOne',

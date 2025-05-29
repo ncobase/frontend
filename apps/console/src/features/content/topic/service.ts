@@ -36,7 +36,7 @@ export const useQueryTopic = (topic: string) =>
     enabled: !!topic
   });
 
-// List topics with query params
+// List topics
 export const useListTopics = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: topicKeys.list(queryParams),
