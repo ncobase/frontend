@@ -86,6 +86,7 @@
   "actions.update": "تحديث",
   "actions.upload": "رفع",
   "actions.view": "عرض",
+  "actions.retry": "إعادة المحاولة",
   "actions_button.label": "تنفيذ",
   "application_title": "نظام إدارة Ncobase",
   "builder.feature.navigation": "منشئ الميزات",

@@ -24,7 +24,7 @@ export const NetworkError = ({ onRetry }: { onRetry?: () => void }) => {
 
   return (
     <div className='flex flex-col mx-auto pt-20 min-h-[60vh] justify-center items-center'>
-      <div className='text-center font-medium text-6xl text-gradient mb-8'>
+      <div className='text-center font-medium text-6xl leading-20 text-gradient mb-8'>
         {t('errors.network.title', 'Network Error')}
       </div>
       <span className='mx-auto max-w-md text-secondary-600 mt-4 mb-12 text-center'>

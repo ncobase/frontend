@@ -86,6 +86,7 @@
   "actions.update": "Update",
   "actions.upload": "Upload",
   "actions.view": "View",
+  "actions.retry": "Retry",
   "actions_button.label": "Execute",
   "application_title": "Ncobase Management System",
   "builder.feature.navigation": "Feature Builder",

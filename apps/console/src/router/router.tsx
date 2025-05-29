@@ -69,7 +69,7 @@ const routes = [
   },
   {
     path: '/error/network',
-    element: <NetworkError />
+    element: <ErrorPage code='network' />
   },
 
   // Protected routes

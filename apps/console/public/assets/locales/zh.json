@@ -86,6 +86,7 @@
   "actions.update": "更新",
   "actions.upload": "上传",
   "actions.view": "查看",
+  "actions.retry": "重试",
   "actions_button.label": "执行",
   "application_title": "Ncobase 管理系统",
   "builder.feature.navigation": "功能构建器",
