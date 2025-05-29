@@ -156,7 +156,7 @@ export const AdvancedSearchExample = () => {
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value
+      [key]: value === 'all' ? '' : value
     }));
   };
 
@@ -217,7 +217,7 @@ export const AdvancedSearchExample = () => {
                         <SelectValue placeholder={t('example.search.filter.allTypes')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value=''>{t('example.search.filter.allTypes')}</SelectItem>
+                        <SelectItem value='all'>{t('example.search.filter.allTypes')}</SelectItem>
                         <SelectItem value='项目'>项目</SelectItem>
                         <SelectItem value='任务'>任务</SelectItem>
                         <SelectItem value='需求'>需求</SelectItem>
@@ -237,7 +237,9 @@ export const AdvancedSearchExample = () => {
                         <SelectValue placeholder={t('example.search.filter.allStatuses')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value=''>{t('example.search.filter.allStatuses')}</SelectItem>
+                        <SelectItem value='all'>
+                          {t('example.search.filter.allStatuses')}
+                        </SelectItem>
                         <SelectItem value='活跃'>活跃</SelectItem>
                         <SelectItem value='已归档'>已归档</SelectItem>
                         <SelectItem value='已暂停'>已暂停</SelectItem>
@@ -256,7 +258,9 @@ export const AdvancedSearchExample = () => {
                         <SelectValue placeholder={t('example.search.filter.allPriorities')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value=''>{t('example.search.filter.allPriorities')}</SelectItem>
+                        <SelectItem value='all'>
+                          {t('example.search.filter.allPriorities')}
+                        </SelectItem>
                         <SelectItem value='高'>高</SelectItem>
                         <SelectItem value='中'>中</SelectItem>
                         <SelectItem value='低'>低</SelectItem>
@@ -274,7 +278,7 @@ export const AdvancedSearchExample = () => {
                         <SelectValue placeholder={t('example.search.filter.allOwners')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value=''>{t('example.search.filter.allOwners')}</SelectItem>
+                        <SelectItem value='all'>{t('example.search.filter.allOwners')}</SelectItem>
                         <SelectItem value='张三'>张三</SelectItem>
                         <SelectItem value='李四'>李四</SelectItem>
                         <SelectItem value='王五'>王五</SelectItem>

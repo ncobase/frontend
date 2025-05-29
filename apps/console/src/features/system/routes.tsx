@@ -1,5 +1,6 @@
 import { BasicRoutes } from './basic/routes';
 import { DictionaryRoutes } from './dictionary/routes';
+import ExtensionRoutes from './extension/routes';
 import { GroupRoutes } from './group/routes';
 import { MenuRoutes } from './menu/routes';
 import OptionsRoutes from './options/routes';
@@ -13,6 +14,7 @@ import { Guard, renderRoutes } from '@/router';
 export const SystemRoutes = () => {
   const routes = [
     { path: 'dictionary/*', element: <DictionaryRoutes /> },
+    { path: 'extension/*', element: <ExtensionRoutes /> },
     { path: 'group/*', element: <GroupRoutes /> },
     { path: 'user/*', element: <UserRoutes /> },
     { path: 'permission/*', element: <PermissionRoutes /> },
