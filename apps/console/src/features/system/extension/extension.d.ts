@@ -1,91 +1,106 @@
 // Extension types and interfaces
-export interface Extension {
+export interface ExtensionMetadata {
   name: string;
-  version?: string;
-  group: string;
-  type: 'module' | 'plugin';
-  status: 'active' | 'inactive' | 'error';
+  version: string;
   description?: string;
-  metadata?: Record<string, any>;
-  created_at?: string;
-  updated_at?: string;
+  type: string;
+  group: string;
+  dependencies?: string[];
 }
 
+export interface Extension {
+  name: string;
+  version: string;
+  group: string;
+  type: string;
+  description?: string;
+  dependencies?: string[];
+  status?: string;
+}
+
+// Metrics structure
 export interface ExtensionMetrics {
-  events: {
-    memory: {
-      active_handlers: number;
-      delivered: number;
-      events_per_second: number;
-      failed: number;
-      last_event_time: string;
-      published: number;
-      retries: number;
-      success_rate: number;
-      total_subscribers: number;
+  timestamp: string;
+  collections?: {
+    [collectionName: string]: {
+      name: string;
+      metrics: MetricSnapshot[];
+      last_updated: string;
     };
-    queue: {
-      consume_failed: number;
-      consume_success_rate: number;
-      consumed: number;
-      failed: number;
-      last_consume_time: string;
-      last_publish_time: string;
-      publish_success_rate: number;
-      published: number;
-      retries: number;
-    };
+  };
+  storage?: {
     status: string;
-    timestamp: string;
-    total: {
-      failed: number;
-      published: number;
-      success: number;
-      success_rate: number;
+    total_collections: number;
+    total_metrics: number;
+    collections: {
+      [name: string]: {
+        metric_count: number;
+        last_updated: string;
+      };
     };
   };
-  extensions: {
-    by_group: Record<string, number>;
-    by_status: Record<string, number>;
-    by_type: Record<string, number>;
-    circuit_breakers: number;
-    cross_services: number;
-    initialized: boolean;
-    total: number;
-  };
-  messaging: {
-    fallback_active: boolean;
-    fallback_reason: string;
-    kafka_connected: boolean;
-    memory_fallback: boolean;
-    overall_available: boolean;
-    primary_transport: string;
-    rabbitmq_connected: boolean;
-  };
-  service_cache: {
-    age_seconds: number;
+  service_cache?: {
+    status: string;
+    size: number;
+    ttl_seconds: number;
+    last_update: string;
     cache_hits: number;
     cache_misses: number;
-    deregistrations: number;
-    errors: number;
-    evictions: number;
-    health_checks: number;
     hit_rate: number;
-    is_expired: boolean;
-    last_update: string;
-    lookups: number;
-    registrations: number;
-    size: number;
-    status: string;
-    ttl_seconds: number;
     updates: number;
+    evictions: number;
+    age_seconds: number;
+    is_expired: boolean;
+    registrations: number;
+    deregistrations: number;
+    lookups: number;
+    health_checks: number;
+    errors: number;
   };
+  data_health?: {
+    status: string;
+    components: {
+      [name: string]: any;
+    };
+  };
+  data_stats?: any;
+  security?: {
+    sandbox_enabled: boolean;
+    signature_required: boolean;
+    trusted_sources: number;
+    allowed_paths: number;
+    blocked_extensions: number;
+  };
+  resource_usage?: {
+    [pluginName: string]: PluginMetrics;
+  };
+  system?: {
+    memory_usage_mb: number;
+    goroutines: number;
+    gc_cycles: number;
+  };
+}
+
+export interface MetricSnapshot {
+  name: string;
+  type: string; // counter, gauge, histogram, summary
+  value: any;
+  labels?: { [key: string]: string };
   timestamp: string;
+  help?: string;
+  unit?: string;
+}
+
+export interface PluginMetrics {
+  memory_usage_mb: number;
+  cpu_usage_percent: number;
+  load_time: string;
+  init_time?: string;
+  last_access: string;
 }
 
 export interface ExtensionStatus {
   [key: string]: {
-    name: string;
     status: string;
     error?: string;
     uptime?: number;
@@ -98,12 +113,32 @@ export interface ExtensionListResponse {
   };
 }
 
-export interface ExtensionActionPayload {
-  name: string;
+export interface ExtensionActionResponse {
+  message: string;
 }
 
-export interface MetricType {
-  id: string;
-  label: string;
-  description: string;
+export interface HealthCheckResponse {
+  status: string; // healthy, degraded, unhealthy
+  timestamp: string;
+  extensions: number;
+  components: {
+    [name: string]: {
+      status: string;
+      [key: string]: any;
+    };
+  };
+}
+
+export interface CircuitBreakerStatus {
+  total: number;
+  open: number;
+  closed: number;
+  breakers: {
+    [name: string]: {
+      state: string;
+      requests: number;
+      total_successes: number;
+      total_failures: number;
+    };
+  };
 }
