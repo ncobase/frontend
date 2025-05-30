@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-import { Navigate, useLocation } from 'react-router';
+import { useLocation, Navigate } from 'react-router';
 
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Error403 } from '@/components/errors/403';
 import { Spinner } from '@/components/loading/spinner';
 import { useAuthContext } from '@/features/account/context';
-import { Permission } from '@/features/account/permissions';
+import { usePermissions } from '@/features/account/permissions';
 import { useAccount } from '@/features/account/service';
 
 interface GuardProps {
@@ -41,6 +41,7 @@ export const Guard: React.FC<GuardProps> = ({
 }) => {
   const { isAuthenticated, isLoading } = useAuthContext();
   const { isAdmin: hasAdminPrivileges, isSuperAdmin, isLoading: isAccountLoading } = useAccount();
+  const { canAccess } = usePermissions();
   const { pathname, search } = useLocation();
   const [accessDenied, setAccessDenied] = useState(false);
 
@@ -50,7 +51,7 @@ export const Guard: React.FC<GuardProps> = ({
   }, [pathname]);
 
   // Check access permissions
-  const canAccess = (): boolean => {
+  const canAccessRoute = (): boolean => {
     // Server-side access denial takes precedence
     if (accessDenied) return false;
 
@@ -68,7 +69,7 @@ export const Guard: React.FC<GuardProps> = ({
 
     // Permission-based access control
     try {
-      return Permission.canAccess({
+      return canAccess({
         permission,
         role,
         any,
@@ -95,7 +96,7 @@ export const Guard: React.FC<GuardProps> = ({
   }
 
   // Handle access denial
-  if (!canAccess()) {
+  if (!canAccessRoute()) {
     if (fallback) {
       return <>{fallback}</>;
     }

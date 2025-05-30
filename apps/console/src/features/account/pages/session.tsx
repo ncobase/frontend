@@ -19,9 +19,7 @@ const getDeviceIcon = (userAgent?: string, deviceInfo?: Record<string, any>) => 
 };
 
 const getLocationDisplay = (session: Session) => {
-  if (session.location) return session.location;
-  if (session.ip_address) return session.ip_address;
-  return 'Unknown';
+  return session.location || session.ip_address || 'Unknown';
 };
 
 const SessionCard = ({
@@ -106,6 +104,7 @@ const SessionCard = ({
   );
 };
 
+// Main session page component
 export const SessionPage = () => {
   const { t } = useTranslation();
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
@@ -129,6 +128,7 @@ export const SessionPage = () => {
     });
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <Page title={t('sessions.title')}>
@@ -141,6 +141,7 @@ export const SessionPage = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <Page title={t('sessions.title')}>
@@ -158,6 +159,7 @@ export const SessionPage = () => {
     <Page title={t('sessions.title')}>
       <ScrollView className='py-6'>
         <Container className='max-w-4xl'>
+          {/* Header */}
           <div className='mb-6'>
             <div className='flex items-center justify-between'>
               <div>
@@ -178,6 +180,7 @@ export const SessionPage = () => {
             </div>
           </div>
 
+          {/* Sessions list */}
           <div className='space-y-4'>
             {sessions.length === 0 ? (
               <div className='text-center py-12'>
@@ -196,6 +199,7 @@ export const SessionPage = () => {
             )}
           </div>
 
+          {/* Deactivate all confirmation modal */}
           <Modal
             isOpen={showDeactivateModal}
             onChange={() => setShowDeactivateModal(!showDeactivateModal)}

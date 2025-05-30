@@ -7,8 +7,8 @@ import { useLocation } from 'react-router';
 
 import { useAuthContext } from '@/features/account/context';
 import { LoginForm } from '@/features/account/pages/auth/login_form';
-import { Permission } from '@/features/account/permissions';
 import { eventEmitter } from '@/lib/events';
+import { isPublicRoute } from '@/router/helpers/utils';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
 interface LoginInterceptorContextValue {
@@ -38,10 +38,10 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
   // Prevent multiple simultaneous modal openings
   const [isHandlingAuth, setIsHandlingAuth] = useState(false);
   const lastEventTime = useRef<number>(0);
-  const eventCooldown = 2000; // 2 seconds cooldown
+  const EVENT_COOLDOWN = 2000; // 2 seconds cooldown
 
   const open = () => {
-    if (!isHandlingAuth && !opened && !isAuthenticated) {
+    if (!isHandlingAuth && !opened && !isAuthenticated && !isPublicRoute(location.pathname)) {
       setOpened(true);
       setIsHandlingAuth(true);
       queryClient.cancelQueries({ type: 'all' }, { revert: true, silent: true });
@@ -56,18 +56,18 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
-    const handleUnauthenticated = (_message?: string) => {
+    const handleUnauthenticated = () => {
       const now = Date.now();
 
       // Apply cooldown to prevent rapid-fire modal openings
-      if (now - lastEventTime.current < eventCooldown) {
+      if (now - lastEventTime.current < EVENT_COOLDOWN) {
         return;
       }
 
       lastEventTime.current = now;
 
-      // Only show login modal for non-public routes and when not already authenticated
-      if (!Permission.isPublicRoute(location.pathname) && !isAuthenticated && !opened) {
+      // Only show login modal for non-public routes when not authenticated
+      if (!isPublicRoute(location.pathname) && !isAuthenticated && !opened) {
         console.debug('Unauthorized access detected, showing login modal');
 
         // Small delay to prevent immediate modal opening
@@ -80,16 +80,6 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
     const handleForbidden = (data: { method?: string; url?: string; message?: string }) => {
       // For 403 errors, don't show login modal - navigation will handle redirect
       console.warn('Access forbidden - user is authenticated but lacks permissions:', data);
-    };
-
-    const handleServerError = (data: { status?: number; message?: string; url?: string }) => {
-      // For server errors, don't show login modal - navigation will handle redirect
-      console.warn('Server error occurred:', data);
-    };
-
-    const handleNetworkError = (data: { url?: string; message?: string }) => {
-      // For network errors, don't show login modal - navigation will handle redirect
-      console.warn('Network error occurred:', data);
     };
 
     const handleLogin = () => {
@@ -109,17 +99,12 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
       updateTokens();
     };
 
-    // Only listen for unauthorized events when user is not authenticated and not on public routes
-    if (!isAuthenticated && !Permission.isPublicRoute(location.pathname)) {
+    // Listen for authentication events
+    if (!isAuthenticated && !isPublicRoute(location.pathname)) {
       eventEmitter.on('unauthorized', handleUnauthenticated);
     }
 
-    // Always listen for other events but handle them appropriately
     eventEmitter.on('forbidden', handleForbidden);
-    eventEmitter.on('server-error', handleServerError);
-    eventEmitter.on('network-error', handleNetworkError);
-
-    // Listen for authentication events
     eventEmitter.on('login', handleLogin);
     eventEmitter.on('logout', handleLogout);
 
@@ -129,12 +114,10 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
       }
       eventEmitter.off('unauthorized', handleUnauthenticated);
       eventEmitter.off('forbidden', handleForbidden);
-      eventEmitter.off('server-error', handleServerError);
-      eventEmitter.off('network-error', handleNetworkError);
       eventEmitter.off('login', handleLogin);
       eventEmitter.off('logout', handleLogout);
     };
-  }, [location.pathname, isAuthenticated, opened]);
+  }, [location.pathname, isAuthenticated, opened, updateTokens]);
 
   // Reset state when authentication status changes
   useEffect(() => {
@@ -145,7 +128,7 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
 
   // Reset state when route changes to public route
   useEffect(() => {
-    if (Permission.isPublicRoute(location.pathname) && opened) {
+    if (isPublicRoute(location.pathname) && opened) {
       close();
     }
   }, [location.pathname, opened]);

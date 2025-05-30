@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 
 import { Button, CheckboxField, Form, InputField } from '@ncobase/react';
-import { ExplicitAny } from '@ncobase/types';
 import { cn, upperFirst } from '@ncobase/utils';
 import { Controller, useForm, UseFormSetValue } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
@@ -20,36 +19,20 @@ const LoginHint = ({ setValue }: LoginHintProps) => {
   const isProd = import.meta.env.PROD;
   const envName = !isProd && import.meta.env.MODE;
 
-  if (!envName || isProd) {
-    return null;
-  }
-
-  const username = 'super';
-  const password = 'Super123456';
+  if (!envName || isProd) return null;
 
   const handleLoginHintClick = () => {
-    setValue('username', username);
-    setValue('password', password);
+    setValue('username', 'super');
+    setValue('password', 'Super123456');
     setValue('remember', true);
   };
 
-  const classess = cn(
-    'px-3.5 py-2 text-center rounded-xl text-slate-500',
-    {
-      'bg-warning-50': !isProd
-    },
-    { 'bg-red-50': isProd }
-  );
-
   return (
-    <div className={classess}>
+    <div className={cn('px-3.5 py-2 text-center rounded-xl text-slate-500', 'bg-warning-50')}>
       <Trans
         t={t}
         i18nKey='login_hint'
-        values={{
-          name: upperFirst(envName)
-          // credentials: `${username} / ${password}`
-        }}
+        values={{ name: upperFirst(envName) }}
         components={{
           anchor: <Button variant='link' className='px-1' onClick={handleLoginHintClick} />
         }}
@@ -58,15 +41,17 @@ const LoginHint = ({ setValue }: LoginHintProps) => {
   );
 };
 
+interface LoginFormProps {
+  onSuccess?: () => void;
+  hideForgetPassword?: boolean;
+  hideRegister?: boolean;
+}
+
 export const LoginForm = ({
   onSuccess = () => undefined,
   hideForgetPassword = false,
   hideRegister = false
-}: ExplicitAny & {
-  onSuccess: () => void;
-  hideForgetPassword?: boolean;
-  hideRegister?: boolean;
-}) => {
+}: LoginFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -77,26 +62,21 @@ export const LoginForm = ({
     formState: { errors }
   } = useForm<LoginProps>();
 
-  const onError = error => {
-    const { reason, message } = error?._data ?? ({} as ExplicitAny);
-    // TODO: Notification
-    const _notificationProps = {
-      title: reason,
-      message: message || t(`componnets:errorPage.${reason?.toLowerCase() || 'unknown.label'}`),
-      color: 'red',
-      withCloseButton: false
-    };
-  };
-
   const { mutate: onLogin } = useLogin({
     onSuccess,
-    onError
+    onError: error => {
+      console.error('Login failed:', error);
+      // Error handling is done in the hook
+    }
   });
 
   const onSubmit = handleSubmit(
-    useCallback(async (values: LoginProps) => {
-      onLogin(values);
-    }, [])
+    useCallback(
+      async (values: LoginProps) => {
+        onLogin(values);
+      },
+      [onLogin]
+    )
   );
 
   return (
@@ -115,6 +95,7 @@ export const LoginForm = ({
           />
         )}
       />
+
       <Controller
         name='password'
         control={control}
@@ -145,31 +126,32 @@ export const LoginForm = ({
             />
           )}
         />
-        <Button
-          variant='unstyle'
-          className={cn(' text-slate-600 hover:text-primary-600/90 hover:bg-transparent -mr-3', {
-            hidden: hideForgetPassword
-          })}
-          onClick={() => navigate('/forget-password')}
-        >
-          {t('actions.forgot_password')}
-        </Button>
+
+        {!hideForgetPassword && (
+          <Button
+            variant='unstyle'
+            className='text-slate-600 hover:text-primary-600/90 hover:bg-transparent -mr-3'
+            onClick={() => navigate('/forget-password')}
+          >
+            {t('actions.forgot_password')}
+          </Button>
+        )}
       </div>
+
       <LoginHint setValue={setValue} />
+
       <div className={cn('flex justify-between mt-2', { 'justify-end': hideRegister })}>
-        <Button
-          variant='unstyle'
-          className={cn(
-            'text-slate-400 hover:text-primary-600/90 hover:bg-transparent -ml-3 gap-x-2',
-            {
-              hidden: hideRegister
-            }
-          )}
-          onClick={() => navigate('/register')}
-        >
-          {t('actions.need_account')}
-          <strong>{t('actions.register')}</strong>
-        </Button>
+        {!hideRegister && (
+          <Button
+            variant='unstyle'
+            className='text-slate-400 hover:text-primary-600/90 hover:bg-transparent -ml-3 gap-x-2'
+            onClick={() => navigate('/register')}
+          >
+            {t('actions.need_account')}
+            <strong>{t('actions.register')}</strong>
+          </Button>
+        )}
+
         <Button type='submit'>{t('actions.login')}</Button>
       </div>
     </Form>

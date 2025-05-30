@@ -3,10 +3,10 @@ import { isBrowser, locals } from '@ncobase/utils';
 import { $Fetch, $fetch, FetchError, FetchOptions } from 'ofetch';
 
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
-import { Permission } from '@/features/account/permissions';
 import { checkAndRefreshToken } from '@/features/account/token_service';
 import { BearerKey, XMdTenantKey } from '@/lib/constants';
 import { eventEmitter } from '@/lib/events';
+import { isPublicRoute } from '@/router/helpers/utils';
 
 // Circuit breaker for failed endpoints
 class CircuitBreaker {
@@ -222,7 +222,7 @@ export class Request {
         locals.remove(ACCESS_TOKEN_KEY);
         locals.remove(REFRESH_TOKEN_KEY);
 
-        if (!Permission.isPublicRoute(window.location.pathname)) {
+        if (!isPublicRoute(window.location.pathname)) {
           const currentPath = window.location.pathname + window.location.search;
           const loginUrl = `/login?redirect=${encodeURIComponent(currentPath)}`;
           redirectToError(loginUrl, 100);

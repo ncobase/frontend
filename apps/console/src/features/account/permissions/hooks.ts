@@ -1,13 +1,11 @@
 import { useCallback, useMemo } from 'react';
 
-import { Permission } from './service';
+import { useAuthContext } from '../context';
 
 export interface UsePermissionsResult {
   hasRole: (_role: string | string[]) => boolean;
   hasPermission: (_permission: string) => boolean;
-  hasMenuPermission: (_menuPerms?: string) => boolean;
   isAdmin: () => boolean;
-  getCurrentTenantId: () => string;
   getRoles: () => string[];
   getPermissions: () => string[];
   canAccess: (_options: {
@@ -17,39 +15,32 @@ export interface UsePermissionsResult {
     permissions?: string[];
     roles?: string[];
   }) => boolean;
-  canAccessMenu: (_menu: {
-    perms?: string;
-    path?: string;
-    disabled?: boolean;
-    hidden?: boolean;
-  }) => boolean;
-  filterMenusByPermission: <T extends { perms?: string; disabled?: boolean; hidden?: boolean }>(
+  canAccessMenu: (_menu: { perms?: string; disabled?: boolean; hidden?: boolean }) => boolean;
+  filterMenusByPermission: <
+    T extends {
+      perms?: string;
+      disabled?: boolean;
+      hidden?: boolean;
+    }
+  >(
     _menus: T[]
   ) => T[];
 }
 
 export const usePermissions = (): UsePermissionsResult => {
-  const hasRole = useCallback((role: string | string[]): boolean => Permission.hasRole(role), []);
+  const { hasRole, hasPermission, roles, permissions, user } = useAuthContext();
 
-  const hasPermission = useCallback(
-    (permission: string): boolean => Permission.hasPermission(permission),
-    []
-  );
+  const isAdmin = useCallback((): boolean => {
+    return user?.is_admin || false;
+  }, [user]);
 
-  const hasMenuPermission = useCallback((menuPerms?: string): boolean => {
-    if (!menuPerms || menuPerms.trim() === '') {
-      return true; // No permission required
-    }
-    return Permission.hasPermission(menuPerms);
-  }, []);
+  const getRoles = useCallback((): string[] => {
+    return roles;
+  }, [roles]);
 
-  const isAdmin = useCallback((): boolean => Permission.isAdmin(), []);
-
-  const getCurrentTenantId = useCallback((): string => Permission.getCurrentTenantId(), []);
-
-  const getRoles = useCallback((): string[] => Permission.getRoles(), []);
-
-  const getPermissions = useCallback((): string[] => Permission.getPermissions(), []);
+  const getPermissions = useCallback((): string[] => {
+    return permissions;
+  }, [permissions]);
 
   const canAccess = useCallback(
     (options: {
@@ -58,30 +49,59 @@ export const usePermissions = (): UsePermissionsResult => {
       any?: boolean;
       permissions?: string[];
       roles?: string[];
-    }): boolean => Permission.canAccess(options),
-    []
+    }): boolean => {
+      // Admin has access to everything
+      if (isAdmin()) return true;
+
+      const {
+        permission,
+        role,
+        any = false,
+        permissions: reqPermissions = [],
+        roles: reqRoles = []
+      } = options;
+
+      // Check single permission
+      if (permission && !hasPermission(permission)) return false;
+
+      // Check single role
+      if (role && !hasRole(role)) return false;
+
+      // Check multiple permissions
+      if (reqPermissions.length > 0) {
+        const hasPermissions = any
+          ? reqPermissions.some(p => hasPermission(p))
+          : reqPermissions.every(p => hasPermission(p));
+
+        if (!hasPermissions) return false;
+      }
+
+      // Check multiple roles
+      if (reqRoles.length > 0) {
+        const hasRoles = any ? reqRoles.some(r => hasRole(r)) : reqRoles.every(r => hasRole(r));
+
+        if (!hasRoles) return false;
+      }
+
+      return true;
+    },
+    [hasPermission, hasRole, isAdmin]
   );
 
   const canAccessMenu = useCallback(
-    (menu: { perms?: string; path?: string; disabled?: boolean; hidden?: boolean }): boolean => {
+    (menu: { perms?: string; disabled?: boolean; hidden?: boolean }): boolean => {
       // Check if menu is disabled or hidden
-      if (menu.disabled || menu.hidden) {
-        return false;
-      }
+      if (menu.disabled || menu.hidden) return false;
 
       // Admin can access all menus
-      if (Permission.isAdmin()) {
-        return true;
-      }
+      if (isAdmin()) return true;
 
       // Check permission requirement
-      if (!menu.perms || menu.perms.trim() === '') {
-        return true; // No permission required
-      }
+      if (!menu.perms || menu.perms.trim() === '') return true;
 
-      return Permission.hasPermission(menu.perms);
+      return hasPermission(menu.perms);
     },
-    []
+    [hasPermission, isAdmin]
   );
 
   const filterMenusByPermission = useCallback(
@@ -95,9 +115,7 @@ export const usePermissions = (): UsePermissionsResult => {
     () => ({
       hasRole,
       hasPermission,
-      hasMenuPermission,
       isAdmin,
-      getCurrentTenantId,
       getRoles,
       getPermissions,
       canAccess,
@@ -107,9 +125,7 @@ export const usePermissions = (): UsePermissionsResult => {
     [
       hasRole,
       hasPermission,
-      hasMenuPermission,
       isAdmin,
-      getCurrentTenantId,
       getRoles,
       getPermissions,
       canAccess,
@@ -119,22 +135,9 @@ export const usePermissions = (): UsePermissionsResult => {
   );
 };
 
-// Menu permissions hooks
+// Menu permissions hook
 export const useMenuPermissions = () => {
-  const { hasMenuPermission, canAccessMenu, filterMenusByPermission, isAdmin } = usePermissions();
-
-  const checkMenuAccess = useCallback(
-    (menu: {
-      perms?: string;
-      path?: string;
-      disabled?: boolean;
-      hidden?: boolean;
-      children?: any[];
-    }): boolean => {
-      return canAccessMenu(menu);
-    },
-    [canAccessMenu]
-  );
+  const { canAccessMenu, filterMenusByPermission, isAdmin } = usePermissions();
 
   const filterMenuTree = useCallback(
     <
@@ -163,8 +166,6 @@ export const useMenuPermissions = () => {
   );
 
   return {
-    hasMenuPermission,
-    checkMenuAccess,
     canAccessMenu,
     filterMenusByPermission,
     filterMenuTree,
@@ -172,16 +173,14 @@ export const useMenuPermissions = () => {
   };
 };
 
-// Route permissions hooks
+// Route permissions hook
 export const useRoutePermissions = () => {
-  const { hasPermission, canAccess, isAdmin } = usePermissions();
+  const { hasPermission, isAdmin } = usePermissions();
 
   const canAccessRoute = useCallback(
     (path: string, requiredPermission?: string): boolean => {
       // Admin can access all routes
-      if (isAdmin()) {
-        return true;
-      }
+      if (isAdmin()) return true;
 
       // Check specific permission if provided
       if (requiredPermission) {
@@ -210,7 +209,6 @@ export const useRoutePermissions = () => {
   return {
     canAccessRoute,
     hasPermission,
-    canAccess,
     isAdmin
   };
 };

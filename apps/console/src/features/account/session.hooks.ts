@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { useToastMessage } from '@ncobase/react';
-import { useMutation, useQuery, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ListSessionsParams } from './session.d';
 import { sessionService } from './session_service';
@@ -15,7 +15,7 @@ export const sessionKeys = {
   detail: (id: string) => [...sessionKeys.details(), id] as const
 };
 
-// Hook to list sessions
+// List sessions hook
 export const useSessions = (params?: ListSessionsParams) => {
   return useQuery({
     queryKey: sessionKeys.list(params),
@@ -24,7 +24,7 @@ export const useSessions = (params?: ListSessionsParams) => {
   });
 };
 
-// Hook to get specific session
+// Get specific session hook
 export const useSession = (sessionId: string, enabled = true) => {
   return useQuery({
     queryKey: sessionKeys.detail(sessionId),
@@ -34,8 +34,8 @@ export const useSession = (sessionId: string, enabled = true) => {
   });
 };
 
-// Hook to delete session
-export const useDeleteSession = (options?: Partial<UseMutationOptions<void, Error, string>>) => {
+// Delete session hook
+export const useDeleteSession = () => {
   const queryClient = useQueryClient();
   const toast = useToastMessage();
 
@@ -52,19 +52,16 @@ export const useDeleteSession = (options?: Partial<UseMutationOptions<void, Erro
         description: 'You have been logged out from that device.'
       });
     },
-    onError: error => {
+    onError: (error: Error) => {
       toast.error('Delete Failed', {
         description: error.message || 'Failed to delete session.'
       });
-    },
-    ...options
+    }
   });
 };
 
-// Hook to deactivate all sessions
-export const useDeactivateAllSessions = (
-  options?: Partial<UseMutationOptions<void, Error, void>>
-) => {
+// Deactivate all sessions hook
+export const useDeactivateAllSessions = () => {
   const queryClient = useQueryClient();
   const toast = useToastMessage();
 
@@ -78,16 +75,15 @@ export const useDeactivateAllSessions = (
         description: 'You have been logged out from all devices.'
       });
     },
-    onError: error => {
+    onError: (error: Error) => {
       toast.error('Deactivation Failed', {
         description: error.message || 'Failed to deactivate all sessions.'
       });
-    },
-    ...options
+    }
   });
 };
 
-// Hook for session management utilities
+// Session management utilities hook
 export const useSessionPage = () => {
   const queryClient = useQueryClient();
 

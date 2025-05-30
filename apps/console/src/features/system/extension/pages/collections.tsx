@@ -1,4 +1,3 @@
-// ./apps/console/src/features/system/extension/pages/collections.tsx
 import { useState, useMemo } from 'react';
 
 import {

@@ -91,7 +91,7 @@ export interface ApiOptions<
 }
 
 /**
- * Creates a standard CRUD API for a given endpoint and model type
+ * Creates a standard CRUD API for a given endpoint and model type with extensibility options
  *
  * @param endpoint The API endpoint path
  * @param options Optional configuration to customize or extend API behavior
@@ -136,14 +136,14 @@ export function createApi<
       return request.delete(`${endpoint}/${id}`);
     },
 
-    // List operation
+    // List operation with optional params
     list: async (params?: ExplicitAny): Promise<ListResult> => {
       const queryString = params ? buildQueryString(params) : '';
       return request.get(`${endpoint}${queryString ? `?${queryString}` : ''}`);
     }
   };
 
-  // Build the API object
+  // Build the API object with overridden methods and extensions
   const api = {
     // Expose context for advanced usage
     _context: apiContext,
