@@ -337,6 +337,10 @@ export class Request {
     return this.request('PUT', url, data, options);
   }
 
+  public patch(url: string, data?: ExplicitAny, options?: FetchOptions & { timestamp?: boolean }) {
+    return this.request('PATCH', url, data, options);
+  }
+
   public delete(url: string, options?: FetchOptions & { timestamp?: boolean }) {
     return this.request('DELETE', url, undefined, options);
   }
