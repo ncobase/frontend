@@ -26,7 +26,7 @@ export const UserViewerForms = ({ record }) => {
       <FieldViewer title='关于' className='col-span-full'>
         {profile?.about}
       </FieldViewer>
-      {profile?.links.length > 0 && (
+      {profile?.links?.length > 0 && (
         <FieldViewer title='社交网络' className='col-span-full'>
           {profile?.links?.map(link => (
             <Button variant='link' key={link.name}>

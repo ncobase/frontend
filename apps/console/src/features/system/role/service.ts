@@ -7,6 +7,10 @@ import { Role } from './role';
 interface RoleKeys {
   create: ['roleService', 'create'];
   get: (_options?: { role?: string }) => ['roleService', 'role', { role?: string }];
+  permissions: (_options?: {
+    role?: string;
+  }) => ['roleService', 'rolePermissions', { role?: string }];
+  users: (_options?: { role?: string }) => ['roleService', 'roleUsers', { role?: string }];
   update: ['roleService', 'update'];
   list: (_options?: QueryFormParams) => ['roleService', 'roles', QueryFormParams];
 }
@@ -14,11 +18,13 @@ interface RoleKeys {
 export const roleKeys: RoleKeys = {
   create: ['roleService', 'create'],
   get: ({ role } = {}) => ['roleService', 'role', { role }],
+  permissions: ({ role } = {}) => ['roleService', 'rolePermissions', { role }],
+  users: ({ role } = {}) => ['roleService', 'roleUsers', { role }],
   update: ['roleService', 'update'],
   list: (queryParams = {}) => ['roleService', 'roles', queryParams]
 };
 
-// Query a specific role by ID or Slug
+// Enhanced role queries and mutations
 export const useQueryRole = (role: string) =>
   useQuery({
     queryKey: roleKeys.get({ role }),
@@ -26,41 +32,50 @@ export const useQueryRole = (role: string) =>
     enabled: !!role
   });
 
-// List roles
+export const useQueryRolePermissions = (role: string) =>
+  useQuery({
+    queryKey: roleKeys.permissions({ role }),
+    queryFn: () => getRolePermissions(role),
+    enabled: !!role
+  });
+
+export const useQueryRoleUsers = (role: string) =>
+  useQuery({
+    queryKey: roleKeys.users({ role }),
+    queryFn: () => getRoleUsers(role),
+    enabled: !!role
+  });
+
 export const useListRoles = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: roleKeys.list(queryParams),
     queryFn: () => getRoles(queryParams),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000 // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000
   });
 };
 
-// Create role mutation
+// Role mutations
 export const useCreateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: Pick<Role, keyof Role>) => createRole(payload),
     onSuccess: () => {
-      // Invalidate and refetch roles list
       queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
     },
     onError: error => {
       console.error('Failed to create role:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
 
-// Update role mutation
 export const useUpdateRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload),
     onSuccess: (_, variables) => {
-      // Invalidate specific role and roles list
       queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
       if (variables.id) {
         queryClient.invalidateQueries({
@@ -70,19 +85,16 @@ export const useUpdateRole = () => {
     },
     onError: error => {
       console.error('Failed to update role:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
 
-// Delete role mutation
 export const useDeleteRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => deleteRole(id),
     onSuccess: (_, deletedId) => {
-      // Remove from cache and invalidate roles list
       queryClient.removeQueries({
         queryKey: roleKeys.get({ role: deletedId })
       });
@@ -90,7 +102,70 @@ export const useDeleteRole = () => {
     },
     onError: error => {
       console.error('Failed to delete role:', error);
-      // Handle error (toast notification, etc.)
     }
   });
+};
+
+// Role permission management
+export const useAssignPermissionsToRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
+      assignPermissionsToRole(roleId, permissionIds),
+    onSuccess: (_, { roleId }) => {
+      queryClient.invalidateQueries({
+        queryKey: roleKeys.permissions({ role: roleId })
+      });
+    },
+    onError: error => {
+      console.error('Failed to assign permissions:', error);
+    }
+  });
+};
+
+export const useRemovePermissionsFromRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
+      removePermissionsFromRole(roleId, permissionIds),
+    onSuccess: (_, { roleId }) => {
+      queryClient.invalidateQueries({
+        queryKey: roleKeys.permissions({ role: roleId })
+      });
+    },
+    onError: error => {
+      console.error('Failed to remove permissions:', error);
+    }
+  });
+};
+
+// API functions for role-permission management
+const getRolePermissions = async (roleId: string) => {
+  const response = await fetch(`/api/iam/roles/${roleId}/permissions`);
+  return response.json();
+};
+
+const getRoleUsers = async (roleId: string) => {
+  const response = await fetch(`/api/iam/roles/${roleId}/users`);
+  return response.json();
+};
+
+const assignPermissionsToRole = async (roleId: string, permissionIds: string[]) => {
+  const response = await fetch(`/api/iam/roles/${roleId}/permissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ permissionIds })
+  });
+  return response.json();
+};
+
+const removePermissionsFromRole = async (roleId: string, permissionIds: string[]) => {
+  const response = await fetch(`/api/iam/roles/${roleId}/permissions`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ permissionIds })
+  });
+  return response.json();
 };

@@ -47,13 +47,10 @@ export interface UserPasswordPayload {
   confirm: string;
 }
 
-// Create enhanced API with extended methods
 export const userApi = createApi<User, UserMeshes, UserMeshes, any>('/sys/users', {
   extensions: ({ endpoint, request }) => ({
     // Get user meshes (combined user and profile data)
     getUserMeshes: async (id: string): Promise<UserMeshes> => {
-      console.log(111, id);
-
       return request.get(`${endpoint}/${id}/meshes`);
     },
 
@@ -95,6 +92,31 @@ export const userApi = createApi<User, UserMeshes, UserMeshes, any>('/sys/users'
     // Disable user
     disableUser: async (id: string): Promise<UserMeshes> => {
       return request.put(`${endpoint}/${id}/disable`);
+    },
+
+    // Reset password
+    resetPassword: async (payload: { username: string; email: string }): Promise<void> => {
+      return request.post(`${endpoint}/reset-password`, payload);
+    },
+
+    // Get filtered users
+    getFiltered: async (params: any): Promise<User[]> => {
+      return request.get(`${endpoint}/filter`, { params });
+    },
+
+    // Get user by email
+    getUserByEmail: async (email: string): Promise<User> => {
+      return request.get(`${endpoint}/by-email/${email}`);
+    },
+
+    // Get user by username
+    getUserByUsername: async (username: string): Promise<User> => {
+      return request.get(`${endpoint}/by-username/${username}`);
+    },
+
+    // Update user status
+    updateStatus: async (username: string, status: number): Promise<User> => {
+      return request.patch(`${endpoint}/${username}/status`, { status });
     }
   })
 });
@@ -113,3 +135,8 @@ export const assignRoles = userApi.assignRoles;
 export const removeRoles = userApi.removeRoles;
 export const enableUser = userApi.enableUser;
 export const disableUser = userApi.disableUser;
+export const resetPassword = userApi.resetPassword;
+export const getFiltered = userApi.getFiltered;
+export const getUserByEmail = userApi.getUserByEmail;
+export const getUserByUsername = userApi.getUserByUsername;
+export const updateStatus = userApi.updateStatus;

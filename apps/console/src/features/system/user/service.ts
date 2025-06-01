@@ -8,7 +8,12 @@ import {
   getUsers,
   updateUser,
   createUserWithProfile,
-  updateUserWithProfile
+  updateUserWithProfile,
+  getUserRoles,
+  assignRoles,
+  removeRoles,
+  enableUser,
+  disableUser
 } from './apis';
 import { QueryFormParams } from './config/query';
 import { User } from './user';
@@ -17,6 +22,7 @@ interface UserKeys {
   create: ['userService', 'create'];
   get: (_options?: { user?: string }) => ['userService', 'user', { user?: string }];
   meshes: (_options?: { user?: string }) => ['userService', 'userMeshes', { user?: string }];
+  roles: (_options?: { user?: string }) => ['userService', 'userRoles', { user?: string }];
   update: ['userService', 'update'];
   list: (_options?: QueryFormParams) => ['userService', 'users', QueryFormParams];
 }
@@ -25,11 +31,12 @@ export const userKeys: UserKeys = {
   create: ['userService', 'create'],
   get: ({ user } = {}) => ['userService', 'user', { user }],
   meshes: ({ user } = {}) => ['userService', 'userMeshes', { user }],
+  roles: ({ user } = {}) => ['userService', 'userRoles', { user }],
   update: ['userService', 'update'],
   list: (queryParams = {}) => ['userService', 'users', queryParams]
 };
 
-// Query a specific user by ID
+// Query user by ID
 export const useQueryUser = (user: string) =>
   useQuery({
     queryKey: userKeys.get({ user }),
@@ -37,11 +44,20 @@ export const useQueryUser = (user: string) =>
     enabled: !!user
   });
 
-// Query user meshes
+// Query user meshes (combined user and profile data)
 export const useQueryUserMeshes = (user: string) => {
   return useQuery({
     queryKey: userKeys.meshes({ user }),
     queryFn: () => getUserMeshes(user),
+    enabled: !!user
+  });
+};
+
+// Query user roles
+export const useQueryUserRoles = (user: string) => {
+  return useQuery({
+    queryKey: userKeys.roles({ user }),
+    queryFn: () => getUserRoles(user),
     enabled: !!user
   });
 };
@@ -51,8 +67,8 @@ export const useListUsers = (queryParams: QueryFormParams) => {
   return useQuery({
     queryKey: userKeys.list(queryParams),
     queryFn: () => getUsers(queryParams),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000 // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000
   });
 };
 
@@ -63,12 +79,10 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: (payload: Pick<User, keyof User>) => createUser(payload),
     onSuccess: () => {
-      // Invalidate and refetch users list
       queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
     },
     onError: error => {
       console.error('Failed to create user:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
@@ -80,12 +94,10 @@ export const useCreateUserWithProfile = () => {
   return useMutation({
     mutationFn: createUserWithProfile,
     onSuccess: () => {
-      // Invalidate and refetch users list
       queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
     },
     onError: error => {
       console.error('Failed to create user with profile:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
@@ -97,7 +109,6 @@ export const useUpdateUser = () => {
   return useMutation({
     mutationFn: (payload: Pick<User, keyof User>) => updateUser(payload),
     onSuccess: (_, variables) => {
-      // Invalidate specific user, user meshes, and users list
       queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
       if (variables.id) {
         queryClient.invalidateQueries({
@@ -110,7 +121,6 @@ export const useUpdateUser = () => {
     },
     onError: error => {
       console.error('Failed to update user:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
@@ -122,7 +132,6 @@ export const useUpdateUserWithProfile = () => {
   return useMutation({
     mutationFn: updateUserWithProfile,
     onSuccess: (_, variables) => {
-      // Invalidate specific user, user meshes, and users list
       queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
       if (variables.user.id) {
         queryClient.invalidateQueries({
@@ -135,7 +144,90 @@ export const useUpdateUserWithProfile = () => {
     },
     onError: error => {
       console.error('Failed to update user with profile:', error);
-      // Handle error (toast notification, etc.)
+    }
+  });
+};
+
+// Assign roles mutation
+export const useAssignRoles = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, roleIds }: { userId: string; roleIds: string[] }) =>
+      assignRoles(userId, roleIds),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.roles({ user: userId })
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.meshes({ user: userId })
+      });
+    },
+    onError: error => {
+      console.error('Failed to assign roles:', error);
+    }
+  });
+};
+
+// Remove roles mutation
+export const useRemoveRoles = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, roleIds }: { userId: string; roleIds: string[] }) =>
+      removeRoles(userId, roleIds),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.roles({ user: userId })
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.meshes({ user: userId })
+      });
+    },
+    onError: error => {
+      console.error('Failed to remove roles:', error);
+    }
+  });
+};
+
+// Enable user mutation
+export const useEnableUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => enableUser(userId),
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.get({ user: userId })
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.meshes({ user: userId })
+      });
+    },
+    onError: error => {
+      console.error('Failed to enable user:', error);
+    }
+  });
+};
+
+// Disable user mutation
+export const useDisableUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: string) => disableUser(userId),
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.get({ user: userId })
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.meshes({ user: userId })
+      });
+    },
+    onError: error => {
+      console.error('Failed to disable user:', error);
     }
   });
 };
@@ -147,18 +239,19 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: (id: string) => deleteUser(id),
     onSuccess: (_, deletedId) => {
-      // Remove from cache and invalidate users list
       queryClient.removeQueries({
         queryKey: userKeys.get({ user: deletedId })
       });
       queryClient.removeQueries({
         queryKey: userKeys.meshes({ user: deletedId })
       });
+      queryClient.removeQueries({
+        queryKey: userKeys.roles({ user: deletedId })
+      });
       queryClient.invalidateQueries({ queryKey: ['userService', 'users'] });
     },
     onError: error => {
       console.error('Failed to delete user:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
