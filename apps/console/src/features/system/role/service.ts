@@ -1,6 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { createRole, deleteRole, getRole, getRoles, updateRole } from './apis';
+import {
+  assignPermissionsToRole,
+  createRole,
+  deleteRole,
+  getRole,
+  getRolePermissions,
+  getRoles,
+  getRoleUsers,
+  removePermissionsFromRole,
+  updateRole
+} from './apis';
 import { QueryFormParams } from './config/query';
 import { Role } from './role';
 
@@ -139,33 +149,4 @@ export const useRemovePermissionsFromRole = () => {
       console.error('Failed to remove permissions:', error);
     }
   });
-};
-
-// API functions for role-permission management
-const getRolePermissions = async (roleId: string) => {
-  const response = await fetch(`/api/iam/roles/${roleId}/permissions`);
-  return response.json();
-};
-
-const getRoleUsers = async (roleId: string) => {
-  const response = await fetch(`/api/iam/roles/${roleId}/users`);
-  return response.json();
-};
-
-const assignPermissionsToRole = async (roleId: string, permissionIds: string[]) => {
-  const response = await fetch(`/api/iam/roles/${roleId}/permissions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ permissionIds })
-  });
-  return response.json();
-};
-
-const removePermissionsFromRole = async (roleId: string, permissionIds: string[]) => {
-  const response = await fetch(`/api/iam/roles/${roleId}/permissions`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ permissionIds })
-  });
-  return response.json();
 };

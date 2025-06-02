@@ -4,7 +4,7 @@ import { Account, LoginProps, LoginReply, RegisterProps } from './account';
 
 import { request } from '@/lib/api/request';
 
-const accountEndpoint = '/iam/account';
+const accountEndpoint = '/account';
 
 export const accountApi = {
   // Current user
@@ -42,7 +42,7 @@ export const accountApi = {
   // }
 };
 
-const authEndpoint = '/iam';
+const authEndpoint = '';
 
 export const authApi = {
   // Login

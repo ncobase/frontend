@@ -1,8 +1,12 @@
 import { Group } from './group';
 
-import { createApi } from '@/lib/api/factory';
+import { ApiContext, createApi } from '@/lib/api/factory';
 
-export const groupApi = createApi<Group>('/org/groups');
+const extensionMethods = ({ request, endpoint }: ApiContext) => ({});
+
+export const groupApi = createApi<Group>('/org/groups', {
+  extensions: extensionMethods
+});
 
 export const createGroup = groupApi.create;
 export const getGroup = groupApi.get;

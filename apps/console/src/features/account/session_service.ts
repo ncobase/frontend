@@ -5,7 +5,7 @@ import { ListSessionsParams, Session } from './session';
 import { request } from '@/lib/api/request';
 
 // Session API endpoints
-const sessionEndpoint = '/iam/sessions';
+const sessionEndpoint = '/sessions';
 
 export const sessionService = {
   // List user sessions

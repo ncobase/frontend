@@ -111,10 +111,10 @@ export class Request {
 
   private isAuthEndpoint(url: string): boolean {
     return (
-      url.includes('/iam/login') ||
-      url.includes('/iam/refresh-token') ||
-      url.includes('/iam/register') ||
-      url.includes('/iam/logout')
+      url.includes('/login') ||
+      url.includes('/refresh-token') ||
+      url.includes('/register') ||
+      url.includes('/logout')
     );
   }
 

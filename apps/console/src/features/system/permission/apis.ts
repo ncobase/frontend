@@ -1,8 +1,12 @@
 import { Permission } from './permission';
 
-import { createApi } from '@/lib/api/factory';
+import { ApiContext, createApi } from '@/lib/api/factory';
 
-export const permissionApi = createApi<Permission>('/iam/permissions');
+const extensionMethods = ({ request, endpoint }: ApiContext) => ({});
+
+export const permissionApi = createApi<Permission>('/sys/permissions', {
+  extensions: extensionMethods
+});
 
 export const createPermission = permissionApi.create;
 export const getPermission = permissionApi.get;

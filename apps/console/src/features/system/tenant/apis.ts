@@ -1,8 +1,12 @@
 import { Tenant } from './tenant';
 
-import { createApi } from '@/lib/api/factory';
+import { ApiContext, createApi } from '@/lib/api/factory';
 
-export const tenantApi = createApi<Tenant>('/iam/tenants');
+const extensionMethods = ({ request, endpoint }: ApiContext) => ({});
+
+export const tenantApi = createApi<Tenant>('/sys/tenants', {
+  extensions: extensionMethods
+});
 
 export const createTenant = tenantApi.create;
 export const getTenant = tenantApi.get;

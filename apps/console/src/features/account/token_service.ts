@@ -85,7 +85,7 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
 
   try {
     refreshingPromise = request.post(
-      '/iam/refresh-token',
+      '/refresh-token',
       { refresh_token: refreshToken },
       { timeout: 10000 }
     );
