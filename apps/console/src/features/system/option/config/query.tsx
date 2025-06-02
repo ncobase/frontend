@@ -19,7 +19,7 @@ export const queryFields = ({
   return [
     {
       name: 'name',
-      label: t('options.fields.name', 'Name'),
+      label: t('option.fields.name', 'Name'),
       component: (
         <Controller
           name='name'
@@ -27,7 +27,7 @@ export const queryFields = ({
           defaultValue=''
           render={({ field }) => (
             <InputField
-              placeholder={t('options.placeholders.name', 'Search by name')}
+              placeholder={t('option.placeholders.name', 'Search by name')}
               prependIcon='IconSearch'
               className='py-1.5'
               {...field}
@@ -38,7 +38,7 @@ export const queryFields = ({
     },
     {
       name: 'type',
-      label: t('options.fields.type', 'Type'),
+      label: t('option.fields.type', 'Type'),
       component: (
         <Controller
           name='type'
@@ -47,12 +47,12 @@ export const queryFields = ({
           render={({ field }) => (
             <SelectField
               allowClear
-              options={[
-                { label: t('options.types.string', 'String'), value: 'string' },
-                { label: t('options.types.number', 'Number'), value: 'number' },
-                { label: t('options.types.boolean', 'Boolean'), value: 'boolean' },
-                { label: t('options.types.object', 'Object'), value: 'object' },
-                { label: t('options.types.array', 'Array'), value: 'array' }
+              option={[
+                { label: t('option.types.string', 'String'), value: 'string' },
+                { label: t('option.types.number', 'Number'), value: 'number' },
+                { label: t('option.types.boolean', 'Boolean'), value: 'boolean' },
+                { label: t('option.types.object', 'Object'), value: 'object' },
+                { label: t('option.types.array', 'Array'), value: 'array' }
               ]}
               className='[&>button]:py-1.5'
               {...field}
@@ -63,7 +63,7 @@ export const queryFields = ({
     },
     {
       name: 'autoload',
-      label: t('options.fields.autoload', 'Autoload'),
+      label: t('option.fields.autoload', 'Autoload'),
       component: (
         <Controller
           name='autoload'
@@ -72,7 +72,7 @@ export const queryFields = ({
           render={({ field }) => (
             <SelectField
               allowClear
-              options={[
+              option={[
                 { label: t('common.yes', 'Yes'), value: true },
                 { label: t('common.no', 'No'), value: false }
               ]}
@@ -85,7 +85,7 @@ export const queryFields = ({
     },
     {
       name: 'prefix',
-      label: t('options.fields.prefix', 'Prefix'),
+      label: t('option.fields.prefix', 'Prefix'),
       component: (
         <Controller
           name='prefix'
@@ -93,7 +93,7 @@ export const queryFields = ({
           defaultValue=''
           render={({ field }) => (
             <InputField
-              placeholder={t('options.placeholders.prefix', 'Filter by name prefix')}
+              placeholder={t('option.placeholders.prefix', 'Filter by name prefix')}
               className='py-1.5'
               {...field}
             />

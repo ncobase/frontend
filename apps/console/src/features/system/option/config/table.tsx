@@ -2,15 +2,15 @@ import { Button, TableViewProps, Badge, Tooltip, Icons } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { Options } from '../options';
+import { Option } from '../option';
 
 export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
-      title: t('options.fields.name', 'Name'),
+      title: t('option.fields.name', 'Name'),
       accessorKey: 'name',
-      parser: (value: string, record: Options) => (
+      parser: (value: string, record: Option) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
           <span className='font-medium font-mono text-sm'>{value}</span>
         </Button>
@@ -18,19 +18,19 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       icon: 'IconKey'
     },
     {
-      title: t('options.fields.type', 'Type'),
+      title: t('option.fields.type', 'Type'),
       accessorKey: 'type',
-      parser: (value: string) => renderOptionsType(value),
+      parser: (value: string) => renderOptionType(value),
       icon: 'IconTag'
     },
     {
-      title: t('options.fields.value', 'Value'),
+      title: t('option.fields.value', 'Value'),
       accessorKey: 'value',
-      parser: (value: string, record: Options) => renderOptionsValue(value, record.type),
+      parser: (value: string, record: Option) => renderOptionValue(value, record.type),
       icon: 'IconCode'
     },
     {
-      title: t('options.fields.autoload', 'Autoload'),
+      title: t('option.fields.autoload', 'Autoload'),
       accessorKey: 'autoload',
       parser: (value: boolean) => (
         <Badge className={value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
@@ -40,7 +40,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       icon: 'IconRefresh'
     },
     {
-      title: t('options.fields.created_at', 'Created'),
+      title: t('option.fields.created_at', 'Created'),
       accessorKey: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
@@ -56,17 +56,17 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.view', 'View'),
           icon: 'IconEye',
-          onClick: (record: Options) => handleView(record, 'view')
+          onClick: (record: Option) => handleView(record, 'view')
         },
         {
           title: t('actions.edit', 'Edit'),
           icon: 'IconPencil',
-          onClick: (record: Options) => handleView(record, 'edit')
+          onClick: (record: Option) => handleView(record, 'edit')
         },
         {
           title: t('actions.duplicate', 'Duplicate'),
           icon: 'IconCopy',
-          onClick: (record: Options) => {
+          onClick: (record: Option) => {
             const duplicateRecord = {
               ...record,
               id: undefined,
@@ -78,7 +78,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.delete', 'Delete'),
           icon: 'IconTrash',
-          onClick: (record: Options) => handleDelete(record)
+          onClick: (record: Option) => handleDelete(record)
         }
       ]
     }
@@ -86,7 +86,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
 };
 
 // Option type rendering helper
-const renderOptionsType = (type: string) => {
+const renderOptionType = (type: string) => {
   if (!type) return '-';
 
   const typeColors = {
@@ -117,7 +117,7 @@ const renderOptionsType = (type: string) => {
 };
 
 // Option value rendering helper
-const renderOptionsValue = (value: string, type: string) => {
+const renderOptionValue = (value: string, type: string) => {
   if (!value) return '-';
 
   let displayValue = value;

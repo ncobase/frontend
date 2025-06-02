@@ -108,7 +108,7 @@ export const GroupListPage = () => {
     columns: tableColumns({ handleView, handleDelete }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('system.group.title')
+    title: t('system.groups.title')
   };
 
   return (

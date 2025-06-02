@@ -124,7 +124,7 @@ export const RoleListPage = () => {
     columns: tableColumns({ handleView, handleDelete }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('system.role.title')
+    title: t('system.roles.title')
   };
 
   return (

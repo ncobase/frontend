@@ -4,7 +4,7 @@ import { ApiContext, createApi } from '@/lib/api/factory';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({});
 
-export const groupApi = createApi<Group>('/org/groups', {
+export const groupApi = createApi<Group>('/sys/groups', {
   extensions: extensionMethods
 });
 

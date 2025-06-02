@@ -1,4 +1,4 @@
-export interface Options {
+export interface Option {
   id?: string;
   name?: string;
   type?: string;
@@ -11,8 +11,8 @@ export interface Options {
   updated_at?: string;
 }
 
-export interface OptionsList {
-  items: Options[];
+export interface OptionList {
+  items: Option[];
   total: number;
   has_next: boolean;
   next?: string;

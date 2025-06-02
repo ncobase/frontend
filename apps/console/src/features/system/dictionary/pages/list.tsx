@@ -124,7 +124,7 @@ export const DictionaryListPage = () => {
     columns: tableColumns({ handleView, handleDelete }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('system.dictionary.title')
+    title: t('system.dictionaries.title')
   };
 
   return (

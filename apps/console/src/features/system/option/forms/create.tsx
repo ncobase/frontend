@@ -5,13 +5,13 @@ import { useTenantContext } from '../../tenant/context';
 
 import { FieldConfigProps } from '@/components/form';
 
-export const CreateOptionsForms = ({ onSubmit, control, errors }) => {
+export const CreateOptionForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
   const { tenant_id } = useTenantContext();
 
   const fields: FieldConfigProps[] = [
     {
-      title: t('options.fields.name', 'Name'),
+      title: t('option.fields.name', 'Name'),
       name: 'name',
       defaultValue: '',
       placeholder: 'Enter option name (unique key)',
@@ -25,21 +25,21 @@ export const CreateOptionsForms = ({ onSubmit, control, errors }) => {
       }
     },
     {
-      title: t('options.fields.type', 'Type'),
+      title: t('option.fields.type', 'Type'),
       name: 'type',
       defaultValue: 'string',
       type: 'select',
-      options: [
-        { label: t('options.types.string', 'String'), value: 'string' },
-        { label: t('options.types.number', 'Number'), value: 'number' },
-        { label: t('options.types.boolean', 'Boolean'), value: 'boolean' },
-        { label: t('options.types.object', 'Object'), value: 'object' },
-        { label: t('options.types.array', 'Array'), value: 'array' }
+      option: [
+        { label: t('option.types.string', 'String'), value: 'string' },
+        { label: t('option.types.number', 'Number'), value: 'number' },
+        { label: t('option.types.boolean', 'Boolean'), value: 'boolean' },
+        { label: t('option.types.object', 'Object'), value: 'object' },
+        { label: t('option.types.array', 'Array'), value: 'array' }
       ],
       rules: { required: t('forms.select_required') }
     },
     {
-      title: t('options.fields.value', 'Value'),
+      title: t('option.fields.value', 'Value'),
       name: 'value',
       defaultValue: '',
       placeholder: 'Enter option value',
@@ -73,7 +73,7 @@ export const CreateOptionsForms = ({ onSubmit, control, errors }) => {
       }
     },
     {
-      title: t('options.fields.autoload', 'Autoload'),
+      title: t('option.fields.autoload', 'Autoload'),
       name: 'autoload',
       defaultValue: false,
       type: 'switch',
@@ -90,7 +90,7 @@ export const CreateOptionsForms = ({ onSubmit, control, errors }) => {
 
   return (
     <Form
-      id='create-options'
+      id='create-option'
       className='my-4 md:grid-cols-2'
       onSubmit={onSubmit}
       control={control}

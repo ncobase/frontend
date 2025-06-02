@@ -3,7 +3,7 @@ import { DictionaryRoutes } from './dictionary/routes';
 import ExtensionRoutes from './extension/routes';
 import { GroupRoutes } from './group/routes';
 import { MenuRoutes } from './menu/routes';
-import OptionsRoutes from './options/routes';
+import { OptionRoutes } from './option/routes';
 import { PermissionRoutes } from './permission/routes';
 import { RoleRoutes } from './role/routes';
 import { TenantRoutes } from './tenant/routes';
@@ -13,16 +13,16 @@ import { Guard, renderRoutes } from '@/router';
 
 export const SystemRoutes = () => {
   const routes = [
-    { path: 'dictionary/*', element: <DictionaryRoutes /> },
-    { path: 'extension/*', element: <ExtensionRoutes /> },
-    { path: 'group/*', element: <GroupRoutes /> },
-    { path: 'user/*', element: <UserRoutes /> },
-    { path: 'permission/*', element: <PermissionRoutes /> },
-    { path: 'menu/*', element: <MenuRoutes /> },
-    { path: 'role/*', element: <RoleRoutes /> },
-    { path: 'tenant/*', element: <TenantRoutes /> },
-    { path: 'basic/*', element: <Guard super children={<BasicRoutes />} /> },
-    { path: 'options/*', element: <OptionsRoutes /> }
+    { path: 'dictionaries/*', element: <DictionaryRoutes /> },
+    { path: 'extensions/*', element: <ExtensionRoutes /> },
+    { path: 'groups/*', element: <GroupRoutes /> },
+    { path: 'users/*', element: <UserRoutes /> },
+    { path: 'permissions/*', element: <PermissionRoutes /> },
+    { path: 'menus/*', element: <MenuRoutes /> },
+    { path: 'roles/*', element: <RoleRoutes /> },
+    { path: 'tenants/*', element: <TenantRoutes /> },
+    { path: 'basics/*', element: <Guard super children={<BasicRoutes />} /> },
+    { path: 'options/*', element: <OptionRoutes /> }
   ];
   return renderRoutes(routes);
 };

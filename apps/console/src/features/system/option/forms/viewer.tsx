@@ -1,10 +1,10 @@
 import { CodeHighlighter, FieldViewer } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 
-import { useQueryOptions } from '../service';
+import { useQueryOption } from '../service';
 
-export const OptionsViewerForms = ({ record }) => {
-  const { data = {} } = useQueryOptions(record);
+export const OptionViewerForms = ({ record }) => {
+  const { data = {} } = useQueryOption(record);
 
   const renderValue = (value: string, type: string) => {
     if (['object', 'array'].includes(type)) {

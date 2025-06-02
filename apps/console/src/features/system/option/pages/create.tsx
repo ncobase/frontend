@@ -1,38 +1,17 @@
-import { Button, Icons, ScrollView, Container } from '@ncobase/react';
+import { Button, Container, Icons, ScrollView } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 
-import { EditorOptionsForms } from '../forms/editor';
+import { CreateOptionForms } from '../forms/create';
 
 import { useLayoutContext } from '@/components/layout';
 
-export const EditorOptionsPage = ({
-  viewMode,
-  record: initialRecord,
-  onSubmit,
-  control,
-  setValue,
-  errors
-}) => {
+export const CreateOptionPage = ({ viewMode, onSubmit, control, errors }) => {
   const { vmode } = useLayoutContext();
-  const { id } = useParams<{ id: string }>();
-  const record = initialRecord || id;
   const mode = viewMode || vmode || 'flatten';
 
-  if (!record) {
-    return null;
-  }
-
   if (mode === 'modal') {
-    return (
-      <EditorOptionsForms
-        record={record}
-        onSubmit={onSubmit}
-        control={control}
-        setValue={setValue}
-        errors={errors}
-      />
-    );
+    return <CreateOptionForms onSubmit={onSubmit} control={control} errors={errors} />;
   }
 
   const { t } = useTranslation();
@@ -43,7 +22,7 @@ export const EditorOptionsPage = ({
       <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-x-4'>
-            <div className='text-slate-600 font-medium'>{t('actions.edit')}</div>
+            <div className='text-slate-600 font-medium'>{t('actions.create')}</div>
           </div>
           <div className='flex gap-x-4'>
             <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
@@ -57,13 +36,7 @@ export const EditorOptionsPage = ({
       </div>
       <ScrollView className='bg-white'>
         <Container>
-          <EditorOptionsForms
-            record={record}
-            onSubmit={onSubmit}
-            control={control}
-            setValue={setValue}
-            errors={errors}
-          />
+          <CreateOptionForms onSubmit={onSubmit} control={control} errors={errors} />
         </Container>
       </ScrollView>
     </>

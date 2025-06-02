@@ -135,7 +135,7 @@ export const MenuListPage = () => {
     columns: tableColumns({ handleView, handleDelete, handleToggleStatus }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('system.menu.title')
+    title: t('system.menus.title')
   };
 
   return (

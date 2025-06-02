@@ -4,22 +4,22 @@ import { FieldConfigProps, Form } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { useQueryOptions } from '../service';
+import { useQueryOption } from '../service';
 
-export const EditorOptionsForms = ({ record, onSubmit, control, setValue, errors }) => {
+export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {}, isLoading } = useQueryOptions(record);
+  const { data = {}, isLoading } = useQueryOption(record);
 
   const fields: FieldConfigProps[] = [
     {
-      title: t('options.fields.id', 'ID'),
+      title: t('option.fields.id', 'ID'),
       name: 'id',
       defaultValue: '',
       type: 'text',
       disabled: true
     },
     {
-      title: t('options.fields.name', 'Name'),
+      title: t('option.fields.name', 'Name'),
       name: 'name',
       defaultValue: '',
       placeholder: 'Enter option name',
@@ -33,21 +33,21 @@ export const EditorOptionsForms = ({ record, onSubmit, control, setValue, errors
       }
     },
     {
-      title: t('options.fields.type', 'Type'),
+      title: t('option.fields.type', 'Type'),
       name: 'type',
       defaultValue: 'string',
       type: 'select',
-      options: [
-        { label: t('options.types.string', 'String'), value: 'string' },
-        { label: t('options.types.number', 'Number'), value: 'number' },
-        { label: t('options.types.boolean', 'Boolean'), value: 'boolean' },
-        { label: t('options.types.object', 'Object'), value: 'object' },
-        { label: t('options.types.array', 'Array'), value: 'array' }
+      option: [
+        { label: t('option.types.string', 'String'), value: 'string' },
+        { label: t('option.types.number', 'Number'), value: 'number' },
+        { label: t('option.types.boolean', 'Boolean'), value: 'boolean' },
+        { label: t('option.types.object', 'Object'), value: 'object' },
+        { label: t('option.types.array', 'Array'), value: 'array' }
       ],
       rules: { required: t('forms.select_required') }
     },
     {
-      title: t('options.fields.value', 'Value'),
+      title: t('option.fields.value', 'Value'),
       name: 'value',
       defaultValue: '',
       placeholder: 'Enter option value',
@@ -56,28 +56,28 @@ export const EditorOptionsForms = ({ record, onSubmit, control, setValue, errors
       rules: { required: t('forms.input_required') }
     },
     {
-      title: t('options.fields.autoload', 'Autoload'),
+      title: t('option.fields.autoload', 'Autoload'),
       name: 'autoload',
       defaultValue: false,
       type: 'switch',
       elementClassName: 'my-3'
     },
     {
-      title: t('options.fields.tenant', 'Tenant'),
+      title: t('option.fields.tenant', 'Tenant'),
       name: 'tenant_id',
       defaultValue: '',
       type: 'text',
       disabled: true
     },
     {
-      title: t('options.fields.created_at', 'Created At'),
+      title: t('option.fields.created_at', 'Created At'),
       name: 'created_at',
       defaultValue: '',
       type: 'text',
       disabled: true
     },
     {
-      title: t('options.fields.updated_at', 'Updated At'),
+      title: t('option.fields.updated_at', 'Updated At'),
       name: 'updated_at',
       defaultValue: '',
       type: 'text',
@@ -104,7 +104,7 @@ export const EditorOptionsForms = ({ record, onSubmit, control, setValue, errors
 
   return (
     <Form
-      id='edit-options'
+      id='edit-option'
       className='my-4 md:grid-cols-2'
       onSubmit={onSubmit}
       control={control}

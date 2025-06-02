@@ -124,7 +124,7 @@ export const PermissionListPage = () => {
     columns: tableColumns({ handleView, handleDelete }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('system.permission.title')
+    title: t('system.permissions.title')
   };
 
   return (

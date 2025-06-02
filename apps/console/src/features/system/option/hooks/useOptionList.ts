@@ -3,14 +3,14 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { isEqual } from 'lodash';
 
 import { QueryFormParams } from '../config/query';
-import { OptionsList } from '../options';
-import { useListOptions } from '../service';
+import { OptionList } from '../option';
+import { useListOption } from '../service';
 
-export const useOptionsList = (initialParams: QueryFormParams = { limit: 20 }) => {
+export const useOptionList = (initialParams: QueryFormParams = { limit: 20 }) => {
   const [queryParams, setQueryParams] = useState<QueryFormParams>(initialParams);
   const lastParamsRef = useRef(initialParams);
 
-  const { data, isLoading, error, refetch } = useListOptions(queryParams);
+  const { data, isLoading, error, refetch } = useListOption(queryParams);
 
   // Fetch data
   const fetchData = useCallback(
@@ -37,7 +37,7 @@ export const useOptionsList = (initialParams: QueryFormParams = { limit: 20 }) =
   }, [queryParams]);
 
   return {
-    data: data as OptionsList | undefined,
+    data: data as OptionList | undefined,
     queryParams,
     loading: isLoading,
     error,

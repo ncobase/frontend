@@ -2,11 +2,11 @@ import { Button, Icons, ScrollView, Container } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { OptionsViewerForms } from '../forms/viewer';
+import { OptionViewerForms } from '../forms/viewer';
 
 import { useLayoutContext } from '@/components/layout';
 
-export const OptionsViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
+export const OptionViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();
   const { id } = useParams<{ id: string }>();
   const record = initialRecord || id;
@@ -17,7 +17,7 @@ export const OptionsViewerPage = ({ viewMode, record: initialRecord, handleView 
   }
 
   if (mode === 'modal') {
-    return <OptionsViewerForms record={record} />;
+    return <OptionViewerForms record={record} />;
   }
 
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export const OptionsViewerPage = ({ viewMode, record: initialRecord, handleView 
       </div>
       <ScrollView className='bg-white'>
         <Container>
-          <OptionsViewerForms record={record} />
+          <OptionViewerForms record={record} />
         </Container>
       </ScrollView>
     </>

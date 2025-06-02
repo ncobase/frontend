@@ -124,7 +124,7 @@ export const UserListPage = () => {
     columns: tableColumns({ handleView, handleDelete }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('system.user.title')
+    title: t('system.users.title')
   };
 
   return (
