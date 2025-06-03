@@ -128,7 +128,7 @@ export class Request {
     if (error instanceof FetchError) {
       status = error.status;
       data = error.data || error['_data'];
-      message = data?.message || error.message || message;
+      message = data?.message || error['message'] || message;
     } else if (error instanceof Response) {
       status = error.status;
       try {
@@ -139,7 +139,7 @@ export class Request {
         // Ignore parse errors
       }
     } else if (error instanceof Error) {
-      message = error.message;
+      message = error['message'];
     }
 
     console.error(`[${method} ${url}] ${status || 'NETWORK'}: ${message}`);

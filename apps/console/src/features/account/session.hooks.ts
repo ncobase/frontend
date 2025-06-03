@@ -54,7 +54,7 @@ export const useDeleteSession = () => {
     },
     onError: (error: Error) => {
       toast.error('Delete Failed', {
-        description: error.message || 'Failed to delete session.'
+        description: error['message'] || 'Failed to delete session.'
       });
     }
   });
@@ -77,7 +77,7 @@ export const useDeactivateAllSessions = () => {
     },
     onError: (error: Error) => {
       toast.error('Deactivation Failed', {
-        description: error.message || 'Failed to deactivate all sessions.'
+        description: error['message'] || 'Failed to deactivate all sessions.'
       });
     }
   });

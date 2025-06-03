@@ -116,7 +116,7 @@ export const refreshAccessToken = async (): Promise<TokenResponse> => {
     if (
       error.response?.status === 401 ||
       error.response?.status === 403 ||
-      error.message?.includes('invalid')
+      error['message']?.includes('invalid')
     ) {
       clearTokens();
     }

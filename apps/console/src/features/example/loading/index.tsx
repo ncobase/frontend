@@ -94,7 +94,7 @@ const ErrorState = ({ error, onRetry }) => {
       </div>
       <p className='text-slate-800 font-medium mb-2'>{t('example.loading.states.error')}</p>
       <p className='text-slate-600 mb-4'>
-        {error.message || t('example.loading.states.unknownError')}
+        {error['message'] || t('example.loading.states.unknownError')}
       </p>
       {onRetry && (
         <Button variant='primary' onClick={onRetry}>
