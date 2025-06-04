@@ -5,3 +5,4 @@ export * from './navigation/account.dropdown';
 export * from './navigation/main.navigation';
 export * from './navigation/tenant.dropdown';
 export * from './page';
+export * from './tabs';

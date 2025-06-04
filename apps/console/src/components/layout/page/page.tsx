@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
 
-import { Shell } from '@ncobase/react';
+import { Shell, ShellTabBar } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
+import { useLayoutContext } from '../layout.context';
 import { useFocusMode } from '../layout.hooks';
+import { TabBar } from '../tabs';
 
 import { PageContainer } from './page.container';
 import { PageContext } from './page.context';
@@ -23,6 +25,7 @@ export interface PageProps extends React.HTMLAttributes<HTMLDivElement> {
   submenu?: boolean;
   title?: string;
   layout?: boolean;
+  enableTabs?: boolean;
 }
 
 export const Page: React.FC<PageProps> = ({
@@ -32,12 +35,13 @@ export const Page: React.FC<PageProps> = ({
   submenu,
   title,
   layout = true,
+  enableTabs = false,
   ...rest
 }) => {
   useFocusMode();
   const { t } = useTranslation();
+  const { tabsEnabled, tabs } = useLayoutContext();
 
-  // Use our custom localStorage hook
   const { storedValue: sidebarExpanded, setValue: setSidebarExpanded } = useLocalStorage(
     SIDEBAR_EXPANDED_KEY,
     false
@@ -50,11 +54,13 @@ export const Page: React.FC<PageProps> = ({
 
   const renderContent = () => <PageContainer {...rest} />;
 
-  // Get document direction once, don't recalculate on every render
   const documentDirection = useMemo(
     () => (document.documentElement.dir || 'ltr') as 'ltr' | 'rtl',
     []
   );
+
+  // Show tabs if enabled globally or locally, and there are tabs to show
+  const showTabs = (enableTabs || tabsEnabled) && tabs && tabs.length > 0;
 
   return (
     <PageContext.Provider value={pageContextValue}>
@@ -68,6 +74,13 @@ export const Page: React.FC<PageProps> = ({
                 expanded={sidebarExpanded}
                 setExpanded={value => setSidebarExpanded(value as boolean)}
               />
+            )
+          }
+          tabbar={
+            showTabs && (
+              <ShellTabBar>
+                <TabBar />
+              </ShellTabBar>
             )
           }
           topbar={topbar}
