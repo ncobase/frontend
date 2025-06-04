@@ -1,3 +1,4 @@
+import AccessRoutes from './access/routes';
 import { BasicRoutes } from './basic/routes';
 import { DictionaryRoutes } from './dictionary/routes';
 import ExtensionRoutes from './extension/routes';
@@ -13,6 +14,7 @@ import { Guard, renderRoutes } from '@/router';
 
 export const SystemRoutes = () => {
   const routes = [
+    { path: 'access/*', element: <AccessRoutes /> },
     { path: 'dictionaries/*', element: <DictionaryRoutes /> },
     { path: 'extensions/*', element: <ExtensionRoutes /> },
     { path: 'groups/*', element: <GroupRoutes /> },

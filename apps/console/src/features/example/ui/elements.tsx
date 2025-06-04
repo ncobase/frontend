@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import {
   Badge,
@@ -18,9 +18,42 @@ import {
   SelectTrigger,
   SelectValue,
   TableView,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Textarea,
   Tooltip,
-  Uploader
+  Uploader,
+  Alert,
+  AlertDialog,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Switch,
+  Slider,
+  Progress,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Dialog,
+  Dropdown,
+  DropdownContent,
+  DropdownItem,
+  DropdownTrigger,
+  Divider,
+  Skeleton,
+  ColorPicker,
+  IconPicker,
+  RadioGroup,
+  CheckboxGroup,
+  MultiSelect,
+  TreeSelect,
+  ToastProvider,
+  ToastContainer,
+  useToastMessage,
+  Portal
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -31,10 +64,11 @@ import { uploadConfigs, useUpload } from '@/hooks';
 export const UITopbar = ({ ...rest }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
   const topbarElement = {
     title: t('example.ui.title'),
     left: [
-      <div className='rounded-md flex items-center justify-between gap-x-1'>
+      <div className='rounded-md flex items-center justify-between gap-x-1' key='left'>
         <Tooltip side='bottom' content='Create'>
           <Button
             variant='unstyle'
@@ -48,7 +82,7 @@ export const UITopbar = ({ ...rest }) => {
       </div>
     ],
     right: [
-      <div className='rounded-md flex items-center justify-between gap-x-1'>
+      <div className='rounded-md flex items-center justify-between gap-x-1' key='right-1'>
         <Tooltip side='bottom' content='Filter'>
           <Button variant='unstyle' size='ratio'>
             <Icons name='IconFilter' />
@@ -60,7 +94,10 @@ export const UITopbar = ({ ...rest }) => {
           </Button>
         </Tooltip>
       </div>,
-      <div className='bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2'>
+      <div
+        className='bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2'
+        key='right-2'
+      >
         <Tooltip side='bottom' content='Card Layout'>
           <Button
             variant='unstyle'
@@ -81,7 +118,7 @@ export const UITopbar = ({ ...rest }) => {
             <Icons name='IconTableColumn' />
           </Button>
         </Tooltip>
-        <Tooltip side='bottom' content='Card Layout'>
+        <Tooltip side='bottom' content='Table Layout'>
           <Button
             variant='unstyle'
             size='ratio'
@@ -104,1825 +141,1116 @@ export const UITopbar = ({ ...rest }) => {
 };
 
 export const Elements = ({ ...rest }) => {
-  const handleDateSelect = date => {
-    console.log(date);
-  };
+  // Toast system
+  const toast = useToastMessage();
 
-  const handleDateRangeSelect = range => {
-    console.log(range);
-  };
+  // State management
+  const [basicFiles, setBasicFiles] = useState<File[] | null>([]);
+  const [multipleFiles, setMultipleFiles] = useState<File[]>([]);
+  const [selectedColor, setSelectedColor] = useState('#2563EB');
+  const [selectedIcon, setSelectedIcon] = useState('IconStar');
+  const [switchValue, setSwitchValue] = useState(false);
+  const [sliderValue, setSliderValue] = useState([50]);
+  const [progressValue, setProgressValue] = useState(60);
+  const [radioValue, setRadioValue] = useState('option1');
+  const [checkboxValues, setCheckboxValues] = useState<string[]>(['option1']);
+  const [multiSelectValue, setMultiSelectValue] = useState<string[]>([]);
+  const [treeSelectValue, setTreeSelectValue] = useState<string[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 
-  const [files, setFiles] = useState<File[] | null>([]);
+  // Date handlers
+  const handleDateSelect = useCallback((date: any) => {
+    console.log('Date selected:', date);
+  }, []);
 
-  // Basic upload hooks for examples
+  const handleDateRangeSelect = useCallback((range: any) => {
+    console.log('Date range selected:', range);
+  }, []);
+
+  // Upload configuration
   const imageUpload = useUpload(uploadConfigs.image('example-images', 'system'));
   const documentUpload = useUpload(uploadConfigs.document('example-docs', 'system', true));
-  const [multipleFiles, setMultipleFiles] = useState<File[]>([]);
 
-  // Auto-hide success messages after 3 seconds
-  const [showImageSuccess, setShowImageSuccess] = useState(false);
-  const [showDocSuccess, setShowDocSuccess] = useState(false);
+  // Upload handlers
+  const handleImageUpload = useCallback(
+    async (file: File) => {
+      try {
+        return await imageUpload.uploadFile(file);
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        throw error;
+      }
+    },
+    [imageUpload]
+  );
 
-  // Simple upload handlers
-  const handleImageUpload = async (value: File | File[] | null) => {
-    if (!value) return;
+  const handleDocumentUpload = useCallback(
+    async (file: File) => {
+      try {
+        return await documentUpload.uploadFile(file);
+      } catch (error) {
+        console.error('Document upload failed:', error);
+        throw error;
+      }
+    },
+    [documentUpload]
+  );
 
-    try {
-      const file = Array.isArray(value) ? value[0] : value;
-      await imageUpload.uploadFile(file);
+  const handleBasicFileChange = useCallback((value: File | File[] | null) => {
+    setBasicFiles(Array.isArray(value) ? value : value ? [value] : []);
+  }, []);
 
-      // Show success message and auto-hide after 3 seconds
-      setShowImageSuccess(true);
-      setTimeout(() => setShowImageSuccess(false), 3000);
-    } catch (error) {
-      console.error('Upload failed:', error);
-    }
-  };
-
-  const handleDocumentUpload = async (value: File | File[] | null) => {
-    if (!value) return;
-
-    try {
-      const file = Array.isArray(value) ? value[0] : value;
-      await documentUpload.uploadFile(file);
-
-      // Show success message and auto-hide after 3 seconds
-      setShowDocSuccess(true);
-      setTimeout(() => setShowDocSuccess(false), 3000);
-    } catch (error) {
-      console.error('Upload failed:', error);
-    }
-  };
-
-  const handleMultipleFilesChange = (value: File | File[] | null) => {
-    if (!value) {
-      setMultipleFiles([]);
-      return;
-    }
-
-    const filesArray = Array.isArray(value) ? value : [value];
+  const handleMultipleFilesChange = useCallback((value: File | File[] | null) => {
+    const filesArray = Array.isArray(value) ? value : value ? [value] : [];
     setMultipleFiles(filesArray);
 
-    // Log file details for debugging
-    console.log('Multiple files selected:', {
-      count: filesArray.length,
-      files: filesArray.map(file => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        lastModified: file.lastModified
-      }))
-    });
+    if (filesArray.length > 0) {
+      console.log('Multiple files selected:', {
+        count: filesArray.length,
+        files: filesArray.map(file => ({
+          name: file.name,
+          size: file.size,
+          type: file.type
+        }))
+      });
+    }
+  }, []);
+
+  // Toast handlers
+  const showToast = (type: 'success' | 'error' | 'warning' | 'info') => {
+    switch (type) {
+      case 'success':
+        toast.success('Success!', { description: 'Operation completed successfully.' });
+        break;
+      case 'error':
+        toast.error('Error!', { description: 'Something went wrong.' });
+        break;
+      case 'warning':
+        toast.warning('Warning!', { description: 'Please check your input.' });
+        break;
+      case 'info':
+        toast.info('Info!', { description: 'Here is some information.' });
+        break;
+    }
   };
 
-  const handleValueChange = (value: File | File[] | null) => {
-    setFiles(Array.isArray(value) ? value : value ? [value] : []);
-  };
+  // Sample data for complex components
+  const tableData = [
+    { id: 1, name: 'John Doe', role: 'Developer', department: 'Engineering', status: 'Active' },
+    { id: 2, name: 'Jane Smith', role: 'Designer', department: 'Design', status: 'Active' },
+    { id: 3, name: 'Bob Johnson', role: 'Manager', department: 'Sales', status: 'Inactive' },
+    { id: 4, name: 'Alice Brown', role: 'Analyst', department: 'Marketing', status: 'Active' },
+    {
+      id: 5,
+      name: 'Charlie Wilson',
+      role: 'Developer',
+      department: 'Engineering',
+      status: 'Active'
+    },
+    { id: 6, name: 'Diana Davis', role: 'Designer', department: 'Design', status: 'Pending' }
+  ];
+
+  const selectOptions = [
+    { label: 'Option 1', value: 'option1' },
+    { label: 'Option 2', value: 'option2' },
+    { label: 'Option 3', value: 'option3' },
+    { label: 'Option 4', value: 'option4' }
+  ];
+
+  const treeOptions = [
+    {
+      label: 'Technology',
+      value: 'tech',
+      children: [
+        { label: 'Frontend', value: 'frontend' },
+        { label: 'Backend', value: 'backend' },
+        { label: 'Mobile', value: 'mobile' }
+      ]
+    },
+    {
+      label: 'Design',
+      value: 'design',
+      children: [
+        { label: 'UI/UX', value: 'uiux' },
+        { label: 'Graphics', value: 'graphics' }
+      ]
+    }
+  ];
 
   return (
-    <Page sidebar {...rest} topbar={<UITopbar />}>
-      <div className='grid grid-cols-4 gap-4'>
-        <Card>
-          <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>Button</CardTitle>
-          </CardHeader>
-          <CardContent className='flex-col p-4 max-h-72 overflow-auto'>
-            <div className='flex gap-4 justify-between'>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>Default size:</div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary'>Primary</Button>
-                  <Button variant='outline-primary'>Primary</Button>
-                  <Button variant='secondary'>Secondary</Button>
-                  <Button variant='outline-secondary'>Secondary</Button>
-                  <Button variant='success'>Success</Button>
-                  <Button variant='outline-success'>Success</Button>
-                  <Button variant='warning'>Warning</Button>
-                  <Button variant='outline-warning'>Warning</Button>
-                  <Button variant='danger'>Danger</Button>
-                  <Button variant='outline-danger'>Danger</Button>
-                  <Button variant='slate'>Slate</Button>
-                  <Button variant='outline-slate'>Slate</Button>
-                  <Button variant='blue'>Blue</Button>
-                  <Button variant='outline-blue'>Blue</Button>
-                  <Button variant='indigo'>Indigo</Button>
-                  <Button variant='outline-indigo'>Indigo</Button>
-                  <Button variant='purple'>Purple</Button>
-                  <Button variant='outline-purple'>Purple</Button>
-                  <Button variant='pink'>Pink</Button>
-                  <Button variant='outline-pink'>Pink</Button>
-                  <Button variant='rose'>Rose</Button>
-                  <Button variant='outline-rose'>Rose</Button>
-                  <Button variant='orange'>Orange</Button>
-                  <Button variant='outline-orange'>Orange</Button>
-                  <Button variant='yellow'>Yellow</Button>
-                  <Button variant='outline-yellow'>Yellow</Button>
-                  <Button variant='green'>Green</Button>
-                  <Button variant='outline-green'>Green</Button>
-                  <Button variant='teal'>Teal</Button>
-                  <Button variant='outline-teal'>Teal</Button>
-                  <Button variant='cyan'>Cyan</Button>
-                  <Button variant='outline-cyan'>Cyan</Button>
-                </div>
-              </div>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>
-                  Default size with disabled:
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='success' disabled>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' disabled>
-                    Success
-                  </Button>
-                  <Button variant='warning' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='danger' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='slate' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='blue' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='pink' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='rose' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='orange' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='green' disabled>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' disabled>
-                    Green
-                  </Button>
-                  <Button variant='teal' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' disabled>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' disabled>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className='flex gap-4 justify-between'>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>Extra Small size:</div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='xs'>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='xs'>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='xs'>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='xs'>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='xs'>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='xs'>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='xs'>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='xs'>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='xs'>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='xs'>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='xs'>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='xs'>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='xs'>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='xs'>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='xs'>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='xs'>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='xs'>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='xs'>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='xs'>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='xs'>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='xs'>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='xs'>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='xs'>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='xs'>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='xs'>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='xs'>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='xs'>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='xs'>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='xs'>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='xs'>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='xs'>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='xs'>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
+    <ToastProvider>
+      <Page sidebar {...rest} topbar={<UITopbar />}>
+        <Tabs defaultValue='basic'>
+          <TabsList className='w-full justify-start mb-4'>
+            <TabsTrigger value='basic'>Basic</TabsTrigger>
+            <TabsTrigger value='forms'>Forms</TabsTrigger>
+            <TabsTrigger value='data'>Data Display</TabsTrigger>
+            <TabsTrigger value='feedback'>Feedback</TabsTrigger>
+            <TabsTrigger value='navigation'>Navigation</TabsTrigger>
+            <TabsTrigger value='layout'>Layout</TabsTrigger>
+          </TabsList>
 
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>
-                  Extra Small size with disabled:
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='xs' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='xs' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='xs' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='xs' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='xs' disabled>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='xs' disabled>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='xs' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='xs' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='xs' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='xs' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='xs' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='xs' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='xs' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='xs' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='xs' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='xs' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='xs' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='xs' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='xs' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='xs' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='xs' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='xs' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='xs' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='xs' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='xs' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='xs' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='xs' disabled>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='xs' disabled>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='xs' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='xs' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='xs' disabled>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='xs' disabled>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className='flex gap-4 justify-between'>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>Small size:</div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='sm'>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='sm'>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='sm'>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='sm'>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='sm'>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='sm'>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='sm'>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='sm'>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='sm'>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='sm'>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='sm'>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='sm'>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='sm'>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='sm'>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='sm'>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='sm'>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='sm'>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='sm'>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='sm'>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='sm'>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='sm'>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='sm'>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='sm'>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='sm'>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='sm'>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='sm'>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='sm'>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='sm'>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='sm'>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='sm'>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='sm'>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='sm'>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>
-                  Small size with disabled:
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='sm' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='sm' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='sm' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='sm' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='sm' disabled>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='sm' disabled>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='sm' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='sm' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='sm' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='sm' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='sm' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='sm' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='sm' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='sm' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='sm' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='sm' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='sm' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='sm' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='sm' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='sm' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='sm' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='sm' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='sm' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='sm' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='sm' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='sm' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='sm' disabled>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='sm' disabled>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='sm' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='sm' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='sm' disabled>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='sm' disabled>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className='flex gap-4 justify-between'>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>Large size:</div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='lg'>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='lg'>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='lg'>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='lg'>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='lg'>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='lg'>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='lg'>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='lg'>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='lg'>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='lg'>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='lg'>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='lg'>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='lg'>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='lg'>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='lg'>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='lg'>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='lg'>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='lg'>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='lg'>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='lg'>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='lg'>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='lg'>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='lg'>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='lg'>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='lg'>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='lg'>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='lg'>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='lg'>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='lg'>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='lg'>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='lg'>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='lg'>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>
-                  Large size with disabled:
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='lg' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='lg' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='lg' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='lg' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='lg' disabled>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='lg' disabled>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='lg' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='lg' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='lg' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='lg' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='lg' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='lg' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='lg' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='lg' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='lg' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='lg' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='lg' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='lg' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='lg' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='lg' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='lg' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='lg' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='lg' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='lg' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='lg' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='lg' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='lg' disabled>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='lg' disabled>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='lg' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='lg' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='lg' disabled>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='lg' disabled>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className='flex gap-4 justify-between'>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>Extra large size:</div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='xl'>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='xl'>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='xl'>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='xl'>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='xl'>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='xl'>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='xl'>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='xl'>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='xl'>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='xl'>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='xl'>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='xl'>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='xl'>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='xl'>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='xl'>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='xl'>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='xl'>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='xl'>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='xl'>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='xl'>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='xl'>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='xl'>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='xl'>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='xl'>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='xl'>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='xl'>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='xl'>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='xl'>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='xl'>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='xl'>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='xl'>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='xl'>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-              <div className='grid grid-cols-1 gap-4 pb-4'>
-                <div className='flex items-center text-slate-800 text-lg'>
-                  Extra large size with disabled:
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <Button variant='primary' size='xl' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='outline-primary' size='xl' disabled>
-                    Primary
-                  </Button>
-                  <Button variant='secondary' size='xl' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='outline-secondary' size='xl' disabled>
-                    Secondary
-                  </Button>
-                  <Button variant='success' size='xl' disabled>
-                    Success
-                  </Button>
-                  <Button variant='outline-success' size='xl' disabled>
-                    Success
-                  </Button>
-                  <Button variant='warning' size='xl' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='outline-warning' size='xl' disabled>
-                    Warning
-                  </Button>
-                  <Button variant='danger' size='xl' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='outline-danger' size='xl' disabled>
-                    Danger
-                  </Button>
-                  <Button variant='slate' size='xl' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='outline-slate' size='xl' disabled>
-                    Slate
-                  </Button>
-                  <Button variant='blue' size='xl' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='outline-blue' size='xl' disabled>
-                    Blue
-                  </Button>
-                  <Button variant='indigo' size='xl' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='outline-indigo' size='xl' disabled>
-                    Indigo
-                  </Button>
-                  <Button variant='purple' size='xl' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='outline-purple' size='xl' disabled>
-                    Purple
-                  </Button>
-                  <Button variant='pink' size='xl' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='outline-pink' size='xl' disabled>
-                    Pink
-                  </Button>
-                  <Button variant='rose' size='xl' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='outline-rose' size='xl' disabled>
-                    Rose
-                  </Button>
-                  <Button variant='orange' size='xl' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='outline-orange' size='xl' disabled>
-                    Orange
-                  </Button>
-                  <Button variant='yellow' size='xl' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='outline-yellow' size='xl' disabled>
-                    Yellow
-                  </Button>
-                  <Button variant='green' size='xl' disabled>
-                    Green
-                  </Button>
-                  <Button variant='outline-green' size='xl' disabled>
-                    Green
-                  </Button>
-                  <Button variant='teal' size='xl' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='outline-teal' size='xl' disabled>
-                    Teal
-                  </Button>
-                  <Button variant='cyan' size='xl' disabled>
-                    Cyan
-                  </Button>
-                  <Button variant='outline-cyan' size='xl' disabled>
-                    Cyan
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className='col-span-2'>
-          <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>Form</CardTitle>
-          </CardHeader>
-          <CardContent className='p-4 max-h-72 overflow-auto'>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Input：</div>
-              <div className='grid grid-cols-3 gap-4'>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Full name:</Label>
-                  <Input type='text' placeholder='' />
-                </div>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Last name:</Label>
-                  <Input type='text' placeholder='' />
-                </div>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Mr.</Label>
-                  <Select>
-                    <SelectTrigger allowClear>
-                      <SelectValue placeholder='Select' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='mr'>Mr.</SelectItem>
-                      <SelectItem value='mrs'>Mrs.</SelectItem>
-                      <SelectItem value='miss'>Miss</SelectItem>
-                      <SelectItem value='dr'>Dr.</SelectItem>
-                      <SelectItem value='other'>Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Datepicker：</Label>
-                  <DatePicker onChange={handleDateSelect} />
-                </div>
-                <div className='col-span-2 flex flex-col gap-y-1'>
-                  <Label>Datepicker Range:</Label>
-                  <DatePicker mode='range' onChange={handleDateRangeSelect} />
-                </div>
-                <div className='flex flex-col gap-4 pb-4'>
-                  <div className='flex items-center text-slate-800 text-lg'>Checkbox：</div>
-                  <div className='flex items-center gap-4'>
-                    <div className='inline-flex'>
-                      <Checkbox id='ha-unchecked' />
-                      <Label className='pl-2' htmlFor='ha-unchecked'>
-                        unchecked
-                      </Label>
-                    </div>
-                    <div className='inline-flex'>
-                      <Checkbox id='ha-checked' defaultChecked />
-                      <Label className='pl-2' htmlFor='ha-checked'>
-                        checked
-                      </Label>
+          {/* Basic Components */}
+          <TabsContent value='basic'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+              {/* Button Component */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Button</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Variants:</div>
+                    <div className='grid grid-cols-2 gap-2'>
+                      <Button variant='primary'>Primary</Button>
+                      <Button variant='outline-primary'>Outline</Button>
+                      <Button variant='secondary'>Secondary</Button>
+                      <Button variant='success'>Success</Button>
+                      <Button variant='warning'>Warning</Button>
+                      <Button variant='danger'>Danger</Button>
                     </div>
                   </div>
-                </div>
-                <div className='col-span-full flex flex-col gap-y-1'>
-                  <Label>Description：</Label>
-                  <Textarea rows={3}></Textarea>
-                </div>
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Disabled Input:</div>
-              <div className='grid grid-cols-3 gap-4'>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Full name:</Label>
-                  <Input type='text' placeholder='' disabled />
-                </div>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Last name:</Label>
-                  <Input type='text' placeholder='' disabled />
-                </div>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Mr.</Label>
-                  <Select disabled>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='mr'>Mr.</SelectItem>
-                      <SelectItem value='mrs'>Mrs.</SelectItem>
-                      <SelectItem value='miss'>Miss</SelectItem>
-                      <SelectItem value='dr'>Dr.</SelectItem>
-                      <SelectItem value='other'>Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className='flex flex-col gap-y-1'>
-                  <Label>Datepicker：</Label>
-                  <DatePicker onChange={handleDateSelect} disabled />
-                </div>
-                <div className='col-span-2 flex flex-col gap-y-1'>
-                  <Label>Datepicker Range:</Label>
-                  <DatePicker mode='range' onChange={handleDateRangeSelect} disabled />
-                </div>
-                <div className='flex flex-col gap-4 pb-4'>
-                  <div className='flex items-center text-slate-800 text-lg'>Checkbox：</div>
-                  <div className='flex items-center gap-4'>
-                    <div className='inline-flex'>
-                      <Checkbox id='ha-disabled-unchecked' disabled />
-                      <Label className='pl-2' htmlFor='ha-disabled-unchecked'>
-                        disabled unchecked
-                      </Label>
-                    </div>
-                    <div className='inline-flex'>
-                      <Checkbox id='ha-disabled-checked' disabled defaultChecked />
-                      <Label className='pl-2' htmlFor='ha-disabled-checked'>
-                        disabled checked
-                      </Label>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Sizes:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Button variant='primary' size='xs'>
+                        Extra Small
+                      </Button>
+                      <Button variant='primary' size='sm'>
+                        Small
+                      </Button>
+                      <Button variant='primary' size='md'>
+                        Medium
+                      </Button>
+                      <Button variant='primary' size='lg'>
+                        Large
+                      </Button>
                     </div>
                   </div>
-                </div>
-                <div className='col-span-full flex flex-col gap-y-1'>
-                  <Label>Description：</Label>
-                  <Textarea rows={3} disabled></Textarea>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>Badge</CardTitle>
-          </CardHeader>
-          <CardContent className='p-4 max-h-72 overflow-auto'>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Default size:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' />
-                <Badge variant='outline-primary' />
-                <Badge variant='secondary' />
-                <Badge variant='outline-secondary' />
-                <Badge variant='success' />
-                <Badge variant='outline-success' />
-                <Badge variant='warning' />
-                <Badge variant='outline-warning' />
-                <Badge variant='danger' />
-                <Badge variant='outline-danger' />
-                <Badge variant='slate' />
-                <Badge variant='outline-slate' />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>
-                Default size with text:
-              </div>
-              <div className='flex gap-4'>
-                <Badge variant='primary'>23</Badge>
-                <Badge variant='outline-primary'>23</Badge>
-                <Badge variant='secondary'>23</Badge>
-                <Badge variant='outline-secondary'>23</Badge>
-                <Badge variant='success'>23</Badge>
-                <Badge variant='outline-success'>23</Badge>
-                <Badge variant='warning'>23</Badge>
-                <Badge variant='outline-warning'>23</Badge>
-                <Badge variant='danger'>23</Badge>
-                <Badge variant='outline-danger'>23</Badge>
-                <Badge variant='slate'>23</Badge>
-                <Badge variant='outline-slate'>23</Badge>
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>
-                Default size with icon:
-              </div>
-              <div className='flex gap-4'>
-                <Badge variant='primary'>
-                  <Icons name='IconCalendar' />
-                </Badge>
-                <Badge variant='outline-primary'>
-                  <Icons name='IconPlus' />
-                </Badge>
-                <Badge variant='secondary'>
-                  <Icons name='IconPencil' />
-                </Badge>
-                <Badge variant='outline-secondary'>
-                  <Icons name='IconCategory' />
-                </Badge>
-                <Badge variant='success'>
-                  <Icons name='IconArrowsMaximize' />
-                </Badge>
-                <Badge variant='outline-success'>
-                  <Icons name='IconCopy' />
-                </Badge>
-                <Badge variant='warning'>
-                  <Icons name='IconFilter' />
-                </Badge>
-                <Badge variant='outline-warning'>
-                  <Icons name='IconTrash' />
-                </Badge>
-                <Badge variant='danger'>
-                  <Icons name='IconHash' />
-                </Badge>
-                <Badge variant='outline-danger'>
-                  <Icons name='IconSquareRoundedCheck' />
-                </Badge>
-                <Badge variant='slate'>
-                  <Icons name='IconCircleMinus' />
-                </Badge>
-                <Badge variant='outline-slate'>
-                  <Icons name='IconLayoutBoard' />
-                </Badge>
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Extra Small size:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='xs' />
-                <Badge variant='outline-primary' size='xs' />
-                <Badge variant='secondary' size='xs' />
-                <Badge variant='outline-secondary' size='xs' />
-                <Badge variant='success' size='xs' />
-                <Badge variant='outline-success' size='xs' />
-                <Badge variant='warning' size='xs' />
-                <Badge variant='outline-warning' size='xs' />
-                <Badge variant='danger' size='xs' />
-                <Badge variant='outline-danger' size='xs' />
-                <Badge variant='slate' size='xs' />
-                <Badge variant='outline-slate' size='xs' />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Small size:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='sm' />
-                <Badge variant='outline-primary' size='sm' />
-                <Badge variant='secondary' size='sm' />
-                <Badge variant='outline-secondary' size='sm' />
-                <Badge variant='success' size='sm' />
-                <Badge variant='outline-success' size='sm' />
-                <Badge variant='warning' size='sm' />
-                <Badge variant='outline-warning' size='sm' />
-                <Badge variant='danger' size='sm' />
-                <Badge variant='outline-danger' size='sm' />
-                <Badge variant='slate' size='sm' />
-                <Badge variant='outline-slate' size='sm' />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Large size:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='lg' />
-                <Badge variant='outline-primary' size='lg' />
-                <Badge variant='secondary' size='lg' />
-                <Badge variant='outline-secondary' size='lg' />
-                <Badge variant='success' size='lg' />
-                <Badge variant='outline-success' size='lg' />
-                <Badge variant='warning' size='lg' />
-                <Badge variant='outline-warning' size='lg' />
-                <Badge variant='danger' size='lg' />
-                <Badge variant='outline-danger' size='lg' />
-                <Badge variant='slate' size='lg' />
-                <Badge variant='outline-slate' size='lg' />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Large size with text:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='outline-primary' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='secondary' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='outline-secondary' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='success' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='outline-success' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='warning' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='outline-warning' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='danger' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='outline-danger' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='slate' size='lg'>
-                  23
-                </Badge>
-                <Badge variant='outline-slate' size='lg'>
-                  23
-                </Badge>
-              </div>
-            </div>
 
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Large size with icon:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='outline-primary' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='secondary' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='outline-secondary' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='success' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='outline-success' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='warning' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='outline-warning' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='danger' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='outline-danger' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='slate' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-                <Badge variant='outline-slate' size='lg'>
-                  <Icons name='IconStar' />
-                </Badge>
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>Extra large size:</div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='xl' />
-                <Badge variant='outline-primary' size='xl' />
-                <Badge variant='secondary' size='xl' />
-                <Badge variant='outline-secondary' size='xl' />
-                <Badge variant='success' size='xl' />
-                <Badge variant='outline-success' size='xl' />
-                <Badge variant='warning' size='xl' />
-                <Badge variant='outline-warning' size='xl' />
-                <Badge variant='danger' size='xl' />
-                <Badge variant='outline-danger' size='xl' />
-                <Badge variant='slate' size='xl' />
-                <Badge variant='outline-slate' size='xl' />
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>
-                Extra large size with text:
-              </div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='outline-primary' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='secondary' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='outline-secondary' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='success' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='outline-success' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='warning' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='outline-warning' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='danger' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='outline-danger' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='slate' size='xl'>
-                  23
-                </Badge>
-                <Badge variant='outline-slate' size='xl'>
-                  23
-                </Badge>
-              </div>
-            </div>
-            <div className='grid grid-cols-1 gap-4 pb-4'>
-              <div className='flex items-center text-slate-800 text-lg'>
-                Extra large size with icon:
-              </div>
-              <div className='flex gap-4'>
-                <Badge variant='primary' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='outline-primary' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='secondary' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='outline-secondary' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='success' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='outline-success' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='warning' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='outline-warning' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='danger' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='outline-danger' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='slate' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-                <Badge variant='outline-slate' size='xl'>
-                  <Icons name='IconUser' />
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className='col-span-full'>
-          <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>Table</CardTitle>
-          </CardHeader>
-          <CardContent className='p-0 overflow-auto'>
-            <TableView
-              pageSize={6}
-              selected
-              visibleControl
-              header={[
-                { title: '姓名', accessorKey: 'name' },
-                { title: '性别', accessorKey: 'sex' },
-                { title: '年龄', accessorKey: 'age' },
-                { title: '所属部门', accessorKey: 'department' },
-                { title: '职务', accessorKey: 'position' },
-                { title: '操作', accessorKey: 'operation' }
-              ]}
-              data={[
-                {
-                  id: 1,
-                  name: '张三',
-                  sex: '男',
-                  age: 18,
-                  department: '研发部',
-                  position: '总监'
-                },
-                {
-                  id: 2,
-                  name: '李四',
-                  sex: '男',
-                  age: 20,
-                  department: '销售部',
-                  position: '销售'
-                },
-                {
-                  id: 3,
-                  name: '王五',
-                  sex: '女',
-                  age: 22,
-                  department: '市场部',
-                  position: '市场'
-                },
-                {
-                  id: 4,
-                  name: '赵六',
-                  sex: '男',
-                  age: 24,
-                  department: '财务部',
-                  position: '财务'
-                },
-                {
-                  id: 5,
-                  name: '田七',
-                  sex: '女',
-                  age: 26,
-                  department: '人事部',
-                  position: '人事'
-                },
-                {
-                  id: 6,
-                  name: '钱八',
-                  sex: '男',
-                  age: 28,
-                  department: '运营部',
-                  position: '运营'
-                },
-                {
-                  id: 7,
-                  name: '孙九',
-                  sex: '男',
-                  age: 30,
-                  department: '行政部',
-                  position: '行政'
-                },
-                {
-                  id: 8,
-                  name: '周十',
-                  sex: '男',
-                  age: 32,
-                  department: '运营部',
-                  position: '运营'
-                },
-                {
-                  id: 9,
-                  name: '吴十一',
-                  sex: '男',
-                  age: 34,
-                  department: '行政部',
-                  position: '行政'
-                },
-                {
-                  id: 10,
-                  name: '郑十二',
-                  sex: '男',
-                  age: 36,
-                  department: '行政部',
-                  position: '行政'
-                }
-              ]}
-            />
-          </CardContent>
-        </Card>
-
-        <Card className='col-span-2'>
-          <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>File Upload Examples</CardTitle>
-          </CardHeader>
-          <CardContent className='overflow-auto pt-6 space-y-6'>
-            {/* Basic file selection without upload */}
-            <div className='space-y-2'>
-              <div className='text-sm font-medium text-slate-700'>Basic File Selection</div>
-              <div className='text-xs text-slate-500'>Select files without backend upload</div>
-              <Uploader
-                value={files}
-                onValueChange={handleValueChange}
-                maxFiles={5}
-                maxSize={5 * 1024 * 1024}
-                placeholderText={{
-                  main: 'Select files',
-                  sub: 'or drag and drop',
-                  hint: 'Any file type (max 5MB each)'
-                }}
-              />
-              {files && files.length > 0 && (
-                <div className='text-xs text-gray-600'>
-                  Selected: {files.map(f => f.name).join(', ')}
-                </div>
-              )}
-            </div>
-
-            {/* Image upload with backend integration */}
-            <div className='space-y-2'>
-              <div className='text-sm font-medium text-slate-700'>Image Upload</div>
-              <div className='text-xs text-slate-500'>
-                Upload images to backend
-                {imageUpload.uploading && ` - Progress: ${imageUpload.progress}%`}
-              </div>
-              <Uploader
-                maxFiles={1}
-                maxSize={2 * 1024 * 1024}
-                accept={{
-                  'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-                }}
-                onValueChange={handleImageUpload}
-                placeholderText={{
-                  main: 'Upload image',
-                  sub: 'or drag and drop',
-                  hint: 'PNG, JPG, GIF, WebP (max 2MB)'
-                }}
-              />
-
-              {/* Upload status */}
-              {imageUpload.uploading && (
-                <div className='flex items-center space-x-2 text-sm text-blue-600'>
-                  <div className='w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
-                  <span>Uploading... {imageUpload.progress}%</span>
-                </div>
-              )}
-
-              {imageUpload.error && (
-                <div className='text-sm text-red-600'>Error: {imageUpload.error.message}</div>
-              )}
-
-              {(showImageSuccess || (imageUpload.result && !imageUpload.uploading)) && (
-                <div className='text-sm text-green-600 flex items-center space-x-1'>
-                  <span>✓</span>
-                  <span>Upload successful</span>
-                  {imageUpload.result?.downloadUrl && (
-                    <a
-                      href={imageUpload.result.downloadUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='underline hover:no-underline ml-2'
-                    >
-                      View
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Document upload */}
-            <div className='space-y-2'>
-              <div className='text-sm font-medium text-slate-700'>Document Upload</div>
-              <div className='text-xs text-slate-500'>
-                Upload documents (PDF, DOC, etc.)
-                {documentUpload.uploading && ` - Progress: ${documentUpload.progress}%`}
-              </div>
-              <Uploader
-                maxFiles={1}
-                maxSize={10 * 1024 * 1024}
-                accept={{
-                  'application/pdf': ['.pdf'],
-                  'application/msword': ['.doc'],
-                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
-                    '.docx'
-                  ],
-                  'text/plain': ['.txt']
-                }}
-                onValueChange={handleDocumentUpload}
-                placeholderText={{
-                  main: 'Upload document',
-                  sub: 'or drag and drop',
-                  hint: 'PDF, DOC, DOCX, TXT (max 10MB)'
-                }}
-              />
-
-              {/* Upload status */}
-              {documentUpload.uploading && (
-                <div className='flex items-center space-x-2 text-sm text-blue-600'>
-                  <div className='w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
-                  <span>Uploading document... {documentUpload.progress}%</span>
-                </div>
-              )}
-
-              {documentUpload.error && (
-                <div className='text-sm text-red-600'>Error: {documentUpload.error.message}</div>
-              )}
-
-              {(showDocSuccess || (documentUpload.result && !documentUpload.uploading)) && (
-                <div className='p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700'>
-                  Document uploaded successfully
-                  {documentUpload.result?.downloadUrl && (
-                    <a
-                      href={documentUpload.result.downloadUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='ml-2 underline hover:no-underline'
-                    >
-                      View
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Multiple files with size limits */}
-            <div className='space-y-2'>
-              <div className='text-sm font-medium text-slate-700'>Multiple Files</div>
-              <div className='text-xs text-slate-500'>Select up to 3 files</div>
-              <Uploader
-                maxFiles={3}
-                maxSize={1 * 1024 * 1024}
-                onValueChange={handleMultipleFilesChange}
-                placeholderText={{
-                  main: 'Select multiple files',
-                  sub: 'up to 3 files',
-                  hint: 'Max 1MB each'
-                }}
-              />
-
-              {/* Display selected files info */}
-              {multipleFiles.length > 0 && (
-                <div className='mt-2 p-2 bg-blue-50 border border-blue-200 rounded'>
-                  <div className='text-sm font-medium text-blue-800 mb-1'>
-                    Selected Files ({multipleFiles.length}/3):
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>With Icons:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Button variant='primary' startIcon={<Icons name='IconPlus' />}>
+                        Add Item
+                      </Button>
+                      <Button variant='outline' endIcon={<Icons name='IconArrowRight' />}>
+                        Continue
+                      </Button>
+                      <Button variant='ghost' size='icon'>
+                        <Icons name='IconSettings' />
+                      </Button>
+                    </div>
                   </div>
-                  <div className='space-y-1'>
-                    {multipleFiles.map((file, index) => (
-                      <div key={index} className='text-xs text-blue-700 flex justify-between'>
-                        <span className='truncate'>{file.name}</span>
-                        <span className='ml-2 text-blue-600'>
-                          {(file.size / 1024).toFixed(1)} KB
-                        </span>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>States:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Button variant='primary' loading>
+                        Loading
+                      </Button>
+                      <Button variant='secondary' disabled>
+                        Disabled
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Badge Component */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Badge</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Default badges:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Badge variant='primary' />
+                      <Badge variant='secondary' />
+                      <Badge variant='success' />
+                      <Badge variant='warning' />
+                      <Badge variant='danger' />
+                      <Badge variant='slate' />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>With text:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Badge variant='primary'>New</Badge>
+                      <Badge variant='success'>Active</Badge>
+                      <Badge variant='warning'>Pending</Badge>
+                      <Badge variant='danger'>Error</Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>With icons:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Badge variant='primary'>
+                        <Icons name='IconStar' className='w-3 h-3' />
+                      </Badge>
+                      <Badge variant='success'>
+                        <Icons name='IconCheck' className='w-3 h-3' />
+                      </Badge>
+                      <Badge variant='warning'>
+                        <Icons name='IconAlert' className='w-3 h-3' />
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Outline variants:</div>
+                    <div className='flex flex-wrap gap-2'>
+                      <Badge variant='outline-primary'>Primary</Badge>
+                      <Badge variant='outline-success'>Success</Badge>
+                      <Badge variant='outline-warning'>Warning</Badge>
+                      <Badge variant='outline-danger'>Danger</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Avatar Component */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Avatar</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>With Image:</div>
+                    <div className='flex gap-3'>
+                      <Avatar>
+                        <AvatarImage src='https://github.com/shadcn.png' alt='Avatar' />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <Avatar className='h-12 w-12'>
+                        <AvatarImage src='https://github.com/shadcn.png' alt='Avatar' />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Fallbacks:</div>
+                    <div className='flex gap-3'>
+                      <Avatar>
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                      <Avatar>
+                        <AvatarFallback>AB</AvatarFallback>
+                      </Avatar>
+                      <Avatar>
+                        <AvatarFallback>XY</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Icons Component */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Icons</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Common Icons:</div>
+                    <div className='grid grid-cols-8 gap-3'>
+                      <Icons name='IconHome' />
+                      <Icons name='IconUser' />
+                      <Icons name='IconSettings' />
+                      <Icons name='IconBell' />
+                      <Icons name='IconMail' />
+                      <Icons name='IconSearch' />
+                      <Icons name='IconPlus' />
+                      <Icons name='IconX' />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Different Sizes:</div>
+                    <div className='flex items-center gap-3'>
+                      <Icons name='IconStar' size={16} />
+                      <Icons name='IconStar' size={24} />
+                      <Icons name='IconStar' size={32} />
+                      <Icons name='IconStar' size={48} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Forms Components */}
+          <TabsContent value='forms'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+              {/* Input & Select */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Input & Select</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Label>Text Input:</Label>
+                    <Input type='text' placeholder='Enter text' />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Email Input:</Label>
+                    <Input type='email' placeholder='Enter email' />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Password Input:</Label>
+                    <Input type='password' placeholder='Enter password' />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Select:</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select option' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='option1'>Option 1</SelectItem>
+                        <SelectItem value='option2'>Option 2</SelectItem>
+                        <SelectItem value='option3'>Option 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Textarea:</Label>
+                    <Textarea rows={3} placeholder='Enter description' />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Checkbox & Radio */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Checkbox & Radio</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Checkboxes:</div>
+                    <CheckboxGroup
+                      options={selectOptions}
+                      value={checkboxValues}
+                      onChange={setCheckboxValues}
+                    />
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Radio Group:</div>
+                    <RadioGroup
+                      options={selectOptions}
+                      value={radioValue}
+                      onChange={setRadioValue}
+                    />
+                  </div>
+
+                  <div>
+                    <div className='text-slate-800 text-lg mb-2'>Single Checkbox:</div>
+                    <div className='flex items-center space-x-2'>
+                      <Checkbox id='terms' />
+                      <Label htmlFor='terms'>Accept terms and conditions</Label>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Date Pickers */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Date Pickers</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Label>Single Date:</Label>
+                    <DatePicker onChange={handleDateSelect} />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Date Range:</Label>
+                    <DatePicker mode='range' onChange={handleDateRangeSelect} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Advanced Selects */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Advanced Selects</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Label>Multi Select:</Label>
+                    <MultiSelect
+                      options={selectOptions}
+                      value={multiSelectValue}
+                      onChange={setMultiSelectValue}
+                      placeholder='Select multiple options'
+                    />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Tree Select:</Label>
+                    <TreeSelect
+                      options={treeOptions}
+                      value={treeSelectValue}
+                      onChange={setTreeSelectValue}
+                      placeholder='Select from tree'
+                      multiple
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Color & Icon Pickers */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Pickers</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Label>Color Picker:</Label>
+                    <ColorPicker value={selectedColor} onChange={setSelectedColor} />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Icon Picker:</Label>
+                    <div className='flex items-center gap-2'>
+                      <Icons name={selectedIcon} />
+                      <Input
+                        value={selectedIcon}
+                        readOnly
+                        placeholder='Click to select icon'
+                        onClick={() => {
+                          // Icon picker would open here
+                          console.log('Open icon picker');
+                        }}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Upload Component */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>File Upload</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Label>Basic Upload:</Label>
+                    <Uploader
+                      value={basicFiles}
+                      onValueChange={handleBasicFileChange}
+                      maxFiles={3}
+                      maxSize={5 * 1024 * 1024}
+                      placeholderText={{
+                        main: 'Select files',
+                        sub: 'or drag and drop',
+                        hint: 'Any file type (max 5MB each)'
+                      }}
+                    />
+                  </div>
+
+                  <div className='space-y-2'>
+                    <Label>Image Upload:</Label>
+                    <Uploader
+                      maxFiles={1}
+                      maxSize={2 * 1024 * 1024}
+                      accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'] }}
+                      autoUpload={true}
+                      uploadFunction={handleImageUpload}
+                      placeholderText={{
+                        main: 'Upload image',
+                        sub: 'or drag and drop',
+                        hint: 'PNG, JPG, GIF, WebP (max 2MB)'
+                      }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Data Display Components */}
+          <TabsContent value='data'>
+            <div className='grid grid-cols-1 gap-6'>
+              {/* Table */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Table</CardTitle>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <TableView
+                    header={[
+                      { title: 'Name', accessorKey: 'name' },
+                      { title: 'Role', accessorKey: 'role' },
+                      { title: 'Department', accessorKey: 'department' },
+                      { title: 'Status', accessorKey: 'status' }
+                    ]}
+                    data={tableData}
+                    pageSize={6}
+                    selected
+                    visibleControl
+                  />
+                </CardContent>
+              </Card>
+
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+                {/* Progress & Slider */}
+                <Card>
+                  <CardHeader className='p-4 border-b border-slate-100'>
+                    <CardTitle className='text-lg font-normal'>Progress & Slider</CardTitle>
+                  </CardHeader>
+                  <CardContent className='p-4 space-y-6'>
+                    <div className='space-y-2'>
+                      <Label>Progress Bar:</Label>
+                      <Progress value={progressValue} className='w-full' />
+                      <div className='text-sm text-gray-500'>{progressValue}% completed</div>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Label>Slider:</Label>
+                      <Slider
+                        value={sliderValue}
+                        onValueChange={setSliderValue}
+                        max={100}
+                        step={1}
+                        className='w-full'
+                      />
+                      <div className='text-sm text-gray-500'>Value: {sliderValue[0]}</div>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Label>Switch:</Label>
+                      <Switch checked={switchValue} onCheckedChange={setSwitchValue} />
+                      <div className='text-sm text-gray-500'>
+                        Switch is {switchValue ? 'on' : 'off'}
                       </div>
-                    ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Skeleton */}
+                <Card>
+                  <CardHeader className='p-4 border-b border-slate-100'>
+                    <CardTitle className='text-lg font-normal'>Skeleton</CardTitle>
+                  </CardHeader>
+                  <CardContent className='p-4 space-y-4'>
+                    <div className='space-y-2'>
+                      <Skeleton className='h-4 w-[250px]' />
+                      <Skeleton className='h-4 w-[200px]' />
+                      <Skeleton className='h-4 w-[150px]' />
+                    </div>
+
+                    <div className='flex items-center space-x-4'>
+                      <Skeleton className='h-12 w-12 rounded-full' />
+                      <div className='space-y-2'>
+                        <Skeleton className='h-4 w-[150px]' />
+                        <Skeleton className='h-4 w-[100px]' />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Feedback Components */}
+          <TabsContent value='feedback'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+              {/* Alerts */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Alerts</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <Alert variant='default'>
+                    <Icons name='IconInfoCircle' className='h-4 w-4' />
+                    <div>
+                      <div className='font-medium'>Info Alert</div>
+                      <div className='text-sm'>This is an informational message.</div>
+                    </div>
+                  </Alert>
+
+                  <Alert variant='destructive'>
+                    <Icons name='IconAlertTriangle' className='h-4 w-4' />
+                    <div>
+                      <div className='font-medium'>Error Alert</div>
+                      <div className='text-sm'>Something went wrong.</div>
+                    </div>
+                  </Alert>
+                </CardContent>
+              </Card>
+
+              {/* Toast Messages */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Toast Messages</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='grid grid-cols-2 gap-2'>
+                    <Button onClick={() => showToast('success')} variant='success'>
+                      Success Toast
+                    </Button>
+                    <Button onClick={() => showToast('error')} variant='danger'>
+                      Error Toast
+                    </Button>
+                    <Button onClick={() => showToast('warning')} variant='warning'>
+                      Warning Toast
+                    </Button>
+                    <Button onClick={() => showToast('info')} variant='secondary'>
+                      Info Toast
+                    </Button>
                   </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+              {/* Dialogs */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Dialogs</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Button onClick={() => setDialogOpen(true)} variant='primary'>
+                      Open Dialog
+                    </Button>
+                    <Dialog
+                      isOpen={dialogOpen}
+                      onChange={() => setDialogOpen(false)}
+                      title='Sample Dialog'
+                      description='This is a sample dialog with some content.'
+                      onConfirm={() => {
+                        setDialogOpen(false);
+                        toast.success('Dialog confirmed!');
+                      }}
+                      onCancel={() => setDialogOpen(false)}
+                      confirmText='Confirm'
+                      cancelText='Cancel'
+                    >
+                      <div className='py-4'>
+                        <p>This is the dialog content. You can put any content here.</p>
+                      </div>
+                    </Dialog>
+                  </div>
 
-        {/* Code examples card */}
-        <Card>
-          <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>Usage Examples</CardTitle>
-          </CardHeader>
-          <CardContent className='p-4 space-y-4 text-xs'>
-            <div className='space-y-2'>
-              <div className='font-medium text-slate-700'>Basic Usage:</div>
-              <pre className='bg-slate-100 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap'>
-                {`// Basic file selection
-<Uploader
-  maxFiles={5}
-  maxSize={5 * 1024 * 1024}
-  onValueChange={(files) => setFiles(files)}
-/>`}
-              </pre>
-            </div>
+                  <div className='space-y-2'>
+                    <Button onClick={() => setAlertDialogOpen(true)} variant='danger'>
+                      Open Alert Dialog
+                    </Button>
+                    <AlertDialog
+                      isOpen={alertDialogOpen}
+                      onChange={() => setAlertDialogOpen(false)}
+                      title='Are you sure?'
+                      description='This action cannot be undone. This will permanently delete the item.'
+                      onConfirm={() => {
+                        setAlertDialogOpen(false);
+                        toast.success('Item deleted!');
+                      }}
+                      onCancel={() => setAlertDialogOpen(false)}
+                      confirmText='Delete'
+                      cancelText='Cancel'
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-            <div className='space-y-2'>
-              <div className='font-medium text-slate-700'>With Upload Hook:</div>
-              <pre className='bg-slate-100 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap'>
-                {`// Upload to backend
-const upload = useUpload(config);
+              {/* Tooltip */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Tooltip</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='flex flex-wrap gap-4'>
+                    <Tooltip content='This is a tooltip on top' side='top'>
+                      <Button variant='outline'>Hover me (top)</Button>
+                    </Tooltip>
 
-<Uploader
-  onValueChange={async (value) => {
-    if (value) {
-      const file = Array.isArray(value) ? value[0] : value;
-      await upload.uploadFile(file);
-    }
-  }}
-/>`}
-              </pre>
-            </div>
+                    <Tooltip content='This is a tooltip on bottom' side='bottom'>
+                      <Button variant='outline'>Hover me (bottom)</Button>
+                    </Tooltip>
 
-            <div className='space-y-2'>
-              <div className='font-medium text-slate-700'>File Type Restrictions:</div>
-              <pre className='bg-slate-100 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap'>
-                {`// Images only
-<Uploader
-  accept={{
-    'image/*': ['.png', '.jpg', '.jpeg']
-  }}
-  maxSize={2 * 1024 * 1024}
-/>`}
-              </pre>
+                    <Tooltip content='This is a tooltip on left' side='left'>
+                      <Button variant='outline'>Hover me (left)</Button>
+                    </Tooltip>
+
+                    <Tooltip content='This is a tooltip on right' side='right'>
+                      <Button variant='outline'>Hover me (right)</Button>
+                    </Tooltip>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </Page>
+          </TabsContent>
+
+          {/* Navigation Components */}
+          <TabsContent value='navigation'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+              {/* Tabs */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Tabs</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4'>
+                  <Tabs defaultValue='tab1'>
+                    <TabsList className='grid w-full grid-cols-3'>
+                      <TabsTrigger value='tab1'>Tab 1</TabsTrigger>
+                      <TabsTrigger value='tab2'>Tab 2</TabsTrigger>
+                      <TabsTrigger value='tab3'>Tab 3</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value='tab1' className='mt-4'>
+                      <div className='p-4 bg-gray-50 rounded-md'>
+                        <h3 className='font-medium mb-2'>Tab 1 Content</h3>
+                        <p className='text-sm text-gray-600'>
+                          This is the content for the first tab.
+                        </p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value='tab2' className='mt-4'>
+                      <div className='p-4 bg-gray-50 rounded-md'>
+                        <h3 className='font-medium mb-2'>Tab 2 Content</h3>
+                        <p className='text-sm text-gray-600'>
+                          This is the content for the second tab.
+                        </p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value='tab3' className='mt-4'>
+                      <div className='p-4 bg-gray-50 rounded-md'>
+                        <h3 className='font-medium mb-2'>Tab 3 Content</h3>
+                        <p className='text-sm text-gray-600'>
+                          This is the content for the third tab.
+                        </p>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+
+              {/* Dropdown */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Dropdown</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div className='space-y-2'>
+                    <Label>Basic Dropdown:</Label>
+                    <Dropdown>
+                      <DropdownTrigger asChild>
+                        <Button variant='outline'>
+                          Open Menu
+                          <Icons name='IconChevronDown' className='ml-2 h-4 w-4' />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownContent align='start'>
+                        <DropdownItem onClick={() => toast.info('Profile clicked')}>
+                          <Icons name='IconUser' className='mr-2 h-4 w-4' />
+                          Profile
+                        </DropdownItem>
+                        <DropdownItem onClick={() => toast.info('Settings clicked')}>
+                          <Icons name='IconSettings' className='mr-2 h-4 w-4' />
+                          Settings
+                        </DropdownItem>
+                        <DropdownItem onClick={() => toast.info('Help clicked')}>
+                          <Icons name='IconHelp' className='mr-2 h-4 w-4' />
+                          Help
+                        </DropdownItem>
+                        <DropdownItem onClick={() => toast.warning('Logout clicked')}>
+                          <Icons name='IconLogout' className='mr-2 h-4 w-4' />
+                          Logout
+                        </DropdownItem>
+                      </DropdownContent>
+                    </Dropdown>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Accordion */}
+              <Card className='lg:col-span-2'>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Accordion</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4'>
+                  <Accordion type='single' collapsible className='w-full'>
+                    <AccordionItem value='item-1'>
+                      <AccordionTrigger>Is it accessible?</AccordionTrigger>
+                      <AccordionContent>
+                        Yes. It adheres to the WAI-ARIA design pattern and follows accessibility
+                        best practices.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value='item-2'>
+                      <AccordionTrigger>Is it styled?</AccordionTrigger>
+                      <AccordionContent>
+                        Yes. It comes with default styles that matches the other components'
+                        aesthetic.
+                      </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value='item-3'>
+                      <AccordionTrigger>Is it animated?</AccordionTrigger>
+                      <AccordionContent>
+                        Yes. It's animated by default, but you can disable it if you prefer.
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Layout Components */}
+          <TabsContent value='layout'>
+            <div className='grid grid-cols-1 gap-6'>
+              {/* Cards */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Cards</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Simple Card</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className='text-sm text-gray-600'>
+                          This is a simple card with just text content.
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className='flex items-center gap-2'>
+                          <Icons name='IconStar' className='h-5 w-5' />
+                          Card with Icon
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className='text-sm text-gray-600'>This card has an icon in the title.</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Interactive Card</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className='text-sm text-gray-600 mb-4'>
+                          This card has interactive elements.
+                        </p>
+                        <div className='flex gap-2'>
+                          <Button size='sm' variant='primary'>
+                            Action
+                          </Button>
+                          <Button size='sm' variant='outline'>
+                            Cancel
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Divider */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Divider</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4 space-y-4'>
+                  <div>
+                    <p className='text-sm text-gray-600 mb-2'>Horizontal Divider:</p>
+                    <div className='text-center'>Content above</div>
+                    <Divider />
+                    <div className='text-center'>Content below</div>
+                  </div>
+
+                  <div>
+                    <p className='text-sm text-gray-600 mb-2'>Divider with Label:</p>
+                    <div className='text-center'>Section 1</div>
+                    <Divider label='OR' />
+                    <div className='text-center'>Section 2</div>
+                  </div>
+
+                  <div>
+                    <p className='text-sm text-gray-600 mb-2'>Colored Divider:</p>
+                    <div className='text-center'>Content above</div>
+                    <Divider color='blue' />
+                    <div className='text-center'>Content below</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Portal Example */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>Portal</CardTitle>
+                </CardHeader>
+                <CardContent className='p-4'>
+                  <div className='space-y-4'>
+                    <p className='text-sm text-gray-600'>
+                      Portal allows rendering components outside the normal component tree. It's
+                      commonly used for modals, tooltips, and dropdowns.
+                    </p>
+
+                    <div className='p-4 border rounded-md bg-gray-50'>
+                      <p className='text-sm'>Normal content in the component tree</p>
+                      <Portal>
+                        <div className='fixed bottom-4 right-4 p-4 bg-blue-500 text-white rounded-md shadow-lg z-50'>
+                          <p className='text-sm'>This content is rendered via Portal!</p>
+                          <p className='text-xs mt-1 opacity-75'>Check the bottom-right corner</p>
+                        </div>
+                      </Portal>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Complex Example - Dashboard Card */}
+              <Card>
+                <CardHeader className='p-4 border-b border-slate-100'>
+                  <CardTitle className='text-lg font-normal'>
+                    Complex Example - Dashboard Widget
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='p-4'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+                    {/* Stats Cards */}
+                    <Card className='p-4'>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <p className='text-sm font-medium text-gray-600'>Total Users</p>
+                          <p className='text-2xl font-bold'>2,847</p>
+                        </div>
+                        <div className='h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center'>
+                          <Icons name='IconUsers' className='h-4 w-4 text-blue-600' />
+                        </div>
+                      </div>
+                      <div className='mt-2 flex items-center'>
+                        <Badge variant='success'>+12%</Badge>
+                        <span className='text-xs text-gray-500 ml-2'>from last month</span>
+                      </div>
+                    </Card>
+
+                    <Card className='p-4'>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <p className='text-sm font-medium text-gray-600'>Revenue</p>
+                          <p className='text-2xl font-bold'>$24,571</p>
+                        </div>
+                        <div className='h-8 w-8 bg-green-100 rounded-full flex items-center justify-center'>
+                          <Icons name='IconCurrencyDollar' className='h-4 w-4 text-green-600' />
+                        </div>
+                      </div>
+                      <div className='mt-2 flex items-center'>
+                        <Badge variant='success'>+8%</Badge>
+                        <span className='text-xs text-gray-500 ml-2'>from last month</span>
+                      </div>
+                    </Card>
+
+                    <Card className='p-4'>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <p className='text-sm font-medium text-gray-600'>Orders</p>
+                          <p className='text-2xl font-bold'>1,423</p>
+                        </div>
+                        <div className='h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center'>
+                          <Icons name='IconShoppingCart' className='h-4 w-4 text-orange-600' />
+                        </div>
+                      </div>
+                      <div className='mt-2 flex items-center'>
+                        <Badge variant='warning'>-3%</Badge>
+                        <span className='text-xs text-gray-500 ml-2'>from last month</span>
+                      </div>
+                    </Card>
+
+                    <Card className='p-4'>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <p className='text-sm font-medium text-gray-600'>Conversion</p>
+                          <p className='text-2xl font-bold'>3.2%</p>
+                        </div>
+                        <div className='h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center'>
+                          <Icons name='IconTrendingUp' className='h-4 w-4 text-purple-600' />
+                        </div>
+                      </div>
+                      <div className='mt-2 flex items-center'>
+                        <Badge variant='success'>+0.5%</Badge>
+                        <span className='text-xs text-gray-500 ml-2'>from last month</span>
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Activity Feed */}
+                  <Card className='mt-6'>
+                    <CardHeader className='pb-3'>
+                      <CardTitle className='text-base'>Recent Activity</CardTitle>
+                    </CardHeader>
+                    <CardContent className='space-y-3'>
+                      {[
+                        {
+                          action: 'New user registered',
+                          time: '2 minutes ago',
+                          icon: 'IconUserPlus',
+                          color: 'blue'
+                        },
+                        {
+                          action: 'Order #1234 completed',
+                          time: '5 minutes ago',
+                          icon: 'IconCheck',
+                          color: 'green'
+                        },
+                        {
+                          action: 'Payment received',
+                          time: '10 minutes ago',
+                          icon: 'IconCreditCard',
+                          color: 'purple'
+                        },
+                        {
+                          action: 'Support ticket created',
+                          time: '15 minutes ago',
+                          icon: 'IconMessageCircle',
+                          color: 'orange'
+                        }
+                      ].map((item, index) => (
+                        <div
+                          key={index}
+                          className='flex items-center gap-3 p-2 rounded-md hover:bg-gray-50'
+                        >
+                          <div
+                            className={`h-8 w-8 bg-${item.color}-100 rounded-full flex items-center justify-center`}
+                          >
+                            <Icons
+                              name={item.icon as any}
+                              className={`h-4 w-4 text-${item.color}-600`}
+                            />
+                          </div>
+                          <div className='flex-1'>
+                            <p className='text-sm font-medium'>{item.action}</p>
+                            <p className='text-xs text-gray-500'>{item.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </Page>
+
+      {/* Toast Container */}
+      <ToastContainer position='top-right' />
+    </ToastProvider>
   );
 };
