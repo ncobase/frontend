@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { Page, Topbar } from '@/components/layout';
+import { uploadConfigs, useUpload } from '@/hooks';
 
 export const UITopbar = ({ ...rest }) => {
   const { t } = useTranslation();
@@ -113,8 +114,69 @@ export const Elements = ({ ...rest }) => {
 
   const [files, setFiles] = useState<File[] | null>([]);
 
-  const handleValueChange = value => {
-    setFiles(value);
+  // Basic upload hooks for examples
+  const imageUpload = useUpload(uploadConfigs.image('example-images', 'system'));
+  const documentUpload = useUpload(uploadConfigs.document('example-docs', 'system', true));
+  const [multipleFiles, setMultipleFiles] = useState<File[]>([]);
+
+  // Auto-hide success messages after 3 seconds
+  const [showImageSuccess, setShowImageSuccess] = useState(false);
+  const [showDocSuccess, setShowDocSuccess] = useState(false);
+
+  // Simple upload handlers
+  const handleImageUpload = async (value: File | File[] | null) => {
+    if (!value) return;
+
+    try {
+      const file = Array.isArray(value) ? value[0] : value;
+      await imageUpload.uploadFile(file);
+
+      // Show success message and auto-hide after 3 seconds
+      setShowImageSuccess(true);
+      setTimeout(() => setShowImageSuccess(false), 3000);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+  };
+
+  const handleDocumentUpload = async (value: File | File[] | null) => {
+    if (!value) return;
+
+    try {
+      const file = Array.isArray(value) ? value[0] : value;
+      await documentUpload.uploadFile(file);
+
+      // Show success message and auto-hide after 3 seconds
+      setShowDocSuccess(true);
+      setTimeout(() => setShowDocSuccess(false), 3000);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
+  };
+
+  const handleMultipleFilesChange = (value: File | File[] | null) => {
+    if (!value) {
+      setMultipleFiles([]);
+      return;
+    }
+
+    const filesArray = Array.isArray(value) ? value : [value];
+    setMultipleFiles(filesArray);
+
+    // Log file details for debugging
+    console.log('Multiple files selected:', {
+      count: filesArray.length,
+      files: filesArray.map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified
+      }))
+    });
+  };
+
+  const handleValueChange = (value: File | File[] | null) => {
+    setFiles(Array.isArray(value) ? value : value ? [value] : []);
   };
 
   return (
@@ -1641,18 +1703,223 @@ export const Elements = ({ ...rest }) => {
           </CardContent>
         </Card>
 
+        <Card className='col-span-2'>
+          <CardHeader className='p-4 border-b border-slate-100'>
+            <CardTitle className='text-lg font-normal'>File Upload Examples</CardTitle>
+          </CardHeader>
+          <CardContent className='overflow-auto pt-6 space-y-6'>
+            {/* Basic file selection without upload */}
+            <div className='space-y-2'>
+              <div className='text-sm font-medium text-slate-700'>Basic File Selection</div>
+              <div className='text-xs text-slate-500'>Select files without backend upload</div>
+              <Uploader
+                value={files}
+                onValueChange={handleValueChange}
+                maxFiles={5}
+                maxSize={5 * 1024 * 1024}
+                placeholderText={{
+                  main: 'Select files',
+                  sub: 'or drag and drop',
+                  hint: 'Any file type (max 5MB each)'
+                }}
+              />
+              {files && files.length > 0 && (
+                <div className='text-xs text-gray-600'>
+                  Selected: {files.map(f => f.name).join(', ')}
+                </div>
+              )}
+            </div>
+
+            {/* Image upload with backend integration */}
+            <div className='space-y-2'>
+              <div className='text-sm font-medium text-slate-700'>Image Upload</div>
+              <div className='text-xs text-slate-500'>
+                Upload images to backend
+                {imageUpload.uploading && ` - Progress: ${imageUpload.progress}%`}
+              </div>
+              <Uploader
+                maxFiles={1}
+                maxSize={2 * 1024 * 1024}
+                accept={{
+                  'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+                }}
+                onValueChange={handleImageUpload}
+                placeholderText={{
+                  main: 'Upload image',
+                  sub: 'or drag and drop',
+                  hint: 'PNG, JPG, GIF, WebP (max 2MB)'
+                }}
+              />
+
+              {/* Upload status */}
+              {imageUpload.uploading && (
+                <div className='flex items-center space-x-2 text-sm text-blue-600'>
+                  <div className='w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
+                  <span>Uploading... {imageUpload.progress}%</span>
+                </div>
+              )}
+
+              {imageUpload.error && (
+                <div className='text-sm text-red-600'>Error: {imageUpload.error.message}</div>
+              )}
+
+              {(showImageSuccess || (imageUpload.result && !imageUpload.uploading)) && (
+                <div className='text-sm text-green-600 flex items-center space-x-1'>
+                  <span>✓</span>
+                  <span>Upload successful</span>
+                  {imageUpload.result?.downloadUrl && (
+                    <a
+                      href={imageUpload.result.downloadUrl}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='underline hover:no-underline ml-2'
+                    >
+                      View
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Document upload */}
+            <div className='space-y-2'>
+              <div className='text-sm font-medium text-slate-700'>Document Upload</div>
+              <div className='text-xs text-slate-500'>
+                Upload documents (PDF, DOC, etc.)
+                {documentUpload.uploading && ` - Progress: ${documentUpload.progress}%`}
+              </div>
+              <Uploader
+                maxFiles={1}
+                maxSize={10 * 1024 * 1024}
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
+                    '.docx'
+                  ],
+                  'text/plain': ['.txt']
+                }}
+                onValueChange={handleDocumentUpload}
+                placeholderText={{
+                  main: 'Upload document',
+                  sub: 'or drag and drop',
+                  hint: 'PDF, DOC, DOCX, TXT (max 10MB)'
+                }}
+              />
+
+              {/* Upload status */}
+              {documentUpload.uploading && (
+                <div className='flex items-center space-x-2 text-sm text-blue-600'>
+                  <div className='w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin'></div>
+                  <span>Uploading document... {documentUpload.progress}%</span>
+                </div>
+              )}
+
+              {documentUpload.error && (
+                <div className='text-sm text-red-600'>Error: {documentUpload.error.message}</div>
+              )}
+
+              {(showDocSuccess || (documentUpload.result && !documentUpload.uploading)) && (
+                <div className='p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700'>
+                  Document uploaded successfully
+                  {documentUpload.result?.downloadUrl && (
+                    <a
+                      href={documentUpload.result.downloadUrl}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='ml-2 underline hover:no-underline'
+                    >
+                      View
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Multiple files with size limits */}
+            <div className='space-y-2'>
+              <div className='text-sm font-medium text-slate-700'>Multiple Files</div>
+              <div className='text-xs text-slate-500'>Select up to 3 files</div>
+              <Uploader
+                maxFiles={3}
+                maxSize={1 * 1024 * 1024}
+                onValueChange={handleMultipleFilesChange}
+                placeholderText={{
+                  main: 'Select multiple files',
+                  sub: 'up to 3 files',
+                  hint: 'Max 1MB each'
+                }}
+              />
+
+              {/* Display selected files info */}
+              {multipleFiles.length > 0 && (
+                <div className='mt-2 p-2 bg-blue-50 border border-blue-200 rounded'>
+                  <div className='text-sm font-medium text-blue-800 mb-1'>
+                    Selected Files ({multipleFiles.length}/3):
+                  </div>
+                  <div className='space-y-1'>
+                    {multipleFiles.map((file, index) => (
+                      <div key={index} className='text-xs text-blue-700 flex justify-between'>
+                        <span className='truncate'>{file.name}</span>
+                        <span className='ml-2 text-blue-600'>
+                          {(file.size / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Code examples card */}
         <Card>
           <CardHeader className='p-4 border-b border-slate-100'>
-            <CardTitle className='text-lg font-normal'>File Upload</CardTitle>
+            <CardTitle className='text-lg font-normal'>Usage Examples</CardTitle>
           </CardHeader>
-          <CardContent className='overflow-auto pt-6'>
-            <Uploader
-              value={files}
-              onValueChange={handleValueChange}
-              maxFiles={10}
-              maxSize={5 * 1024 * 1024}
-              // accept={['image/*', 'video/*']}
-            />
+          <CardContent className='p-4 space-y-4 text-xs'>
+            <div className='space-y-2'>
+              <div className='font-medium text-slate-700'>Basic Usage:</div>
+              <pre className='bg-slate-100 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap'>
+                {`// Basic file selection
+<Uploader
+  maxFiles={5}
+  maxSize={5 * 1024 * 1024}
+  onValueChange={(files) => setFiles(files)}
+/>`}
+              </pre>
+            </div>
+
+            <div className='space-y-2'>
+              <div className='font-medium text-slate-700'>With Upload Hook:</div>
+              <pre className='bg-slate-100 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap'>
+                {`// Upload to backend
+const upload = useUpload(config);
+
+<Uploader
+  onValueChange={async (value) => {
+    if (value) {
+      const file = Array.isArray(value) ? value[0] : value;
+      await upload.uploadFile(file);
+    }
+  }}
+/>`}
+              </pre>
+            </div>
+
+            <div className='space-y-2'>
+              <div className='font-medium text-slate-700'>File Type Restrictions:</div>
+              <pre className='bg-slate-100 p-2 rounded text-xs overflow-x-auto whitespace-pre-wrap'>
+                {`// Images only
+<Uploader
+  accept={{
+    'image/*': ['.png', '.jpg', '.jpeg']
+  }}
+  maxSize={2 * 1024 * 1024}
+/>`}
+              </pre>
+            </div>
           </CardContent>
         </Card>
       </div>
