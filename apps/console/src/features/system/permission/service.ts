@@ -1,110 +1,142 @@
-import { AnyObject } from '@ncobase/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   createPermission,
-  deletePermission,
   getPermission,
+  updatePermission,
+  deletePermission,
   getPermissions,
-  updatePermission
+  assignPermissionsToRole,
+  removePermissionsFromRole,
+  getRolePermissions,
+  getPermissionsByAction,
+  getPermissionsBySubject,
+  getDefaultPermissions,
+  bulkUpdatePermissions,
+  bulkDeletePermissions
 } from './apis';
-import { QueryFormParams } from './config/query';
-import { Permission } from './permission';
 
-interface PermissionKeys {
-  create: ['permissionService', 'create'];
-  get: (_options?: {
-    permission?: string;
-  }) => ['permissionService', 'permission', { permission?: string }];
-  tree: (_options?: AnyObject) => ['permissionService', 'tree', AnyObject];
-  update: ['permissionService', 'update'];
-  list: (_options?: QueryFormParams) => ['permissionService', 'permissions', QueryFormParams];
-}
-
-export const permissionKeys: PermissionKeys = {
-  create: ['permissionService', 'create'],
-  get: ({ permission } = {}) => ['permissionService', 'permission', { permission }],
-  tree: (queryParams = {}) => ['permissionService', 'tree', queryParams],
-  update: ['permissionService', 'update'],
-  list: (queryParams = {}) => ['permissionService', 'permissions', queryParams]
-};
-
-// Query a specific permission by ID or Slug
-export const useQueryPermission = (permission: string) =>
+// Permission CRUD hooks
+export const useQueryPermission = (permissionId: string) =>
   useQuery({
-    queryKey: permissionKeys.get({ permission }),
-    queryFn: () => getPermission(permission),
-    enabled: !!permission
+    queryKey: ['permission', permissionId],
+    queryFn: () => getPermission(permissionId),
+    enabled: !!permissionId
   });
 
-// List permissions
-export const useListPermissions = (queryParams: QueryFormParams) => {
-  return useQuery({
-    queryKey: permissionKeys.list(queryParams),
-    queryFn: () => getPermissions(queryParams),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000 // 10 minutes
+export const useListPermissions = (params: any) =>
+  useQuery({
+    queryKey: ['permissions', params],
+    queryFn: () => getPermissions(params),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000
   });
-};
 
-// Create permission mutation
 export const useCreatePermission = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: Pick<Permission, keyof Permission>) => createPermission(payload),
+    mutationFn: createPermission,
     onSuccess: () => {
-      // Invalidate and refetch permissions list
-      queryClient.invalidateQueries({ queryKey: ['permissionService', 'permissions'] });
-      queryClient.invalidateQueries({ queryKey: ['permissionService', 'tree'] });
-    },
-    onError: error => {
-      console.error('Failed to create permission:', error);
-      // Handle error (toast notification, etc.)
+      queryClient.invalidateQueries({ queryKey: ['permissions'] });
     }
   });
 };
 
-// Update permission mutation
 export const useUpdatePermission = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: Pick<Permission, keyof Permission>) => updatePermission(payload),
+    mutationFn: updatePermission,
     onSuccess: (_, variables) => {
-      // Invalidate specific permission, permissions list, and tree
-      queryClient.invalidateQueries({ queryKey: ['permissionService', 'permissions'] });
-      queryClient.invalidateQueries({ queryKey: ['permissionService', 'tree'] });
+      queryClient.invalidateQueries({ queryKey: ['permissions'] });
       if (variables.id) {
-        queryClient.invalidateQueries({
-          queryKey: permissionKeys.get({ permission: variables.id })
-        });
+        queryClient.invalidateQueries({ queryKey: ['permission', variables.id] });
       }
-    },
-    onError: error => {
-      console.error('Failed to update permission:', error);
-      // Handle error (toast notification, etc.)
     }
   });
 };
 
-// Delete permission mutation
 export const useDeletePermission = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (id: string) => deletePermission(id),
+    mutationFn: deletePermission,
     onSuccess: (_, deletedId) => {
-      // Remove from cache and invalidate permissions list and tree
-      queryClient.removeQueries({
-        queryKey: permissionKeys.get({ permission: deletedId })
-      });
-      queryClient.invalidateQueries({ queryKey: ['permissionService', 'permissions'] });
-      queryClient.invalidateQueries({ queryKey: ['permissionService', 'tree'] });
-    },
-    onError: error => {
-      console.error('Failed to delete permission:', error);
-      // Handle error (toast notification, etc.)
+      queryClient.removeQueries({ queryKey: ['permission', deletedId] });
+      queryClient.invalidateQueries({ queryKey: ['permissions'] });
+    }
+  });
+};
+
+// Role-Permission relationship hooks
+export const useAssignPermissionsToRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
+      assignPermissionsToRole(roleId, permissionIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rolePermissions'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+    }
+  });
+};
+
+export const useRemovePermissionsFromRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
+      removePermissionsFromRole(roleId, permissionIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rolePermissions'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+    }
+  });
+};
+
+export const useQueryRolePermissions = (roleId: string) =>
+  useQuery({
+    queryKey: ['rolePermissions', roleId],
+    queryFn: () => getRolePermissions(roleId),
+    enabled: !!roleId
+  });
+
+// Advanced permission queries
+export const useQueryPermissionsByAction = (action: string) =>
+  useQuery({
+    queryKey: ['permissionsByAction', action],
+    queryFn: () => getPermissionsByAction(action),
+    enabled: !!action
+  });
+
+export const useQueryPermissionsBySubject = (subject: string) =>
+  useQuery({
+    queryKey: ['permissionsBySubject', subject],
+    queryFn: () => getPermissionsBySubject(subject),
+    enabled: !!subject
+  });
+
+export const useQueryDefaultPermissions = () =>
+  useQuery({
+    queryKey: ['defaultPermissions'],
+    queryFn: getDefaultPermissions,
+    staleTime: 10 * 60 * 1000
+  });
+
+// Bulk operations
+export const useBulkUpdatePermissions = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkUpdatePermissions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['permissions'] });
+    }
+  });
+};
+
+export const useBulkDeletePermissions = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeletePermissions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['permissions'] });
     }
   });
 };

@@ -1,19 +1,31 @@
-import { Dictionary } from './dictionary';
+import { Dictionary } from './dictionary.d';
 
-import { ApiContext, createApi } from '@/lib/api/factory';
+import { createApi, ApiContext } from '@/lib/api/factory';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
-  getDictionaryBySlug: async (slug: string) => {
-    return request.get(`${endpoint}/slug/${slug}`);
-  },
+  // Get enum options for a dictionary
   getEnumOptions: async (slug: string) => {
-    return request.get(`${endpoint}/options/${slug}`);
+    return request.get(`${endpoint}/${slug}/options`);
   },
+
+  // Validate enum value
   validateEnumValue: async (slug: string, value: string) => {
-    return request.get(`${endpoint}/validate/${slug}?value=${encodeURIComponent(value)}`);
+    return request.post(`${endpoint}/${slug}/validate`, { value });
   },
+
+  // Batch get dictionaries by slugs
   batchGetBySlug: async (slugs: string[]) => {
-    return request.post(`${endpoint}/batch`, slugs);
+    return request.post(`${endpoint}/batch`, { slugs });
+  },
+
+  // Get dictionary usage information
+  getUsage: async (id: string) => {
+    return request.get(`${endpoint}/${id}/usage`);
+  },
+
+  // Get all dictionaries
+  getAllDictionaries: async (): Promise<Dictionary[]> => {
+    return request.get(`${endpoint}/all`);
   }
 });
 
@@ -21,12 +33,15 @@ export const dictionaryApi = createApi<Dictionary>('/sys/dictionaries', {
   extensions: extensionMethods
 });
 
-export const createDictionary = dictionaryApi.create;
-export const getDictionary = dictionaryApi.get;
-export const updateDictionary = dictionaryApi.update;
-export const deleteDictionary = dictionaryApi.delete;
-export const getDictionaries = dictionaryApi.list;
-export const getDictionaryBySlug = dictionaryApi.getDictionaryBySlug;
-export const getEnumOptions = dictionaryApi.getEnumOptions;
-export const validateEnumValue = dictionaryApi.validateEnumValue;
-export const batchGetBySlug = dictionaryApi.batchGetBySlug;
+export const {
+  create: createDictionary,
+  get: getDictionary,
+  update: updateDictionary,
+  delete: deleteDictionary,
+  list: getDictionaries,
+  getEnumOptions,
+  validateEnumValue,
+  batchGetBySlug,
+  getUsage: getDictionaryUsage,
+  getAllDictionaries
+} = dictionaryApi;

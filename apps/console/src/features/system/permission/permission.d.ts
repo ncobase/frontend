@@ -5,7 +5,7 @@ export interface Permission {
   subject?: string;
   description?: string;
   default?: boolean;
-  disabled?: true;
+  disabled?: boolean;
   extras?: object | null;
   parent?: string;
   group?: string;

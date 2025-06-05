@@ -13,10 +13,20 @@ import {
   assignRoles,
   removeRoles,
   enableUser,
-  disableUser
+  disableUser,
+  deleteApiKey,
+  generateApiKey,
+  getUserTenantRoles,
+  createEmployee,
+  deleteEmployee,
+  getEmployee,
+  getUserApiKeys,
+  updateEmployee,
+  getEmployees,
+  updateStatus
 } from './apis';
 import { QueryFormParams } from './config/query';
-import { User } from './user';
+import { CreateApiKeyRequest, EmployeeBody, User } from './user';
 
 interface UserKeys {
   create: ['userService', 'create'];
@@ -255,3 +265,105 @@ export const useDeleteUser = () => {
     }
   });
 };
+
+// Employee hooks
+export const useQueryEmployee = (userId: string) => {
+  return useQuery({
+    queryKey: ['userService', 'employee', { userId }],
+    queryFn: () => getEmployee(userId),
+    enabled: !!userId
+  });
+};
+
+export const useCreateEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: EmployeeBody) => createEmployee(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userService', 'employees'] });
+    }
+  });
+};
+
+export const useUpdateEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, ...payload }: EmployeeBody & { userId: string }) =>
+      updateEmployee(userId, payload),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['userService', 'employee', { userId }]
+      });
+    }
+  });
+};
+
+export const useDeleteEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => deleteEmployee(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userService', 'employees'] });
+    }
+  });
+};
+
+// API Key hooks
+export const useQueryUserApiKeys = (userId: string) => {
+  return useQuery({
+    queryKey: ['userService', 'apiKeys', { userId }],
+    queryFn: () => getUserApiKeys(userId),
+    enabled: !!userId
+  });
+};
+
+export const useGenerateApiKey = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateApiKeyRequest) => generateApiKey(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userService', 'apiKeys'] });
+    }
+  });
+};
+
+export const useDeleteApiKey = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (keyId: string) => deleteApiKey(keyId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userService', 'apiKeys'] });
+    }
+  });
+};
+
+// Query user tenant roles
+export const useQueryUserTenantRoles = (
+  userId: string,
+  tenantId?: string,
+  options = { enabled: false }
+) =>
+  useQuery({
+    queryKey: ['userService', 'userTenantRoles', { userId, tenantId }],
+    queryFn: () => getUserTenantRoles(userId, tenantId!),
+    enabled: !!userId && !!tenantId && options?.enabled !== false,
+    ...options
+  });
+
+export const useUpdateStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ username, status }: { username: string; status: number }) =>
+      updateStatus(username, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    }
+  });
+};
+
+export const useListEmployees = (params: any) =>
+  useQuery({
+    queryKey: ['employees', params],
+    queryFn: () => getEmployees(params),
+    staleTime: 5 * 60 * 1000
+  });

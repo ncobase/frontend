@@ -4,11 +4,12 @@ import { FieldConfigProps, Form } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
+import { Option } from '../option.d';
 import { useQueryOption } from '../service';
 
 export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {}, isLoading } = useQueryOption(record);
+  const { data = {} as Option, isLoading } = useQueryOption(record);
 
   const fields: FieldConfigProps[] = [
     {
@@ -24,6 +25,7 @@ export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors 
       defaultValue: '',
       placeholder: 'Enter option name',
       type: 'text',
+      help: 'Option name must be unique across the system',
       rules: {
         required: t('forms.input_required'),
         pattern: {
@@ -53,14 +55,42 @@ export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors 
       placeholder: 'Enter option value',
       type: 'textarea',
       className: 'col-span-full',
-      rules: { required: t('forms.input_required') }
+      rows: 4,
+      help: 'Value will be validated based on the selected type',
+      rules: {
+        required: t('forms.input_required'),
+        validate: {
+          validFormat: value => {
+            const type = control._formValues?.type || data?.type;
+            if (['object', 'array'].includes(type)) {
+              try {
+                JSON.parse(value);
+                return true;
+              } catch {
+                return 'Must be valid JSON for object/array types';
+              }
+            }
+            if (type === 'number' && isNaN(Number(value))) {
+              return 'Must be a valid number';
+            }
+            if (
+              type === 'boolean' &&
+              !['true', 'false', '1', '0', 'yes', 'no'].includes(value.toLowerCase())
+            ) {
+              return 'Must be a valid boolean value (true/false, 1/0, yes/no)';
+            }
+            return true;
+          }
+        }
+      }
     },
     {
-      title: t('option.fields.autoload', 'Autoload'),
+      title: t('option.fields.autoload', 'Auto Load'),
       name: 'autoload',
       defaultValue: false,
       type: 'switch',
-      elementClassName: 'my-3'
+      elementClassName: 'my-3',
+      help: 'Enable to load this option on system startup'
     },
     {
       title: t('option.fields.tenant', 'Tenant'),
@@ -99,13 +129,18 @@ export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors 
   }, [setValue, data, isLoading]);
 
   if (isLoading) {
-    return <div className='p-4 text-center'>Loading option data...</div>;
+    return (
+      <div className='p-8 text-center'>
+        <div className='inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent'></div>
+        <p className='mt-2 text-gray-600'>Loading option data...</p>
+      </div>
+    );
   }
 
   return (
     <Form
       id='edit-option'
-      className='my-4 md:grid-cols-2'
+      className='my-4 md:grid-cols-2 gap-6'
       onSubmit={onSubmit}
       control={control}
       errors={errors}

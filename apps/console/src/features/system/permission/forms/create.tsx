@@ -1,13 +1,10 @@
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useTenantContext } from '../../tenant/context';
-
 import { FieldConfigProps } from '@/components/form';
 
 export const CreatePermissionForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
-  const { tenant_id } = useTenantContext();
 
   const fields: FieldConfigProps[] = [
     {
@@ -18,10 +15,7 @@ export const CreatePermissionForms = ({ onSubmit, control, errors }) => {
       type: 'text',
       rules: {
         required: t('forms.input_required'),
-        minLength: {
-          value: 2,
-          message: 'Permission name must be at least 2 characters'
-        }
+        minLength: { value: 2, message: 'Permission name must be at least 2 characters' }
       }
     },
     {
@@ -36,8 +30,7 @@ export const CreatePermissionForms = ({ onSubmit, control, errors }) => {
         { label: 'Update', value: 'update' },
         { label: 'Delete', value: 'delete' },
         { label: 'Manage', value: 'manage' },
-        { label: 'Execute', value: 'execute' },
-        { label: 'Custom', value: 'custom' }
+        { label: 'Execute', value: 'execute' }
       ],
       rules: { required: t('forms.select_required') }
     },
@@ -53,30 +46,14 @@ export const CreatePermissionForms = ({ onSubmit, control, errors }) => {
       title: t('permission.fields.group', 'Group'),
       name: 'group',
       defaultValue: '',
-      placeholder: 'Select group',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search group');
-      }
-    },
-    {
-      title: t('permission.fields.parent', 'Parent Permission'),
-      name: 'parent',
-      defaultValue: '',
-      placeholder: 'Select parent permission',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search parent permission');
-      }
+      placeholder: 'Permission group category',
+      type: 'text'
     },
     {
       title: t('permission.fields.default', 'Default Permission'),
       name: 'default',
       defaultValue: false,
       type: 'switch',
-      elementClassName: 'my-3',
       description: 'Default permissions are automatically granted to new users'
     },
     {
@@ -84,7 +61,6 @@ export const CreatePermissionForms = ({ onSubmit, control, errors }) => {
       name: 'disabled',
       defaultValue: false,
       type: 'switch',
-      elementClassName: 'my-3',
       description: 'Disable this permission to prevent it from being granted'
     },
     {
@@ -95,17 +71,8 @@ export const CreatePermissionForms = ({ onSubmit, control, errors }) => {
       type: 'textarea',
       className: 'col-span-full',
       rules: {
-        maxLength: {
-          value: 500,
-          message: 'Description cannot exceed 500 characters'
-        }
+        maxLength: { value: 500, message: 'Description cannot exceed 500 characters' }
       }
-    },
-    {
-      title: 'Tenant ID',
-      name: 'tenant',
-      defaultValue: tenant_id,
-      type: 'hidden'
     }
   ];
 

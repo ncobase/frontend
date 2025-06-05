@@ -4,11 +4,30 @@ import { renderRoutes } from '@/router';
 
 export const OptionRoutes = () => {
   const routes = [
-    { path: '/', element: <OptionListPage /> },
-    { path: '/:mode', element: <OptionListPage /> },
-    { path: '/:mode/:id', element: <OptionListPage /> }
+    {
+      path: '/',
+      element: <OptionListPage />,
+      meta: {
+        title: 'System Options',
+        description: 'Manage system configuration options'
+      }
+    },
+    {
+      path: '/:mode',
+      element: <OptionListPage />,
+      meta: {
+        title: 'System Options',
+        description: 'Manage system configuration options'
+      }
+    },
+    {
+      path: '/:mode/:id',
+      element: <OptionListPage />,
+      meta: {
+        title: 'System Options',
+        description: 'Manage system configuration options'
+      }
+    }
   ];
   return renderRoutes(routes);
 };
-
-export default OptionRoutes;

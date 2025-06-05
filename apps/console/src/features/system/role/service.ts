@@ -1,18 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
-  assignPermissionsToRole,
+  assignPermissions,
+  assignUsers,
   createRole,
   deleteRole,
+  getEnabledRoles,
   getRole,
+  getRoleBySlug,
   getRolePermissions,
   getRoles,
   getRoleUsers,
-  removePermissionsFromRole,
+  removePermissions,
+  removeUsers,
   updateRole
 } from './apis';
 import { QueryFormParams } from './config/query';
-import { Role } from './role';
 
 interface RoleKeys {
   create: ['roleService', 'create'];
@@ -34,119 +37,126 @@ export const roleKeys: RoleKeys = {
   list: (queryParams = {}) => ['roleService', 'roles', queryParams]
 };
 
-// Enhanced role queries and mutations
-export const useQueryRole = (role: string) =>
+// Role CRUD hooks
+export const useQueryRole = (roleId: string) =>
   useQuery({
-    queryKey: roleKeys.get({ role }),
-    queryFn: () => getRole(role),
-    enabled: !!role
+    queryKey: ['role', roleId],
+    queryFn: () => getRole(roleId),
+    enabled: !!roleId
   });
 
-export const useQueryRolePermissions = (role: string) =>
+export const useQueryRoleBySlug = (slug: string) =>
   useQuery({
-    queryKey: roleKeys.permissions({ role }),
-    queryFn: () => getRolePermissions(role),
-    enabled: !!role
+    queryKey: ['roleBySlug', slug],
+    queryFn: () => getRoleBySlug(slug),
+    enabled: !!slug
   });
 
-export const useQueryRoleUsers = (role: string) =>
+export const useListRoles = (params: any) =>
   useQuery({
-    queryKey: roleKeys.users({ role }),
-    queryFn: () => getRoleUsers(role),
-    enabled: !!role
-  });
-
-export const useListRoles = (queryParams: QueryFormParams) => {
-  return useQuery({
-    queryKey: roleKeys.list(queryParams),
-    queryFn: () => getRoles(queryParams),
+    queryKey: ['roles', params],
+    queryFn: () => getRoles(params),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000
   });
-};
 
-// Role mutations
+export const useListEnabledRoles = () =>
+  useQuery({
+    queryKey: ['enabledRoles'],
+    queryFn: getEnabledRoles,
+    staleTime: 10 * 60 * 1000
+  });
+
 export const useCreateRole = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: Pick<Role, keyof Role>) => createRole(payload),
+    mutationFn: createRole,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
-    },
-    onError: error => {
-      console.error('Failed to create role:', error);
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
     }
   });
 };
 
 export const useUpdateRole = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (payload: Pick<Role, keyof Role>) => updateRole(payload),
+    mutationFn: updateRole,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
       if (variables.id) {
-        queryClient.invalidateQueries({
-          queryKey: roleKeys.get({ role: variables.id })
-        });
+        queryClient.invalidateQueries({ queryKey: ['role', variables.id] });
       }
-    },
-    onError: error => {
-      console.error('Failed to update role:', error);
     }
   });
 };
 
 export const useDeleteRole = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (id: string) => deleteRole(id),
+    mutationFn: deleteRole,
     onSuccess: (_, deletedId) => {
-      queryClient.removeQueries({
-        queryKey: roleKeys.get({ role: deletedId })
-      });
-      queryClient.invalidateQueries({ queryKey: ['roleService', 'roles'] });
-    },
-    onError: error => {
-      console.error('Failed to delete role:', error);
+      queryClient.removeQueries({ queryKey: ['role', deletedId] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
     }
   });
 };
 
-// Role permission management
-export const useAssignPermissionsToRole = () => {
-  const queryClient = useQueryClient();
+// Role-Permission management hooks
+export const useQueryRolePermissions = (roleId: string) =>
+  useQuery({
+    queryKey: ['rolePermissions', roleId],
+    queryFn: () => getRolePermissions(roleId),
+    enabled: !!roleId
+  });
 
+export const useAssignPermissions = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
-      assignPermissionsToRole(roleId, permissionIds),
+      assignPermissions(roleId, permissionIds),
     onSuccess: (_, { roleId }) => {
-      queryClient.invalidateQueries({
-        queryKey: roleKeys.permissions({ role: roleId })
-      });
-    },
-    onError: error => {
-      console.error('Failed to assign permissions:', error);
+      queryClient.invalidateQueries({ queryKey: ['rolePermissions', roleId] });
     }
   });
 };
 
-export const useRemovePermissionsFromRole = () => {
+export const useRemovePermissions = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
-      removePermissionsFromRole(roleId, permissionIds),
+      removePermissions(roleId, permissionIds),
     onSuccess: (_, { roleId }) => {
-      queryClient.invalidateQueries({
-        queryKey: roleKeys.permissions({ role: roleId })
-      });
-    },
-    onError: error => {
-      console.error('Failed to remove permissions:', error);
+      queryClient.invalidateQueries({ queryKey: ['rolePermissions', roleId] });
+    }
+  });
+};
+
+// Role-User management hooks
+export const useQueryRoleUsers = (roleId: string) =>
+  useQuery({
+    queryKey: ['roleUsers', roleId],
+    queryFn: () => getRoleUsers(roleId),
+    enabled: !!roleId
+  });
+
+export const useAssignUsers = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roleId, userIds }: { roleId: string; userIds: string[] }) =>
+      assignUsers(roleId, userIds),
+    onSuccess: (_, { roleId }) => {
+      queryClient.invalidateQueries({ queryKey: ['roleUsers', roleId] });
+    }
+  });
+};
+
+export const useRemoveUsers = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roleId, userIds }: { roleId: string; userIds: string[] }) =>
+      removeUsers(roleId, userIds),
+    onSuccess: (_, { roleId }) => {
+      queryClient.invalidateQueries({ queryKey: ['roleUsers', roleId] });
     }
   });
 };

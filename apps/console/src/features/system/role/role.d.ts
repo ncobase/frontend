@@ -5,18 +5,18 @@ export interface Role {
   disabled?: boolean;
   description?: string;
   extras?: object | null;
-  parent?: string;
-  group?: string;
-  tenant?: string;
   created_by?: string;
-  created_at?: string;
-  updated_by?: string;
+  created_at?: number;
+  updated_by?: number;
   updated_at?: string;
 }
 
-export interface Roles {
-  items: Role[];
-  total: number;
-  has_next: boolean;
-  next?: string;
+export interface RolePermission {
+  role_id: string;
+  permission_id: string;
+}
+
+export interface UserRole {
+  user_id: string;
+  role_id: string;
 }

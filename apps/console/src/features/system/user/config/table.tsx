@@ -4,8 +4,15 @@ import { useTranslation } from 'react-i18next';
 
 import { User } from '../user';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  setRoleManagementModal,
+  setApiKeyModal,
+  setEmployeeModal
+}): TableViewProps['header'] => {
   const { t } = useTranslation();
+
   return [
     {
       title: t('user.fields.id', 'ID'),
@@ -72,6 +79,21 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       accessorKey: 'operation-column',
       actions: [
         {
+          title: t('actions.role', 'Roles'),
+          icon: 'IconUserCheck',
+          onClick: (record: User) => setRoleManagementModal({ open: true, user: record })
+        },
+        {
+          title: t('actions.api_key', 'API Keys'),
+          icon: 'IconKey',
+          onClick: (record: User) => setApiKeyModal({ open: true, user: record })
+        },
+        {
+          title: t('actions.employee', 'Employee'),
+          icon: 'IconBriefcase',
+          onClick: (record: User) => setEmployeeModal({ open: true, user: record })
+        },
+        {
           title: t('actions.view', 'View'),
           icon: 'IconEye',
           onClick: (record: User) => handleView(record, 'view')
@@ -85,7 +107,6 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
           title: t('actions.duplicate', 'Duplicate'),
           icon: 'IconCopy',
           onClick: (record: User) => {
-            // Create a copy without ID for duplication
             const duplicateRecord = {
               ...record,
               id: undefined,
@@ -113,6 +134,5 @@ const renderUserStatus = (status: number) => {
   };
 
   const config = statusConfig[status] || { label: 'Unknown', variant: 'secondary' as const };
-
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };

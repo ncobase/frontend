@@ -6,7 +6,6 @@ import {
   getDictionaries,
   getDictionary,
   updateDictionary,
-  getDictionaryBySlug,
   getEnumOptions,
   validateEnumValue,
   batchGetBySlug
@@ -51,7 +50,7 @@ export const useQueryDictionary = (dictionary: string) =>
 export const useQueryDictionaryBySlug = (slug: string) =>
   useQuery({
     queryKey: dictionaryKeys.getBySlug(slug),
-    queryFn: () => getDictionaryBySlug(slug),
+    queryFn: () => getDictionary(slug),
     enabled: !!slug
   });
 

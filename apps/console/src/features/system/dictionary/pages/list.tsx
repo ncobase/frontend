@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { Modal } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
+import { DictionaryImportExport } from '../components';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
@@ -28,6 +30,7 @@ export const DictionaryListPage = () => {
 
   const [viewType, setViewType] = useState<string | undefined>(mode);
   const [selectedRecord, setSelectedRecord] = useState<Dictionary | null>(null);
+  const [showImportExport, setShowImportExport] = useState(false);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -122,50 +125,60 @@ export const DictionaryListPage = () => {
 
   const tableConfig = {
     columns: tableColumns({ handleView, handleDelete }),
-    topbarLeft: topbarLeftSection({ handleView }),
+    topbarLeft: topbarLeftSection({ handleView, setShowImportExport }),
     topbarRight: topbarRightSection,
     title: t('system.dictionaries.title')
   };
 
   return (
-    <CurdView
-      viewMode={vmode}
-      title={tableConfig.title}
-      topbarLeft={tableConfig.topbarLeft}
-      topbarRight={tableConfig.topbarRight}
-      columns={tableConfig.columns}
-      data={data?.items || []}
-      selected
-      queryFields={queryFields({ queryControl })}
-      onQuery={onQuery}
-      onResetQuery={onResetQuery}
-      fetchData={fetchData}
-      loading={loading}
-      createComponent={
-        <CreateDictionaryPage
-          viewMode={vmode}
-          onSubmit={handleConfirm}
-          control={formControl}
-          errors={formErrors}
-        />
-      }
-      viewComponent={record => (
-        <DictionaryViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
-      )}
-      editComponent={record => (
-        <EditorDictionaryPage
-          viewMode={vmode}
-          record={record?.id}
-          onSubmit={handleConfirm}
-          control={formControl}
-          setValue={setFormValue}
-          errors={formErrors}
-        />
-      )}
-      type={viewType}
-      record={selectedRecord}
-      onConfirm={handleConfirm}
-      onCancel={handleClose}
-    />
+    <>
+      <CurdView
+        viewMode={vmode}
+        title={tableConfig.title}
+        topbarLeft={tableConfig.topbarLeft}
+        topbarRight={tableConfig.topbarRight}
+        columns={tableConfig.columns}
+        data={data?.items || []}
+        selected
+        queryFields={queryFields({ queryControl })}
+        onQuery={onQuery}
+        onResetQuery={onResetQuery}
+        fetchData={fetchData}
+        loading={loading}
+        createComponent={
+          <CreateDictionaryPage
+            viewMode={vmode}
+            onSubmit={handleConfirm}
+            control={formControl}
+            errors={formErrors}
+          />
+        }
+        viewComponent={record => (
+          <DictionaryViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+        )}
+        editComponent={record => (
+          <EditorDictionaryPage
+            viewMode={vmode}
+            record={record?.id}
+            onSubmit={handleConfirm}
+            control={formControl}
+            setValue={setFormValue}
+            errors={formErrors}
+          />
+        )}
+        type={viewType}
+        record={selectedRecord}
+        onConfirm={handleConfirm}
+        onCancel={handleClose}
+      />
+      <Modal
+        isOpen={showImportExport}
+        onCancel={() => setShowImportExport(false)}
+        title={t('dictionary.import_export.title')}
+        className='max-w-4xl'
+      >
+        <DictionaryImportExport />
+      </Modal>
+    </>
   );
 };

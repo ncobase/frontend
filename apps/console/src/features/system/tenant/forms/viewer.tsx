@@ -46,15 +46,18 @@ export const TenantViewerForm = ({ record }) => {
           accessor: 'name'
         },
         {
+          id: 'slug',
+          title: t('tenant.fields.slug', 'Slug'),
+          accessor: 'slug',
+          renderer: value => (
+            <span className='font-mono text-sm bg-slate-100 px-2 py-1 rounded'>{value}</span>
+          )
+        },
+        {
           id: 'type',
           title: t('tenant.fields.type', 'Type'),
           accessor: 'type',
-          renderer: value => renderTenantType(value)
-        },
-        {
-          id: 'slug',
-          title: t('tenant.fields.slug', 'Slug'),
-          accessor: 'slug'
+          renderer: value => renderTenantType(value, t)
         },
         {
           id: 'url',
@@ -63,17 +66,10 @@ export const TenantViewerForm = ({ record }) => {
           renderer: value => renderUrl(value)
         },
         {
-          id: 'disabled',
+          id: 'status',
           title: t('tenant.fields.status', 'Status'),
           accessor: 'disabled',
-          renderer: value => renderStatus(value)
-        },
-        {
-          id: 'expired_at',
-          title: t('tenant.fields.expired_at', 'Expiration Date'),
-          accessor: 'expired_at',
-          renderer: value =>
-            formatDateTime(value) || t('tenant.no_expiration', 'No expiration date')
+          renderer: value => renderStatus(value, t)
         }
       ]
     },
@@ -130,11 +126,23 @@ export const TenantViewerForm = ({ record }) => {
       ]
     },
     {
-      id: 'system',
-      title: t('tenant.section.system', 'System Information'),
-      subtitle: t('tenant.section.system_subtitle', 'Technical and audit details'),
+      id: 'metadata',
+      title: t('tenant.section.metadata', 'Metadata'),
+      subtitle: t('tenant.section.metadata_subtitle', 'System information and timestamps'),
       icon: 'IconDatabase',
       fields: [
+        {
+          id: 'order',
+          title: t('tenant.fields.order', 'Display Order'),
+          accessor: 'order'
+        },
+        {
+          id: 'expired_at',
+          title: t('tenant.fields.expired_at', 'Expiration Date'),
+          accessor: 'expired_at',
+          renderer: value =>
+            value ? formatDateTime(value, 'date') : t('tenant.no_expiration', 'No expiration')
+        },
         {
           id: 'created_at',
           title: t('tenant.fields.created_at', 'Created'),
@@ -156,23 +164,48 @@ export const TenantViewerForm = ({ record }) => {
           id: 'updated_by',
           title: t('tenant.fields.updated_by', 'Updated By'),
           accessor: 'updated_by'
-        },
-        {
-          id: 'extras',
-          title: t('tenant.fields.extras', 'Extra Metadata'),
-          accessor: 'extras',
-          renderer: value => renderJson(value),
-          className: 'col-span-full'
         }
       ]
     }
   ];
 
   return (
-    <>
+    <div className='space-y-8'>
+      {/* Status Banner */}
+      <div
+        className={`p-4 rounded-lg border ${
+          data.disabled ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'
+        }`}
+      >
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center space-x-2'>
+            <Badge variant={data.disabled ? 'danger' : 'success'}>
+              {data.disabled ? t('tenant.status.disabled') : t('tenant.status.active')}
+            </Badge>
+            <span className='text-sm text-slate-600'>
+              {data.disabled
+                ? t('tenant.status.disabled_desc', 'This tenant is currently disabled')
+                : t('tenant.status.active_desc', 'This tenant is active and accessible')}
+            </span>
+          </div>
+          {data.expired_at && (
+            <div className='text-sm text-slate-600'>
+              {t('tenant.expires_at', 'Expires')}: {formatDateTime(data.expired_at, 'date')}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sections */}
       {viewerSections.map(section => (
-        <Section key={section.id} title={section.title} icon={section.icon} className='mb-6'>
-          <div className='grid grid-cols-2 gap-4'>
+        <Section
+          key={section.id}
+          title={section.title}
+          subtitle={section.subtitle}
+          icon={section.icon}
+          className='mb-6'
+        >
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             {section.fields.map(field => (
               <FieldViewer key={field.id} title={field.title} className={field.className}>
                 {field.renderer
@@ -183,24 +216,29 @@ export const TenantViewerForm = ({ record }) => {
           </div>
         </Section>
       ))}
-    </>
+    </div>
   );
 };
 
+// Helper Components and Functions
 const LoadingSkeleton = () => (
-  <div className='space-y-4'>
-    <Skeleton className='h-8 w-40 mb-4' />
-    <div className='space-y-2'>
-      <Skeleton className='h-12 w-full' />
-      <Skeleton className='h-12 w-full' />
-      <Skeleton className='h-12 w-full' />
-      <Skeleton className='h-12 w-full' />
-      <Skeleton className='h-12 w-full' />
-    </div>
+  <div className='space-y-6'>
+    <div className='h-16 bg-slate-100 rounded-lg animate-pulse' />
+    {[1, 2, 3].map(i => (
+      <div key={i} className='space-y-4'>
+        <Skeleton className='h-8 w-40' />
+        <div className='grid grid-cols-2 gap-4'>
+          <Skeleton className='h-20' />
+          <Skeleton className='h-20' />
+          <Skeleton className='h-20' />
+          <Skeleton className='h-20' />
+        </div>
+      </div>
+    ))}
   </div>
 );
 
-const renderTenantType = type => {
+const renderTenantType = (type: string, t: any) => {
   if (!type) return '-';
 
   const typeColors = {
@@ -213,49 +251,66 @@ const renderTenantType = type => {
 
   return (
     <Badge className={typeColors[type] || 'bg-slate-100'}>
-      {type.charAt(0).toUpperCase() + type.slice(1)}
+      {t(`tenant.types.${type}`, type.charAt(0).toUpperCase() + type.slice(1))}
     </Badge>
   );
 };
 
-const renderStatus = disabled => {
-  return disabled ? (
-    <Badge variant='danger'>Disabled</Badge>
-  ) : (
-    <Badge variant='success'>Active</Badge>
+const renderStatus = (disabled: boolean, t: any) => {
+  return (
+    <Badge variant={disabled ? 'danger' : 'success'}>
+      {disabled ? t('tenant.status.disabled') : t('tenant.status.active')}
+    </Badge>
   );
 };
 
-const renderUrl = url => {
+const renderUrl = (url: string) => {
   if (!url) return '-';
+
+  const fullUrl = url.startsWith('http') ? url : `https://${url}`;
 
   return (
     <a
-      href={url.startsWith('http') ? url : `https://${url}`}
+      href={fullUrl}
       target='_blank'
       rel='noopener noreferrer'
-      className='text-blue-500 hover:underline'
+      className='text-blue-500 hover:underline flex items-center'
     >
       {url}
+      <svg className='w-3 h-3 ml-1' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <path
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          strokeWidth={2}
+          d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
+        />
+      </svg>
     </a>
   );
 };
 
-const renderLogo = (logo, alt) => {
+const renderLogo = (logo: string, alt: string) => {
   if (!logo) return '-';
 
   return (
-    <div className='mt-2'>
+    <div className='flex items-center space-x-3'>
       <img
         src={logo}
         alt={alt || 'Tenant logo'}
-        className='max-h-24 object-contain border p-2 rounded bg-white'
+        className='h-16 w-16 object-contain border rounded bg-white p-2'
+        onError={e => {
+          e.currentTarget.style.display = 'none';
+        }}
       />
+      <div className='text-sm text-slate-600'>
+        <div className='font-medium'>{alt || 'Logo'}</div>
+        <div className='text-xs'>{logo}</div>
+      </div>
     </div>
   );
 };
 
-const renderKeywords = keywords => {
+const renderKeywords = (keywords: string) => {
   if (!keywords) return '-';
 
   return (
@@ -266,15 +321,5 @@ const renderKeywords = keywords => {
         </Badge>
       ))}
     </div>
-  );
-};
-
-const renderJson = data => {
-  if (!data) return '-';
-
-  return (
-    <pre className='bg-slate-50 p-2 rounded text-xs overflow-auto max-h-40'>
-      {JSON.stringify(data, null, 2)}
-    </pre>
   );
 };

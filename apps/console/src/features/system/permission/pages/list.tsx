@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
+import { PermissionBulkActions } from '../components/bulk_actions';
+import { PermissionRoleAssignment } from '../components/role_assignment';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
@@ -28,6 +30,11 @@ export const PermissionListPage = () => {
 
   const [viewType, setViewType] = useState<string | undefined>(mode);
   const [selectedRecord, setSelectedRecord] = useState<Permission | null>(null);
+  const [selectedPermissions, setSelectedPermissions] = useState<Permission[]>([]);
+  const [roleAssignmentModal, setRoleAssignmentModal] = useState<{
+    open: boolean;
+    permission: Permission | null;
+  }>({ open: false, permission: null });
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -88,7 +95,9 @@ export const PermissionListPage = () => {
 
   const onSuccess = useCallback(() => {
     handleClose();
-  }, [handleClose]);
+    refetch();
+    setSelectedPermissions([]);
+  }, [handleClose, refetch]);
 
   const handleCreate = useCallback(
     (data: Permission) => {
@@ -113,6 +122,10 @@ export const PermissionListPage = () => {
     [deletePermissionMutation, onSuccess]
   );
 
+  const handleAssignRoles = useCallback((permission: Permission) => {
+    setRoleAssignmentModal({ open: true, permission });
+  }, []);
+
   const handleConfirm = useCallback(
     handleFormSubmit((data: Permission) => {
       return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
@@ -121,51 +134,75 @@ export const PermissionListPage = () => {
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete }),
+    columns: tableColumns({
+      handleView,
+      handleDelete,
+      handleAssignRoles
+    }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
     title: t('system.permissions.title')
   };
 
   return (
-    <CurdView
-      viewMode={vmode}
-      title={tableConfig.title}
-      topbarLeft={tableConfig.topbarLeft}
-      topbarRight={tableConfig.topbarRight}
-      columns={tableConfig.columns}
-      data={data?.items || []}
-      selected
-      queryFields={queryFields({ queryControl })}
-      onQuery={onQuery}
-      onResetQuery={onResetQuery}
-      fetchData={fetchData}
-      loading={loading}
-      createComponent={
-        <CreatePermissionPage
-          viewMode={vmode}
-          onSubmit={handleConfirm}
-          control={formControl}
-          errors={formErrors}
-        />
-      }
-      viewComponent={record => (
-        <PermissionViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
-      )}
-      editComponent={record => (
-        <EditorPermissionPage
-          viewMode={vmode}
-          record={record?.id}
-          onSubmit={handleConfirm}
-          control={formControl}
-          setValue={setFormValue}
-          errors={formErrors}
-        />
-      )}
-      type={viewType}
-      record={selectedRecord}
-      onConfirm={handleConfirm}
-      onCancel={handleClose}
-    />
+    <>
+      <CurdView
+        viewMode={vmode}
+        title={tableConfig.title}
+        topbarLeft={tableConfig.topbarLeft}
+        topbarRight={tableConfig.topbarRight}
+        columns={tableConfig.columns}
+        data={data?.items || []}
+        selected
+        queryFields={queryFields({ queryControl })}
+        onQuery={onQuery}
+        onResetQuery={onResetQuery}
+        fetchData={fetchData}
+        loading={loading}
+        createComponent={
+          <CreatePermissionPage
+            viewMode={vmode}
+            onSubmit={handleConfirm}
+            control={formControl}
+            errors={formErrors}
+          />
+        }
+        viewComponent={record => (
+          <PermissionViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+        )}
+        editComponent={record => (
+          <EditorPermissionPage
+            viewMode={vmode}
+            record={record?.id}
+            onSubmit={handleConfirm}
+            control={formControl}
+            setValue={setFormValue}
+            errors={formErrors}
+          />
+        )}
+        type={viewType}
+        record={selectedRecord}
+        onConfirm={handleConfirm}
+        onCancel={handleClose}
+      />
+
+      {/* Bulk Actions */}
+      <PermissionBulkActions
+        selectedPermissions={selectedPermissions}
+        onSelectionChange={setSelectedPermissions}
+        onSuccess={onSuccess}
+      />
+
+      {/* Role Assignment Modal */}
+      <PermissionRoleAssignment
+        isOpen={roleAssignmentModal.open}
+        onClose={() => setRoleAssignmentModal({ open: false, permission: null })}
+        permission={roleAssignmentModal.permission}
+        onSuccess={() => {
+          setRoleAssignmentModal({ open: false, permission: null });
+          refetch();
+        }}
+      />
+    </>
   );
 };

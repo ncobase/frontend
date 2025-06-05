@@ -16,6 +16,7 @@ export const queryFields = ({
   queryControl: Control<QueryFormParams, ExplicitAny>;
 }) => {
   const { t } = useTranslation();
+
   return [
     {
       name: 'name',
@@ -27,7 +28,7 @@ export const queryFields = ({
           defaultValue=''
           render={({ field }) => (
             <InputField
-              placeholder={t('option.placeholders.name', 'Search by name')}
+              placeholder={t('option.placeholders.name', 'Search by name...')}
               prependIcon='IconSearch'
               className='py-1.5'
               {...field}
@@ -47,6 +48,7 @@ export const queryFields = ({
           render={({ field }) => (
             <SelectField
               allowClear
+              placeholder='Filter by type'
               option={[
                 { label: t('option.types.string', 'String'), value: 'string' },
                 { label: t('option.types.number', 'Number'), value: 'number' },
@@ -63,15 +65,15 @@ export const queryFields = ({
     },
     {
       name: 'autoload',
-      label: t('option.fields.autoload', 'Autoload'),
+      label: t('option.fields.autoload', 'Auto Load'),
       component: (
         <Controller
           name='autoload'
           control={queryControl}
-          defaultValue=''
           render={({ field }) => (
             <SelectField
               allowClear
+              placeholder='Filter by auto load'
               option={[
                 { label: t('common.yes', 'Yes'), value: true },
                 { label: t('common.no', 'No'), value: false }
@@ -93,7 +95,7 @@ export const queryFields = ({
           defaultValue=''
           render={({ field }) => (
             <InputField
-              placeholder={t('option.placeholders.prefix', 'Filter by name prefix')}
+              placeholder={t('option.placeholders.prefix', 'Filter by name prefix (e.g., app.)')}
               className='py-1.5'
               {...field}
             />

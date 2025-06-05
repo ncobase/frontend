@@ -1,4 +1,4 @@
-import { Button, Icons, ScrollView } from '@ncobase/react';
+import { Button, ScrollView } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -6,11 +6,13 @@ import { CreateTenantForm } from '../forms/create';
 
 import { useLayoutContext } from '@/components/layout';
 
-export const CreateTenantPage = ({ viewMode, onSubmit, control, errors }) => {
+export const CreateTenantPage = ({ viewMode, onSubmit, control, setValue, errors }) => {
   const { vmode } = useLayoutContext();
   const mode = viewMode || vmode || 'flatten';
   if (mode === 'modal') {
-    return <CreateTenantForm onSubmit={onSubmit} control={control} errors={errors} />;
+    return (
+      <CreateTenantForm onSubmit={onSubmit} control={control} setValue={setValue} errors={errors} />
+    );
   }
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -32,7 +34,12 @@ export const CreateTenantPage = ({ viewMode, onSubmit, control, errors }) => {
         </div>
       </div>
       <ScrollView className='bg-white p-4'>
-        <CreateTenantForm onSubmit={onSubmit} control={control} errors={errors} />
+        <CreateTenantForm
+          onSubmit={onSubmit}
+          control={control}
+          setValue={setValue}
+          errors={errors}
+        />
       </ScrollView>
     </>
   );

@@ -15,22 +15,67 @@ export interface User {
   status: number; // 0: active, 1: inactive, 2: disabled
   extras?: Record<string, any>;
   tenant_id?: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: number;
+  updated_at?: number;
+}
+
+export interface CreateUserPayload {
+  user: {
+    username: string;
+    email?: string;
+    phone?: string;
+    status?: number | string;
+    password?: string;
+  };
+  profile: {
+    first_name?: string;
+    last_name?: string;
+    display_name?: string;
+    short_bio?: string;
+    about?: string;
+    language?: string;
+    links?: any[];
+  };
+}
+
+export interface UpdateUserPayload {
+  user: {
+    id: string;
+    username?: string;
+    email?: string;
+    phone?: string;
+    status?: number | string;
+  };
+  profile: {
+    first_name?: string;
+    last_name?: string;
+    display_name?: string;
+    short_bio?: string;
+    about?: string;
+    language?: string;
+    links?: any[];
+  };
+}
+
+export interface UserPasswordPayload {
+  user_id: string;
+  old_password?: string;
+  new_password: string;
+  confirm: string;
 }
 
 /**
  * User profile entity - Extended user information
  */
 export interface UserProfile {
-  id: string; // Same as user ID
+  user_id: string;
+  display_name?: string;
   first_name?: string;
   last_name?: string;
-  display_name?: string;
+  title?: string;
   short_bio?: string;
   about?: string;
   thumbnail?: string;
-  language?: string;
   links?: UserSocialLink[];
   extras?: Record<string, any>;
 }
@@ -45,11 +90,13 @@ export interface UserSocialLink {
 }
 
 /**
- * User combined with profile information - Used for comprehensive user data
+ * User combined entity
  */
 export interface UserMeshes {
   user: User;
   profile: UserProfile;
+  employee?: Employee;
+  api_keys?: ApiKey[];
   roles?: string[];
   tenants?: Tenant[];
   permissions?: string[];
@@ -95,4 +142,73 @@ export interface PaginationParams {
   direction?: 'forward' | 'backward';
   sort?: string;
   order?: 'asc' | 'desc';
+}
+
+// Employee interfaces
+export interface Employee {
+  user_id: string;
+  tenant_id?: string;
+  employee_id?: string;
+  department?: string;
+  position?: string;
+  manager_id?: string;
+  hire_date?: string;
+  termination_date?: string;
+  employment_type?: 'full_time' | 'part_time' | 'contract' | 'intern';
+  status?: 'active' | 'inactive' | 'terminated' | 'on_leave';
+  salary?: number;
+  work_location?: 'office' | 'remote' | 'hybrid';
+  contact_info?: any;
+  skills?: string[];
+  certifications?: string[];
+  extras?: any;
+  created_at?: number;
+  updated_at?: number;
+}
+
+export interface EmployeeBody {
+  user_id: string;
+  tenant_id?: string;
+  employee_id?: string;
+  department?: string;
+  position?: string;
+  manager_id?: string;
+  hire_date?: string;
+  employment_type?: string;
+  status?: string;
+  salary?: number;
+  work_location?: string;
+  skills?: string[];
+  certifications?: string[];
+}
+
+export interface EmployeeListParams extends PaginationParams {
+  search?: string;
+  department?: string;
+  position?: string;
+  manager_id?: string;
+  hire_date?: string;
+  termination_date?: string;
+  employment_type?: string;
+  status?: string;
+  salary?: number;
+  work_location?: string;
+  skills?: string[];
+  certifications?: string[];
+  tenant_id?: string;
+  is_admin?: boolean;
+}
+
+// API Key interfaces
+export interface ApiKey {
+  id: string;
+  name: string;
+  key: string;
+  user_id: string;
+  created_at: number;
+  last_used?: number;
+}
+
+export interface CreateApiKeyRequest {
+  name: string;
 }

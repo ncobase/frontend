@@ -14,13 +14,18 @@ export const CreateOptionForms = ({ onSubmit, control, errors }) => {
       title: t('option.fields.name', 'Name'),
       name: 'name',
       defaultValue: '',
-      placeholder: 'Enter option name (unique key)',
+      placeholder: 'Enter unique option name (e.g., app.max_users)',
       type: 'text',
+      help: 'Option name must be unique and use dots for namespacing',
       rules: {
         required: t('forms.input_required'),
         pattern: {
           value: /^[a-zA-Z0-9._-]+$/,
           message: 'Name can only contain letters, numbers, dots, hyphens and underscores'
+        },
+        minLength: {
+          value: 2,
+          message: 'Name must be at least 2 characters'
         }
       }
     },
@@ -45,6 +50,7 @@ export const CreateOptionForms = ({ onSubmit, control, errors }) => {
       placeholder: 'Enter option value',
       type: 'textarea',
       className: 'col-span-full',
+      help: 'For object/array types, use valid JSON format',
       rules: {
         required: t('forms.input_required'),
         validate: {
@@ -73,12 +79,12 @@ export const CreateOptionForms = ({ onSubmit, control, errors }) => {
       }
     },
     {
-      title: t('option.fields.autoload', 'Autoload'),
+      title: t('option.fields.autoload', 'Auto Load'),
       name: 'autoload',
       defaultValue: false,
       type: 'switch',
       elementClassName: 'my-3',
-      help: 'Load this option automatically on system startup'
+      help: 'Load this option automatically when system starts'
     },
     {
       title: 'Tenant ID',
@@ -91,7 +97,7 @@ export const CreateOptionForms = ({ onSubmit, control, errors }) => {
   return (
     <Form
       id='create-option'
-      className='my-4 md:grid-cols-2'
+      className='my-4 md:grid-cols-2 gap-6'
       onSubmit={onSubmit}
       control={control}
       errors={errors}

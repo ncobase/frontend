@@ -1,18 +1,50 @@
 import { Button, TableViewProps, Badge, Tooltip, Icons } from '@ncobase/react';
-import { formatDateTime } from '@ncobase/utils';
+import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { Tenant } from '../tenant';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  handleSettings,
+  handleQuotas,
+  handleBilling,
+  handleUsers
+}): TableViewProps['header'] => {
   const { t } = useTranslation();
+
   return [
     {
       title: t('tenant.fields.name', 'Name'),
       accessorKey: 'name',
-      parser: (value, record) => (
+      parser: (value, record: Tenant) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
-          <span className='font-medium'>{value}</span>
+          <div className='flex items-center space-x-2'>
+            {record.logo && (
+              <img
+                src={record.logo}
+                alt={record.logo_alt || record.name}
+                className='w-6 h-6 rounded object-cover'
+                onError={e => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+            <span className='font-medium'>{value}</span>
+            <div className='flex space-x-1'>
+              {record.disabled && (
+                <Badge variant='warning' size='xs'>
+                  {t('tenant.status.disabled')}
+                </Badge>
+              )}
+              {record.expired_at && new Date(record.expired_at) < new Date() && (
+                <Badge variant='danger' size='xs'>
+                  {t('tenant.status.expired')}
+                </Badge>
+              )}
+            </div>
+          </div>
         </Button>
       ),
       icon: 'IconSignature'
@@ -20,13 +52,17 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: t('tenant.fields.type', 'Type'),
       accessorKey: 'type',
-      parser: value => renderTenantType(value),
+      parser: value => renderTenantType(value, t),
       icon: 'IconCategory2'
     },
     {
       title: t('tenant.fields.slug', 'Slug'),
       accessorKey: 'slug',
-      parser: value => <span className='text-slate-600 font-mono text-xs'>{value}</span>,
+      parser: value => (
+        <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
+          {value}
+        </span>
+      ),
       icon: 'IconRouteAltLeft'
     },
     {
@@ -38,21 +74,15 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: t('tenant.fields.status', 'Status'),
       accessorKey: 'disabled',
-      parser: value => renderStatus(value),
+      parser: (value, record: Tenant) => renderTenantStatus(value, record, t),
       icon: 'IconStatusChange'
-    },
-    {
-      title: t('tenant.fields.expired_at', 'Expires'),
-      accessorKey: 'expired_at',
-      parser: value => formatExpirationDate(value),
-      icon: 'IconCalendarMonth'
     },
     {
       title: t('tenant.fields.updated_at', 'Updated'),
       accessorKey: 'updated_at',
       parser: value => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
-          <span>{formatRelativeTime(value)}</span>
+          <span className='text-sm'>{formatRelativeTime(new Date(value))}</span>
         </Tooltip>
       ),
       icon: 'IconHistory'
@@ -61,6 +91,26 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: t('common.actions', 'Actions'),
       accessorKey: 'operation-column',
       actions: [
+        {
+          title: t('tenant.actions.users', 'Manage Users'),
+          icon: 'IconUsers',
+          onClick: (record: Tenant) => handleUsers(record)
+        },
+        {
+          title: t('tenant.actions.settings', 'Settings'),
+          icon: 'IconSettings',
+          onClick: (record: Tenant) => handleSettings(record)
+        },
+        {
+          title: t('tenant.actions.quotas', 'Quotas'),
+          icon: 'IconGauge',
+          onClick: (record: Tenant) => handleQuotas(record)
+        },
+        {
+          title: t('tenant.actions.billing', 'Billing'),
+          icon: 'IconCreditCard',
+          onClick: (record: Tenant) => handleBilling(record)
+        },
         {
           title: t('actions.view', 'View'),
           icon: 'IconEye',
@@ -81,7 +131,8 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   ];
 };
 
-const renderTenantType = type => {
+// Helper rendering functions
+const renderTenantType = (type: string, t: any) => {
   if (!type) return '-';
 
   const typeColors = {
@@ -94,97 +145,40 @@ const renderTenantType = type => {
 
   return (
     <Badge className={typeColors[type] || 'bg-slate-100'}>
-      {type.charAt(0).toUpperCase() + type.slice(1)}
+      {t(`tenant.types.${type}`, type.charAt(0).toUpperCase() + type.slice(1))}
     </Badge>
   );
 };
 
-const renderStatus = disabled => {
+const renderTenantStatus = (disabled: boolean, record: Tenant, t: any) => {
+  const isExpired = record.expired_at && new Date(record.expired_at) < new Date();
+
+  if (isExpired) {
+    return <Badge variant='danger'>{t('tenant.status.expired')}</Badge>;
+  }
+
   return disabled ? (
-    <Badge variant='danger'>Disabled</Badge>
+    <Badge variant='warning'>{t('tenant.status.disabled')}</Badge>
   ) : (
-    <Badge variant='success'>Active</Badge>
+    <Badge variant='success'>{t('tenant.status.active')}</Badge>
   );
 };
 
-const renderWebsite = url => {
+const renderWebsite = (url: string) => {
   if (!url) return '-';
+
+  const fullUrl = url.startsWith('http') ? url : `https://${url}`;
 
   return (
     <a
-      href={url.startsWith('http') ? url : `https://${url}`}
+      href={fullUrl}
       target='_blank'
       rel='noopener noreferrer'
       className='flex items-center text-blue-500 hover:underline'
+      onClick={e => e.stopPropagation()}
     >
       <span className='truncate max-w-[150px]'>{url}</span>
       <Icons name='IconExternalLink' className='ml-1 w-3 h-3' />
     </a>
   );
-};
-
-const formatExpirationDate = date => {
-  if (!date) return <span className='text-slate-400'>No expiration</span>;
-
-  const expirationDate = new Date(date);
-  const now = new Date();
-
-  // Check if expired
-  if (expirationDate < now) {
-    return (
-      <span className='text-red-500 flex items-center'>
-        <Icons name='IconAlertTriangle' className='mr-1 w-3 h-3' />
-        Expired
-      </span>
-    );
-  }
-
-  // Check if expiring soon (within 30 days)
-  const thirtyDaysFromNow = new Date();
-  thirtyDaysFromNow.setDate(now.getDate() + 30);
-
-  if (expirationDate < thirtyDaysFromNow) {
-    return (
-      <Tooltip content={formatDateTime(date, 'date')}>
-        <span className='text-amber-500 flex items-center'>
-          <Icons name='IconClock' className='mr-1 w-3 h-3' />
-          Expiring soon
-        </span>
-      </Tooltip>
-    );
-  }
-
-  // Normal expiration date
-  return (
-    <Tooltip content={formatDateTime(date, 'date')}>
-      <span>{formatDateTime(date, 'date')}</span>
-    </Tooltip>
-  );
-};
-
-const formatRelativeTime = dateString => {
-  if (!dateString) return '-';
-
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = Math.floor((now.getTime() - date.getTime()) / 1000); // Difference in seconds
-
-  if (diff < 60) {
-    return 'Just now';
-  } else if (diff < 3600) {
-    const minutes = Math.floor(diff / 60);
-    return `${minutes}m ago`;
-  } else if (diff < 86400) {
-    const hours = Math.floor(diff / 3600);
-    return `${hours}h ago`;
-  } else if (diff < 2592000) {
-    const days = Math.floor(diff / 86400);
-    return `${days}d ago`;
-  } else if (diff < 31536000) {
-    const months = Math.floor(diff / 2592000);
-    return `${months}mo ago`;
-  } else {
-    const years = Math.floor(diff / 31536000);
-    return `${years}y ago`;
-  }
 };

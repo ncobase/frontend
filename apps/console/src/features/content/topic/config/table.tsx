@@ -140,13 +140,11 @@ const renderTopicStatus = (status: number, _record: Topic) => {
 
   const config = statusConfig[status] || {
     variant: 'secondary',
-    label: 'Unknown',
-    icon: 'IconQuestionMark'
+    label: 'Unknown'
   };
 
   return (
     <div className='flex items-center space-x-1'>
-      <Icons name={config.icon} className='w-3 h-3' />
       <Badge variant={config.variant as any}>{config.label}</Badge>
     </div>
   );

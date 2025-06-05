@@ -8,52 +8,27 @@ export const CreateRoleForms = ({ onSubmit, control, errors }) => {
 
   const fields: FieldConfigProps[] = [
     {
-      title: t('role.fields.name', 'Name'),
+      title: t('role.fields.name', 'Role Name'),
       name: 'name',
       defaultValue: '',
       placeholder: 'Enter role name',
       type: 'text',
       rules: {
         required: t('forms.input_required'),
-        minLength: {
-          value: 2,
-          message: 'Name must be at least 2 characters'
-        }
+        minLength: { value: 2, message: 'Role name must be at least 2 characters' }
       }
     },
     {
       title: t('role.fields.slug', 'Slug'),
       name: 'slug',
       defaultValue: '',
-      placeholder: 'role-identifier',
+      placeholder: 'role-slug',
       type: 'text',
       rules: {
         pattern: {
-          value: /^[a-z0-9-_]+$/,
-          message: 'Slug can only contain lowercase letters, numbers, hyphens and underscores'
+          value: /^[a-z0-9-]+$/,
+          message: 'Slug can only contain lowercase letters, numbers, and hyphens'
         }
-      }
-    },
-    {
-      title: t('role.fields.parent', 'Parent Role'),
-      name: 'parent',
-      defaultValue: '',
-      placeholder: 'Select parent role',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search parent role');
-      }
-    },
-    {
-      title: t('role.fields.group', 'Group'),
-      name: 'group',
-      defaultValue: '',
-      placeholder: 'Select group',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search group');
       }
     },
     {
@@ -61,21 +36,17 @@ export const CreateRoleForms = ({ onSubmit, control, errors }) => {
       name: 'disabled',
       defaultValue: false,
       type: 'switch',
-      elementClassName: 'my-3',
-      description: 'Disable this role to prevent users from being assigned to it'
+      description: 'Disable this role to prevent it from being assigned'
     },
     {
       title: t('role.fields.description', 'Description'),
       name: 'description',
       defaultValue: '',
-      placeholder: 'Describe the role and its responsibilities',
+      placeholder: 'Describe the purpose and scope of this role',
       type: 'textarea',
       className: 'col-span-full',
       rules: {
-        maxLength: {
-          value: 500,
-          message: 'Description cannot exceed 500 characters'
-        }
+        maxLength: { value: 500, message: 'Description cannot exceed 500 characters' }
       }
     }
   ];

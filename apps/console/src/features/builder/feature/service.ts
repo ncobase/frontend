@@ -1439,7 +1439,7 @@ export const ${featureConfig.name}ListPage = () => {
 };
 
 export const generateTopbarConfig = (_featureConfig: FeatureConfig): string => {
-  const code = `import { Button, DropdownControl, LayoutControl, ScreenControl } from '@/components/elements';
+  const code = `import { Button, ScreenControl } from '@/components/elements';
 import { useTranslation } from 'react-i18next';
 
 export const topbarLeftSection = ({ handleView }) => {
@@ -1458,7 +1458,7 @@ export const topbarLeftSection = ({ handleView }) => {
   ];
 };
 
-export const topbarRightSection = [<DropdownControl />, <LayoutControl />, <ScreenControl />];`;
+export const topbarRightSection = [<ScreenControl />];`;
 
   return code;
 };

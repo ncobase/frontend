@@ -4,8 +4,19 @@ import { useTranslation } from 'react-i18next';
 
 import { Permission } from '../permission';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+interface TableColumnsProps {
+  handleView: (_record: Permission, _type: string) => void;
+  handleDelete: (_record: Permission) => void;
+  handleAssignRoles: (_record: Permission) => void;
+}
+
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  handleAssignRoles
+}: TableColumnsProps): TableViewProps['header'] => {
   const { t } = useTranslation();
+
   return [
     {
       title: t('permission.fields.name', 'Name'),
@@ -16,7 +27,12 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
             <span className='font-medium'>{value}</span>
             {record.default && (
               <Badge variant='primary' className='text-xs px-1'>
-                Default
+                {t('permission.labels.default')}
+              </Badge>
+            )}
+            {record.disabled && (
+              <Badge variant='danger' className='text-xs px-1'>
+                {t('common.disabled')}
               </Badge>
             )}
           </div>
@@ -35,7 +51,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       accessorKey: 'subject',
       parser: (value: string) => (
         <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
-          {value || 'All'}
+          {value || t('permission.labels.all_resources')}
         </span>
       ),
       icon: 'IconTarget'
@@ -50,7 +66,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: t('permission.fields.description', 'Description'),
       accessorKey: 'description',
       parser: (value: string) => (
-        <Tooltip content={value || 'No description'}>
+        <Tooltip content={value || t('permission.labels.no_description')}>
           <span className='truncate max-w-[200px] text-slate-600'>
             {value ? value.substring(0, 40) + (value.length > 40 ? '...' : '') : '-'}
           </span>
@@ -62,7 +78,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: t('permission.fields.status', 'Status'),
       accessorKey: 'disabled',
       parser: (disabled: boolean, record: Permission) =>
-        renderPermissionStatus(disabled, record.default),
+        renderPermissionStatus(disabled, record.default, t),
       icon: 'IconStatusChange'
     },
     {
@@ -93,20 +109,32 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
           title: t('actions.duplicate', 'Duplicate'),
           icon: 'IconCopy',
           onClick: (record: Permission) => {
-            // Create a copy without ID for duplication
             const duplicateRecord = {
               ...record,
               id: undefined,
-              name: `${record.name} (Copy)`,
-              default: false // Copied permissions should not be default
+              name: `${record.name} (Copy)`
             };
             handleView(duplicateRecord, 'create');
           }
         },
         {
-          title: t('actions.roles', 'Assign Roles'),
+          title: t('permission.actions.assign_roles', 'Assign to Roles'),
           icon: 'IconUserCheck',
-          onClick: () => console.log('assign to roles')
+          onClick: (record: Permission) => handleAssignRoles(record)
+        },
+        {
+          title: t('actions.export', 'Export'),
+          icon: 'IconDownload',
+          onClick: (record: Permission) => {
+            const dataStr = JSON.stringify(record, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `permission-${record.id || record.name}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+          }
         },
         {
           title: t('actions.delete', 'Delete'),
@@ -132,43 +160,32 @@ const renderActionBadge = (action: string) => {
     execute: 'bg-orange-100 text-orange-800'
   };
 
-  const actionIcons = {
-    create: 'IconPlus',
-    read: 'IconEye',
-    update: 'IconPencil',
-    delete: 'IconTrash',
-    manage: 'IconSettings',
-    execute: 'IconPlay'
-  };
-
   const lowerAction = action.toLowerCase();
   const colorClass = actionColors[lowerAction] || 'bg-slate-100 text-slate-800';
-  const iconName = actionIcons[lowerAction] || 'IconCommand';
 
   return (
     <div className='flex items-center space-x-1'>
-      <Icons name={iconName} className='w-3 h-3' />
       <Badge className={colorClass}>{action.charAt(0).toUpperCase() + action.slice(1)}</Badge>
     </div>
   );
 };
 
 // Status rendering helper
-const renderPermissionStatus = (disabled: boolean, isDefault: boolean) => {
+const renderPermissionStatus = (disabled: boolean, isDefault: boolean, t: any) => {
   if (disabled) {
-    return <Badge variant='danger'>Disabled</Badge>;
+    return <Badge variant='danger'>{t('common.disabled')}</Badge>;
   }
 
   if (isDefault) {
     return (
       <div className='flex items-center space-x-1'>
-        <Badge variant='success'>Enabled</Badge>
+        <Badge variant='success'>{t('common.enabled')}</Badge>
         <Badge variant='primary' className='text-xs'>
-          System
+          {t('permission.labels.system')}
         </Badge>
       </div>
     );
   }
 
-  return <Badge variant='success'>Enabled</Badge>;
+  return <Badge variant='success'>{t('common.enabled')}</Badge>;
 };

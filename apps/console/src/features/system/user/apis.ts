@@ -1,121 +1,146 @@
-import { User, UserMeshes } from './user';
+import {
+  User,
+  UserMeshes,
+  Employee,
+  ApiKey,
+  CreateApiKeyRequest,
+  UserPasswordPayload,
+  CreateUserPayload,
+  UpdateUserPayload
+} from './user';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
 
-export interface CreateUserPayload {
-  user: {
-    username: string;
-    email?: string;
-    phone?: string;
-    status?: number | string;
-    password?: string;
-  };
-  profile: {
-    first_name?: string;
-    last_name?: string;
-    display_name?: string;
-    short_bio?: string;
-    about?: string;
-    language?: string;
-    links?: any[];
-  };
-}
-
-export interface UpdateUserPayload {
-  user: {
-    id: string;
-    username?: string;
-    email?: string;
-    phone?: string;
-    status?: number | string;
-  };
-  profile: {
-    first_name?: string;
-    last_name?: string;
-    display_name?: string;
-    short_bio?: string;
-    about?: string;
-    language?: string;
-    links?: any[];
-  };
-}
-
-export interface UserPasswordPayload {
-  user_id: string;
-  old_password?: string;
-  new_password: string;
-  confirm: string;
-}
-
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
-  // Get user meshes
+  // User meshes and profiles
   getUserMeshes: async (id: string): Promise<UserMeshes> => {
     return request.get(`${endpoint}/${id}/meshes`);
   },
 
-  // Create a new user with profile
   createUserWithProfile: async (payload: CreateUserPayload): Promise<UserMeshes> => {
     return request.post(`${endpoint}`, payload);
   },
 
-  // Update a user with profile
   updateUserWithProfile: async (payload: UpdateUserPayload): Promise<UserMeshes> => {
-    return request.put(`${endpoint}/${payload.user.id}`, payload);
+    return request.put(`${endpoint}/${payload.user.id}/meshes`, payload);
   },
 
-  // Change user password
+  // Password management
   changePassword: async (id: string, payload: UserPasswordPayload): Promise<void> => {
     return request.put(`${endpoint}/${id}/password`, payload);
   },
 
-  // Get user roles
-  getUserRoles: async (id: string): Promise<string[]> => {
-    return request.get(`${endpoint}/${id}/roles`);
-  },
-
-  // Assign roles to user
-  assignRoles: async (id: string, roleIds: string[]): Promise<void> => {
-    return request.post(`${endpoint}/${id}/roles`, { roleIds });
-  },
-
-  // Remove roles from user
-  removeRoles: async (id: string, roleIds: string[]): Promise<void> => {
-    return request.delete(`${endpoint}/${id}/roles`, { body: { roleIds } });
-  },
-
-  // Enable user
-  enableUser: async (id: string): Promise<UserMeshes> => {
-    return request.put(`${endpoint}/${id}/enable`);
-  },
-
-  // Disable user
-  disableUser: async (id: string): Promise<UserMeshes> => {
-    return request.put(`${endpoint}/${id}/disable`);
-  },
-
-  // Reset password
   resetPassword: async (payload: { username: string; email: string }): Promise<void> => {
     return request.post(`${endpoint}/reset-password`, payload);
   },
 
-  // Get filtered users
+  // Role management
+  getUserRoles: async (id: string): Promise<string[]> => {
+    return request.get(`${endpoint}/${id}/roles`);
+  },
+
+  assignRoles: async (id: string, roleIds: string[]): Promise<void> => {
+    return request.post(`${endpoint}/${id}/roles`, { roleIds });
+  },
+
+  removeRoles: async (id: string, roleIds: string[]): Promise<void> => {
+    return request.delete(`${endpoint}/${id}/roles`, { body: { roleIds } });
+  },
+
+  // Status management
+  enableUser: async (id: string): Promise<UserMeshes> => {
+    return request.put(`${endpoint}/${id}/enable`);
+  },
+
+  disableUser: async (id: string): Promise<UserMeshes> => {
+    return request.put(`${endpoint}/${id}/disable`);
+  },
+
+  updateStatus: async (username: string, status: number): Promise<User> => {
+    return request.patch(`${endpoint}/${username}/status`, { status });
+  },
+
+  // Search and filter
   getFiltered: async (params: any): Promise<User[]> => {
     return request.get(`${endpoint}/filter`, { params });
   },
 
-  // Get user by email
   getUserByEmail: async (email: string): Promise<User> => {
     return request.get(`${endpoint}/by-email/${email}`);
   },
 
-  // Get user by username
   getUserByUsername: async (username: string): Promise<User> => {
     return request.get(`${endpoint}/by-username/${username}`);
   },
 
-  // Update user status
-  updateStatus: async (username: string, status: number): Promise<User> => {
-    return request.patch(`${endpoint}/${username}/status`, { status });
+  // Profile management
+  getUserProfile: async (username: string) => {
+    return request.get(`${endpoint}/${username}/profile`);
+  },
+
+  updateUserProfile: async (username: string, payload: any) => {
+    return request.put(`${endpoint}/${username}/profile`, payload);
+  },
+
+  // Employee management
+  getEmployee: async (userId: string): Promise<Employee> => {
+    return request.get(`${endpoint}/${userId}/employee`);
+  },
+
+  createEmployee: async (payload: any): Promise<Employee> => {
+    return request.post(`${endpoint}/employees`, payload);
+  },
+
+  updateEmployee: async (userId: string, payload: any): Promise<Employee> => {
+    return request.put(`${endpoint}/${userId}/employee`, payload);
+  },
+
+  deleteEmployee: async (userId: string): Promise<void> => {
+    return request.delete(`${endpoint}/${userId}/employee`);
+  },
+
+  getEmployees: async (params: any): Promise<{ items: Employee[] }> => {
+    const queryParams = new URLSearchParams();
+    for (const key in params) {
+      if (params[key] !== undefined) {
+        queryParams.append(key, params[key]);
+      }
+    }
+    return request.get(`${endpoint}/employees?${queryParams.toString()}`);
+  },
+
+  getEmployeesByDepartment: async (department: string): Promise<Employee[]> => {
+    return request.get(`${endpoint}/employees/department/${department}`);
+  },
+
+  getEmployeesByManager: async (managerId: string): Promise<Employee[]> => {
+    return request.get(`${endpoint}/employees/manager/${managerId}`);
+  },
+
+  // API Key management
+  getUserApiKeys: async (userId: string): Promise<ApiKey[]> => {
+    return request.get(`${endpoint}/${userId}/api-keys`);
+  },
+
+  getMyApiKeys: async (): Promise<ApiKey[]> => {
+    return request.get(`${endpoint}/me/api-keys`);
+  },
+
+  generateApiKey: async (payload: CreateApiKeyRequest): Promise<ApiKey> => {
+    return request.post(`${endpoint}/api-keys`, payload);
+  },
+
+  getApiKey: async (keyId: string): Promise<ApiKey> => {
+    return request.get(`${endpoint}/api-keys/${keyId}`);
+  },
+
+  deleteApiKey: async (keyId: string): Promise<void> => {
+    return request.delete(`${endpoint}/api-keys/${keyId}`);
+  },
+
+  // Tenant relationships
+  getUserTenantRoles: async (userId: string, tenantId: string) => {
+    return request.get(`${endpoint}/${userId}/tenants/${tenantId}/roles`);
   }
 });
 
@@ -123,22 +148,39 @@ export const userApi = createApi<User, UserMeshes, UserMeshes, any>('/sys/users'
   extensions: extensionMethods
 });
 
-export const createUser = userApi.create;
-export const getUser = userApi.get;
-export const updateUser = userApi.update;
-export const deleteUser = userApi.delete;
-export const getUsers = userApi.list;
-export const getUserMeshes = userApi.getUserMeshes;
-export const createUserWithProfile = userApi.createUserWithProfile;
-export const updateUserWithProfile = userApi.updateUserWithProfile;
-export const changePassword = userApi.changePassword;
-export const getUserRoles = userApi.getUserRoles;
-export const assignRoles = userApi.assignRoles;
-export const removeRoles = userApi.removeRoles;
-export const enableUser = userApi.enableUser;
-export const disableUser = userApi.disableUser;
-export const resetPassword = userApi.resetPassword;
-export const getFiltered = userApi.getFiltered;
-export const getUserByEmail = userApi.getUserByEmail;
-export const getUserByUsername = userApi.getUserByUsername;
-export const updateStatus = userApi.updateStatus;
+export const {
+  create: createUser,
+  get: getUser,
+  update: updateUser,
+  delete: deleteUser,
+  list: getUsers,
+  getUserMeshes,
+  createUserWithProfile,
+  updateUserWithProfile,
+  changePassword,
+  resetPassword,
+  getUserRoles,
+  assignRoles,
+  removeRoles,
+  enableUser,
+  disableUser,
+  updateStatus,
+  getFiltered,
+  getUserByEmail,
+  getUserByUsername,
+  getUserProfile,
+  updateUserProfile,
+  getEmployee,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+  getEmployees,
+  getEmployeesByDepartment,
+  getEmployeesByManager,
+  getUserApiKeys,
+  getMyApiKeys,
+  generateApiKey,
+  getApiKey,
+  deleteApiKey,
+  getUserTenantRoles
+} = userApi;

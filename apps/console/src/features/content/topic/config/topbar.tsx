@@ -1,4 +1,4 @@
-import { Button, DropdownControl, LayoutControl, ScreenControl } from '@/components/elements';
+import { Button, ScreenControl } from '@/components/elements';
 
 export const topbarLeftSection = ({ handleView }) => [
   <div className='rounded-md flex items-center justify-between gap-x-1'>
@@ -6,4 +6,4 @@ export const topbarLeftSection = ({ handleView }) => [
   </div>
 ];
 
-export const topbarRightSection = [<DropdownControl />, <LayoutControl />, <ScreenControl />];
+export const topbarRightSection = [<ScreenControl />];

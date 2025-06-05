@@ -167,24 +167,10 @@ const renderMenuType = (type: string) => {
     tenant: 'bg-cyan-100 text-cyan-800'
   };
 
-  const typeIcons = {
-    header: 'IconHeading',
-    sidebar: 'IconSidebar',
-    menu: 'IconMenu2',
-    button: 'IconClick',
-    submenu: 'IconChevronRight',
-    divider: 'IconMinus',
-    group: 'IconFolder',
-    account: 'IconUser',
-    tenant: 'IconBuilding'
-  };
-
   const colorClass = typeColors[type] || 'bg-slate-100 text-slate-800';
-  const iconName = typeIcons[type] || 'IconMenu2';
 
   return (
     <div className='flex items-center space-x-1'>
-      <Icons name={iconName} className='w-3 h-3' />
       <Badge className={colorClass}>{type.charAt(0).toUpperCase() + type.slice(1)}</Badge>
     </div>
   );

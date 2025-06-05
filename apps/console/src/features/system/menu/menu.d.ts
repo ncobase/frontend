@@ -1,9 +1,9 @@
 export interface Menu {
   id?: string;
-  name?: string;
-  label?: string;
+  name: string;
+  label: string;
   slug?: string;
-  type?: string;
+  type: 'header' | 'sidebar' | 'account' | 'tenant';
   path?: string;
   target?: string;
   icon?: string;
@@ -11,13 +11,29 @@ export interface Menu {
   hidden?: boolean;
   order?: number;
   disabled?: boolean;
-  extras?: object | object[] | null;
+  extras?: any;
   parent_id?: string;
-  tenant_id?: string;
+  children?: Menu[];
   created_by?: string;
-  created_at?: string;
+  created_at?: number;
   updated_by?: string;
-  updated_at?: string;
+  updated_at?: number;
+}
+
+export interface MenuBody {
+  name: string;
+  label: string;
+  slug?: string;
+  type: 'header' | 'sidebar' | 'account' | 'tenant';
+  path?: string;
+  target?: string;
+  icon?: string;
+  perms?: string;
+  hidden?: boolean;
+  order?: number;
+  disabled?: boolean;
+  extras?: any;
+  parent_id?: string;
 }
 
 export interface MenuTree extends Menu {

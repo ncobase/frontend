@@ -9,7 +9,7 @@ import {
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { DropdownControl, LayoutControl, ScreenControl } from '@/components/elements';
+import { ScreenControl } from '@/components/elements';
 
 export const topbarLeftSection = ({ handleView }) => {
   return [
@@ -26,7 +26,7 @@ export const topbarLeftSection = ({ handleView }) => {
   ];
 };
 
-export const topbarRightSection = ({ handleView }) => {
+export const topbarRightSection = ({ handleImport, handleExport }) => {
   const { t } = useTranslation();
   return [
     <div className='flex items-center gap-2'>
@@ -43,11 +43,11 @@ export const topbarRightSection = ({ handleView }) => {
             <Icons name='IconRefresh' className='mr-2' />
             {t('tenant.actions.refresh', 'Refresh')}
           </DropdownItem>
-          <DropdownItem onClick={() => handleView(null, 'import')}>
+          <DropdownItem onClick={handleImport}>
             <Icons name='IconUpload' className='mr-2' />
             {t('tenant.actions.import', 'Import')}
           </DropdownItem>
-          <DropdownItem onClick={() => handleView(null, 'export')}>
+          <DropdownItem onClick={handleExport}>
             <Icons name='IconDownload' className='mr-2' />
             {t('tenant.actions.export', 'Export')}
           </DropdownItem>

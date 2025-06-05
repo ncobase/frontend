@@ -138,24 +138,11 @@ const renderDictionaryType = (type: string) => {
     other: 'bg-slate-100 text-slate-800'
   };
 
-  const typeIcons = {
-    config: 'IconSettings',
-    enum: 'IconList',
-    constant: 'IconLock',
-    template: 'IconTemplate',
-    string: 'IconText',
-    number: 'IconNumbers',
-    object: 'IconBraces',
-    other: 'IconHelp'
-  };
-
   const lowerType = type.toLowerCase();
   const colorClass = typeColors[lowerType] || 'bg-slate-100 text-slate-800';
-  const iconName = typeIcons[lowerType] || 'IconTag';
 
   return (
     <div className='flex items-center space-x-1'>
-      <Icons name={iconName} className='w-3 h-3' />
       <Badge className={colorClass}>{type.charAt(0).toUpperCase() + type.slice(1)}</Badge>
     </div>
   );

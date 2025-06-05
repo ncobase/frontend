@@ -46,15 +46,30 @@ export const menuApi = createApi<Menu>('/sys/menus', {
   extensions: extensionMethods
 });
 
-export const createMenu = menuApi.create;
-export const getMenu = menuApi.get;
-export const updateMenu = menuApi.update;
-export const deleteMenu = menuApi.delete;
-export const getMenus = menuApi.list;
-export const getMenuTree = menuApi.getMenuTree;
-export const getMenuBySlug = menuApi.getMenuBySlug;
-export const getNavigationMenus = menuApi.getNavigationMenus;
-export const getUserAuthorizedMenus = menuApi.getUserAuthorizedMenus;
-export const moveMenu = menuApi.moveMenu;
-export const reorderMenus = menuApi.reorderMenus;
-export const toggleMenuStatus = menuApi.toggleMenuStatus;
+// export const createMenu = menuApi.create;
+// export const getMenu = menuApi.get;
+// export const updateMenu = menuApi.update;
+// export const deleteMenu = menuApi.delete;
+// export const getMenus = menuApi.list;
+// export const getMenuTree = menuApi.getMenuTree;
+// export const getMenuBySlug = menuApi.getMenuBySlug;
+// export const getNavigationMenus = menuApi.getNavigationMenus;
+// export const getUserAuthorizedMenus = menuApi.getUserAuthorizedMenus;
+// export const moveMenu = menuApi.moveMenu;
+// export const reorderMenus = menuApi.reorderMenus;
+// export const toggleMenuStatus = menuApi.toggleMenuStatus;
+
+export const {
+  create: createMenu,
+  get: getMenu,
+  update: updateMenu,
+  delete: deleteMenu,
+  list: getMenus,
+  getMenuTree,
+  getMenuBySlug,
+  getNavigationMenus,
+  getUserAuthorizedMenus,
+  moveMenu,
+  reorderMenus,
+  toggleMenuStatus
+} = menuApi;

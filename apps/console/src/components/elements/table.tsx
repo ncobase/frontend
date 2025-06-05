@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   Icons,
   Select,
@@ -59,17 +61,29 @@ export const LayoutControl = ({ onChange }: { onChange?: () => void }) => {
   );
 };
 
-export const ScreenControl = ({ onChange }: { onChange?: () => void }) => {
+export const ScreenControl = () => {
   const { t } = useTranslation();
   const wrapperStyle = 'bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2';
   const childButtonStyle = 'rounded-md p-1 hover:bg-white';
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
   return (
     <div className={wrapperStyle}>
       <Button
-        icon='IconArrowsMaximize'
-        tooltip={t('table.layout.fullscreen')}
+        icon={isFullscreen ? 'IconArrowsMinimize' : 'IconArrowsMaximize'}
+        tooltip={t(isFullscreen ? 'table.layout.exitFullscreen' : 'table.layout.fullscreen')}
         className={childButtonStyle}
-        onClick={onChange}
+        onClick={toggleFullscreen}
       />
     </div>
   );

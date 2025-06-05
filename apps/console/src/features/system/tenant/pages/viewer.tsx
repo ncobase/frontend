@@ -27,7 +27,7 @@ export const TenantViewerPage = ({ viewMode, record: initialRecord, handleView }
       <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-x-4'>
-            <Button variant='outline-slate' onClick={() => navigate(-1)}>
+            <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
               <Icons name='IconArrowLeft' />
             </Button>
             <div className='text-slate-600 font-medium'>{t('actions.view')}</div>
@@ -35,6 +35,7 @@ export const TenantViewerPage = ({ viewMode, record: initialRecord, handleView }
           <div className='flex gap-x-4'>
             <Button
               variant='outline-primary'
+              size='sm'
               prependIcon={<Icons name='IconEdit' className='w-4 h-4' />}
               onClick={() => handleView({ slug: record }, '../edit')}
             >
@@ -42,6 +43,7 @@ export const TenantViewerPage = ({ viewMode, record: initialRecord, handleView }
             </Button>
             <Button
               variant='outline-danger'
+              size='sm'
               prependIcon={<Icons name='IconPrinter' className='w-4 h-4' />}
               onClick={() => handleView({ slug: record }, '../printer')}
             >
