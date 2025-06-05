@@ -25,9 +25,7 @@ export const tableColumns = ({
           >
             <span className='font-medium font-mono text-sm text-blue-600'>{value}</span>
           </Button>
-          {record.id && (
-            <span className='text-xs text-gray-400 font-mono mt-1'>ID: {record.id}</span>
-          )}
+          {record.id && <span className='text-xs text-gray-400 mt-1'>ID: {record.id}</span>}
         </div>
       ),
       icon: 'IconKey'

@@ -53,8 +53,6 @@ export const topbarRightSection = ({ handleImport, handleExport }) => {
           </DropdownItem>
         </DropdownContent>
       </Dropdown>
-      <DropdownControl />
-      <LayoutControl />
       <ScreenControl />
     </div>
   ];

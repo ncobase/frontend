@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
+import { TableRowExpandComponent } from '../config/table-row-expand';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useTopicList } from '../hooks';
 import { useCreateTopic, useDeleteTopic, useUpdateTopic } from '../service';
@@ -124,7 +125,8 @@ export const TopicListPage = () => {
     columns: tableColumns({ handleView, handleDelete }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
-    title: t('content.topic.title', 'Topics')
+    title: t('content.topic.title', 'Topics'),
+    expandComponent: (item: Topic) => <TableRowExpandComponent item={item} />
   };
 
   return (
@@ -135,12 +137,12 @@ export const TopicListPage = () => {
       topbarRight={tableConfig.topbarRight}
       columns={tableConfig.columns}
       data={data?.items || []}
-      selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
       loading={loading}
+      expandComponent={tableConfig.expandComponent}
       createComponent={
         <CreateTopicPage
           viewMode={vmode}

@@ -15,31 +15,26 @@ export const tableColumns = ({
 
   return [
     {
-      title: t('user.fields.id', 'ID'),
-      accessorKey: 'id',
-      parser: (value: string, record: User) => (
-        <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
-          <span className='font-mono text-xs'>{value.slice(0, 8)}...</span>
-        </Button>
-      ),
-      icon: 'IconHash'
-    },
-    {
       title: t('user.fields.username', 'Username'),
       accessorKey: 'username',
       parser: (value: string, record: User) => (
-        <div className='flex items-center space-x-2'>
-          <span className='font-medium'>{value}</span>
-          {record.is_admin && (
-            <Badge variant='warning' className='text-xs px-1'>
-              Admin
-            </Badge>
-          )}
-          {record.is_certified && (
-            <Tooltip content='Verified User'>
-              <Icons name='IconShieldCheck' className='w-4 h-4 text-green-500' />
-            </Tooltip>
-          )}
+        <div className='flex flex-col'>
+          <div className='flex items-center'>
+            <Button variant='link' size='xs' onClick={() => handleView(record, 'view')}>
+              <span className='font-mono'>{value}</span>
+            </Button>
+            {record.is_admin && (
+              <Badge variant='warning' size='xs' className='px-1'>
+                Admin
+              </Badge>
+            )}
+            {record.is_certified && (
+              <Tooltip content='Verified User'>
+                <Icons name='IconShieldCheck' className='w-4 h-4 text-green-500' />
+              </Tooltip>
+            )}
+          </div>
+          {record.id && <span className='text-gray-400 ml-1'>ID: {record.id}</span>}
         </div>
       ),
       icon: 'IconUser'

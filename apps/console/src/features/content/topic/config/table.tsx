@@ -14,9 +14,9 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       title: t('topic.fields.title', 'Title'),
       accessorKey: 'title',
       parser: (value: string, record: Topic) => (
-        <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
+        <Button variant='link' onClick={() => handleView(record, 'view')}>
           <div className='flex items-center space-x-2'>
-            <span className='font-medium'>{value}</span>
+            {value}
             {record.private && (
               <Badge variant='secondary' className='text-xs px-1'>
                 Private
