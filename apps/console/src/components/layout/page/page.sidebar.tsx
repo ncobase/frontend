@@ -89,9 +89,7 @@ const MenuItemRecursive = React.memo(
               aria-label={`${menu.name || menu.label} submenu`}
             >
               <div className='flex items-center justify-start'>
-                {menu.icon && (
-                  <Icons size={18} name={menu.icon} className='mr-1.5' aria-hidden='true' />
-                )}
+                {menu.icon && <Icons name={menu.icon} className='mr-1.5' aria-hidden='true' />}
                 <span>{t(menu.label || '') || menu.name}</span>
               </div>
             </AccordionTrigger>
@@ -135,9 +133,7 @@ const MenuItemRecursive = React.memo(
           aria-current={isActive(menu.path || '', 3) ? 'page' : undefined}
         >
           <div className='flex items-center justify-start'>
-            {menu.icon && (
-              <Icons size={18} name={menu.icon} className='mr-1.5' aria-hidden='true' />
-            )}
+            {menu.icon && <Icons name={menu.icon} className='mr-1.5' aria-hidden='true' />}
             <span style={{ paddingLeft: `${depth * 0.5}rem` }}>
               {t(menu.label || '') || menu.name}
             </span>
@@ -182,7 +178,7 @@ const CollapsedMenuItem = React.memo(
           aria-current={isActive(menu.path || '') ? 'page' : undefined}
         >
           {menu.icon ? (
-            <Icons size={18} name={menu.icon} aria-hidden='true' />
+            <Icons name={menu.icon} aria-hidden='true' />
           ) : (
             <span aria-hidden='true'>{getInitials(menu.name || menu.label || menu.id || 'M')}</span>
           )}

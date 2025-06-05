@@ -202,7 +202,7 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
         <Dropdown key={id || label}>
           <DropdownTrigger className={classes.link} onClick={handleClick}>
             <span className={classes.linkLabel}>{t(label || '') || 'Menu'}</span>
-            <Icons name='IconChevronDown' size='0.9rem' />
+            <Icons name='IconChevronDown' />
           </DropdownTrigger>
           <DropdownContent className='w-48 max-h-96 overflow-y-auto'>
             <DropdownMenuItems menuItems={children as MenuTree[]} navigate={navigate} t={t} />
@@ -231,19 +231,17 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     <div className={cn('flex items-center ml-4 relative', classes.navigationContainer)}>
       {showScrollButtons && canScrollLeft && (
         <Button
-          variant='unstyle'
-          size='sm'
+          variant='icon'
           className={cn(
             'absolute left-0 top-1/2 -translate-y-1/2 z-20',
-            'bg-gradient-to-r from-slate-800/90 via-slate-800/60 to-transparent',
-            'text-white/60 hover:text-white/90',
+            'text-[color-mix(in_srgb,var(--foreground-color,#fff)_60%,transparent)] hover:text-[color-mix(in_srgb,var(--foreground-color,#fff)_90%,transparent)]',
             'w-6 h-6 p-0 rounded-r-full rounded-l-none',
             classes.scrollButton
           )}
           onClick={() => scroll('left')}
           aria-label='Scroll left'
         >
-          <Icons name='IconChevronLeft' size='0.75rem' />
+          <Icons name='IconChevronLeft' />
         </Button>
       )}
       <div
@@ -264,19 +262,17 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
       </div>
       {showScrollButtons && canScrollRight && (
         <Button
-          variant='unstyle'
-          size='sm'
+          variant='icon'
           className={cn(
             'absolute right-0 top-1/2 -translate-y-1/2 z-20',
-            'bg-gradient-to-l from-slate-800/90 via-slate-800/60 to-transparent',
-            'text-white/60 hover:text-white/90',
+            'text-[color-mix(in_srgb,var(--foreground-color,#fff)_60%,transparent)] hover:text-[color-mix(in_srgb,var(--foreground-color,#fff)_90%,transparent)]',
             'w-6 h-6 p-0 rounded-l-full rounded-r-none',
             classes.scrollButton
           )}
           onClick={() => scroll('right')}
           aria-label='Scroll right'
         >
-          <Icons name='IconChevronRight' size='0.75rem' />
+          <Icons name='IconChevronRight' />
         </Button>
       )}
     </div>

@@ -83,11 +83,11 @@ export const ExtensionMetricsPage = () => {
   const { data: specificMetrics } = useMetricsByType(selectedMetricType, !!selectedMetricType);
 
   // Navigation functions
-  const goToHealth = () => navigate('/system/extension/health');
+  const goToHealth = () => navigate('/system/extensions/health');
   const goToCollections = (collection?: string) => {
-    navigate('/system/extension/collections', { state: { selectedCollection: collection } });
+    navigate('/system/extensions/collections', { state: { selectedCollection: collection } });
   };
-  const goToOverview = () => navigate('/system/extension/overview');
+  const goToOverview = () => navigate('/system/extensions/overview');
 
   // Chart data preparation
   const chartData = useMemo(() => {

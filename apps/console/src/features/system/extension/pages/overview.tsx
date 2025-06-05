@@ -175,15 +175,15 @@ export const ExtensionOverviewPage = () => {
 
   // Navigation helpers
   const goToMetrics = (collection?: string) => {
-    navigate('/system/extension/metrics', { state: { selectedCollection: collection } });
+    navigate('/system/extensions/metrics', { state: { selectedCollection: collection } });
   };
 
   const goToHealth = () => {
-    navigate('/system/extension/health');
+    navigate('/system/extensions/health');
   };
 
   const goToCollections = (collection?: string) => {
-    navigate('/system/extension/collections', { state: { selectedCollection: collection } });
+    navigate('/system/extensions/collections', { state: { selectedCollection: collection } });
   };
 
   const getStatusBadge = (currentStatus: any) => {

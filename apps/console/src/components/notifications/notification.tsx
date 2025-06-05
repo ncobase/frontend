@@ -146,12 +146,11 @@ export const Notifications = ({
         {customTrigger || (
           <Button
             variant='unstyle'
-            size='xs'
             className={triggerClassName}
             aria-label={t('notification.title')}
           >
             {displayCount > 0 && (
-              <Badge className='absolute -top-1 -right-1 text-[9px] px-1!'>{displayCount}</Badge>
+              <Badge className='absolute top-0 right-0 text-[9px] px-1!'>{displayCount}</Badge>
             )}
             <Icons name={triggerIcon} className='stroke-slate-500/85' />
           </Button>
@@ -175,7 +174,7 @@ export const Notifications = ({
             </Tooltip>
           )}
         </CardHeader>
-        <CardContent className='grid gap-4 max-h-[15rem] mb-3 overflow-auto'>
+        <CardContent className='p-0 px-4 grid gap-4 max-h-[15rem] mb-3 overflow-auto'>
           {items.length === 0 ? (
             <div className='text-center py-4 text-slate-400'>
               {emptyMessage || t('notification.no_notifications')}
@@ -184,7 +183,7 @@ export const Notifications = ({
             items.slice(0, maxItems).map(notification => (
               <div
                 key={notification.id}
-                className='grid grid-cols-[22px_1fr] items-start last:mb-0 last:pb-0 cursor-pointer hover:bg-slate-50 p-1 rounded-md'
+                className='grid grid-cols-[22px_1fr] items-center last:mb-0 last:pb-0 cursor-pointer hover:bg-slate-50 px-2.5 py-0.5 rounded-md'
                 onClick={() => handleNotificationClick(notification)}
                 role='button'
                 tabIndex={0}

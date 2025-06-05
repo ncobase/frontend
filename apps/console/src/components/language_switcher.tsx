@@ -24,11 +24,11 @@ export const LanguageSwitcher: React.FC = () => {
    * Display current language flag or global icon
    */
   const renderLanguageTrigger = () => (
-    <Button variant='unstyle' size='xs' className='text-muted-foreground hover:bg-transparent'>
+    <Button variant='icon' className='text-muted-foreground hover:bg-transparent'>
       {currentLanguage.flag ? (
         <span className='text-base'>{currentLanguage.flag}</span>
       ) : (
-        <Icons name='IconWorld' className='h-5 w-5' />
+        <Icons name='IconWorld' />
       )}
     </Button>
   );
@@ -36,7 +36,6 @@ export const LanguageSwitcher: React.FC = () => {
   return (
     <Dropdown>
       <DropdownTrigger asChild>{renderLanguageTrigger()}</DropdownTrigger>
-
       <DropdownContent align='end' className='min-w-[120px]'>
         {availableLanguages.map(({ key, flag, name }) => (
           <DropdownItem

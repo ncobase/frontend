@@ -101,11 +101,7 @@ export const Preferences = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant='unstyle'
-          size='xs'
-          className='relative text-slate-400/70 [&>svg]:stroke-slate-400/70'
-        >
+        <Button variant='icon' className='relative text-slate-400/70 [&>svg]:stroke-slate-400/70'>
           <Icons name='IconSettings' className='stroke-slate-500/85' />
         </Button>
       </PopoverTrigger>

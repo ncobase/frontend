@@ -138,7 +138,7 @@ const HeaderComponent = ({
               onClick={onMobileMenuToggle}
               aria-label='Toggle mobile menu'
             >
-              <Icons name='IconMenu2' size='1.25rem' />
+              <Icons name='IconMenu2' />
             </Button>
           )}
 
@@ -186,10 +186,10 @@ const HeaderComponent = ({
             onClick={onMobileMenuToggle}
             aria-label='Toggle mobile menu'
           >
-            <Icons name='IconMenu2' size='1.25rem' />
+            <Icons name='IconMenu2' />
           </Button>
         )}
-        <div className='hidden sm:flex md:hidden items-center gap-x-3'>
+        <div className='hidden sm:flex md:hidden items-center'>
           <LanguageSwitcher />
           <Notifications
             items={notifications}
@@ -200,7 +200,7 @@ const HeaderComponent = ({
           <TenantDropdown />
         </div>
 
-        <div className='hidden md:flex items-center gap-x-3'>
+        <div className='hidden md:flex items-center'>
           <Search />
           <LanguageSwitcher />
           <Preferences />
