@@ -1,4 +1,4 @@
-import { AnalyzePage } from './analyze';
+import { AnalyzePage } from './analyze/analyze';
 import { AuthExample } from './auth';
 import { ExampleCardRoutes } from './card';
 import { Masonry } from './card/masonry';

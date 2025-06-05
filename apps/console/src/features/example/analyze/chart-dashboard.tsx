@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from '@ncobase/charts';
-import { useTranslation } from 'react-i18next';
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -13,8 +12,6 @@ import {
   BarChart as RechartsBarChart,
   Bar
 } from 'recharts';
-
-import { Page } from '@/components/layout';
 
 // Sample data for charts
 const salesData = [
@@ -50,7 +47,6 @@ const performanceData = [
 
 // Dashboard component
 export const ChartDashboard = () => {
-  const { t } = useTranslation();
   const [theme, setTheme] = useState('light');
 
   // Chart configurations
@@ -138,264 +134,31 @@ export const ChartDashboard = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
     document.body.classList.toggle('dark');
   };
-
+  // <Page title={t('example.analyze.title')}>
+  // </Page>
   return (
-    <Page title={t('example.analyze.title')}>
-      <div className={`w-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px'
-          }}
-        >
-          <h1>Sales Analytics Dashboard</h1>
-          <button onClick={toggleTheme}>Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode</button>
-        </div>
+    <div className={`w-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px'
+        }}
+      >
+        <h1>Sales Analytics Dashboard</h1>
+        <button onClick={toggleTheme}>Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode</button>
+      </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-          {/* ECharts Line Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Monthly Performance (ECharts)</h2>
-            <div>
-              <ChartContainer
-                config={salesConfig}
-                library='echarts'
-                style={{ height: '350px' }}
-                echartsProps={{
-                  option: {
-                    tooltip: {
-                      trigger: 'axis'
-                    },
-                    legend: {
-                      data: ['Sales', 'Revenue', 'Profit']
-                    },
-                    xAxis: {
-                      type: 'category',
-                      data: salesData.map(item => item.month)
-                    },
-                    yAxis: {
-                      type: 'value'
-                    },
-                    series: [
-                      {
-                        name: 'Sales',
-                        type: 'line',
-                        smooth: true,
-                        data: salesData.map(item => item.sales),
-                        lineStyle: {
-                          color: salesConfig.sales.theme.light
-                        }
-                      },
-                      {
-                        name: 'Revenue',
-                        type: 'line',
-                        smooth: true,
-                        data: salesData.map(item => item.revenue),
-                        lineStyle: {
-                          color: salesConfig.revenue.theme.light
-                        }
-                      },
-                      {
-                        name: 'Profit',
-                        type: 'line',
-                        smooth: true,
-                        data: salesData.map(item => item.profit),
-                        lineStyle: {
-                          color: salesConfig.profit.theme.light
-                        }
-                      }
-                    ]
-                  }
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Recharts Line Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Monthly Performance (Recharts)</h2>
-            <ChartContainer config={salesConfig} className='max-h-96'>
-              <RechartsLineChart data={salesData}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='month' />
-                <YAxis />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Legend content={<ChartLegendContent />} />
-                <Line type='monotone' dataKey='sales' stroke='var(--color-sales)' />
-                <Line type='monotone' dataKey='revenue' stroke='var(--color-revenue)' />
-                <Line type='monotone' dataKey='profit' stroke='var(--color-profit)' />
-              </RechartsLineChart>
-            </ChartContainer>
-          </div>
-
-          {/* ECharts Pie Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Product Distribution</h2>
-            <ChartContainer
-              config={productConfig}
-              library='echarts'
-              style={{ height: '350px' }}
-              echartsProps={{
-                option: {
-                  tooltip: {
-                    trigger: 'item'
-                  },
-                  legend: {
-                    orient: 'vertical',
-                    left: 'left'
-                  },
-                  series: [
-                    {
-                      type: 'pie',
-                      radius: '50%',
-                      data: productData.map((item, index) => ({
-                        value: item.value,
-                        name: item.name,
-                        itemStyle: {
-                          color: Object.values(productConfig)[index].theme.light
-                        }
-                      })),
-                      emphasis: {
-                        itemStyle: {
-                          shadowBlur: 10,
-                          shadowOffsetX: 0,
-                          shadowColor: 'rgba(0, 0, 0, 0.5)'
-                        }
-                      }
-                    }
-                  ]
-                }
-              }}
-            />
-          </div>
-
-          {/* ECharts Radar Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Performance Comparison</h2>
-            <ChartContainer
-              config={performanceConfig}
-              library='echarts'
-              style={{ height: '350px' }}
-              echartsProps={{
-                option: {
-                  radar: {
-                    indicator: performanceData.map(item => ({
-                      name: item.metric,
-                      max: 100
-                    }))
-                  },
-                  series: [
-                    {
-                      type: 'radar',
-                      data: [
-                        {
-                          value: performanceData.map(item => item.valueA),
-                          name: 'Product A',
-                          itemStyle: {
-                            color: performanceConfig['product-a'].theme.light
-                          }
-                        },
-                        {
-                          value: performanceData.map(item => item.valueB),
-                          name: 'Product B',
-                          itemStyle: {
-                            color: performanceConfig['product-b'].theme.light
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }}
-            />
-          </div>
-
-          {/* ECharts Bar Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Half-Year Comparison (ECharts)</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+        {/* ECharts Line Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Monthly Performance (ECharts)</h2>
+          <div>
             <ChartContainer
               config={salesConfig}
               library='echarts'
               style={{ height: '350px' }}
-              echartsProps={{
-                option: {
-                  tooltip: {
-                    trigger: 'axis'
-                  },
-                  legend: {
-                    data: ['Sales', 'Revenue', 'Profit']
-                  },
-                  xAxis: {
-                    type: 'category',
-                    data: salesData.slice(0, 6).map(item => item.month)
-                  },
-                  yAxis: {
-                    type: 'value'
-                  },
-                  series: [
-                    {
-                      name: 'Sales',
-                      type: 'bar',
-                      data: salesData.slice(0, 6).map(item => item.sales),
-                      itemStyle: {
-                        color: salesConfig.sales.theme.light
-                      }
-                    },
-                    {
-                      name: 'Revenue',
-                      type: 'bar',
-                      data: salesData.slice(0, 6).map(item => item.revenue),
-                      itemStyle: {
-                        color: salesConfig.revenue.theme.light
-                      }
-                    },
-                    {
-                      name: 'Profit',
-                      type: 'bar',
-                      data: salesData.slice(0, 6).map(item => item.profit),
-                      itemStyle: {
-                        color: salesConfig.profit.theme.light
-                      }
-                    }
-                  ]
-                }
-              }}
-            />
-          </div>
-
-          {/* Recharts Bar Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Half-Year Comparison (Recharts)</h2>
-            <ChartContainer config={salesConfig} className='max-h-96'>
-              <RechartsBarChart data={salesData.slice(0, 6)}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='month' />
-                <YAxis />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Legend content={<ChartLegendContent />} />
-                <Bar dataKey='sales' fill='var(--color-sales)' />
-                <Bar dataKey='revenue' fill='var(--color-revenue)' />
-                <Bar dataKey='profit' fill='var(--color-profit)' />
-              </RechartsBarChart>
-            </ChartContainer>
-          </div>
-
-          {/* ECharts Area Chart */}
-          <div
-            style={{
-              border: '1px solid #e8e8e8',
-              borderRadius: '8px',
-              padding: '16px',
-              gridColumn: '1 / span 3'
-            }}
-          >
-            <h2>Trend Analysis</h2>
-            <ChartContainer
-              config={salesConfig}
-              library='echarts'
-              style={{ height: '400px' }}
               echartsProps={{
                 option: {
                   tooltip: {
@@ -415,33 +178,27 @@ export const ChartDashboard = () => {
                     {
                       name: 'Sales',
                       type: 'line',
-                      stack: 'Total',
                       smooth: true,
-                      areaStyle: {},
                       data: salesData.map(item => item.sales),
-                      itemStyle: {
+                      lineStyle: {
                         color: salesConfig.sales.theme.light
                       }
                     },
                     {
                       name: 'Revenue',
                       type: 'line',
-                      stack: 'Total',
                       smooth: true,
-                      areaStyle: {},
                       data: salesData.map(item => item.revenue),
-                      itemStyle: {
+                      lineStyle: {
                         color: salesConfig.revenue.theme.light
                       }
                     },
                     {
                       name: 'Profit',
                       type: 'line',
-                      stack: 'Total',
                       smooth: true,
-                      areaStyle: {},
                       data: salesData.map(item => item.profit),
-                      itemStyle: {
+                      lineStyle: {
                         color: salesConfig.profit.theme.light
                       }
                     }
@@ -451,7 +208,245 @@ export const ChartDashboard = () => {
             />
           </div>
         </div>
+
+        {/* Recharts Line Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Monthly Performance (Recharts)</h2>
+          <ChartContainer config={salesConfig} className='max-h-96'>
+            <RechartsLineChart data={salesData}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='month' />
+              <YAxis />
+              <Tooltip content={<ChartTooltipContent />} />
+              <Legend content={<ChartLegendContent />} />
+              <Line type='monotone' dataKey='sales' stroke='var(--color-sales)' />
+              <Line type='monotone' dataKey='revenue' stroke='var(--color-revenue)' />
+              <Line type='monotone' dataKey='profit' stroke='var(--color-profit)' />
+            </RechartsLineChart>
+          </ChartContainer>
+        </div>
+
+        {/* ECharts Pie Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Product Distribution</h2>
+          <ChartContainer
+            config={productConfig}
+            library='echarts'
+            style={{ height: '350px' }}
+            echartsProps={{
+              option: {
+                tooltip: {
+                  trigger: 'item'
+                },
+                legend: {
+                  orient: 'vertical',
+                  left: 'left'
+                },
+                series: [
+                  {
+                    type: 'pie',
+                    radius: '50%',
+                    data: productData.map((item, index) => ({
+                      value: item.value,
+                      name: item.name,
+                      itemStyle: {
+                        color: Object.values(productConfig)[index].theme.light
+                      }
+                    })),
+                    emphasis: {
+                      itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                      }
+                    }
+                  }
+                ]
+              }
+            }}
+          />
+        </div>
+
+        {/* ECharts Radar Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Performance Comparison</h2>
+          <ChartContainer
+            config={performanceConfig}
+            library='echarts'
+            style={{ height: '350px' }}
+            echartsProps={{
+              option: {
+                radar: {
+                  indicator: performanceData.map(item => ({
+                    name: item.metric,
+                    max: 100
+                  }))
+                },
+                series: [
+                  {
+                    type: 'radar',
+                    data: [
+                      {
+                        value: performanceData.map(item => item.valueA),
+                        name: 'Product A',
+                        itemStyle: {
+                          color: performanceConfig['product-a'].theme.light
+                        }
+                      },
+                      {
+                        value: performanceData.map(item => item.valueB),
+                        name: 'Product B',
+                        itemStyle: {
+                          color: performanceConfig['product-b'].theme.light
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }}
+          />
+        </div>
+
+        {/* ECharts Bar Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Half-Year Comparison (ECharts)</h2>
+          <ChartContainer
+            config={salesConfig}
+            library='echarts'
+            style={{ height: '350px' }}
+            echartsProps={{
+              option: {
+                tooltip: {
+                  trigger: 'axis'
+                },
+                legend: {
+                  data: ['Sales', 'Revenue', 'Profit']
+                },
+                xAxis: {
+                  type: 'category',
+                  data: salesData.slice(0, 6).map(item => item.month)
+                },
+                yAxis: {
+                  type: 'value'
+                },
+                series: [
+                  {
+                    name: 'Sales',
+                    type: 'bar',
+                    data: salesData.slice(0, 6).map(item => item.sales),
+                    itemStyle: {
+                      color: salesConfig.sales.theme.light
+                    }
+                  },
+                  {
+                    name: 'Revenue',
+                    type: 'bar',
+                    data: salesData.slice(0, 6).map(item => item.revenue),
+                    itemStyle: {
+                      color: salesConfig.revenue.theme.light
+                    }
+                  },
+                  {
+                    name: 'Profit',
+                    type: 'bar',
+                    data: salesData.slice(0, 6).map(item => item.profit),
+                    itemStyle: {
+                      color: salesConfig.profit.theme.light
+                    }
+                  }
+                ]
+              }
+            }}
+          />
+        </div>
+
+        {/* Recharts Bar Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Half-Year Comparison (Recharts)</h2>
+          <ChartContainer config={salesConfig} className='max-h-96'>
+            <RechartsBarChart data={salesData.slice(0, 6)}>
+              <CartesianGrid strokeDasharray='3 3' />
+              <XAxis dataKey='month' />
+              <YAxis />
+              <Tooltip content={<ChartTooltipContent />} />
+              <Legend content={<ChartLegendContent />} />
+              <Bar dataKey='sales' fill='var(--color-sales)' />
+              <Bar dataKey='revenue' fill='var(--color-revenue)' />
+              <Bar dataKey='profit' fill='var(--color-profit)' />
+            </RechartsBarChart>
+          </ChartContainer>
+        </div>
+
+        {/* ECharts Area Chart */}
+        <div
+          style={{
+            border: '1px solid #e8e8e8',
+            borderRadius: '8px',
+            padding: '16px',
+            gridColumn: '1 / span 3'
+          }}
+        >
+          <h2>Trend Analysis</h2>
+          <ChartContainer
+            config={salesConfig}
+            library='echarts'
+            style={{ height: '400px' }}
+            echartsProps={{
+              option: {
+                tooltip: {
+                  trigger: 'axis'
+                },
+                legend: {
+                  data: ['Sales', 'Revenue', 'Profit']
+                },
+                xAxis: {
+                  type: 'category',
+                  data: salesData.map(item => item.month)
+                },
+                yAxis: {
+                  type: 'value'
+                },
+                series: [
+                  {
+                    name: 'Sales',
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,
+                    areaStyle: {},
+                    data: salesData.map(item => item.sales),
+                    itemStyle: {
+                      color: salesConfig.sales.theme.light
+                    }
+                  },
+                  {
+                    name: 'Revenue',
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,
+                    areaStyle: {},
+                    data: salesData.map(item => item.revenue),
+                    itemStyle: {
+                      color: salesConfig.revenue.theme.light
+                    }
+                  },
+                  {
+                    name: 'Profit',
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,
+                    areaStyle: {},
+                    data: salesData.map(item => item.profit),
+                    itemStyle: {
+                      color: salesConfig.profit.theme.light
+                    }
+                  }
+                ]
+              }
+            }}
+          />
+        </div>
       </div>
-    </Page>
+    </div>
   );
 };

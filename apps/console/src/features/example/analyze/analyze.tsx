@@ -159,20 +159,20 @@ const timeFilters = [
   { id: 'last_90_days', label: 'filter.last_90_days', days: 90 }
 ];
 
-export const FilterBar = ({ activeFilter, onFilterChange, ...rest }) => {
+export const FilterBar = ({ activeFilter, onFilterChange = undefined, ...rest }) => {
   const { t } = useTranslation();
 
   return (
     <Topbar {...rest}>
       {/* Filter buttons for different time ranges */}
-      <div className='rounded-md shadow-inner'>
+      <div className='rounded-md'>
         {timeFilters.map(filter => (
           <Button
             key={filter.id}
             variant={activeFilter === filter.id ? 'primary' : 'outline-slate'}
             className={`${
               activeFilter === filter.id ? '' : 'bg-white'
-            } -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg shadow-sm ${
+            } -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg ${
               activeFilter === filter.id ? 'border border-slate-200/65' : ''
             }`}
             onClick={() => onFilterChange(filter.id)}

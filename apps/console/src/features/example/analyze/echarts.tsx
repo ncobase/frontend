@@ -1,12 +1,8 @@
 import { useState } from 'react';
 
 import { ChartContainer } from '@ncobase/charts';
-import { useTranslation } from 'react-i18next';
-
-import { Page } from '@/components/layout';
 
 export const EChartsExample = () => {
-  const { t } = useTranslation();
   const [theme, setTheme] = useState('light');
 
   // Sample data
@@ -260,78 +256,79 @@ export const EChartsExample = () => {
     document.body.classList.toggle('dark');
   };
 
+  // <Page title={t('example.analyze.title')}>
+  // </Page>
+
   return (
-    <Page title={t('example.analyze.title')}>
-      <div className={`w-full h-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px'
-          }}
-        >
-          <h1>ECharts Examples</h1>
-          <button onClick={toggleTheme}>Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode</button>
+    <div className={`w-full h-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px'
+        }}
+      >
+        <h1>ECharts Examples</h1>
+        <button onClick={toggleTheme}>Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode</button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+        {/* ECharts Line Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Monthly Performance</h2>
+          <div className='h-80'>
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                // @ts-expect-error
+                option: lineChartOption,
+                settings: { renderer: 'canvas' }
+              }}
+            />
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-          {/* ECharts Line Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Monthly Performance</h2>
-            <div className='h-80'>
-              <ChartContainer
-                config={chartConfig}
-                library='echarts'
-                echartsProps={{
-                  // @ts-expect-error
-                  option: lineChartOption,
-                  settings: { renderer: 'canvas' }
-                }}
-              />
-            </div>
+        {/* ECharts Bar Chart */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Half-Year Comparison</h2>
+          <div className='h-80'>
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                // @ts-expect-error
+                option: barChartOption,
+                settings: { renderer: 'canvas' }
+              }}
+            />
           </div>
+        </div>
 
-          {/* ECharts Bar Chart */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Half-Year Comparison</h2>
-            <div className='h-80'>
-              <ChartContainer
-                config={chartConfig}
-                library='echarts'
-                echartsProps={{
-                  // @ts-expect-error
-                  option: barChartOption,
-                  settings: { renderer: 'canvas' }
-                }}
-              />
-            </div>
-          </div>
-
-          {/* ECharts Pie Chart */}
-          <div
-            style={{
-              border: '1px solid #e8e8e8',
-              borderRadius: '8px',
-              padding: '16px',
-              gridColumn: '1 / span 2'
-            }}
-          >
-            <h2>Revenue Distribution</h2>
-            <div className='h-80'>
-              <ChartContainer
-                config={chartConfig}
-                library='echarts'
-                echartsProps={{
-                  // @ts-expect-error
-                  option: pieChartOption,
-                  settings: { renderer: 'canvas' }
-                }}
-              />
-            </div>
+        {/* ECharts Pie Chart */}
+        <div
+          style={{
+            border: '1px solid #e8e8e8',
+            borderRadius: '8px',
+            padding: '16px',
+            gridColumn: '1 / span 2'
+          }}
+        >
+          <h2>Revenue Distribution</h2>
+          <div className='h-80'>
+            <ChartContainer
+              config={chartConfig}
+              library='echarts'
+              echartsProps={{
+                // @ts-expect-error
+                option: pieChartOption,
+                settings: { renderer: 'canvas' }
+              }}
+            />
           </div>
         </div>
       </div>
-    </Page>
+    </div>
   );
 };

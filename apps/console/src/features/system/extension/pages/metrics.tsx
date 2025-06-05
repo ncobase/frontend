@@ -195,186 +195,187 @@ export const ExtensionMetricsPage = () => {
     );
   }
 
+  // <Page title={t('extensions.metrics.title', 'Extension Metrics')}>
+  // </Page>
+
   return (
-    <Page title={t('extensions.metrics.title', 'Extension Metrics')}>
-      <div className='w-full space-y-6'>
-        {/* Header with Navigation */}
-        <div className='flex justify-between items-center'>
-          <div className='flex items-center gap-4'>
-            <div>
-              <h1 className='text-2xl font-bold text-slate-800'>Extension System Metrics</h1>
-              <div className='flex items-center gap-4 text-sm text-slate-500'>
-                <span>Last updated: {currentTime.toLocaleString()}</span>
-                {autoRefresh && (
-                  <div className='flex items-center gap-1'>
-                    <div className='w-2 h-2 rounded-full bg-green-500 animate-pulse' />
-                    <span>Live updates every {refreshInterval}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className='flex items-center gap-4'>
-            <Select value={refreshInterval} onValueChange={setRefreshInterval}>
-              <SelectTrigger className='w-20'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='1s'>1s</SelectItem>
-                <SelectItem value='5s'>5s</SelectItem>
-                <SelectItem value='10s'>10s</SelectItem>
-                <SelectItem value='30s'>30s</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              variant={autoRefresh ? 'primary' : 'outline-slate'}
-              icon={autoRefresh ? 'IconPlayerPause' : 'IconPlayerPlay'}
-              size='sm'
-            >
-              {autoRefresh ? 'Pause' : 'Resume'}
-            </Button>
-            <Button
-              onClick={() => refetch()}
-              variant='outline-slate'
-              icon='IconRefresh'
-              disabled={isLoading}
-              size='sm'
-            >
-              Refresh
-            </Button>
-            <Button
-              onClick={() => refreshMutation.mutate()}
-              variant='primary'
-              icon='IconSettings'
-              loading={refreshMutation.isPending}
-              size='sm'
-            >
-              Refresh Services
-            </Button>
-          </div>
-        </div>
-
-        {/* Alerts */}
-        {alerts.length > 0 && (
-          <div className='space-y-2'>
-            {alerts.map((alert, index) => (
-              <Alert key={index} variant={alert.type === 'error' ? 'destructive' : 'default'}>
-                <Icons name='IconAlertTriangle' className='w-4 h-4' />
-                <AlertDescription className='flex items-center justify-between'>
-                  <span>{alert.message}</span>
-                  <Button size='sm' variant='outline-slate' onClick={alert.action} className='ml-4'>
-                    Investigate
-                  </Button>
-                </AlertDescription>
-              </Alert>
-            ))}
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className='grid md:grid-cols-4 gap-4'>
-          <div
-            className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
-            onClick={goToHealth}
-          >
-            <div className='flex items-center gap-3'>
-              <div className='w-10 h-10 rounded-full bg-green-100 flex items-center justify-center'>
-                <Icons name='IconHeart' className='w-5 h-5 text-green-600' />
-              </div>
-              <div>
-                <div className='font-medium'>System Health</div>
-                <div className='text-sm text-slate-500'>View health dashboard</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
-            onClick={() => goToCollections()}
-          >
-            <div className='flex items-center gap-3'>
-              <div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center'>
-                <Icons name='IconDatabase' className='w-5 h-5 text-blue-600' />
-              </div>
-              <div>
-                <div className='font-medium'>Collections</div>
-                <div className='text-sm text-slate-500'>Browse metric collections</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
-            onClick={() => goToCollections('performance')}
-          >
-            <div className='flex items-center gap-3'>
-              <div className='w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center'>
-                <Icons name='IconActivity' className='w-5 h-5 text-purple-600' />
-              </div>
-              <div>
-                <div className='font-medium'>Performance</div>
-                <div className='text-sm text-slate-500'>Resource usage details</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
-            onClick={() => goToCollections('cache')}
-          >
-            <div className='flex items-center gap-3'>
-              <div className='w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center'>
-                <Icons name='IconCpu' className='w-5 h-5 text-orange-600' />
-              </div>
-              <div>
-                <div className='font-medium'>Cache Stats</div>
-                <div className='text-sm text-slate-500'>Cache performance metrics</div>
-              </div>
+    <div className='w-full space-y-6'>
+      {/* Header with Navigation */}
+      <div className='flex justify-between items-center'>
+        <div className='flex items-center gap-4'>
+          <div>
+            <h1 className='text-2xl font-bold text-slate-800'>Extension System Metrics</h1>
+            <div className='flex items-center gap-4 text-sm text-slate-500'>
+              <span>Last updated: {currentTime.toLocaleString()}</span>
+              {autoRefresh && (
+                <div className='flex items-center gap-1'>
+                  <div className='w-2 h-2 rounded-full bg-green-500 animate-pulse' />
+                  <span>Live updates every {refreshInterval}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Main Content Tabs */}
-        <Tabs defaultValue='overview' className='w-full'>
-          <TabsList className='grid w-full grid-cols-4 gap-2 p-1 bg-slate-50 rounded-xl'>
-            <TabsTrigger value='overview' className='rounded-lg data-[state=active]:bg-white'>
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value='performance' className='rounded-lg data-[state=active]:bg-white'>
-              Performance
-            </TabsTrigger>
-            <TabsTrigger value='cache' className='rounded-lg data-[state=active]:bg-white'>
-              Cache
-            </TabsTrigger>
-            <TabsTrigger value='system' className='rounded-lg data-[state=active]:bg-white'>
-              System
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value='overview' className='space-y-6'>
-            <MetricsOverviewTab
-              chartData={chartData}
-              metrics={metrics}
-              colors={colors}
-              goToCollections={goToCollections}
-              initialCollection={initialCollection}
-            />
-          </TabsContent>
-
-          <TabsContent value='performance' className='space-y-6'>
-            <PerformanceTab chartData={chartData} metrics={metrics} colors={colors} />
-          </TabsContent>
-
-          <TabsContent value='cache' className='space-y-6'>
-            <CacheTab metrics={metrics} chartData={chartData} colors={colors} />
-          </TabsContent>
-
-          <TabsContent value='system' className='space-y-6'>
-            <SystemTab metrics={metrics} colors={colors} />
-          </TabsContent>
-        </Tabs>
+        <div className='flex items-center gap-4'>
+          <Select value={refreshInterval} onValueChange={setRefreshInterval}>
+            <SelectTrigger className='w-20'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='1s'>1s</SelectItem>
+              <SelectItem value='5s'>5s</SelectItem>
+              <SelectItem value='10s'>10s</SelectItem>
+              <SelectItem value='30s'>30s</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            variant={autoRefresh ? 'primary' : 'outline-slate'}
+            icon={autoRefresh ? 'IconPlayerPause' : 'IconPlayerPlay'}
+            size='sm'
+          >
+            {autoRefresh ? 'Pause' : 'Resume'}
+          </Button>
+          <Button
+            onClick={() => refetch()}
+            variant='outline-slate'
+            icon='IconRefresh'
+            disabled={isLoading}
+            size='sm'
+          >
+            Refresh
+          </Button>
+          <Button
+            onClick={() => refreshMutation.mutate()}
+            variant='primary'
+            icon='IconSettings'
+            loading={refreshMutation.isPending}
+            size='sm'
+          >
+            Refresh Services
+          </Button>
+        </div>
       </div>
-    </Page>
+
+      {/* Alerts */}
+      {alerts.length > 0 && (
+        <div className='space-y-2'>
+          {alerts.map((alert, index) => (
+            <Alert key={index} variant={alert.type === 'error' ? 'destructive' : 'default'}>
+              <Icons name='IconAlertTriangle' className='w-4 h-4' />
+              <AlertDescription className='flex items-center justify-between'>
+                <span>{alert.message}</span>
+                <Button size='sm' variant='outline-slate' onClick={alert.action} className='ml-4'>
+                  Investigate
+                </Button>
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className='grid md:grid-cols-4 gap-4'>
+        <div
+          className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
+          onClick={goToHealth}
+        >
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 rounded-full bg-green-100 flex items-center justify-center'>
+              <Icons name='IconHeart' className='w-5 h-5 text-green-600' />
+            </div>
+            <div>
+              <div className='font-medium'>System Health</div>
+              <div className='text-sm text-slate-500'>View health dashboard</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
+          onClick={() => goToCollections()}
+        >
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center'>
+              <Icons name='IconDatabase' className='w-5 h-5 text-blue-600' />
+            </div>
+            <div>
+              <div className='font-medium'>Collections</div>
+              <div className='text-sm text-slate-500'>Browse metric collections</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
+          onClick={() => goToCollections('performance')}
+        >
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center'>
+              <Icons name='IconActivity' className='w-5 h-5 text-purple-600' />
+            </div>
+            <div>
+              <div className='font-medium'>Performance</div>
+              <div className='text-sm text-slate-500'>Resource usage details</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className='p-4 bg-white rounded-lg border border-slate-200/60 hover:border-primary-300 cursor-pointer transition-colors'
+          onClick={() => goToCollections('cache')}
+        >
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center'>
+              <Icons name='IconCpu' className='w-5 h-5 text-orange-600' />
+            </div>
+            <div>
+              <div className='font-medium'>Cache Stats</div>
+              <div className='text-sm text-slate-500'>Cache performance metrics</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue='overview' className='w-full'>
+        <TabsList className='grid w-full grid-cols-4 gap-2 p-1 bg-slate-50 rounded-xl'>
+          <TabsTrigger value='overview' className='rounded-lg data-[state=active]:bg-white'>
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value='performance' className='rounded-lg data-[state=active]:bg-white'>
+            Performance
+          </TabsTrigger>
+          <TabsTrigger value='cache' className='rounded-lg data-[state=active]:bg-white'>
+            Cache
+          </TabsTrigger>
+          <TabsTrigger value='system' className='rounded-lg data-[state=active]:bg-white'>
+            System
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value='overview' className='space-y-6'>
+          <MetricsOverviewTab
+            chartData={chartData}
+            metrics={metrics}
+            colors={colors}
+            goToCollections={goToCollections}
+            initialCollection={initialCollection}
+          />
+        </TabsContent>
+
+        <TabsContent value='performance' className='space-y-6'>
+          <PerformanceTab chartData={chartData} metrics={metrics} colors={colors} />
+        </TabsContent>
+
+        <TabsContent value='cache' className='space-y-6'>
+          <CacheTab metrics={metrics} chartData={chartData} colors={colors} />
+        </TabsContent>
+
+        <TabsContent value='system' className='space-y-6'>
+          <SystemTab metrics={metrics} colors={colors} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };

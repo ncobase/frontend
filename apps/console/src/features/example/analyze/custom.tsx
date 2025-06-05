@@ -1,10 +1,7 @@
 import { forwardRef, useState } from 'react';
 
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from '@ncobase/charts';
-import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
-import { Page } from '@/components/layout';
 
 // Define a custom chart component that extends the @ncobase/charts functionality
 export const GradientAreaChart = forwardRef(
@@ -125,7 +122,6 @@ CustomRechartsBarChart.displayName = 'CustomRechartsBarChart';
 
 // Example usage component
 export const CustomChartExample = () => {
-  const { t } = useTranslation();
   const [theme, setTheme] = useState('light');
 
   // Sample data
@@ -253,93 +249,94 @@ export const CustomChartExample = () => {
     document.body.classList.toggle('dark');
   };
 
+  // <Page title={t('example.analyze.title')}>
+  // </Page>
+
   return (
-    <Page title={t('example.analyze.title')}>
-      <div className={`w-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
+    <div className={`w-full ${theme}`} style={{ padding: '20px', margin: '0 auto' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px'
+        }}
+      >
+        <h1>Custom Chart Components</h1>
+        <button onClick={toggleTheme}>Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode</button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+        {/* Custom Gradient Area Chart */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px'
-          }}
-        >
-          <h1>Custom Chart Components</h1>
-          <button onClick={toggleTheme}>Toggle {theme === 'light' ? 'Dark' : 'Light'} Mode</button>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-          {/* Custom Gradient Area Chart */}
-          <div
-            style={{
-              border: '1px solid #e8e8e8',
-              borderRadius: '8px',
-              padding: '16px',
-              gridColumn: '1 / span 2'
-            }}
-          >
-            <h2>Custom Gradient Area Chart</h2>
-            <div style={{ height: '350px' }}>
-              <GradientAreaChart
-                config={areaChartConfig}
-                series={areaSeries}
-                options={areaOptions}
-                categories={timeSeriesData.map(item => item.date)}
-              />
-            </div>
-          </div>
-
-          {/* Custom Recharts Bar Chart - Basic */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Custom Recharts Bar Chart</h2>
-            <div style={{ height: '350px' }}>
-              <CustomRechartsBarChart
-                data={barChartData}
-                config={barChartConfig}
-                xAxisDataKey='category'
-                dataKeys={['primary', 'secondary', 'tertiary']}
-                barSize={30}
-              />
-            </div>
-          </div>
-
-          {/* Custom Recharts Bar Chart - Stacked */}
-          <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
-            <h2>Custom Stacked Bar Chart</h2>
-            <div style={{ height: '350px' }}>
-              <CustomRechartsBarChart
-                data={barChartData}
-                config={barChartConfig}
-                xAxisDataKey='category'
-                dataKeys={['primary', 'secondary', 'tertiary']}
-                stackId='stack1'
-                barSize={50}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            marginTop: '20px',
-            padding: '20px',
             border: '1px solid #e8e8e8',
-            borderRadius: '8px'
+            borderRadius: '8px',
+            padding: '16px',
+            gridColumn: '1 / span 2'
           }}
         >
-          <h2>Implementation Details</h2>
-          <p>
-            The examples above demonstrate how to create custom chart components that leverage the
-            @ncobase/charts. Key benefits include:
-          </p>
-          <ul>
-            <li>Abstraction of common configuration patterns</li>
-            <li>Consistent theming across different chart types</li>
-            <li>Simplified API for complex chart configurations</li>
-            <li>Reusable components across your application</li>
-          </ul>
+          <h2>Custom Gradient Area Chart</h2>
+          <div style={{ height: '350px' }}>
+            <GradientAreaChart
+              config={areaChartConfig}
+              series={areaSeries}
+              options={areaOptions}
+              categories={timeSeriesData.map(item => item.date)}
+            />
+          </div>
+        </div>
+
+        {/* Custom Recharts Bar Chart - Basic */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Custom Recharts Bar Chart</h2>
+          <div style={{ height: '350px' }}>
+            <CustomRechartsBarChart
+              data={barChartData}
+              config={barChartConfig}
+              xAxisDataKey='category'
+              dataKeys={['primary', 'secondary', 'tertiary']}
+              barSize={30}
+            />
+          </div>
+        </div>
+
+        {/* Custom Recharts Bar Chart - Stacked */}
+        <div style={{ border: '1px solid #e8e8e8', borderRadius: '8px', padding: '16px' }}>
+          <h2>Custom Stacked Bar Chart</h2>
+          <div style={{ height: '350px' }}>
+            <CustomRechartsBarChart
+              data={barChartData}
+              config={barChartConfig}
+              xAxisDataKey='category'
+              dataKeys={['primary', 'secondary', 'tertiary']}
+              stackId='stack1'
+              barSize={50}
+            />
+          </div>
         </div>
       </div>
-    </Page>
+
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '20px',
+          border: '1px solid #e8e8e8',
+          borderRadius: '8px'
+        }}
+      >
+        <h2>Implementation Details</h2>
+        <p>
+          The examples above demonstrate how to create custom chart components that leverage the
+          @ncobase/charts. Key benefits include:
+        </p>
+        <ul>
+          <li>Abstraction of common configuration patterns</li>
+          <li>Consistent theming across different chart types</li>
+          <li>Simplified API for complex chart configurations</li>
+          <li>Reusable components across your application</li>
+        </ul>
+      </div>
+    </div>
   );
 };

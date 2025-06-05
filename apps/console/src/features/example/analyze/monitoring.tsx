@@ -20,8 +20,6 @@ import {
   Legend
 } from 'recharts';
 
-import { Page } from '@/components/layout';
-
 export const OperationsDashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [serverStatus, setServerStatus] = useState([]);
@@ -264,463 +262,459 @@ export const OperationsDashboard = () => {
     { subject: 'Throughput', A: 80, B: 75 }
   ];
 
+  // <Page title='Operations Monitoring Dashboard'>
+  // </Page>
+
   return (
-    <Page title='Operations Monitoring Dashboard'>
-      <div className='w-full'>
-        <div className='flex justify-between items-center mb-4'>
-          <div>
-            <h1 className='text-2xl font-bold text-slate-800'>Operations Monitoring</h1>
-            <p className='text-slate-500'>Last updated: {currentTime.toLocaleString()}</p>
-          </div>
-          <div className='flex gap-4'>
-            <select
-              className='bg-white border border-slate-300 rounded-sm px-3 py-1.5'
-              value={dataPoints}
-              onChange={e => setDataPoints(Number(e.target.value))}
+    <div className='w-full'>
+      <div className='flex justify-between items-center mb-4'>
+        <div>
+          <h1 className='text-2xl font-bold text-slate-800'>Operations Monitoring</h1>
+          <p className='text-slate-500'>Last updated: {currentTime.toLocaleString()}</p>
+        </div>
+        <div className='flex gap-4'>
+          <select
+            className='bg-white border border-slate-300 rounded-sm px-3 py-1.5'
+            value={dataPoints}
+            onChange={e => setDataPoints(Number(e.target.value))}
+          >
+            <option value={10}>Last 10 points</option>
+            <option value={20}>Last 20 points</option>
+            <option value={30}>Last 30 points</option>
+            <option value={60}>Last 60 points</option>
+          </select>
+          <button className='bg-blue-600 text-white px-4 py-1.5 rounded-sm hover:bg-blue-700 transition-colors'>
+            Refresh Data
+          </button>
+        </div>
+      </div>
+
+      {/* System Status Overview */}
+      <div className='mb-6'>
+        <h2 className='text-lg font-semibold mb-3 text-slate-700'>System Status</h2>
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+          {serverStatus.map(server => (
+            <div
+              key={server.id}
+              className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 flex flex-col'
             >
-              <option value={10}>Last 10 points</option>
-              <option value={20}>Last 20 points</option>
-              <option value={30}>Last 30 points</option>
-              <option value={60}>Last 60 points</option>
-            </select>
-            <button className='bg-blue-600 text-white px-4 py-1.5 rounded-sm hover:bg-blue-700 transition-colors'>
-              Refresh Data
-            </button>
-          </div>
-        </div>
-
-        {/* System Status Overview */}
-        <div className='mb-6'>
-          <h2 className='text-lg font-semibold mb-3 text-slate-700'>System Status</h2>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-            {serverStatus.map(server => (
-              <div
-                key={server.id}
-                className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 flex flex-col'
-              >
-                <div className='flex items-center justify-between mb-2'>
-                  <h3 className='font-medium'>{server.name}</h3>
-                  <span
-                    className='px-2 py-0.5 rounded-full font-medium'
-                    style={{
-                      backgroundColor:
-                        server.status === 'OK'
-                          ? 'rgba(52, 168, 83, 0.15)'
-                          : server.status === 'Warning'
-                            ? 'rgba(251, 188, 5, 0.15)'
-                            : 'rgba(234, 67, 53, 0.15)',
-                      color:
-                        server.status === 'OK'
-                          ? '#34A853'
-                          : server.status === 'Warning'
-                            ? '#FBBC05'
-                            : '#EA4335'
-                    }}
-                  >
-                    {server.status}
-                  </span>
-                </div>
-                <div className='text-slate-500 mb-1'>Role: {server.role}</div>
-                <div className='flex justify-between items-center mb-1.5'>
-                  <span className='text-xs'>CPU</span>
-                  <div className='flex-1 mx-2 bg-slate-100 rounded-full h-2 overflow-hidden'>
-                    <div
-                      className='h-full rounded-full'
-                      style={{
-                        width: `${server.cpu}%`,
-                        backgroundColor:
-                          server.cpu > 80
-                            ? chartColors.red
-                            : server.cpu > 60
-                              ? chartColors.yellow
-                              : chartColors.green
-                      }}
-                    ></div>
-                  </div>
-                  <span className='font-medium'>{server.cpu}%</span>
-                </div>
-                <div className='flex justify-between items-center'>
-                  <span className='text-xs'>MEM</span>
-                  <div className='flex-1 mx-2 bg-slate-100 rounded-full h-2 overflow-hidden'>
-                    <div
-                      className='h-full rounded-full'
-                      style={{
-                        width: `${server.memory}%`,
-                        backgroundColor:
-                          server.memory > 80
-                            ? chartColors.red
-                            : server.memory > 60
-                              ? chartColors.yellow
-                              : chartColors.green
-                      }}
-                    ></div>
-                  </div>
-                  <span className='font-medium'>{server.memory}%</span>
-                </div>
-                <div className='mt-2 text-slate-500'>
-                  Uptime: {Math.floor(server.uptime / 24)}d {Math.floor(server.uptime % 24)}h
-                </div>
+              <div className='flex items-center justify-between mb-2'>
+                <h3 className='font-medium'>{server.name}</h3>
+                <span
+                  className='px-2 py-0.5 rounded-full font-medium'
+                  style={{
+                    backgroundColor:
+                      server.status === 'OK'
+                        ? 'rgba(52, 168, 83, 0.15)'
+                        : server.status === 'Warning'
+                          ? 'rgba(251, 188, 5, 0.15)'
+                          : 'rgba(234, 67, 53, 0.15)',
+                    color:
+                      server.status === 'OK'
+                        ? '#34A853'
+                        : server.status === 'Warning'
+                          ? '#FBBC05'
+                          : '#EA4335'
+                  }}
+                >
+                  {server.status}
+                </span>
               </div>
-            ))}
+              <div className='text-slate-500 mb-1'>Role: {server.role}</div>
+              <div className='flex justify-between items-center mb-1.5'>
+                <span className='text-xs'>CPU</span>
+                <div className='flex-1 mx-2 bg-slate-100 rounded-full h-2 overflow-hidden'>
+                  <div
+                    className='h-full rounded-full'
+                    style={{
+                      width: `${server.cpu}%`,
+                      backgroundColor:
+                        server.cpu > 80
+                          ? chartColors.red
+                          : server.cpu > 60
+                            ? chartColors.yellow
+                            : chartColors.green
+                    }}
+                  ></div>
+                </div>
+                <span className='font-medium'>{server.cpu}%</span>
+              </div>
+              <div className='flex justify-between items-center'>
+                <span className='text-xs'>MEM</span>
+                <div className='flex-1 mx-2 bg-slate-100 rounded-full h-2 overflow-hidden'>
+                  <div
+                    className='h-full rounded-full'
+                    style={{
+                      width: `${server.memory}%`,
+                      backgroundColor:
+                        server.memory > 80
+                          ? chartColors.red
+                          : server.memory > 60
+                            ? chartColors.yellow
+                            : chartColors.green
+                    }}
+                  ></div>
+                </div>
+                <span className='font-medium'>{server.memory}%</span>
+              </div>
+              <div className='mt-2 text-slate-500'>
+                Uptime: {Math.floor(server.uptime / 24)}d {Math.floor(server.uptime % 24)}h
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Charts Row 1 */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
+        {/* CPU Usage Chart */}
+        <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
+          <h2 className='text-lg font-semibold mb-2 text-slate-700'>CPU Usage by Service</h2>
+          <div className='h-72'>
+            <ResponsiveContainer width='100%' height='100%'>
+              <LineChart data={cpuUsageData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+                <XAxis dataKey='time' tick={{ fontSize: 12 }} />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  domain={[0, 100]}
+                  tickFormatter={value => `${value}%`}
+                />
+                <Tooltip formatter={value => [`${value}%`, '']} />
+                <Legend />
+                <Line
+                  type='monotone'
+                  dataKey='web'
+                  name='Web Servers'
+                  stroke={chartColors.blue}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type='monotone'
+                  dataKey='api'
+                  name='API Servers'
+                  stroke={chartColors.orange}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type='monotone'
+                  dataKey='db'
+                  name='Databases'
+                  stroke={chartColors.purple}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Charts Row 1 */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
-          {/* CPU Usage Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
-            <h2 className='text-lg font-semibold mb-2 text-slate-700'>CPU Usage by Service</h2>
-            <div className='h-72'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <LineChart data={cpuUsageData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-                  <XAxis dataKey='time' tick={{ fontSize: 12 }} />
-                  <YAxis
-                    tick={{ fontSize: 12 }}
-                    domain={[0, 100]}
-                    tickFormatter={value => `${value}%`}
-                  />
-                  <Tooltip formatter={value => [`${value}%`, '']} />
-                  <Legend />
-                  <Line
-                    type='monotone'
-                    dataKey='web'
-                    name='Web Servers'
-                    stroke={chartColors.blue}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line
-                    type='monotone'
-                    dataKey='api'
-                    name='API Servers'
-                    stroke={chartColors.orange}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line
-                    type='monotone'
-                    dataKey='db'
-                    name='Databases'
-                    stroke={chartColors.purple}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Memory Usage Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
-            <h2 className='text-lg font-semibold mb-2 text-slate-700'>Memory Allocation</h2>
-            <div className='h-72'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <AreaChart
-                  data={memoryUsageData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  stackOffset='expand'
-                >
-                  <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-                  <XAxis dataKey='time' tick={{ fontSize: 12 }} />
-                  <YAxis
-                    tickFormatter={value => `${(value * 100).toFixed(0)}%`}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip
-                    formatter={(value, name) => [
-                      `${value}GB`,
-                      name === 'used' ? 'Used Memory' : 'Free Memory'
-                    ]}
-                  />
-                  <Legend />
-                  <Area
-                    type='monotone'
-                    dataKey='used'
-                    name='Used Memory'
-                    stackId='1'
-                    stroke={chartColors.blue}
-                    fill={chartColors.blue}
-                    fillOpacity={0.6}
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='free'
-                    name='Free Memory'
-                    stackId='1'
-                    stroke={chartColors.green}
-                    fill={chartColors.green}
-                    fillOpacity={0.6}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Row 2 */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-6'>
-          {/* Network Traffic Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 md:col-span-2'>
-            <h2 className='text-lg font-semibold mb-2 text-slate-700'>Network Traffic (MB/s)</h2>
-            <div className='h-72'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <AreaChart
-                  data={networkTrafficData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-                  <XAxis dataKey='time' tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip formatter={value => [`${value} MB/s`, '']} />
-                  <Legend />
-                  <Area
-                    type='monotone'
-                    dataKey='inbound'
-                    name='Inbound Traffic'
-                    stroke={chartColors.cyan}
-                    fill={chartColors.cyan}
-                    fillOpacity={0.3}
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='outbound'
-                    name='Outbound Traffic'
-                    stroke={chartColors.red}
-                    fill={chartColors.red}
-                    fillOpacity={0.3}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Performance Score Radar Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
-            <h2 className='text-lg font-semibold mb-2 text-slate-700'>Performance Score</h2>
-            <div className='h-72'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <RadarChart outerRadius={90} data={performanceScoreData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey='subject' />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                  <Radar
-                    name='Production'
-                    dataKey='A'
-                    stroke={chartColors.blue}
-                    fill={chartColors.blue}
-                    fillOpacity={0.5}
-                  />
-                  <Radar
-                    name='Staging'
-                    dataKey='B'
-                    stroke={chartColors.green}
-                    fill={chartColors.green}
-                    fillOpacity={0.5}
-                  />
-                  <Legend />
-                  <Tooltip />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Row 3 */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {/* Response Time Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
-            <h2 className='text-lg font-semibold mb-2 text-slate-700'>API Response Times (ms)</h2>
-            <div className='h-72'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <LineChart
-                  data={responseTimeData}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-                  <XAxis dataKey='time' tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip formatter={value => [`${value} ms`, '']} />
-                  <Legend />
-                  <Line
-                    type='monotone'
-                    dataKey='web'
-                    name='Web Requests'
-                    stroke={chartColors.blue}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line
-                    type='monotone'
-                    dataKey='api'
-                    name='API Requests'
-                    stroke={chartColors.orange}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                  <Line
-                    type='monotone'
-                    dataKey='database'
-                    name='Database Queries'
-                    stroke={chartColors.purple}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Error Rate Chart */}
-          <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
-            <h2 className='text-lg font-semibold mb-2 text-slate-700'>Error Rates</h2>
-            <div className='h-72'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <BarChart data={errorRateData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-                  <XAxis dataKey='time' tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar
-                    dataKey='4xx'
-                    name='4xx Errors'
-                    fill={chartColors.yellow}
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar
-                    dataKey='5xx'
-                    name='5xx Errors'
-                    fill={chartColors.red}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Critical Alerts Section */}
-        <div className='mt-6'>
-          <h2 className='text-lg font-semibold mb-3 text-slate-700'>Recent Alerts</h2>
-          <div className='bg-white rounded-lg shadow-xs border border-slate-200 overflow-hidden'>
-            <table className='min-w-full divide-y divide-slate-200'>
-              <thead className='bg-slate-50'>
-                <tr>
-                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
-                    Time
-                  </th>
-                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
-                    Severity
-                  </th>
-                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
-                    Resource
-                  </th>
-                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
-                    Message
-                  </th>
-                  <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className='bg-white divide-y divide-slate-200'>
-                <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 10:15 AM</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
-                      Critical
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Database 2</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    CPU usage exceeded 90% threshold for 5 minutes
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
-                      Resolved
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 09:42 AM</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
-                      Warning
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>API Server 1</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    High 5xx error rate detected
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
-                      Resolved
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 09:15 AM</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
-                      Critical
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Cache Server</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    Memory usage at 95%, potential memory leak
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
-                      Investigating
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Yesterday 11:52 PM</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
-                      Warning
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Web Server 2</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    Response time increased by 40%
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
-                      Resolved
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Yesterday 10:23 PM</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
-                    <span className='px-2 py-1 font-medium bg-slate-100 text-slate-800 rounded-full'>
-                      Info
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Job Queue</td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    Queue depth exceeding normal patterns
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
-                    <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
-                      Resolved
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        {/* Memory Usage Chart */}
+        <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
+          <h2 className='text-lg font-semibold mb-2 text-slate-700'>Memory Allocation</h2>
+          <div className='h-72'>
+            <ResponsiveContainer width='100%' height='100%'>
+              <AreaChart
+                data={memoryUsageData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                stackOffset='expand'
+              >
+                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+                <XAxis dataKey='time' tick={{ fontSize: 12 }} />
+                <YAxis
+                  tickFormatter={value => `${(value * 100).toFixed(0)}%`}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `${value}GB`,
+                    name === 'used' ? 'Used Memory' : 'Free Memory'
+                  ]}
+                />
+                <Legend />
+                <Area
+                  type='monotone'
+                  dataKey='used'
+                  name='Used Memory'
+                  stackId='1'
+                  stroke={chartColors.blue}
+                  fill={chartColors.blue}
+                  fillOpacity={0.6}
+                />
+                <Area
+                  type='monotone'
+                  dataKey='free'
+                  name='Free Memory'
+                  stackId='1'
+                  stroke={chartColors.green}
+                  fill={chartColors.green}
+                  fillOpacity={0.6}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
-    </Page>
+
+      {/* Charts Row 2 */}
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-6'>
+        {/* Network Traffic Chart */}
+        <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200 md:col-span-2'>
+          <h2 className='text-lg font-semibold mb-2 text-slate-700'>Network Traffic (MB/s)</h2>
+          <div className='h-72'>
+            <ResponsiveContainer width='100%' height='100%'>
+              <AreaChart
+                data={networkTrafficData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+                <XAxis dataKey='time' tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip formatter={value => [`${value} MB/s`, '']} />
+                <Legend />
+                <Area
+                  type='monotone'
+                  dataKey='inbound'
+                  name='Inbound Traffic'
+                  stroke={chartColors.cyan}
+                  fill={chartColors.cyan}
+                  fillOpacity={0.3}
+                />
+                <Area
+                  type='monotone'
+                  dataKey='outbound'
+                  name='Outbound Traffic'
+                  stroke={chartColors.red}
+                  fill={chartColors.red}
+                  fillOpacity={0.3}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Performance Score Radar Chart */}
+        <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
+          <h2 className='text-lg font-semibold mb-2 text-slate-700'>Performance Score</h2>
+          <div className='h-72'>
+            <ResponsiveContainer width='100%' height='100%'>
+              <RadarChart outerRadius={90} data={performanceScoreData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey='subject' />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                <Radar
+                  name='Production'
+                  dataKey='A'
+                  stroke={chartColors.blue}
+                  fill={chartColors.blue}
+                  fillOpacity={0.5}
+                />
+                <Radar
+                  name='Staging'
+                  dataKey='B'
+                  stroke={chartColors.green}
+                  fill={chartColors.green}
+                  fillOpacity={0.5}
+                />
+                <Legend />
+                <Tooltip />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Row 3 */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        {/* Response Time Chart */}
+        <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
+          <h2 className='text-lg font-semibold mb-2 text-slate-700'>API Response Times (ms)</h2>
+          <div className='h-72'>
+            <ResponsiveContainer width='100%' height='100%'>
+              <LineChart
+                data={responseTimeData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+                <XAxis dataKey='time' tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip formatter={value => [`${value} ms`, '']} />
+                <Legend />
+                <Line
+                  type='monotone'
+                  dataKey='web'
+                  name='Web Requests'
+                  stroke={chartColors.blue}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type='monotone'
+                  dataKey='api'
+                  name='API Requests'
+                  stroke={chartColors.orange}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type='monotone'
+                  dataKey='database'
+                  name='Database Queries'
+                  stroke={chartColors.purple}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Error Rate Chart */}
+        <div className='bg-white rounded-lg p-4 shadow-xs border border-slate-200'>
+          <h2 className='text-lg font-semibold mb-2 text-slate-700'>Error Rates</h2>
+          <div className='h-72'>
+            <ResponsiveContainer width='100%' height='100%'>
+              <BarChart data={errorRateData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+                <XAxis dataKey='time' tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                <Bar
+                  dataKey='4xx'
+                  name='4xx Errors'
+                  fill={chartColors.yellow}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar dataKey='5xx' name='5xx Errors' fill={chartColors.red} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Critical Alerts Section */}
+      <div className='mt-6'>
+        <h2 className='text-lg font-semibold mb-3 text-slate-700'>Recent Alerts</h2>
+        <div className='bg-white rounded-lg shadow-xs border border-slate-200 overflow-hidden'>
+          <table className='min-w-full divide-y divide-slate-200'>
+            <thead className='bg-slate-50'>
+              <tr>
+                <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
+                  Time
+                </th>
+                <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
+                  Severity
+                </th>
+                <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
+                  Resource
+                </th>
+                <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
+                  Message
+                </th>
+                <th className='px-6 py-3 text-left font-medium text-slate-500 uppercase tracking-wider'>
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className='bg-white divide-y divide-slate-200'>
+              <tr>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 10:15 AM</td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
+                    Critical
+                  </span>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Database 2</td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  CPU usage exceeded 90% threshold for 5 minutes
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
+                    Resolved
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 09:42 AM</td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+                    Warning
+                  </span>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>API Server 1</td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  High 5xx error rate detected
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
+                    Resolved
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Today 09:15 AM</td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <span className='px-2 py-1 font-medium bg-red-100 text-red-800 rounded-full'>
+                    Critical
+                  </span>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Cache Server</td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  Memory usage at 95%, potential memory leak
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+                    Investigating
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Yesterday 11:52 PM</td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <span className='px-2 py-1 font-medium bg-yellow-100 text-yellow-800 rounded-full'>
+                    Warning
+                  </span>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Web Server 2</td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  Response time increased by 40%
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
+                    Resolved
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Yesterday 10:23 PM</td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <span className='px-2 py-1 font-medium bg-slate-100 text-slate-800 rounded-full'>
+                    Info
+                  </span>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>Job Queue</td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  Queue depth exceeding normal patterns
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap text-slate-600'>
+                  <span className='px-2 py-1 font-medium bg-green-100 text-green-800 rounded-full'>
+                    Resolved
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 };
