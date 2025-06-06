@@ -16,7 +16,7 @@ export const tableColumns = ({
   return [
     {
       title: t('user.fields.username', 'Username'),
-      accessorKey: 'username',
+      dataIndex: 'username',
       parser: (value: string, record: User) => (
         <div className='flex flex-col'>
           <div className='flex items-center'>
@@ -41,7 +41,7 @@ export const tableColumns = ({
     },
     {
       title: t('user.fields.email', 'Email'),
-      accessorKey: 'email',
+      dataIndex: 'email',
       parser: (value: string) => (
         <span className='text-slate-600 truncate max-w-[200px]'>{value || '-'}</span>
       ),
@@ -49,19 +49,19 @@ export const tableColumns = ({
     },
     {
       title: t('user.fields.phone', 'Phone'),
-      accessorKey: 'phone',
+      dataIndex: 'phone',
       parser: (value: string) => <span className='text-slate-600'>{value || '-'}</span>,
       icon: 'IconPhone'
     },
     {
       title: t('user.fields.status', 'Status'),
-      accessorKey: 'status',
+      dataIndex: 'status',
       parser: (value: number) => renderUserStatus(value),
       icon: 'IconStatusChange'
     },
     {
       title: t('user.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span>{formatRelativeTime(new Date(value))}</span>
@@ -71,7 +71,7 @@ export const tableColumns = ({
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.role', 'Roles'),

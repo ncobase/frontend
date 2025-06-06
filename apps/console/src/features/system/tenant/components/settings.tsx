@@ -660,7 +660,7 @@ const UsersManagementTab = ({ tenantId, users, t }) => {
   const userColumns = [
     {
       title: t('tenant.users.fields.username', 'Username'),
-      accessorKey: 'username',
+      dataIndex: 'username',
       icon: 'IconUser',
       parser: (value, record) => (
         <div className='flex items-center space-x-2'>
@@ -675,13 +675,13 @@ const UsersManagementTab = ({ tenantId, users, t }) => {
     },
     {
       title: t('tenant.users.fields.email', 'Email'),
-      accessorKey: 'email',
+      dataIndex: 'email',
       icon: 'IconMail',
       parser: value => <span className='text-slate-600 truncate max-w-[200px]'>{value || '-'}</span>
     },
     {
       title: t('tenant.users.fields.roles', 'Roles'),
-      accessorKey: 'role_ids',
+      dataIndex: 'role_ids',
       icon: 'IconUserCheck',
       parser: roleIds => {
         roleIds = roleIds ? JSON.parse(roleIds) : []; // Assuming roleIds is a JSON string
@@ -706,7 +706,7 @@ const UsersManagementTab = ({ tenantId, users, t }) => {
     },
     {
       title: t('tenant.users.fields.access_level', 'Access Level'),
-      accessorKey: 'access_level',
+      dataIndex: 'access_level',
       icon: 'IconShield',
       parser: value => {
         if (!value) return '-';
@@ -725,7 +725,7 @@ const UsersManagementTab = ({ tenantId, users, t }) => {
     },
     {
       title: t('tenant.users.fields.status', 'Status'),
-      accessorKey: 'is_active',
+      dataIndex: 'is_active',
       icon: 'IconStatusChange',
       parser: value => (
         <Badge variant={value ? 'success' : 'danger'}>
@@ -735,7 +735,7 @@ const UsersManagementTab = ({ tenantId, users, t }) => {
     },
     {
       title: t('tenant.users.fields.joined_at', 'Joined'),
-      accessorKey: 'joined_at',
+      dataIndex: 'joined_at',
       icon: 'IconCalendarPlus',
       parser: value => (value ? formatDateTime(value, 'date') : '-')
     }
@@ -828,7 +828,7 @@ const CustomSettingsTab = ({ settings, onDelete, onAdd, t }) => {
   const settingsColumns = [
     {
       title: t('tenant.custom_settings.fields.name', 'Setting Name'),
-      accessorKey: 'setting_name',
+      dataIndex: 'setting_name',
       icon: 'IconTag',
       parser: (value, record) => (
         <div>
@@ -844,7 +844,7 @@ const CustomSettingsTab = ({ settings, onDelete, onAdd, t }) => {
     },
     {
       title: t('tenant.custom_settings.fields.type', 'Type'),
-      accessorKey: 'setting_type',
+      dataIndex: 'setting_type',
       icon: 'IconCode',
       parser: value => {
         const typeColors = {
@@ -863,7 +863,7 @@ const CustomSettingsTab = ({ settings, onDelete, onAdd, t }) => {
     },
     {
       title: t('tenant.custom_settings.fields.scope', 'Scope'),
-      accessorKey: 'scope',
+      dataIndex: 'scope',
       icon: 'IconTarget',
       parser: value => {
         const scopeColors = {
@@ -881,7 +881,7 @@ const CustomSettingsTab = ({ settings, onDelete, onAdd, t }) => {
     },
     {
       title: t('tenant.custom_settings.fields.value', 'Value'),
-      accessorKey: 'setting_value',
+      dataIndex: 'setting_value',
       icon: 'IconEdit',
       parser: (value, record) => (
         <div className='max-w-[200px]'>
@@ -891,7 +891,7 @@ const CustomSettingsTab = ({ settings, onDelete, onAdd, t }) => {
     },
     {
       title: t('tenant.custom_settings.fields.properties', 'Properties'),
-      accessorKey: 'is_required',
+      dataIndex: 'is_required',
       icon: 'IconShield',
       parser: (_, record) => (
         <div className='flex flex-wrap gap-1'>
@@ -915,7 +915,7 @@ const CustomSettingsTab = ({ settings, onDelete, onAdd, t }) => {
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       parser: (_, record) => (
         <div className='flex items-center space-x-2'>
           {!record.is_readonly && (

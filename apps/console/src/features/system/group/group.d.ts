@@ -1,6 +1,8 @@
 export interface Group {
   id?: string;
   name?: string;
+  slug?: string;
+  type?: string;
   disabled?: boolean;
   description?: string;
   leader?: object | null;
@@ -11,11 +13,4 @@ export interface Group {
   created_at?: string;
   updated_by?: string;
   updated_at?: string;
-}
-
-export interface Groups {
-  items: Group[];
-  total: number;
-  has_next: boolean;
-  next?: string;
 }

@@ -231,7 +231,7 @@ export const ListPage = () => {
         header={[
           {
             title: 'ID',
-            accessorKey: 'id',
+            dataIndex: 'id',
             parser: value => (
               <Button variant='link' size='sm' onClick={() => navigate(`/example/ui/form/viewer`)}>
                 {value}
@@ -241,45 +241,45 @@ export const ListPage = () => {
           },
           {
             title: 'Name',
-            accessorKey: 'name',
+            dataIndex: 'name',
             icon: 'IconFlame'
           },
           {
             title: 'Slug',
-            accessorKey: 'slug',
+            dataIndex: 'slug',
             icon: 'IconAffiliate'
           },
           {
             title: 'Path',
-            accessorKey: 'path',
+            dataIndex: 'path',
             icon: 'IconRoute'
           },
           {
             title: 'Icon',
-            accessorKey: 'icon',
+            dataIndex: 'icon',
             parser: value => <Icons name={value} size={16} />,
             icon: 'IconCategory'
           },
           {
             title: 'Status',
-            accessorKey: 'disabled',
+            dataIndex: 'disabled',
             parser: value => parseStatus(!value),
             icon: 'IconFlagCog'
           },
           {
             title: 'Created At',
-            accessorKey: 'created_at',
+            dataIndex: 'created_at',
             parser: value => formatDateTime(value),
             icon: 'IconCalendarMonth'
           },
           {
             title: 'Updated At',
-            accessorKey: 'updated_at',
+            dataIndex: 'updated_at',
             parser: value => formatDateTime(value),
             icon: 'IconCalendarMonth'
           },
           {
-            accessorKey: 'operation-column',
+            dataIndex: 'operation-column',
             actions: [
               {
                 title: 'Edit',

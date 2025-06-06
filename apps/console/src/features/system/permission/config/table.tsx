@@ -20,7 +20,7 @@ export const tableColumns = ({
   return [
     {
       title: t('permission.fields.name', 'Name'),
-      accessorKey: 'name',
+      dataIndex: 'name',
       parser: (value: string, record: Permission) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
           <div className='flex items-center space-x-2'>
@@ -42,13 +42,13 @@ export const tableColumns = ({
     },
     {
       title: t('permission.fields.action', 'Action'),
-      accessorKey: 'action',
+      dataIndex: 'action',
       parser: (value: string) => renderActionBadge(value),
       icon: 'IconCommand'
     },
     {
       title: t('permission.fields.subject', 'Subject/Resource'),
-      accessorKey: 'subject',
+      dataIndex: 'subject',
       parser: (value: string) => (
         <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
           {value || t('permission.labels.all_resources')}
@@ -58,13 +58,13 @@ export const tableColumns = ({
     },
     {
       title: t('permission.fields.group', 'Group'),
-      accessorKey: 'group',
+      dataIndex: 'group',
       parser: (value: string) => <span className='text-slate-600'>{value || '-'}</span>,
       icon: 'IconUsers'
     },
     {
       title: t('permission.fields.description', 'Description'),
-      accessorKey: 'description',
+      dataIndex: 'description',
       parser: (value: string) => (
         <Tooltip content={value || t('permission.labels.no_description')}>
           <span className='truncate max-w-[200px] text-slate-600'>
@@ -76,14 +76,14 @@ export const tableColumns = ({
     },
     {
       title: t('permission.fields.status', 'Status'),
-      accessorKey: 'disabled',
+      dataIndex: 'disabled',
       parser: (disabled: boolean, record: Permission) =>
         renderPermissionStatus(disabled, record.default, t),
       icon: 'IconStatusChange'
     },
     {
       title: t('permission.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span>{formatRelativeTime(new Date(value))}</span>
@@ -93,7 +93,7 @@ export const tableColumns = ({
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

@@ -96,13 +96,13 @@ export const I18nExample = () => {
           <CardContent className='p-0'>
             <TableView
               header={[
-                { title: t('example.i18n.name'), accessorKey: 'name' },
-                { title: t('example.i18n.role'), accessorKey: 'role' },
-                { title: t('example.i18n.department'), accessorKey: 'department' },
-                { title: t('example.i18n.status'), accessorKey: 'status' },
+                { title: t('example.i18n.name'), dataIndex: 'name' },
+                { title: t('example.i18n.role'), dataIndex: 'role' },
+                { title: t('example.i18n.department'), dataIndex: 'department' },
+                { title: t('example.i18n.status'), dataIndex: 'status' },
                 {
                   title: t('example.i18n.operations'),
-                  accessorKey: 'operation-column',
+                  dataIndex: 'operation-column',
                   actions: [
                     {
                       title: t('actions.view'),

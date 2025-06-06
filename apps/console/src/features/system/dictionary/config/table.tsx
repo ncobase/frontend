@@ -9,7 +9,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   return [
     {
       title: t('dictionary.fields.name', 'Name'),
-      accessorKey: 'name',
+      dataIndex: 'name',
       parser: (value: string, record: Dictionary) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
           <span className='font-medium'>{value}</span>
@@ -19,7 +19,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('dictionary.fields.slug', 'Slug'),
-      accessorKey: 'slug',
+      dataIndex: 'slug',
       parser: (value: string) => (
         <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
           {value || '-'}
@@ -29,19 +29,19 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('dictionary.fields.type', 'Type'),
-      accessorKey: 'type',
+      dataIndex: 'type',
       parser: (value: string) => renderDictionaryType(value),
       icon: 'IconCategory'
     },
     {
       title: t('dictionary.fields.value', 'Value'),
-      accessorKey: 'value',
+      dataIndex: 'value',
       parser: (value: string, record: Dictionary) => renderDictionaryValue(value, record.type),
       icon: 'IconCode'
     },
     {
       title: t('dictionary.fields.description', 'Description'),
-      accessorKey: 'description',
+      dataIndex: 'description',
       parser: (value: string) => (
         <Tooltip content={value || 'No description'}>
           <span className='truncate max-w-[200px] text-slate-600'>
@@ -53,7 +53,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('dictionary.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span>{formatRelativeTime(new Date(value))}</span>
@@ -63,7 +63,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

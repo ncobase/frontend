@@ -328,7 +328,7 @@ export const CreatePage = () => {
                 header={[
                   {
                     title: 'ID',
-                    accessorKey: 'id',
+                    dataIndex: 'id',
                     parser: value => (
                       <Button variant='link' size='sm' onClick={() => navigate(`viewer/${value}`)}>
                         {value}
@@ -338,30 +338,30 @@ export const CreatePage = () => {
                   },
                   {
                     title: 'Name',
-                    accessorKey: 'name',
+                    dataIndex: 'name',
                     parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconFlame'
                   },
                   {
                     title: 'Slug',
-                    accessorKey: 'slug',
+                    dataIndex: 'slug',
                     icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',
-                    accessorKey: 'path',
+                    dataIndex: 'path',
                     parser: value => <Input type='text' defaultValue={value} className='py-1.5' />,
                     icon: 'IconRoute'
                   },
                   {
                     title: 'Icon',
-                    accessorKey: 'icon',
+                    dataIndex: 'icon',
                     parser: value => <Icons name={value} size={16} />,
                     icon: 'IconCategory'
                   },
                   {
                     title: 'Status',
-                    accessorKey: 'disabled',
+                    dataIndex: 'disabled',
                     parser: value => {
                       value = value ? '1' : '0';
                       return (
@@ -380,7 +380,7 @@ export const CreatePage = () => {
                   },
                   {
                     title: 'Created At',
-                    accessorKey: 'created_at',
+                    dataIndex: 'created_at',
                     parser: value => <DatePicker defaultValue={value} />,
                     icon: 'IconCalendarMonth'
                   }

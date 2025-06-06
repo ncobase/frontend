@@ -180,7 +180,7 @@ export const ViewerPage = () => {
                 header={[
                   {
                     title: 'ID',
-                    accessorKey: 'id',
+                    dataIndex: 'id',
                     parser: value => (
                       <Button variant='link' size='sm' onClick={() => navigate(`viewer/${value}`)}>
                         {value}
@@ -190,34 +190,34 @@ export const ViewerPage = () => {
                   },
                   {
                     title: 'Name',
-                    accessorKey: 'name',
+                    dataIndex: 'name',
                     icon: 'IconFlame'
                   },
                   {
                     title: 'Slug',
-                    accessorKey: 'slug',
+                    dataIndex: 'slug',
                     icon: 'IconAffiliate'
                   },
                   {
                     title: 'Path',
-                    accessorKey: 'path',
+                    dataIndex: 'path',
                     icon: 'IconRoute'
                   },
                   {
                     title: 'Icon',
-                    accessorKey: 'icon',
+                    dataIndex: 'icon',
                     parser: value => <Icons name={value} size={16} />,
                     icon: 'IconCategory'
                   },
                   {
                     title: 'Status',
-                    accessorKey: 'disabled',
+                    dataIndex: 'disabled',
                     parser: value => parseStatus(!value),
                     icon: 'IconFlagCog'
                   },
                   {
                     title: 'Created At',
-                    accessorKey: 'created_at',
+                    dataIndex: 'created_at',
                     parser: value => formatDateTime(value),
                     icon: 'IconCalendarMonth'
                   }

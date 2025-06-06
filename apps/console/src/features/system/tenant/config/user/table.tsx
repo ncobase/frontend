@@ -12,7 +12,7 @@ export const tableColumns = ({
   return [
     {
       title: t('tenant.users.fields.username', 'Username'),
-      accessorKey: 'username',
+      dataIndex: 'username',
       parser: (value: string, record: any) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
           <div className='flex items-center space-x-2'>
@@ -29,7 +29,7 @@ export const tableColumns = ({
     },
     {
       title: t('tenant.users.fields.email', 'Email'),
-      accessorKey: 'email',
+      dataIndex: 'email',
       parser: (value: string) => (
         <span className='text-slate-600 truncate max-w-[200px]'>{value || '-'}</span>
       ),
@@ -37,25 +37,25 @@ export const tableColumns = ({
     },
     {
       title: t('tenant.users.fields.roles', 'Roles'),
-      accessorKey: 'role_ids',
+      dataIndex: 'role_ids',
       parser: (roleIds: string[]) => renderRoles(roleIds),
       icon: 'IconUserCheck'
     },
     {
       title: t('tenant.users.fields.access_level', 'Access Level'),
-      accessorKey: 'access_level',
+      dataIndex: 'access_level',
       parser: (value: string) => renderAccessLevel(value, t),
       icon: 'IconShield'
     },
     {
       title: t('tenant.users.fields.status', 'Status'),
-      accessorKey: 'is_active',
+      dataIndex: 'is_active',
       parser: (value: boolean) => renderTenantUserStatus(value, t),
       icon: 'IconStatusChange'
     },
     {
       title: t('tenant.users.fields.joined_at', 'Joined'),
-      accessorKey: 'joined_at',
+      dataIndex: 'joined_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span>{formatRelativeTime(new Date(value))}</span>
@@ -65,7 +65,7 @@ export const tableColumns = ({
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

@@ -692,10 +692,10 @@ export const Elements = ({ ...rest }) => {
                 <CardContent className='p-0'>
                   <TableView
                     header={[
-                      { title: 'Name', accessorKey: 'name' },
-                      { title: 'Role', accessorKey: 'role' },
-                      { title: 'Department', accessorKey: 'department' },
-                      { title: 'Status', accessorKey: 'status' }
+                      { title: 'Name', dataIndex: 'name' },
+                      { title: 'Role', dataIndex: 'role' },
+                      { title: 'Department', dataIndex: 'department' },
+                      { title: 'Status', dataIndex: 'status' }
                     ]}
                     data={tableData}
                     pageSize={6}

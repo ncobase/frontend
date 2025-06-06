@@ -14,7 +14,7 @@ export const tableColumns = ({
   return [
     {
       title: t('menu.fields.name', 'Name'),
-      accessorKey: 'name',
+      dataIndex: 'name',
       parser: (value: string, record) => (
         <Button variant='link' onClick={() => handleView({ id: record?.id }, 'view')}>
           <div className='flex items-center space-x-2'>
@@ -30,13 +30,13 @@ export const tableColumns = ({
     },
     {
       title: t('menu.fields.type', 'Type'),
-      accessorKey: 'type',
+      dataIndex: 'type',
       parser: (value: string) => renderMenuType(value),
       icon: 'IconCategory'
     },
     {
       title: t('menu.fields.path', 'Path'),
-      accessorKey: 'path',
+      dataIndex: 'path',
       parser: (value: string) => (
         <span className='text-slate-600 font-mono text-xs bg-slate-50 px-2 py-1 rounded'>
           {value || '-'}
@@ -46,7 +46,7 @@ export const tableColumns = ({
     },
     {
       title: t('menu.fields.parent', 'Parent'),
-      accessorKey: 'parent_id',
+      dataIndex: 'parent_id',
       parser: (value: string, _record: MenuTree) =>
         value ? (
           <Badge className='bg-blue-100 text-blue-800'>Has Parent</Badge>
@@ -57,19 +57,19 @@ export const tableColumns = ({
     },
     {
       title: t('menu.fields.order', 'Order'),
-      accessorKey: 'order',
+      dataIndex: 'order',
       parser: (value: number) => <Badge className='bg-gray-100 text-gray-700'>{value}</Badge>,
       icon: 'IconArrowsSort'
     },
     {
       title: t('menu.fields.status', 'Status'),
-      accessorKey: 'disabled',
+      dataIndex: 'disabled',
       parser: (disabled: boolean, record: MenuTree) => renderMenuStatus(disabled, record.hidden),
       icon: 'IconFlagCog'
     },
     {
       title: t('menu.fields.perms', 'Permissions'),
-      accessorKey: 'perms',
+      dataIndex: 'perms',
       parser: (value: string) => (
         <Tooltip content={value || 'No permissions required'}>
           <span className='text-slate-600 text-xs'>
@@ -81,7 +81,7 @@ export const tableColumns = ({
     },
     {
       title: t('menu.fields.created_by', 'Created By'),
-      accessorKey: 'created_by',
+      dataIndex: 'created_by',
       parser: value => {
         const { data } = useQueryUser(value);
         return data?.username || '-';
@@ -90,13 +90,13 @@ export const tableColumns = ({
     },
     {
       title: t('menu.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: value => formatDateTime(value),
       icon: 'IconCalendarMonth'
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

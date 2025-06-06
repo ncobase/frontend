@@ -14,7 +14,7 @@ export const tableColumns = ({
   return [
     {
       title: t('option.fields.name', 'Name'),
-      accessorKey: 'name',
+      dataIndex: 'name',
       parser: (value: string, record: Option) => (
         <div className='flex flex-col'>
           <Button
@@ -32,19 +32,19 @@ export const tableColumns = ({
     },
     {
       title: t('option.fields.type', 'Type'),
-      accessorKey: 'type',
+      dataIndex: 'type',
       parser: (value: string) => renderOptionType(value),
       icon: 'IconTag'
     },
     {
       title: t('option.fields.value', 'Value'),
-      accessorKey: 'value',
+      dataIndex: 'value',
       parser: (value: string, record: Option) => renderOptionValue(value, record.type),
       icon: 'IconCode'
     },
     {
       title: t('option.fields.autoload', 'Auto Load'),
-      accessorKey: 'autoload',
+      dataIndex: 'autoload',
       parser: (value: boolean) => (
         <Badge className={value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
           <Icons name={value ? 'IconCheck' : 'IconX'} className='w-3 h-3 mr-1' />
@@ -55,7 +55,7 @@ export const tableColumns = ({
     },
     {
       title: t('option.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <div className='text-sm'>
@@ -68,7 +68,7 @@ export const tableColumns = ({
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

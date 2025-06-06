@@ -61,7 +61,7 @@ export const TenantQuotaManagement: React.FC<TenantQuotaManagementProps> = ({
   const quotaColumns = [
     {
       title: t('tenant.quotas.fields.quota_name', 'Name'),
-      accessorKey: 'quota_name',
+      dataIndex: 'quota_name',
       icon: 'IconTag',
       parser: (value, record) => (
         <div>
@@ -72,7 +72,7 @@ export const TenantQuotaManagement: React.FC<TenantQuotaManagementProps> = ({
     },
     {
       title: t('tenant.quotas.fields.quota_type', 'Type'),
-      accessorKey: 'quota_type',
+      dataIndex: 'quota_type',
       icon: 'IconCategory',
       parser: value => (
         <Badge variant='outline-primary'>
@@ -82,7 +82,7 @@ export const TenantQuotaManagement: React.FC<TenantQuotaManagementProps> = ({
     },
     {
       title: t('tenant.quotas.fields.usage', 'Usage'),
-      accessorKey: 'current_used',
+      dataIndex: 'current_used',
       icon: 'IconGauge',
       parser: (value, record) => (
         <div className='space-y-2 min-w-[150px]'>
@@ -104,7 +104,7 @@ export const TenantQuotaManagement: React.FC<TenantQuotaManagementProps> = ({
     },
     {
       title: t('tenant.quotas.fields.status', 'Status'),
-      accessorKey: 'enabled',
+      dataIndex: 'enabled',
       icon: 'IconStatusChange',
       parser: (value, record) => (
         <div className='space-y-1'>
@@ -127,7 +127,7 @@ export const TenantQuotaManagement: React.FC<TenantQuotaManagementProps> = ({
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       parser: (_, record) => (
         <div className='flex items-center space-x-1'>
           <Button

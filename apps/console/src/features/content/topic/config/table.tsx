@@ -1,4 +1,4 @@
-import { Button, Badge, Tooltip, Icons, TableViewProps } from '@ncobase/react';
+import { Button, Badge, Tooltip, TableViewProps } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   return [
     {
       title: t('topic.fields.title', 'Title'),
-      accessorKey: 'title',
+      dataIndex: 'title',
       parser: (value: string, record: Topic) => (
         <Button variant='link' onClick={() => handleView(record, 'view')}>
           <div className='flex items-center space-x-2'>
@@ -34,7 +34,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('topic.fields.slug', 'Slug'),
-      accessorKey: 'slug',
+      dataIndex: 'slug',
       parser: (value: string) => (
         <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
           {value || '-'}
@@ -44,7 +44,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('topic.fields.taxonomy', 'Taxonomy'),
-      accessorKey: 'taxonomy',
+      dataIndex: 'taxonomy',
       parser: (value: string) => {
         const { data } = useQueryTaxonomy(value);
         return <span className='text-slate-600'>{data?.name || value || '-'}</span>;
@@ -53,13 +53,13 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('topic.fields.status', 'Status'),
-      accessorKey: 'status',
+      dataIndex: 'status',
       parser: (status: number, record: Topic) => renderTopicStatus(status, record),
       icon: 'IconStatusChange'
     },
     {
       title: t('topic.fields.markdown', 'Format'),
-      accessorKey: 'markdown',
+      dataIndex: 'markdown',
       parser: (markdown: boolean) => (
         <Badge variant={markdown ? 'primary' : 'secondary'} className='text-xs'>
           {markdown ? 'Markdown' : 'HTML'}
@@ -69,7 +69,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('topic.fields.created_by', 'Author'),
-      accessorKey: 'created_by',
+      dataIndex: 'created_by',
       parser: (value: string) => {
         const { data } = useQueryUser(value);
         return <span className='text-slate-600'>{data?.username || value || '-'}</span>;
@@ -78,7 +78,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('topic.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span>{formatRelativeTime(new Date(value))}</span>
@@ -88,7 +88,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

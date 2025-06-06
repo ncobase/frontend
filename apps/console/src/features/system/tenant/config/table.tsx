@@ -17,7 +17,7 @@ export const tableColumns = ({
   return [
     {
       title: t('tenant.fields.name', 'Name'),
-      accessorKey: 'name',
+      dataIndex: 'name',
       parser: (value, record: Tenant) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
           <div className='flex items-center space-x-2'>
@@ -51,13 +51,13 @@ export const tableColumns = ({
     },
     {
       title: t('tenant.fields.type', 'Type'),
-      accessorKey: 'type',
+      dataIndex: 'type',
       parser: value => renderTenantType(value, t),
       icon: 'IconCategory2'
     },
     {
       title: t('tenant.fields.slug', 'Slug'),
-      accessorKey: 'slug',
+      dataIndex: 'slug',
       parser: value => (
         <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
           {value}
@@ -67,19 +67,19 @@ export const tableColumns = ({
     },
     {
       title: t('tenant.fields.url', 'Website'),
-      accessorKey: 'url',
+      dataIndex: 'url',
       parser: value => renderWebsite(value),
       icon: 'IconWorldWww'
     },
     {
       title: t('tenant.fields.status', 'Status'),
-      accessorKey: 'disabled',
+      dataIndex: 'disabled',
       parser: (value, record: Tenant) => renderTenantStatus(value, record, t),
       icon: 'IconStatusChange'
     },
     {
       title: t('tenant.fields.updated_at', 'Updated'),
-      accessorKey: 'updated_at',
+      dataIndex: 'updated_at',
       parser: value => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span className='text-sm'>{formatRelativeTime(new Date(value))}</span>
@@ -89,7 +89,7 @@ export const tableColumns = ({
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('tenant.actions.users', 'Manage Users'),

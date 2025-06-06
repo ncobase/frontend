@@ -523,7 +523,7 @@ ${tableFields
   .map(field => {
     let column = `    {
       title: t('${featureConfig.name.toLowerCase()}.fields.${field.name}'),
-      accessorKey: '${field.name}'`;
+      dataIndex: '${field.name}'`;
 
     if (field.isPrimary) {
       column += `,
@@ -555,7 +555,7 @@ ${tableFields
       .map(rel => {
         return `    {
       title: t('${featureConfig.name.toLowerCase()}.fields.${rel.name}'),
-      accessorKey: '${rel.name}.name',
+      dataIndex: '${rel.name}.name',
       icon: 'IconLink',
       parser: (value: string, record: ${featureConfig.name}) => (
         record.${rel.name} ? (

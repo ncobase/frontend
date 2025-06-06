@@ -9,7 +9,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
   return [
     {
       title: t('role.fields.name', 'Name'),
-      accessorKey: 'name',
+      dataIndex: 'name',
       parser: (value: string, record: Role) => (
         <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
           <span className='font-medium'>{value}</span>
@@ -19,7 +19,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('role.fields.slug', 'Slug'),
-      accessorKey: 'slug',
+      dataIndex: 'slug',
       parser: (value: string) => (
         <span className='text-slate-600 font-mono text-xs bg-slate-100 px-2 py-1 rounded'>
           {value || '-'}
@@ -29,25 +29,25 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('role.fields.group', 'Group'),
-      accessorKey: 'group',
+      dataIndex: 'group',
       parser: (value: string) => <span className='text-slate-600'>{value || '-'}</span>,
       icon: 'IconUsers'
     },
     {
       title: t('role.fields.tenant', 'Tenant'),
-      accessorKey: 'tenant',
+      dataIndex: 'tenant',
       parser: (value: string) => <span className='text-slate-600'>{value || '-'}</span>,
       icon: 'IconBuilding'
     },
     {
       title: t('role.fields.status', 'Status'),
-      accessorKey: 'disabled',
+      dataIndex: 'disabled',
       parser: (value: boolean) => renderRoleStatus(value),
       icon: 'IconStatusChange'
     },
     {
       title: t('role.fields.description', 'Description'),
-      accessorKey: 'description',
+      dataIndex: 'description',
       parser: (value: string) => (
         <Tooltip content={value || 'No description'}>
           <span className='truncate max-w-[200px] text-slate-600'>
@@ -59,7 +59,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('role.fields.created_at', 'Created'),
-      accessorKey: 'created_at',
+      dataIndex: 'created_at',
       parser: (value: string) => (
         <Tooltip content={formatDateTime(value, 'dateTime')}>
           <span>{formatRelativeTime(new Date(value))}</span>
@@ -69,7 +69,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       actions: [
         {
           title: t('actions.view', 'View'),

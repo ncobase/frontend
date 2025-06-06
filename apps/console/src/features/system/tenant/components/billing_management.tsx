@@ -75,7 +75,7 @@ export const TenantBillingManagement: React.FC<TenantBillingManagementProps> = (
   const billingColumns = [
     {
       title: t('tenant.billing.fields.invoice_number', 'Invoice'),
-      accessorKey: 'invoice_number',
+      dataIndex: 'invoice_number',
       icon: 'IconFileText',
       parser: (value, record) => (
         <div>
@@ -88,7 +88,7 @@ export const TenantBillingManagement: React.FC<TenantBillingManagementProps> = (
     },
     {
       title: t('tenant.billing.fields.amount', 'Amount'),
-      accessorKey: 'amount',
+      dataIndex: 'amount',
       icon: 'IconCurrencyDollar',
       parser: (value, record) => (
         <div className='font-medium'>{formatCurrency(value, record.currency)}</div>
@@ -96,7 +96,7 @@ export const TenantBillingManagement: React.FC<TenantBillingManagementProps> = (
     },
     {
       title: t('tenant.billing.fields.status', 'Status'),
-      accessorKey: 'status',
+      dataIndex: 'status',
       icon: 'IconStatusChange',
       parser: value => {
         const statusColors = {
@@ -115,19 +115,19 @@ export const TenantBillingManagement: React.FC<TenantBillingManagementProps> = (
     },
     {
       title: t('tenant.billing.fields.billing_period', 'Period'),
-      accessorKey: 'billing_period',
+      dataIndex: 'billing_period',
       icon: 'IconCalendar',
       parser: value => t(`tenant.billing.periods.${value}`)
     },
     {
       title: t('tenant.billing.fields.due_date', 'Due Date'),
-      accessorKey: 'due_date',
+      dataIndex: 'due_date',
       icon: 'IconCalendarDue',
       parser: value => (value ? formatDateTime(value, 'date') : '-')
     },
     {
       title: t('common.actions', 'Actions'),
-      accessorKey: 'operation-column',
+      dataIndex: 'operation-column',
       parser: (_, record) => (
         <div className='flex items-center space-x-1'>
           {record.status === 'pending' && (
