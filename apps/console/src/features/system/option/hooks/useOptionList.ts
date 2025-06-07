@@ -44,10 +44,10 @@ export const useOptionList = (initialParams: QueryFormParams = { limit: 20 }) =>
 
   // Load more data for pagination
   const loadMore = useCallback(async () => {
-    if (data?.next_cursor && data?.has_next_page) {
+    if (data?.next_cursor && data?.has_next) {
       await fetchData({ cursor: data.next_cursor });
     }
-  }, [data?.next_cursor, data?.has_next_page, fetchData]);
+  }, [data?.next_cursor, data?.has_next, fetchData]);
 
   // Reset to first page
   const resetToFirstPage = useCallback(() => {
@@ -68,7 +68,7 @@ export const useOptionList = (initialParams: QueryFormParams = { limit: 20 }) =>
     loadMore,
     resetToFirstPage,
     refetch,
-    hasMore: data?.has_next_page || false,
+    hasMore: data?.has_next || false,
     total: data?.total || 0
   };
 };
