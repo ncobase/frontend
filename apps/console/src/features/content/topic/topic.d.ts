@@ -18,9 +18,11 @@ export interface Topic {
   updated_at?: string;
 }
 
-export interface Topics {
-  items: Topic[];
-  total: number;
-  has_next: boolean;
-  next?: string;
-}
+export type QueryFormParams = {
+  search?: string;
+  title?: string;
+  status?: string;
+  taxonomy?: string;
+  private?: boolean | string;
+  markdown?: boolean | string;
+} & PaginationParams;

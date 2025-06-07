@@ -2,9 +2,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 
 import { isEqual } from 'lodash';
 
-import { QueryFormParams } from '../config/query';
 import { useListTaxonomies } from '../service';
-import { Taxonomies } from '../taxonomy';
+import { QueryFormParams } from '../taxonomy.d';
 
 export const useTaxonomyList = (
   initialParams: QueryFormParams = {
@@ -46,7 +45,7 @@ export const useTaxonomyList = (
   }, [queryParams]);
 
   return {
-    data: data as Taxonomies | undefined,
+    data,
     queryParams,
     loading: isLoading,
     error,

@@ -20,9 +20,9 @@ export interface Taxonomy {
   updated_at?: string;
 }
 
-export interface Taxonomies {
-  items: Taxonomy[];
-  total: number;
-  has_next: boolean;
-  next?: string;
-}
+export type QueryFormParams = {
+  type?: string;
+  code?: string;
+  title?: string;
+  status?: string;
+} & PaginationParams;

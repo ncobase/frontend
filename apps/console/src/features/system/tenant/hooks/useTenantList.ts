@@ -4,7 +4,6 @@ import { isEqual } from 'lodash';
 
 import { QueryFormParams } from '../config/query';
 import { useListTenants } from '../service';
-import { Tenants } from '../tenant';
 
 export const useTenantList = (initialParams: QueryFormParams = { limit: 20 }) => {
   const [queryParams, setQueryParams] = useState<QueryFormParams>(initialParams);
@@ -40,7 +39,7 @@ export const useTenantList = (initialParams: QueryFormParams = { limit: 20 }) =>
   }, [queryParams]);
 
   return {
-    data: data as Tenants | undefined,
+    data,
     queryParams,
     loading: isLoading,
     error,

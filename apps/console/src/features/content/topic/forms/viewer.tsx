@@ -34,7 +34,7 @@ export const TopicViewerForm = ({ record }) => {
       <Section
         title={t('topic.section.basic_info', 'Basic Information')}
         icon='IconInfoCircle'
-        className='mb-6'
+        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
       >
         <div className='bg-white rounded-lg p-4'>
           <h1 className='text-2xl font-bold text-gray-800 mb-4'>{data.title}</h1>
@@ -78,7 +78,11 @@ export const TopicViewerForm = ({ record }) => {
       </Section>
 
       {/* Content Section */}
-      <Section title={t('topic.section.content', 'Content')} icon='IconFileText' className='mb-6'>
+      <Section
+        title={t('topic.section.content', 'Content')}
+        icon='IconFileText'
+        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+      >
         <div className='bg-white rounded-lg p-4'>
           <div className='border rounded-md p-4 bg-gray-50'>
             {data.markdown ? (
@@ -94,7 +98,11 @@ export const TopicViewerForm = ({ record }) => {
 
       {/* Thumbnail Section (conditionally rendered) */}
       {data.thumbnail && (
-        <Section title={t('topic.fields.thumbnail', 'Thumbnail')} icon='IconPhoto' className='mb-6'>
+        <Section
+          title={t('topic.fields.thumbnail', 'Thumbnail')}
+          icon='IconPhoto'
+          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        >
           <div className='bg-white rounded-lg p-4'>
             <div className='flex justify-center'>
               <img
@@ -111,7 +119,7 @@ export const TopicViewerForm = ({ record }) => {
       <Section
         title={t('topic.section.system', 'System Information')}
         icon='IconDatabase'
-        className='mb-6'
+        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
       >
         <div className='bg-white rounded-lg p-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

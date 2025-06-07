@@ -1,173 +1,214 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
-import { useForm } from 'react-hook-form';
+import { Card, Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
+import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 
-import { QueryFormParams, queryFields } from '../config/query';
-import { tableColumns } from '../config/table';
-import { topbarLeftSection, topbarRightSection } from '../config/topbar';
-import { useTaxonomyList } from '../hooks';
-import { useCreateTaxonomy, useDeleteTaxonomy, useUpdateTaxonomy } from '../service';
+import { BulkActions } from '../../components/BulkActions';
+import { ContentSearch } from '../../components/ContentSearch';
+import { useContentOperations } from '../../hooks/useContentOperations';
+import { useListTaxonomies } from '../service';
 import { Taxonomy } from '../taxonomy';
 
-import { CreateTaxonomyPage } from './create';
-import { EditorTaxonomyPage } from './editor';
-import { TaxonomyViewerPage } from './viewer';
-
-import { CurdView } from '@/components/curd';
-import { useLayoutContext } from '@/components/layout';
+import { Page, Topbar } from '@/components/layout';
 
 export const TaxonomyListPage = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { mode } = useParams<{ mode: string; slug: string }>();
-  const { vmode } = useLayoutContext();
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useState({ search: '', type: '', limit: 50 });
+  const [selectedItems, setSelectedItems] = useState<Taxonomy[]>([]);
 
-  const { data, fetchData, loading, refetch } = useTaxonomyList();
+  const { data: taxonomyData, isLoading, refetch } = useListTaxonomies(searchParams);
+  const { bulkDeleteTaxonomies } = useContentOperations();
 
-  const [viewType, setViewType] = useState<string | undefined>(mode);
-  const [selectedRecord, setSelectedRecord] = useState<Taxonomy | null>(null);
+  const taxonomies = taxonomyData?.items || [];
 
-  const {
-    handleSubmit: handleQuerySubmit,
-    control: queryControl,
-    reset: queryReset
-  } = useForm<QueryFormParams>();
+  const handleSearch = useCallback((query: string, filters: any) => {
+    setSearchParams(prev => ({
+      ...prev,
+      search: query,
+      type: filters.type || '',
+      cursor: ''
+    }));
+  }, []);
 
-  const {
-    control: formControl,
-    formState: { errors: formErrors },
-    reset: formReset,
-    setValue: setFormValue,
-    handleSubmit: handleFormSubmit
-  } = useForm<Taxonomy>();
+  const handleToggleSelect = useCallback((item: Taxonomy) => {
+    setSelectedItems(prev => {
+      const isSelected = prev.some(selected => selected.id === item.id);
+      return isSelected ? prev.filter(selected => selected.id !== item.id) : [...prev, item];
+    });
+  }, []);
 
-  const createTaxonomyMutation = useCreateTaxonomy();
-  const updateTaxonomyMutation = useUpdateTaxonomy();
-  const deleteTaxonomyMutation = useDeleteTaxonomy();
+  const handleBulkDelete = useCallback(
+    async (ids: string[]) => {
+      const success = await bulkDeleteTaxonomies(ids);
+      if (success) {
+        setSelectedItems([]);
+        refetch();
+      }
+    },
+    [bulkDeleteTaxonomies, refetch]
+  );
 
-  useEffect(() => {
-    if (mode) {
-      setViewType(mode);
-    } else {
-      setViewType(undefined);
-    }
-  }, [mode]);
-
-  const onQuery = handleQuerySubmit(async queryData => {
-    await fetchData({ ...queryData, cursor: '' });
-    await refetch();
-  });
-
-  const onResetQuery = () => {
-    queryReset();
+  const getStatusBadge = (status: number) => {
+    return status === 0 ? (
+      <Badge variant='success'>{t('common.enabled')}</Badge>
+    ) : (
+      <Badge variant='secondary'>{t('common.disabled')}</Badge>
+    );
   };
 
-  const handleView = useCallback(
-    (record: Taxonomy | null, type: string) => {
-      setSelectedRecord(record);
-      setViewType(type);
-
-      if (vmode === 'flatten') {
-        navigate(`${type}${record?.id ? `/${record.id}` : ''}`);
-      }
+  // Table columns configuration
+  const columns = [
+    {
+      title: t('taxonomy.fields.name'),
+      dataIndex: 'name',
+      parser: (_: any, taxonomy: Taxonomy) => (
+        <div className='flex items-center space-x-3'>
+          <div
+            className='w-8 h-8 rounded flex items-center justify-center'
+            style={{ backgroundColor: taxonomy.color || '#3B82F6' }}
+          >
+            <Icons name={taxonomy.icon || 'IconFolder'} size={16} color='#fff' />
+          </div>
+          <div>
+            <div className='font-medium text-gray-900'>{taxonomy.name}</div>
+            <div className='text-sm text-gray-500'>{taxonomy.slug}</div>
+          </div>
+        </div>
+      )
     },
-    [navigate, vmode]
-  );
-
-  const handleClose = useCallback(() => {
-    setSelectedRecord(null);
-    setViewType(undefined);
-    formReset();
-
-    if (vmode === 'flatten' && viewType) {
-      navigate(-1);
+    {
+      title: t('taxonomy.fields.type'),
+      dataIndex: 'type',
+      width: 120,
+      parser: (type: string) => (
+        <Badge variant='primary' className='capitalize'>
+          {type}
+        </Badge>
+      )
+    },
+    {
+      title: t('taxonomy.fields.status'),
+      dataIndex: 'status',
+      width: 120,
+      parser: (status: number) => getStatusBadge(status)
+    },
+    {
+      title: t('taxonomy.fields.description'),
+      dataIndex: 'description',
+      parser: (description: string) => (
+        <span className='text-sm text-gray-600 line-clamp-2'>{description || '-'}</span>
+      )
+    },
+    {
+      title: t('taxonomy.fields.created_at'),
+      dataIndex: 'created_at',
+      width: 120,
+      parser: (created_at: string) => (
+        <Tooltip content={formatDateTime(created_at, 'dateTime')}>
+          <span className='text-sm text-gray-500'>{formatRelativeTime(new Date(created_at))}</span>
+        </Tooltip>
+      )
+    },
+    {
+      title: t('common.actions'),
+      filter: false,
+      parser: (_: any, taxonomy: Taxonomy) => (
+        <div className='flex space-x-1'>
+          <Button
+            variant='text'
+            size='xs'
+            onClick={() => navigate(`/content/taxonomies/${taxonomy.id}`)}
+          >
+            <Icons name='IconEye' size={14} className='mr-1' />
+            {t('actions.view')}
+          </Button>
+          <Button
+            variant='text'
+            size='xs'
+            onClick={() => navigate(`/content/taxonomies/${taxonomy.id}/edit`)}
+          >
+            <Icons name='IconEdit' size={14} className='mr-1' />
+            {t('actions.edit')}
+          </Button>
+        </div>
+      )
     }
-  }, [formReset, navigate, vmode, viewType]);
+  ];
 
-  const onSuccess = useCallback(() => {
-    handleClose();
-  }, [handleClose]);
-
-  const handleCreate = useCallback(
-    (data: Taxonomy) => {
-      createTaxonomyMutation.mutate(data, { onSuccess });
-    },
-    [createTaxonomyMutation, onSuccess]
-  );
-
-  const handleUpdate = useCallback(
-    (data: Taxonomy) => {
-      updateTaxonomyMutation.mutate(data, { onSuccess });
-    },
-    [updateTaxonomyMutation, onSuccess]
-  );
-
-  const handleDelete = useCallback(
-    (record: Taxonomy) => {
-      if (record.id) {
-        deleteTaxonomyMutation.mutate(record.id, { onSuccess });
-      }
-    },
-    [deleteTaxonomyMutation, onSuccess]
-  );
-
-  const handleConfirm = useCallback(
-    handleFormSubmit((data: Taxonomy) => {
-      return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
-    }),
-    [handleFormSubmit, viewType, handleCreate, handleUpdate]
-  );
-
-  const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete }),
-    topbarLeft: topbarLeftSection({ handleView }),
-    topbarRight: topbarRightSection,
-    title: t('content.taxonomy.title')
+  const filterOptions = {
+    types: [
+      { label: t('taxonomy.type.category'), value: 'category' },
+      { label: t('taxonomy.type.tag'), value: 'tag' },
+      { label: t('taxonomy.type.topic'), value: 'topic' },
+      { label: t('taxonomy.type.section'), value: 'section' }
+    ]
   };
 
   return (
-    <CurdView
-      viewMode={vmode}
-      title={tableConfig.title}
-      topbarLeft={tableConfig.topbarLeft}
-      topbarRight={tableConfig.topbarRight}
-      columns={tableConfig.columns}
-      data={data?.items || []}
-      queryFields={queryFields({ queryControl })}
-      onQuery={onQuery}
-      onResetQuery={onResetQuery}
-      maxTreeLevel={-1}
-      paginated={false}
-      isAllExpanded
-      fetchData={fetchData}
-      loading={loading}
-      createComponent={
-        <CreateTaxonomyPage
-          viewMode={vmode}
-          onSubmit={handleConfirm}
-          control={formControl}
-          errors={formErrors}
+    <Page
+      sidebar
+      title={t('content.taxonomies.title')}
+      topbar={
+        <Topbar
+          title={t('content.taxonomies.title')}
+          right={[
+            <Button size='sm' onClick={() => navigate('/content/taxonomies/create')}>
+              <Icons name='IconPlus' size={16} className='mr-1' />
+              {t('content.taxonomies.create')}
+            </Button>
+          ]}
         />
       }
-      viewComponent={record => (
-        <TaxonomyViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
-      )}
-      editComponent={record => (
-        <EditorTaxonomyPage
-          viewMode={vmode}
-          record={record?.id}
-          onSubmit={handleConfirm}
-          control={formControl}
-          setValue={setFormValue}
-          errors={formErrors}
-        />
-      )}
-      type={viewType}
-      record={selectedRecord}
-      onConfirm={handleConfirm}
-      onCancel={handleClose}
-    />
+      className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
+    >
+      {/* Search */}
+      <ContentSearch
+        onSearch={handleSearch}
+        placeholder={t('content.taxonomies.search_placeholder')}
+        showFilters={true}
+        filterOptions={filterOptions}
+      />
+
+      {/* Taxonomies List */}
+      <div>
+        {isLoading ? (
+          <div className='flex items-center justify-center h-48'>
+            <Icons name='IconLoader2' className='animate-spin' size={24} />
+          </div>
+        ) : taxonomies.length > 0 ? (
+          <TableView
+            header={columns}
+            selected
+            data={taxonomies}
+            onSelectRow={row => handleToggleSelect(row)}
+            onSelectAllRows={rows => setSelectedItems(rows)}
+          />
+        ) : (
+          <Card className='text-center py-8'>
+            <Icons name='IconBookmark' size={32} className='mx-auto text-gray-400 mb-3' />
+            <h3 className='text-base font-medium text-gray-900 mb-1'>
+              {t('content.taxonomies.empty.title')}
+            </h3>
+            <p className='text-sm text-gray-500 mb-4'>
+              {t('content.taxonomies.empty.description')}
+            </p>
+            <Button size='sm' onClick={() => navigate('/content/taxonomies/create')}>
+              <Icons name='IconPlus' size={16} className='mr-1' />
+              {t('content.taxonomies.create')}
+            </Button>
+          </Card>
+        )}
+      </div>
+
+      {/* Bulk Actions */}
+      <BulkActions
+        selectedItems={selectedItems}
+        onClearSelection={() => setSelectedItems([])}
+        onBulkDelete={handleBulkDelete}
+      />
+    </Page>
   );
 };

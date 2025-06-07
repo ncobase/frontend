@@ -133,7 +133,7 @@ export const CommentListPage = () => {
   return (
     <CurdView
       viewMode={vmode}
-      title={t('content.comment.title')}
+      title={t('content.comments.title')}
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
       columns={tableColumns({ handleView, handleDelete })}

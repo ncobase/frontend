@@ -19,7 +19,7 @@ export const CreateOptionPage = ({ viewMode, onSubmit, control, errors }) => {
 
   return (
     <>
-      <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4 z-10'>
+      <div className='bg-white sticky -top-4 py-2 right-0 left-0 border-b border-slate-100 pb-4 z-10'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-x-4'>
             <Button
@@ -35,7 +35,7 @@ export const CreateOptionPage = ({ viewMode, onSubmit, control, errors }) => {
             </div>
           </div>
           <div className='flex gap-x-3'>
-            <Button variant='outline' onClick={() => navigate(-1)} size='sm'>
+            <Button variant='outline' size='sm' onClick={() => navigate(-1)}>
               {t('actions.cancel', 'Cancel')}
             </Button>
             <Button onClick={onSubmit} size='sm' variant='primary'>
@@ -45,13 +45,9 @@ export const CreateOptionPage = ({ viewMode, onSubmit, control, errors }) => {
         </div>
       </div>
 
-      <ScrollView className='bg-gray-50 min-h-screen'>
-        <Container className='py-6'>
-          <div className='bg-white rounded-lg shadow-sm border p-6'>
-            <CreateOptionForms onSubmit={onSubmit} control={control} errors={errors} />
-          </div>
-        </Container>
-      </ScrollView>
+      <div className='bg-white rounded-lg p-6'>
+        <CreateOptionForms onSubmit={onSubmit} control={control} errors={errors} />
+      </div>
     </>
   );
 };

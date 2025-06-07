@@ -1,41 +1,79 @@
-import { Button, Container, Icons, ScrollView } from '@ncobase/react';
+import { Button, Icons } from '@ncobase/react';
+import { useToastMessage } from '@ncobase/react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { CreateTaxonomyForms } from '../forms/create';
+import { CreateTaxonomyForm } from '../forms/create';
+import { useCreateTaxonomy } from '../service';
 
-import { useLayoutContext } from '@/components/layout';
+import { Page, Topbar } from '@/components/layout';
 
-export const CreateTaxonomyPage = ({ viewMode, onSubmit, control, errors }) => {
-  const { vmode } = useLayoutContext();
-  const mode = viewMode || vmode || 'flatten';
-  if (mode === 'modal') {
-    return <CreateTaxonomyForms onSubmit={onSubmit} control={control} errors={errors} />;
-  }
+export const CreateTaxonomyPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useToastMessage();
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors }
+  } = useForm();
+  const createTaxonomyMutation = useCreateTaxonomy();
+
+  const onSubmit = handleSubmit(async data => {
+    try {
+      await createTaxonomyMutation.mutateAsync(data);
+      toast.success(t('taxonomy.create.success'));
+      navigate('/content/taxonomies');
+    } catch (error) {
+      toast.error(t('taxonomy.create.error'));
+      console.error('Create taxonomy error:', error);
+    }
+  });
+
   return (
-    <>
-      <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-x-4'>
-            <div className='text-slate-600 font-medium'>{t('actions.create')}</div>
-          </div>
-          <div className='flex gap-x-4'>
-            <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
+    <Page
+      sidebar
+      topbar={
+        <Topbar
+          title={t('content.taxonomies.create_subtitle')}
+          left={[
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={() => navigate('/content/taxonomies')}
+              className='flex items-center gap-2'
+            >
+              <Icons name='IconArrowLeft' size={16} />
+              {t('actions.back')}
+            </Button>
+          ]}
+          right={[
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => navigate('/content/taxonomies')}
+              size='sm'
+            >
               {t('actions.cancel')}
+            </Button>,
+            <Button onClick={onSubmit} size='sm' loading={createTaxonomyMutation.isPending}>
+              <Icons name='IconCheck' size={16} className='mr-2' />
+              {t('actions.create')}
             </Button>
-            <Button onClick={onSubmit} size='sm'>
-              {t('actions.submit')}
-            </Button>
-          </div>
-        </div>
-      </div>
-      <ScrollView className='bg-white'>
-        <Container>
-          <CreateTaxonomyForms onSubmit={onSubmit} control={control} errors={errors} />
-        </Container>
-      </ScrollView>
-    </>
+          ]}
+        />
+      }
+      className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
+    >
+      <CreateTaxonomyForm
+        onSubmit={onSubmit}
+        control={control}
+        setValue={setValue}
+        errors={errors}
+      />
+    </Page>
   );
 };

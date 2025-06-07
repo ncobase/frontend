@@ -2,9 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { isEqual } from 'lodash';
 
-import { QueryFormParams } from '../config/query';
 import { useListTopics } from '../service';
-import { Topics } from '../topic';
+import { QueryFormParams } from '../topic.d';
 
 export const useTopicList = (initialParams: QueryFormParams = { limit: 20 }) => {
   const [queryParams, setQueryParams] = useState<QueryFormParams>(initialParams);
@@ -40,7 +39,7 @@ export const useTopicList = (initialParams: QueryFormParams = { limit: 20 }) => 
   }, [queryParams]);
 
   return {
-    data: data as Topics | undefined,
+    data,
     queryParams,
     loading: isLoading,
     error,

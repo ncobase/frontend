@@ -3,7 +3,6 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { isEqual } from 'lodash';
 
 import { QueryFormParams } from '../config/query';
-import { Roles } from '../role';
 import { useListRoles } from '../service';
 
 export const useRoleList = (initialParams: QueryFormParams = { limit: 20 }) => {
@@ -40,7 +39,7 @@ export const useRoleList = (initialParams: QueryFormParams = { limit: 20 }) => {
   }, [queryParams]);
 
   return {
-    data: data as Roles | undefined,
+    data,
     queryParams,
     loading: isLoading,
     error,
