@@ -22,7 +22,7 @@ export const Login = () => {
   return (
     <Page title={t('account.login.title')} layout={false}>
       <div className='fixed inset-0 bg-gradient-to-br from-blue-50 via-primary-100 to-success-50 opacity-25' />
-      <div className='absolute top-4 right-4 z-10'>
+      <div className='absolute top-4 right-4 z-50'>
         <LanguageSwitcher />
       </div>
       <div className='relative flex flex-col items-center justify-center min-h-lvh z-10 px-4'>

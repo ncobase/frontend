@@ -100,7 +100,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
   maxSize = 10 * 1024 * 1024 // 10MB
 }) => {
   return (
-    <Modal isOpen={isOpen} title='Upload Media' onCancel={onClose} size='lg'>
+    <Modal isOpen={isOpen} title='Upload Media' onCancel={onClose} size='xs'>
       <div className='space-y-4'>
         <p className='text-sm text-gray-600'>Upload images, videos, audio files, or documents</p>
 
