@@ -392,12 +392,12 @@ export const TenantListPage = () => {
       </Modal>
 
       {/* Import Modal */}
-      <Modal isOpen={importModal} title={t('tenant.import.title')} className='max-w-4xl'>
+      <Modal isOpen={importModal} title={t('tenant.import.title')}>
         <TenantImportForm onSubmit={handleImportSubmit} onCancel={() => setImportModal(false)} />
       </Modal>
 
       {/* Export Modal */}
-      <Modal isOpen={exportModal} title={t('tenant.export.title')} className='max-w-4xl'>
+      <Modal isOpen={exportModal} title={t('tenant.export.title')}>
         <TenantExportForm
           onSubmit={handleExportSubmit}
           onCancel={() => setExportModal(false)}

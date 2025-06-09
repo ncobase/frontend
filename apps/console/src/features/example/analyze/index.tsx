@@ -5,21 +5,15 @@ import { useTranslation } from 'react-i18next';
 
 import { BusinessDashboard } from './business';
 import { ChartDashboard } from './chart-dashboard';
-import { CustomChartExample } from './custom';
 import { ECommerceDashboard } from './e-commerce';
-import { EChartsExample } from './echarts';
 import { OperationsDashboard } from './monitoring';
 
 import { Page, Topbar } from '@/components/layout';
-import { ExtensionMetricsPage } from '@/features/system/extension/pages/metrics';
 
 const tabs = [
-  { id: 'extension', label: 'Extension Metrics', component: ExtensionMetricsPage },
+  { id: 'ecommerce', label: 'E-Commerce', component: ECommerceDashboard },
   { id: 'business', label: 'Business Dashboard', component: BusinessDashboard },
   { id: 'chart', label: 'Chart Dashboard', component: ChartDashboard },
-  { id: 'custom', label: 'Custom Chart', component: CustomChartExample },
-  { id: 'ecommerce', label: 'E-Commerce', component: ECommerceDashboard },
-  { id: 'echarts', label: 'ECharts Example', component: EChartsExample },
   { id: 'operations', label: 'Operations', component: OperationsDashboard }
 ];
 
