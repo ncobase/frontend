@@ -68,7 +68,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
 
       {!!left.length && (
         <div
-          className='flex gap-2 shrink-0'
+          className='flex gap-2 shrink-0 mr-auto'
           role='group'
           aria-labelledby={title ? 'topbar-title' : undefined}
         >
@@ -80,7 +80,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
 
       {!!right.length && (
         <div
-          className='grow flex justify-end items-center gap-2 shrink-0'
+          className='grow flex justify-end items-center gap-2 shrink-0 ml-auto'
           role='group'
           aria-label='Actions'
         >
