@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
-import { Card, Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
+import { Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -174,7 +174,7 @@ export const ChannelListPage = () => {
             onSelectAllRows={rows => setSelectedItems(rows)}
           />
         ) : (
-          <Card className='text-center py-8'>
+          <div className='text-center py-8'>
             <Icons name='IconBroadcast' size={32} className='mx-auto text-gray-400 mb-3' />
             <h3 className='text-base font-medium text-gray-900 mb-1'>
               {t('content.channels.empty.title')}
@@ -184,7 +184,7 @@ export const ChannelListPage = () => {
               <Icons name='IconPlus' size={16} className='mr-1' />
               {t('content.channels.create')}
             </Button>
-          </Card>
+          </div>
         )}
       </div>
 

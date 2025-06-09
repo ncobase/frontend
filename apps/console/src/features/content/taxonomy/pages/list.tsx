@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
-import { Card, Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
+import { Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -73,8 +73,18 @@ export const TaxonomyListPage = () => {
             <Icons name={taxonomy.icon || 'IconFolder'} size={16} color='#fff' />
           </div>
           <div>
-            <div className='font-medium text-gray-900'>{taxonomy.name}</div>
-            <div className='text-sm text-gray-500'>{taxonomy.slug}</div>
+            <Button
+              variant='link'
+              size='lg'
+              className='px-0 h-auto min-h-auto'
+              onClick={e => {
+                e.stopPropagation();
+                navigate(`/content/topics/${taxonomy.id}`);
+              }}
+            >
+              {taxonomy.name}
+            </Button>
+            <div className='text-xs px-1.5 text-gray-500'>{taxonomy.description}</div>
           </div>
         </div>
       )
@@ -120,7 +130,10 @@ export const TaxonomyListPage = () => {
           <Button
             variant='text'
             size='xs'
-            onClick={() => navigate(`/content/taxonomies/${taxonomy.id}`)}
+            onClick={e => {
+              e.stopPropagation();
+              navigate(`/content/taxonomies/${taxonomy.id}`);
+            }}
           >
             <Icons name='IconEye' size={14} className='mr-1' />
             {t('actions.view')}
@@ -128,7 +141,10 @@ export const TaxonomyListPage = () => {
           <Button
             variant='text'
             size='xs'
-            onClick={() => navigate(`/content/taxonomies/${taxonomy.id}/edit`)}
+            onClick={e => {
+              e.stopPropagation();
+              navigate(`/content/taxonomies/${taxonomy.id}/edit`);
+            }}
           >
             <Icons name='IconEdit' size={14} className='mr-1' />
             {t('actions.edit')}
@@ -187,7 +203,7 @@ export const TaxonomyListPage = () => {
             onSelectAllRows={rows => setSelectedItems(rows)}
           />
         ) : (
-          <Card className='text-center py-8'>
+          <div className='text-center py-8'>
             <Icons name='IconBookmark' size={32} className='mx-auto text-gray-400 mb-3' />
             <h3 className='text-base font-medium text-gray-900 mb-1'>
               {t('content.taxonomies.empty.title')}
@@ -199,7 +215,7 @@ export const TaxonomyListPage = () => {
               <Icons name='IconPlus' size={16} className='mr-1' />
               {t('content.taxonomies.create')}
             </Button>
-          </Card>
+          </div>
         )}
       </div>
 

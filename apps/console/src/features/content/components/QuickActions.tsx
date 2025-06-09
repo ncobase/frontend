@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Icons, Card } from '@ncobase/react';
+import { Icons } from '@ncobase/react';
 import { useNavigate } from 'react-router';
 
 export const QuickActions: React.FC = () => {
@@ -38,7 +38,7 @@ export const QuickActions: React.FC = () => {
   ];
 
   return (
-    <Card className='p-6'>
+    <div className='px-6'>
       <h2 className='text-lg font-semibold mb-6'>Quick Actions</h2>
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         {actions.map((action, index) => (
@@ -57,6 +57,6 @@ export const QuickActions: React.FC = () => {
           </button>
         ))}
       </div>
-    </Card>
+    </div>
   );
 };

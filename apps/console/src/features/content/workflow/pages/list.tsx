@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
-import { Card, Button, Icons, Badge, TableView } from '@ncobase/react';
+import { Button, Icons, Badge, TableView } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -152,7 +152,7 @@ export const WorkflowListPage = () => {
           ) : workflows.length > 0 ? (
             <TableView header={columns} data={workflows} />
           ) : (
-            <Card className='text-center py-8'>
+            <div className='text-center py-8'>
               <Icons name='IconGitBranch' size={32} className='mx-auto text-gray-400 mb-3' />
               <h3 className='text-base font-medium text-gray-900 mb-1'>No workflows found</h3>
               <p className='text-sm text-gray-500 mb-4'>
@@ -162,7 +162,7 @@ export const WorkflowListPage = () => {
                 <Icons name='IconPlus' size={16} className='mr-1' />
                 Create Workflow
               </Button>
-            </Card>
+            </div>
           )}
         </div>
       </div>

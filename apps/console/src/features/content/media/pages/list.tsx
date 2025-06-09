@@ -194,7 +194,7 @@ export const MediaListPage = () => {
 
     return (
       <Card key={media.id} className='relative group overflow-hidden'>
-        <div className='aspect-square bg-gray-100 flex items-center justify-center'>
+        <div className='aspect-[4/3] bg-gray-100 flex items-center justify-center'>
           {media.type === 'image' && media.url ? (
             <img
               src={media.url}
@@ -210,14 +210,14 @@ export const MediaListPage = () => {
                     ? 'IconMusic'
                     : 'IconFile'
               }
-              size={48}
+              size={32}
               className='text-gray-400'
             />
           )}
         </div>
 
         {/* Selection checkbox */}
-        <div className='absolute top-2 left-2'>
+        <div className='absolute top-2 left-2 z-10'>
           <input
             type='checkbox'
             checked={isSelectedItem}
@@ -227,24 +227,22 @@ export const MediaListPage = () => {
         </div>
 
         {/* Type badge */}
-        <div className='absolute top-2 right-2'>{getTypeBadge(media.type)}</div>
+        <div className='absolute top-2 right-2 z-10'>{getTypeBadge(media.type)}</div>
 
         {/* Actions */}
-        <div className='absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-          <div className='flex space-x-1'>
+        <div className='absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100'>
+          <div className='flex space-x-2'>
             <Button
               variant='ghost'
-              size='sm'
               onClick={() => navigate(`/content/media/${media.id}`)}
-              className='bg-black bg-opacity-50 text-white hover:bg-opacity-70'
+              className='bg-white text-gray-700 hover:bg-gray-100'
             >
               <Icons name='IconEye' size={16} />
             </Button>
             <Button
               variant='ghost'
-              size='sm'
               onClick={() => navigate(`/content/media/${media.id}/edit`)}
-              className='bg-black bg-opacity-50 text-white hover:bg-opacity-70'
+              className='bg-white text-gray-700 hover:bg-gray-100'
             >
               <Icons name='IconEdit' size={16} />
             </Button>
@@ -253,7 +251,7 @@ export const MediaListPage = () => {
                 variant='ghost'
                 size='sm'
                 onClick={() => window.open(media.url, '_blank')}
-                className='bg-black bg-opacity-50 text-white hover:bg-opacity-70'
+                className='bg-white text-gray-700 hover:bg-gray-100'
               >
                 <Icons name='IconDownload' size={16} />
               </Button>
@@ -262,10 +260,10 @@ export const MediaListPage = () => {
         </div>
 
         {/* Media info */}
-        <div className='p-3'>
-          <h3 className='font-medium text-sm truncate'>{media.title}</h3>
-          <div className='flex items-center justify-between text-xs text-gray-500 mt-1'>
-            <span>{media.mime_type}</span>
+        <div className='px-2 py-4 space-y-2'>
+          <h3 className='font-medium text-xs truncate'>{media.title}</h3>
+          <div className='flex items-center justify-between text-xs text-gray-500 mt-0.5'>
+            <span className='truncate max-w-[60%]'>{media.mime_type}</span>
             {media.size && <span>{(media.size / 1024).toFixed(1)} KB</span>}
           </div>
         </div>
@@ -325,22 +323,24 @@ export const MediaListPage = () => {
               }}
             />
           ) : (
-            <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>
               {mediaItems.map(renderMediaCard)}
             </div>
           )
         ) : (
-          <Card className='text-center py-8'>
-            <Icons name='IconPhoto' size={32} className='mx-auto text-gray-400 mb-3' />
-            <h3 className='text-base font-medium text-gray-900 mb-1'>
+          <div className='flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200'>
+            <Icons name='IconPhoto' size={48} className='text-gray-400 mb-4' />
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>
               {t('content.media.empty.title')}
             </h3>
-            <p className='text-sm text-gray-500 mb-4'>{t('content.media.empty.description')}</p>
-            <Button size='sm' onClick={() => setShowUpload(true)}>
-              <Icons name='IconUpload' size={16} className='mr-1' />
+            <p className='text-sm text-gray-500 mb-6 max-w-md text-center'>
+              {t('content.media.empty.description')}
+            </p>
+            <Button size='lg' onClick={() => setShowUpload(true)}>
+              <Icons name='IconUpload' size={20} className='mr-2' />
               {t('content.media.upload')}
             </Button>
-          </Card>
+          </div>
         )}
       </div>
 

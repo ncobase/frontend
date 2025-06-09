@@ -51,12 +51,7 @@ export const CreateTopicPage = () => {
             </Button>
           ]}
           right={[
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => navigate('/content/topics')}
-              size='sm'
-            >
+            <Button variant='outline' size='sm' onClick={() => navigate('/content/topics')}>
               {t('actions.cancel')}
             </Button>,
             <Button onClick={onSubmit} size='sm' loading={createTopicMutation.isPending}>

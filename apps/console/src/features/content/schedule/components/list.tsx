@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Icons, Badge, TableView, Card } from '@ncobase/react';
+import { Button, Icons, Badge, TableView } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -174,13 +174,13 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
       {schedules.length > 0 ? (
         <TableView header={columns} data={schedules} />
       ) : (
-        <Card className='text-center py-8'>
+        <div className='text-center py-8'>
           <Icons name='IconClock' size={32} className='mx-auto text-gray-400 mb-3' />
           <h3 className='text-base font-medium text-gray-900 mb-1'>
             {t('schedule.list.empty.title')}
           </h3>
           <p className='text-sm text-gray-500'>{t('schedule.list.empty.description')}</p>
-        </Card>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-import { Card, Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
+import { Button, Icons, Badge, TableView, Tooltip } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -19,7 +19,6 @@ export const TopicListPage = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useState({ search: '', status: '', limit: 50 });
   const [selectedItems, setSelectedItems] = useState<Topic[]>([]);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
   const { data: topicData, isLoading, refetch } = useListTopics(searchParams);
   const { bulkDeleteTopics } = useContentOperations();
@@ -77,8 +76,18 @@ export const TopicListPage = () => {
       parser: (_: any, topic: Topic) => (
         <div className='flex items-center space-x-3'>
           <div>
-            <div className='font-medium text-black'>{topic.title}</div>
-            <div className='text-sm text-gray-500'>{topic.name}</div>
+            <Button
+              variant='link'
+              size='lg'
+              className='px-0 h-auto min-h-auto'
+              onClick={e => {
+                e.stopPropagation();
+                navigate(`/content/topics/${topic.id}`);
+              }}
+            >
+              {topic.title}
+            </Button>
+            <div className='text-xs text-gray-500'>{topic.name}</div>
           </div>
         </div>
       )
@@ -109,14 +118,24 @@ export const TopicListPage = () => {
       filter: false,
       parser: (_: any, topic: Topic) => (
         <div className='flex space-x-1'>
-          <Button variant='text' size='xs' onClick={() => navigate(`/content/topics/${topic.id}`)}>
+          <Button
+            variant='text'
+            size='xs'
+            onClick={e => {
+              e.stopPropagation();
+              navigate(`/content/topics/${topic.id}`);
+            }}
+          >
             <Icons name='IconEye' size={14} className='mr-1' />
             {t('actions.view')}
           </Button>
           <Button
             variant='text'
             size='xs'
-            onClick={() => navigate(`/content/topics/${topic.id}/edit`)}
+            onClick={e => {
+              e.stopPropagation();
+              navigate(`/content/topics/${topic.id}/edit`);
+            }}
           >
             <Icons name='IconEdit' size={14} className='mr-1' />
             {t('actions.edit')}
@@ -179,7 +198,7 @@ export const TopicListPage = () => {
             expandComponent={(item: Topic) => <TableRowOverflow item={item} />}
           />
         ) : (
-          <Card className='text-center py-8'>
+          <div className='text-center py-8'>
             <Icons name='IconFileText' size={32} className='mx-auto text-gray-400 mb-3' />
             <h3 className='text-base font-medium text-gray-900 mb-1'>
               {t('content.topics.empty.title')}
@@ -189,7 +208,7 @@ export const TopicListPage = () => {
               <Icons name='IconPlus' size={16} className='mr-1' />
               {t('content.topics.create')}
             </Button>
-          </Card>
+          </div>
         )}
       </div>
 

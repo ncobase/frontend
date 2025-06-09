@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import { Card, Button, Icons, Badge, TableView } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
@@ -410,7 +410,7 @@ export const DistributionListPage = () => {
             </div>
           )
         ) : (
-          <Card className='text-center py-8'>
+          <div className='text-center py-8'>
             <Icons name='IconBroadcast' size={32} className='mx-auto text-gray-400 mb-3' />
             <h3 className='text-base font-medium text-gray-900 mb-1'>
               {t('content.distributions.empty.title')}
@@ -422,7 +422,7 @@ export const DistributionListPage = () => {
               <Icons name='IconPlus' size={16} className='mr-1' />
               {t('content.distributions.create')}
             </Button>
-          </Card>
+          </div>
         )}
       </div>
 
