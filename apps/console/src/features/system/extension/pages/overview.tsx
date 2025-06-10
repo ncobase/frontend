@@ -1,37 +1,56 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 import {
   Button,
-  Badge,
   Icons,
-  Card,
-  CardContent,
+  Alert,
+  AlertDescription,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-  Alert,
-  AlertDescription,
-  Progress,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
+  SelectValue
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { AnalyticsView, ExtensionsGrid, PerformanceView } from '../components/overflow';
+import {
+  HealthScoreCard,
+  MetricCard,
+  StatusChart,
+  PerformanceChart,
+  ExtensionCard,
+  LoadingCard,
+  EmptyState,
+  QuickActions
+} from '../components/shared';
+import type { FilterState } from '../extension.d';
 import {
   useExtensions,
   useExtensionStatus,
+  useExtensionMetrics,
   useSystemHealth,
-  useMetrics,
-  useLoadExtension,
-  useUnloadExtension,
-  useReloadExtension
-} from '../service';
+  useLoadPlugin,
+  useUnloadPlugin,
+  useReloadPlugin,
+  useAutoRefresh
+} from '../hooks';
+import {
+  transformExtensionsData,
+  filterExtensions,
+  calculateExtensionStats,
+  prepareStatusChartData,
+  prepareGroupChartData,
+  getFilterOptions,
+  sortExtensions,
+  debounce,
+  COLORS,
+  calculatePerformanceScore
+} from '../utils';
 
 import { Page, Topbar } from '@/components/layout';
 import { Search } from '@/components/search/search';
@@ -40,132 +59,100 @@ export const ExtensionOverviewPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  // Real-time data with auto-refresh
+  // Auto-refresh control
+  const autoRefresh = useAutoRefresh(true);
+
+  // Data hooks
   const {
     data: extensions,
     isLoading: extensionsLoading,
-    error: extensionsError,
-    refetch: refetchExtensions
+    error: extensionsError
   } = useExtensions();
-  const { data: status, refetch: refetchStatus } = useExtensionStatus(true); // Auto-refresh enabled
-  const { data: _health, refetch: refetchHealth } = useSystemHealth(true);
-  const { data: metrics, refetch: refetchMetrics } = useMetrics(true);
+  const { data: statusData } = useExtensionStatus(autoRefresh.enabled);
+  const { data: metricsData } = useExtensionMetrics(autoRefresh.enabled);
+  const { data: _healthData } = useSystemHealth(autoRefresh.enabled);
 
-  const loadMutation = useLoadExtension();
-  const unloadMutation = useUnloadExtension();
-  const reloadMutation = useReloadExtension();
+  // Mutations
+  const loadMutation = useLoadPlugin();
+  const unloadMutation = useUnloadPlugin();
+  const reloadMutation = useReloadPlugin();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [realTimeEnabled, setRealTimeEnabled] = useState(true);
+  // Local state
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    group: '',
+    type: '',
+    status: ''
+  });
+  const [sortBy, setSortBy] = useState<'name' | 'status' | 'group' | 'performance'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Real-time update interval
-  useEffect(() => {
-    if (!realTimeEnabled) return;
+  // Debounced search
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setFilters(prev => ({ ...prev, search: value }));
+      }, 300),
+    []
+  );
 
-    const interval = setInterval(() => {
-      refetchStatus();
-      refetchHealth();
-      refetchMetrics();
-    }, 5000); // Update every 5 seconds
+  // Transform and filter data
+  const transformedExtensions = useMemo(() => {
+    if (!extensions || !statusData) return [];
 
-    return () => clearInterval(interval);
-  }, [realTimeEnabled, refetchStatus, refetchHealth, refetchMetrics]);
+    return transformExtensionsData(extensions, statusData.extensions, metricsData?.extensions);
+  }, [extensions, statusData, metricsData]);
 
-  // Flatten and enrich extensions with status and metrics
-  const flattenedExtensions = useMemo(() => {
-    if (!extensions) return [];
-
-    return Object.entries(extensions).flatMap(([group, types]) =>
-      Object.entries(types).flatMap(([type, exts]) =>
-        exts.map(ext => ({
-          ...ext,
-          group,
-          type,
-          currentStatus: status?.[ext.name] || { status: ext.status || 'unknown' },
-          resourceUsage: metrics?.resource_usage?.[ext.name]
-        }))
-      )
-    );
-  }, [extensions, status, metrics]);
-
-  // Filter extensions
   const filteredExtensions = useMemo(() => {
-    return flattenedExtensions.filter(ext => {
-      const matchesSearch =
-        !searchTerm ||
-        ext.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ext.description?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesGroup = !selectedGroup || ext.group === selectedGroup;
-      const matchesType = !selectedType || ext.type === selectedType;
-      const matchesStatus = !selectedStatus || ext.currentStatus.status === selectedStatus;
+    const filtered = filterExtensions(transformedExtensions, filters);
+    return sortExtensions(filtered, sortBy, sortOrder);
+  }, [transformedExtensions, filters, sortBy, sortOrder]);
 
-      return matchesSearch && matchesGroup && matchesType && matchesStatus;
-    });
-  }, [flattenedExtensions, searchTerm, selectedGroup, selectedType, selectedStatus]);
-
-  // Calculate statistics
+  // Statistics
   const stats = useMemo(() => {
-    const total = flattenedExtensions.length;
-    const active = flattenedExtensions.filter(ext => ext.currentStatus.status === 'active').length;
-    const error = flattenedExtensions.filter(ext => ext.currentStatus.status === 'error').length;
-    const inactive = flattenedExtensions.filter(ext =>
-      ['inactive', 'disabled'].includes(ext.currentStatus.status)
-    ).length;
-
-    return {
-      total,
-      active,
-      error,
-      inactive,
-      healthScore: total > 0 ? Math.round((active / total) * 100) : 100
-    };
-  }, [flattenedExtensions]);
+    return calculateExtensionStats(transformedExtensions);
+  }, [transformedExtensions]);
 
   // Chart data
   const chartData = useMemo(() => {
-    const statusData = [
-      { name: 'Active', value: stats.active, color: '#34A853' },
-      { name: 'Error', value: stats.error, color: '#EA4335' },
-      { name: 'Inactive', value: stats.inactive, color: '#FBBC05' }
-    ].filter(item => item.value > 0);
+    return {
+      statusData: prepareStatusChartData(stats),
+      groupData: prepareGroupChartData(transformedExtensions)
+    };
+  }, [stats, transformedExtensions]);
 
-    const groupData = Object.entries(
-      flattenedExtensions.reduce(
-        (acc, ext) => {
-          acc[ext.group] = (acc[ext.group] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>
-      )
-    ).map(([name, value]) => ({ name, value }));
-
-    return { statusData, groupData };
-  }, [stats, flattenedExtensions]);
+  // Performance data for charts
+  const performanceData = useMemo(() => {
+    return transformedExtensions
+      .filter(ext => ext.metrics)
+      .map(ext => ({
+        name: ext.name,
+        memory: 0, // Memory data not available in current API
+        initTime: ext.metrics?.init_time_ms || 0,
+        score: ext.metrics ? calculatePerformanceScore(ext.metrics) : 0,
+        serviceCalls: ext.metrics?.service_calls || 0
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+  }, [transformedExtensions]);
 
   // Filter options
   const filterOptions = useMemo(() => {
-    const groups = [...new Set(flattenedExtensions.map(ext => ext.group))];
-    const types = [...new Set(flattenedExtensions.map(ext => ext.type))];
-    const statuses = [...new Set(flattenedExtensions.map(ext => ext.currentStatus.status))];
+    return getFilterOptions(transformedExtensions);
+  }, [transformedExtensions]);
 
-    return { groups, types, statuses };
-  }, [flattenedExtensions]);
-
-  // Handle extension actions
-  const handleAction = async (action: string, extensionName: string) => {
+  // Event handlers
+  const handleAction = async (action: string, name: string) => {
     try {
       switch (action) {
         case 'load':
-          await loadMutation.mutateAsync(extensionName);
+          await loadMutation.mutateAsync(name);
           break;
         case 'unload':
-          await unloadMutation.mutateAsync(extensionName);
+          await unloadMutation.mutateAsync(name);
           break;
         case 'reload':
-          await reloadMutation.mutateAsync(extensionName);
+          await reloadMutation.mutateAsync(name);
           break;
       }
     } catch (error) {
@@ -173,34 +160,24 @@ export const ExtensionOverviewPage = () => {
     }
   };
 
+  const handleViewMetrics = (name: string) => {
+    navigate('/system/extensions/metrics', { state: { extensionName: name } });
+  };
+
+  const handleFilterChange = (key: keyof FilterState, value: string) => {
+    if (value === 'all') value = '';
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
   // Navigation helpers
-  const goToMetrics = (collection?: string) => {
-    navigate('/system/extensions/metrics', { state: { selectedCollection: collection } });
-  };
+  const goToHealth = () => navigate('/system/extensions/health');
+  const goToMetrics = () => navigate('/system/extensions/metrics');
+  const goToCollections = () => navigate('/system/extensions/collections');
 
-  const goToHealth = () => {
-    navigate('/system/extensions/health');
-  };
-
-  const goToCollections = (collection?: string) => {
-    navigate('/system/extensions/collections', { state: { selectedCollection: collection } });
-  };
-
-  const getStatusBadge = (currentStatus: any) => {
-    switch (currentStatus.status) {
-      case 'active':
-        return 'success';
-      case 'inactive':
-      case 'disabled':
-        return 'warning';
-      case 'error':
-        return 'danger';
-      case 'initializing':
-      case 'maintenance':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
+  // Refresh handler
+  const handleRefresh = () => {
+    // Trigger refresh through auto-refresh hook
+    autoRefresh.setEnabled(true);
   };
 
   if (extensionsError) {
@@ -216,226 +193,139 @@ export const ExtensionOverviewPage = () => {
     );
   }
 
-  // Handle Select group change
-  const handleSelectedGroup = (value: string) => {
-    if (value === 'all') {
-      setSelectedGroup('');
-      setSelectedType('');
-      setSelectedStatus('');
-    } else {
-      setSelectedGroup(value);
-      setSelectedType('');
-      setSelectedStatus('');
-    }
-  };
-
-  // // Handle Select type change
-  // const handleSelectedType = (value: string) => {
-  //   if (value === 'all') {
-  //     setSelectedType('');
-  //     setSelectedStatus('');
-  //   } else {
-  //     setSelectedType(value);
-  //     setSelectedStatus('');
-  //   }
-  // };
-
-  // Handle Select status change
-  const handleSelectedStatus = (value: string) => {
-    if (value === 'all') {
-      setSelectedStatus('');
-    } else {
-      setSelectedStatus(value);
-    }
-  };
-
   return (
     <Page
       title={t('extensions.overview.title', 'Extensions Overview')}
       topbar={
-        <Topbar>
-          <div className='flex items-center gap-4'>
-            <div className='flex items-center gap-2'>
-              <div
-                className={`w-2 h-2 rounded-full ${realTimeEnabled ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}
+        <Topbar
+          left={[
+            <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-2'>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    autoRefresh.enabled ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+                  }`}
+                />
+                <span className='text-sm text-slate-600'>
+                  {autoRefresh.enabled ? 'Live' : 'Paused'} • {stats.active}/{stats.total} Active
+                </span>
+              </div>
+              <Search
+                placeholder='Search extensions...'
+                fieldClassName='border-slate-200/60 focus:border-primary-600 py-2'
+                onSearch={debouncedSearch}
               />
-              <span className='text-sm text-slate-600'>
-                {realTimeEnabled ? 'Live' : 'Paused'} • {stats.active}/{stats.total} Active
-              </span>
+              <Select
+                value={filters.group}
+                onValueChange={value => handleFilterChange('group', value)}
+              >
+                <SelectTrigger className='w-32 py-1.5'>
+                  <SelectValue placeholder='All Groups' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All Groups</SelectItem>
+                  {filterOptions.groups.map(group => (
+                    <SelectItem key={group} value={group}>
+                      {group}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={filters.status}
+                onValueChange={value => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className='w-32 py-1.5'>
+                  <SelectValue placeholder='All Status' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All Status</SelectItem>
+                  {filterOptions.statuses.map(status => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Search
-              placeholder='Search extensions...'
-              value={searchTerm}
-              fieldClassName='border-slate-200/60 focus:border-primary-600 py-2'
-              onSearch={setSearchTerm}
-            />
-            <Select value={selectedGroup} onValueChange={handleSelectedGroup}>
-              <SelectTrigger className='w-32'>
-                <SelectValue placeholder='All Groups' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>All Groups</SelectItem>
-                {filterOptions.groups.map(group => (
-                  <SelectItem key={group} value={group}>
-                    {group}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={selectedStatus} onValueChange={handleSelectedStatus}>
-              <SelectTrigger className='w-32'>
-                <SelectValue placeholder='All Status' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>All Status</SelectItem>
-                {filterOptions.statuses.map(status => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className='flex items-center gap-2'>
+          ]}
+          right={[
             <Button
               size='sm'
-              variant={realTimeEnabled ? 'primary' : 'outline-slate'}
-              icon={realTimeEnabled ? 'IconPlayerPause' : 'IconPlayerPlay'}
-              onClick={() => setRealTimeEnabled(!realTimeEnabled)}
+              variant={autoRefresh.enabled ? 'primary' : 'outline-slate'}
+              icon={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'}
+              onClick={autoRefresh.toggle}
             >
-              {realTimeEnabled ? 'Pause' : 'Resume'} Live
-            </Button>
+              {autoRefresh.enabled ? 'Pause' : 'Resume'} Live
+            </Button>,
             <Button
               size='sm'
               variant='outline-slate'
               icon='IconRefresh'
-              onClick={() => {
-                refetchExtensions();
-                refetchStatus();
-                refetchHealth();
-              }}
+              onClick={handleRefresh}
               disabled={extensionsLoading}
             >
               Refresh
             </Button>
-          </div>
-        </Topbar>
+          ]}
+        />
       }
+      className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
       <div className='w-full space-y-6'>
+        {/* Quick Actions */}
+        <QuickActions
+          onRefresh={handleRefresh}
+          onViewHealth={goToHealth}
+          onViewMetrics={goToMetrics}
+          onViewCollections={goToCollections}
+          loading={extensionsLoading}
+        />
+
         {/* Health Score Cards */}
         <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6'>
-          <Card className='cursor-pointer hover:shadow-md transition-shadow' onClick={goToHealth}>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm font-medium text-slate-600'>System Health</p>
-                  <p className='text-3xl font-bold mt-1'>{stats.healthScore}%</p>
-                </div>
-                <div className='w-12 h-12 rounded-full bg-green-100 flex items-center justify-center'>
-                  <Icons name='IconHeart' className='w-6 h-6 text-green-600' />
-                </div>
-              </div>
-              <div className='mt-4'>
-                <Progress value={stats.healthScore} className='h-2' />
-                <div className='flex items-center justify-between mt-2'>
-                  <Badge
-                    variant={
-                      stats.healthScore >= 80
-                        ? 'success'
-                        : stats.healthScore >= 60
-                          ? 'warning'
-                          : 'danger'
-                    }
-                  >
-                    {stats.healthScore >= 80
-                      ? 'Healthy'
-                      : stats.healthScore >= 60
-                        ? 'Degraded'
-                        : 'Critical'}
-                  </Badge>
-                  <span className='text-xs text-slate-500'>Click to view details</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <HealthScoreCard
+            score={stats.healthScore}
+            total={stats.total}
+            active={stats.active}
+            onClick={goToHealth}
+          />
 
-          <Card
-            className='cursor-pointer hover:shadow-md transition-shadow'
-            onClick={() => goToMetrics()}
-          >
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm font-medium text-slate-600'>Active Extensions</p>
-                  <p className='text-3xl font-bold mt-1'>{stats.active}</p>
-                </div>
-                <div className='w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center'>
-                  <Icons name='IconPackage' className='w-6 h-6 text-blue-600' />
-                </div>
-              </div>
-              <div className='mt-4 flex items-center justify-between'>
-                <Badge variant='success'>{stats.active} Running</Badge>
-                <span className='text-xs text-slate-500'>View metrics</span>
-              </div>
-            </CardContent>
-          </Card>
+          <MetricCard
+            title='Active Extensions'
+            value={stats.active}
+            icon='IconPackage'
+            color={COLORS.success}
+            subtitle={`${stats.total} total extensions`}
+            onClick={goToMetrics}
+          />
 
-          <Card
-            className='cursor-pointer hover:shadow-md transition-shadow'
-            onClick={() => goToCollections()}
-          >
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm font-medium text-slate-600'>Metric Collections</p>
-                  <p className='text-3xl font-bold mt-1'>
-                    {metrics?.storage?.total_collections || 0}
-                  </p>
-                </div>
-                <div className='w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center'>
-                  <Icons name='IconActivity' className='w-6 h-6 text-purple-600' />
-                </div>
-              </div>
-              <div className='mt-4 flex items-center justify-between'>
-                <Badge variant='outline'>{metrics?.storage?.total_metrics || 0} metrics</Badge>
-                <span className='text-xs text-slate-500'>Explore data</span>
-              </div>
-            </CardContent>
-          </Card>
+          <MetricCard
+            title='System Memory'
+            value={metricsData?.system?.memory_usage_mb || 0}
+            unit='MB'
+            icon='IconCpu'
+            color={COLORS.info}
+            subtitle={`${metricsData?.system?.goroutine_count || 0} goroutines`}
+          />
 
-          <Card>
-            <CardContent className='p-6'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <p className='text-sm font-medium text-slate-600'>Cache Hit Rate</p>
-                  <p className='text-3xl font-bold mt-1'>
-                    {Math.round(metrics?.service_cache?.hit_rate || 0)}%
-                  </p>
-                </div>
-                <div className='w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center'>
-                  <Icons name='IconDatabase' className='w-6 h-6 text-orange-600' />
-                </div>
-              </div>
-              <div className='mt-4 flex items-center justify-between'>
-                <Badge
-                  variant={metrics?.service_cache?.status === 'active' ? 'success' : 'warning'}
-                >
-                  {metrics?.service_cache?.status || 'unknown'}
-                </Badge>
-                <span className='text-xs text-slate-500'>
-                  {metrics?.service_cache?.size || 0} entries
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+          <MetricCard
+            title='Service Calls'
+            value={Object.values(metricsData?.extensions || {}).reduce(
+              (sum, ext) => sum + ext.service_calls,
+              0
+            )}
+            icon='IconActivity'
+            color={COLORS.purple}
+            subtitle='Total across all extensions'
+          />
         </div>
 
-        {/* Charts and Tables */}
+        {/* Main Content Tabs */}
         <Tabs defaultValue='extensions' className='w-full'>
           <TabsList className='grid w-full grid-cols-3 gap-2 p-1 bg-slate-50 rounded-xl'>
             <TabsTrigger value='extensions' className='rounded-lg data-[state=active]:bg-white'>
-              Extensions
+              Extensions ({filteredExtensions.length})
             </TabsTrigger>
             <TabsTrigger value='analytics' className='rounded-lg data-[state=active]:bg-white'>
               Analytics
@@ -446,30 +336,153 @@ export const ExtensionOverviewPage = () => {
           </TabsList>
 
           <TabsContent value='extensions' className='space-y-6'>
-            <ExtensionsGrid
-              extensions={filteredExtensions}
-              isLoading={extensionsLoading}
-              onAction={handleAction}
-              getStatusBadge={getStatusBadge}
-              goToMetrics={goToMetrics}
-            />
+            {/* Sort Controls */}
+            <div className='flex items-center gap-4'>
+              <span className='text-sm text-slate-600'>Sort by:</span>
+              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <SelectTrigger className='w-40 py-1.5'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='name'>Name</SelectItem>
+                  <SelectItem value='status'>Status</SelectItem>
+                  <SelectItem value='group'>Group</SelectItem>
+                  <SelectItem value='performance'>Performance</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                size='sm'
+                variant='outline-slate'
+                onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
+                icon={sortOrder === 'asc' ? 'IconSortAscending' : 'IconSortDescending'}
+              >
+                {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+              </Button>
+            </div>
+
+            {/* Extensions Grid */}
+            {extensionsLoading ? (
+              <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <LoadingCard key={i} />
+                ))}
+              </div>
+            ) : filteredExtensions.length === 0 ? (
+              <EmptyState
+                icon='IconPackage'
+                title='No Extensions Found'
+                description='No extensions match the current filters.'
+                action={{
+                  label: 'Clear Filters',
+                  onClick: () => setFilters({ search: '', group: '', type: '', status: '' })
+                }}
+              />
+            ) : (
+              <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+                {filteredExtensions.map(extension => (
+                  <ExtensionCard
+                    key={extension.name}
+                    extension={extension}
+                    onAction={handleAction}
+                    onViewMetrics={handleViewMetrics}
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value='analytics' className='space-y-6'>
-            <AnalyticsView
-              chartData={chartData}
-              stats={stats}
-              goToHealth={goToHealth}
-              goToMetrics={goToMetrics}
-            />
+            <div className='grid lg:grid-cols-2 gap-6'>
+              <StatusChart
+                data={chartData.statusData}
+                title='Status Distribution'
+                onClick={goToHealth}
+              />
+
+              <StatusChart
+                data={chartData.groupData}
+                title='Extensions by Group'
+                onClick={goToMetrics}
+              />
+            </div>
+
+            {/* System Statistics */}
+            <div className='grid md:grid-cols-4 gap-4'>
+              <div className='text-center p-4 bg-green-50 rounded-lg'>
+                <div className='text-2xl font-bold text-green-600'>{stats.active}</div>
+                <div className='text-slate-600'>Active Extensions</div>
+                <div className='text-xs text-slate-500 mt-1'>
+                  {((stats.active / stats.total) * 100).toFixed(1)}% of total
+                </div>
+              </div>
+              <div className='text-center p-4 bg-red-50 rounded-lg'>
+                <div className='text-2xl font-bold text-red-600'>{stats.error}</div>
+                <div className='text-slate-600'>Error State</div>
+                <div className='text-xs text-slate-500 mt-1'>
+                  {stats.error > 0 ? 'Needs attention' : 'All good'}
+                </div>
+              </div>
+              <div className='text-center p-4 bg-yellow-50 rounded-lg'>
+                <div className='text-2xl font-bold text-yellow-600'>{stats.inactive}</div>
+                <div className='text-slate-600'>Inactive</div>
+                <div className='text-xs text-slate-500 mt-1'>Stopped or disabled</div>
+              </div>
+              <div className='text-center p-4 bg-blue-50 rounded-lg'>
+                <div className='text-2xl font-bold text-blue-600'>{stats.total}</div>
+                <div className='text-slate-600'>Total Extensions</div>
+                <div className='text-xs text-slate-500 mt-1'>System capacity</div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value='performance' className='space-y-6'>
-            <PerformanceView
-              extensions={filteredExtensions}
-              metrics={metrics}
-              goToCollections={goToCollections}
-            />
+            {performanceData.length > 0 ? (
+              <>
+                <PerformanceChart
+                  data={performanceData}
+                  title='Top Extensions by Performance'
+                  onClick={() => navigate('/system/extensions/metrics')}
+                />
+
+                {/* Performance Summary */}
+                <div className='grid md:grid-cols-3 gap-4'>
+                  <MetricCard
+                    title='Avg Init Time'
+                    value={
+                      performanceData.reduce((sum, ext) => sum + ext.initTime, 0) /
+                      performanceData.length
+                    }
+                    unit='ms'
+                    icon='IconClock'
+                    color={COLORS.warning}
+                    subtitle='Extension initialization'
+                  />
+                  <MetricCard
+                    title='Avg Performance Score'
+                    value={
+                      performanceData.reduce((sum, ext) => sum + ext.score, 0) /
+                      performanceData.length
+                    }
+                    icon='IconTarget'
+                    color={COLORS.success}
+                    subtitle='Overall performance rating'
+                  />
+                  <MetricCard
+                    title='Total Service Calls'
+                    value={performanceData.reduce((sum, ext) => sum + ext.serviceCalls, 0)}
+                    icon='IconActivity'
+                    color={COLORS.info}
+                    subtitle='Across all extensions'
+                  />
+                </div>
+              </>
+            ) : (
+              <EmptyState
+                icon='IconActivity'
+                title='No Performance Data'
+                description='Performance metrics are not available yet.'
+              />
+            )}
           </TabsContent>
         </Tabs>
       </div>

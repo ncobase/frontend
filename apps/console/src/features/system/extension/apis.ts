@@ -1,154 +1,160 @@
 import type {
-  Extension,
-  ExtensionMetrics,
-  ExtensionStatus,
   ExtensionListResponse,
-  ExtensionActionResponse,
-  HealthCheckResponse,
+  ExtensionStatus,
+  MetricsResponse,
+  HealthResponse,
+  DataHealth,
   CircuitBreakerStatus,
-  MetricSnapshot
-} from './extension';
+  ExtensionActionResponse,
+  HistoricalMetricsResponse,
+  LatestMetricsResponse,
+  StorageStats
+} from './extension.d';
 
 import { createApi } from '@/lib/api/factory';
 
-export const extensionService = createApi<Extension, any, any, any>('/sys/exts', {
+export const extensionApi = createApi<any, any, any, any>('/ncore', {
   extensions: ({ endpoint, request }) => ({
-    // Get all extensions grouped by group and type
-    getAllExtensions: async (): Promise<ExtensionListResponse> => {
-      return request.get(endpoint);
+    // Extension management
+    getExtensions: async (): Promise<ExtensionListResponse> => {
+      return request.get(`${endpoint}/extensions`);
     },
 
-    // Get extension status
-    getExtensionStatus: async (): Promise<ExtensionStatus> => {
-      return request.get(`${endpoint}/status`);
+    getExtensionStatus: async (): Promise<{ summary: any; extensions: ExtensionStatus }> => {
+      return request.get(`${endpoint}/extensions/status`);
     },
 
-    // Get comprehensive metrics
-    getMetrics: async (): Promise<ExtensionMetrics> => {
-      return request.get(`${endpoint}/metrics`);
+    getExtensionMetadata: async (): Promise<Record<string, any>> => {
+      return request.get(`${endpoint}/extensions/metadata`);
     },
 
-    // Get specific metric type (collections, storage, service_cache, data, system, security, resource)
-    getMetricsByType: async (type: string): Promise<any> => {
-      return request.get(`${endpoint}/metrics/${type}`);
+    getExtension: async (name: string): Promise<any> => {
+      return request.get(`${endpoint}/extensions/${name}`);
     },
 
-    // Get metrics collections list
-    getMetricsCollections: async (): Promise<{
-      collections: string[];
-      details: { [name: string]: any };
-    }> => {
-      return request.get(`${endpoint}/metrics/collections`);
+    // Plugin management
+    loadPlugin: async (name: string): Promise<ExtensionActionResponse> => {
+      return request.post(`${endpoint}/plugins/load?name=${encodeURIComponent(name)}`);
     },
 
-    // Get specific collection data
-    getCollectionData: async (
-      collection: string
-    ): Promise<{
-      collection: string;
-      metrics: MetricSnapshot[];
-      last_updated: string;
-    }> => {
-      return request.get(`${endpoint}/metrics/collections/${collection}`);
+    unloadPlugin: async (name: string): Promise<ExtensionActionResponse> => {
+      return request.post(`${endpoint}/plugins/unload?name=${encodeURIComponent(name)}`);
     },
 
-    // Query historical metrics
-    queryMetrics: async (
-      collection: string,
-      params: {
-        start?: string;
-        end?: string;
-        limit?: number;
-      }
-    ): Promise<{
-      collection: string;
-      start?: string;
-      end?: string;
-      limit?: number;
-      count: number;
-      data: MetricSnapshot[];
-    }> => {
+    reloadPlugin: async (name: string): Promise<ExtensionActionResponse> => {
+      return request.post(`${endpoint}/plugins/reload?name=${encodeURIComponent(name)}`);
+    },
+
+    // Metrics endpoints
+    getMetricsSummary: async (): Promise<any> => {
+      return request.get(`${endpoint}/metrics/summary`);
+    },
+
+    getSystemMetrics: async (): Promise<any> => {
+      return request.get(`${endpoint}/metrics/system`);
+    },
+
+    getComprehensiveMetrics: async (): Promise<any> => {
+      return request.get(`${endpoint}/metrics/comprehensive`);
+    },
+
+    getExtensionMetrics: async (): Promise<MetricsResponse> => {
+      return request.get(`${endpoint}/metrics/extensions`);
+    },
+
+    getSpecificExtensionMetrics: async (name: string): Promise<any> => {
+      return request.get(`${endpoint}/metrics/extensions/${name}`);
+    },
+
+    getDataMetrics: async (): Promise<any> => {
+      return request.get(`${endpoint}/metrics/data`);
+    },
+
+    getEventsMetrics: async (): Promise<any> => {
+      return request.get(`${endpoint}/metrics/events`);
+    },
+
+    getServiceDiscoveryMetrics: async (): Promise<any> => {
+      return request.get(`${endpoint}/metrics/service-discovery`);
+    },
+
+    getHistoricalMetrics: async (params?: any): Promise<HistoricalMetricsResponse> => {
       const query = new URLSearchParams();
-      if (params.start) query.append('start', params.start);
-      if (params.end) query.append('end', params.end);
-      if (params.limit) query.append('limit', params.limit.toString());
+      if (params?.extension) query.append('extension', params.extension);
+      if (params?.metric_type) query.append('metric_type', params.metric_type);
+      if (params?.start) query.append('start', params.start);
+      if (params?.end) query.append('end', params.end);
+      if (params?.aggregation) query.append('aggregation', params.aggregation);
+      if (params?.interval) query.append('interval', params.interval);
+      if (params?.limit) query.append('limit', params.limit.toString());
 
-      return request.get(`${endpoint}/metrics/query/${collection}?${query}`);
+      return request.get(`${endpoint}/metrics/history?${query}`);
     },
 
-    // Get metrics snapshot
-    getMetricsSnapshot: async (): Promise<{
-      [collection: string]: MetricSnapshot[];
-    }> => {
-      return request.get(`${endpoint}/metrics/snapshot`);
+    getLatestMetrics: async (name: string, limit = 100): Promise<LatestMetricsResponse> => {
+      return request.get(`${endpoint}/metrics/latest/${name}?limit=${limit}`);
     },
 
-    // Get storage stats
-    getStorageStats: async (): Promise<any> => {
+    getStorageStats: async (): Promise<StorageStats> => {
       return request.get(`${endpoint}/metrics/storage`);
     },
 
     // Health endpoints
-    getSystemHealth: async (): Promise<HealthCheckResponse> => {
+    getSystemHealth: async (): Promise<HealthResponse> => {
       return request.get(`${endpoint}/health`);
     },
 
-    getDataHealth: async (): Promise<any> => {
-      return request.get(`${endpoint}/health/data`);
+    getExtensionsHealth: async (): Promise<{ summary: any; extensions: ExtensionStatus }> => {
+      return request.get(`${endpoint}/health/extensions`);
     },
 
-    getExtensionsHealth: async (): Promise<{
-      summary: {
-        total: number;
-        active: number;
-        error: number;
-        other: number;
-      };
-      extensions: { [name: string]: string };
-    }> => {
-      return request.get(`${endpoint}/health/extensions`);
+    getDataHealth: async (): Promise<DataHealth> => {
+      return request.get(`${endpoint}/health/data`);
     },
 
     getCircuitBreakersStatus: async (): Promise<CircuitBreakerStatus> => {
       return request.get(`${endpoint}/health/circuit-breakers`);
     },
 
-    // Plugin management
-    loadExtension: async (name: string): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/load?name=${encodeURIComponent(name)}`);
+    // System management
+    getSystemInfo: async (): Promise<any> => {
+      return request.get(`${endpoint}/system/info`);
     },
 
-    unloadExtension: async (name: string): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/unload?name=${encodeURIComponent(name)}`);
-    },
-
-    reloadExtension: async (name: string): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/reload?name=${encodeURIComponent(name)}`);
-    },
-
-    // Refresh cross services
     refreshCrossServices: async (): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/refresh-cross-services`);
+      return request.post(`${endpoint}/system/cross-services/refresh`);
+    },
+
+    getSystemConfig: async (): Promise<any> => {
+      return request.get(`${endpoint}/system/config`);
     }
   })
 });
 
 export const {
-  getAllExtensions,
+  getExtensions,
   getExtensionStatus,
-  getMetrics,
-  getMetricsByType,
-  getMetricsCollections,
-  getCollectionData,
-  queryMetrics,
-  getMetricsSnapshot,
+  getExtensionMetadata,
+  getExtension,
+  loadPlugin,
+  unloadPlugin,
+  reloadPlugin,
+  getMetricsSummary,
+  getSystemMetrics,
+  getComprehensiveMetrics,
+  getExtensionMetrics,
+  getSpecificExtensionMetrics,
+  getDataMetrics,
+  getEventsMetrics,
+  getServiceDiscoveryMetrics,
+  getHistoricalMetrics,
+  getLatestMetrics,
   getStorageStats,
   getSystemHealth,
-  getDataHealth,
   getExtensionsHealth,
+  getDataHealth,
   getCircuitBreakersStatus,
-  loadExtension,
-  unloadExtension,
-  reloadExtension,
-  refreshCrossServices
-} = extensionService;
+  getSystemInfo,
+  refreshCrossServices,
+  getSystemConfig
+} = extensionApi;
