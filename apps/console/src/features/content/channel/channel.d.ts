@@ -20,7 +20,7 @@ export interface Channel {
   webhook_url?: string;
   auto_publish?: boolean;
   require_review?: boolean;
-  tenant_id?: string;
+  space_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

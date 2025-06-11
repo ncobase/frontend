@@ -157,7 +157,7 @@ export const SEOSettingsPage = () => {
       <Section
         title={t('seo.settings.general')}
         icon='IconSettings'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Form control={control} errors={errors} fields={generalFields} className='space-y-4' />
       </Section>
@@ -165,7 +165,7 @@ export const SEOSettingsPage = () => {
       <Section
         title={t('seo.settings.templates')}
         icon='IconTemplate'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Form control={control} errors={errors} fields={templateFields} className='space-y-4' />
       </Section>
@@ -173,7 +173,7 @@ export const SEOSettingsPage = () => {
       <Section
         title={t('seo.settings.technical')}
         icon='IconCode'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Form control={control} errors={errors} fields={technicalFields} className='space-y-4' />
       </Section>

@@ -7,7 +7,7 @@ export interface Comment {
   reply_to?: string;
   related?: object | null;
   parent?: string;
-  tenant?: string;
+  space_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

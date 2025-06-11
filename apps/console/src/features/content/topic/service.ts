@@ -2,8 +2,7 @@ import { AnyObject } from '@ncobase/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { createTopic, deleteTopic, getTopic, getTopics, updateTopic } from './apis';
-import { QueryFormParams } from './config/query';
-import { Topic } from './topic';
+import { QueryFormParams, Topic } from './topic';
 
 // Topic media related types
 export interface TopicMedia {

@@ -10,7 +10,7 @@ export interface Distribution {
   external_url?: string;
   custom_data?: Record<string, any>;
   error_details?: string;
-  tenant_id?: string;
+  space_id?: string;
   topic?: any;
   channel?: any;
   created_by?: string;

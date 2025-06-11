@@ -3,7 +3,6 @@ import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 
-import { useQueryTaxonomy } from '../../taxonomy/service';
 import { useQueryTopic } from '../service';
 
 import { getStatusBadge } from './form';
@@ -13,7 +12,6 @@ import { useQueryUser } from '@/features/system/user/service';
 export const TopicViewerForm = ({ record }) => {
   const { t } = useTranslation();
   const { data = {}, isLoading } = useQueryTopic(record);
-  const { data: taxonomyData } = useQueryTaxonomy(data?.taxonomy);
   const { data: creatorData } = useQueryUser(data?.created_by);
   const { data: updaterData } = useQueryUser(data?.updated_by);
 
@@ -34,7 +32,7 @@ export const TopicViewerForm = ({ record }) => {
       <Section
         title={t('topic.section.basic_info', 'Basic Information')}
         icon='IconInfoCircle'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <div className='bg-white rounded-lg p-4'>
           <h1 className='text-2xl font-bold text-gray-800 mb-4'>{data.title}</h1>
@@ -68,7 +66,7 @@ export const TopicViewerForm = ({ record }) => {
             <FieldViewer title={t('topic.fields.name', 'Name')}>{data.name}</FieldViewer>
             <FieldViewer title={t('topic.fields.slug', 'Slug')}>{data.slug}</FieldViewer>
             <FieldViewer title={t('topic.fields.taxonomy', 'Taxonomy')}>
-              {taxonomyData?.name || data.taxonomy || '-'}
+              {data.taxonomy?.name || data.taxonomy_id || '-'}
             </FieldViewer>
             <FieldViewer title={t('topic.fields.released', 'Release Date')}>
               {formatDateTime(data.released)}
@@ -81,7 +79,7 @@ export const TopicViewerForm = ({ record }) => {
       <Section
         title={t('topic.section.content', 'Content')}
         icon='IconFileText'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <div className='bg-white rounded-lg p-4'>
           <div className='border rounded-md p-4 bg-gray-50'>
@@ -101,7 +99,7 @@ export const TopicViewerForm = ({ record }) => {
         <Section
           title={t('topic.fields.thumbnail', 'Thumbnail')}
           icon='IconPhoto'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <div className='bg-white rounded-lg p-4'>
             <div className='flex justify-center'>
@@ -119,7 +117,7 @@ export const TopicViewerForm = ({ record }) => {
       <Section
         title={t('topic.section.system', 'System Information')}
         icon='IconDatabase'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <div className='bg-white rounded-lg p-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -135,7 +133,9 @@ export const TopicViewerForm = ({ record }) => {
             <FieldViewer title={t('topic.fields.updated_at', 'Updated At')}>
               {formatDateTime(data.updated_at)}
             </FieldViewer>
-            <FieldViewer title={t('topic.fields.tenant', 'Tenant ID')}>{data.tenant}</FieldViewer>
+            <FieldViewer title={t('topic.fields.space_id', 'Space ID')}>
+              {data.space_id}
+            </FieldViewer>
           </div>
         </div>
       </Section>

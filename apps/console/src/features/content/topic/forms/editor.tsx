@@ -181,7 +181,7 @@ export const EditorTopicForm = ({ record, onSubmit, control, setValue, errors })
         {
           title: t('topic.fields.released', 'Release Date'),
           name: 'released',
-          type: 'datetime-local',
+          type: 'date',
           prependIcon: 'IconCalendarMonth',
           defaultValue: '',
           description: t('topic.released_hint', 'When this topic should be released')
@@ -259,7 +259,7 @@ export const EditorTopicForm = ({ record, onSubmit, control, setValue, errors })
     setValue('slug', data.slug || '');
     setValue('content', data.content || '');
     setValue('thumbnail', data.thumbnail || null);
-    setValue('taxonomy_id', data.taxonomy || '');
+    setValue('taxonomy_id', data.taxonomy_id || '');
     setValue('markdown', data.markdown !== undefined ? data.markdown : true);
     setValue('private', data.private !== undefined ? data.private : false);
     setValue('temp', data.temp !== undefined ? data.temp : false);
@@ -288,7 +288,7 @@ export const EditorTopicForm = ({ record, onSubmit, control, setValue, errors })
           subtitle={section.subtitle}
           icon={section.icon}
           collapsible={section.collapsible}
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             id={`edit-topic-${section.id}`}

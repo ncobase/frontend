@@ -49,7 +49,7 @@ export const TableRowOverflow: React.FC<TableRowOverflowProps> = ({ item }) => {
             </span>
           </div>
           <div className='font-medium text-gray-800 group-hover:text-orange-600 transition-colors truncate'>
-            {item.taxonomy || 'Uncategorized'}
+            {item.taxonomy?.name || 'Uncategorized'}
           </div>
         </div>
 
@@ -68,12 +68,10 @@ export const TableRowOverflow: React.FC<TableRowOverflowProps> = ({ item }) => {
         <div className='group hover:bg-white hover:shadow-sm rounded-lg p-3 transition-all duration-200'>
           <div className='flex items-center gap-2 mb-2'>
             <Icons name='IconBuilding' size={14} className='text-indigo-500' />
-            <span className='text-xs font-medium text-gray-500 uppercase tracking-wide'>
-              Tenant
-            </span>
+            <span className='text-xs font-medium text-gray-500 uppercase tracking-wide'>Space</span>
           </div>
           <div className='font-mono text-xs font-medium text-gray-800 group-hover:text-indigo-600 transition-colors'>
-            {item.tenant || 'Default'}
+            {item.space_id || 'Default'}
           </div>
         </div>
 

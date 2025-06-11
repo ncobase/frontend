@@ -303,7 +303,7 @@ export const SEOEditor: React.FC<SEOEditorProps> = ({
               <Section
                 title={t('seo.sections.basic')}
                 icon='IconTag'
-                className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+                className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
               >
                 <Form
                   control={control}
@@ -318,7 +318,7 @@ export const SEOEditor: React.FC<SEOEditorProps> = ({
               <Section
                 title={t('seo.sections.social')}
                 icon='IconShare'
-                className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+                className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
               >
                 <Form
                   control={control}
@@ -333,7 +333,7 @@ export const SEOEditor: React.FC<SEOEditorProps> = ({
               <Section
                 title={t('seo.sections.advanced')}
                 icon='IconSettings'
-                className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+                className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
               >
                 <Form
                   control={control}

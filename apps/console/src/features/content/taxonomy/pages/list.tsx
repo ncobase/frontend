@@ -79,7 +79,7 @@ export const TaxonomyListPage = () => {
               className='px-0 h-auto min-h-auto'
               onClick={e => {
                 e.stopPropagation();
-                navigate(`/content/topics/${taxonomy.id}`);
+                navigate(`/content/taxonomies/${taxonomy.slug}`);
               }}
             >
               {taxonomy.name}
@@ -132,7 +132,7 @@ export const TaxonomyListPage = () => {
             size='xs'
             onClick={e => {
               e.stopPropagation();
-              navigate(`/content/taxonomies/${taxonomy.id}`);
+              navigate(`/content/taxonomies/${taxonomy.slug}`);
             }}
           >
             <Icons name='IconEye' size={14} className='mr-1' />
@@ -143,7 +143,7 @@ export const TaxonomyListPage = () => {
             size='xs'
             onClick={e => {
               e.stopPropagation();
-              navigate(`/content/taxonomies/${taxonomy.id}/edit`);
+              navigate(`/content/taxonomies/${taxonomy.slug}/edit`);
             }}
           >
             <Icons name='IconEdit' size={14} className='mr-1' />

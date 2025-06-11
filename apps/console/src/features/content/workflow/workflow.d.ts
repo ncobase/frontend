@@ -7,7 +7,7 @@ export interface Workflow {
   steps: WorkflowStep[];
   conditions?: WorkflowCondition[];
   content_types?: string[]; // Which content types this workflow applies to
-  tenant_id?: string;
+  space_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

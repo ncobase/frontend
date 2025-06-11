@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import { useParams, useNavigate } from 'react-router';
 
-import { useQueryTaxonomy } from '../../taxonomy/service';
 import { useQueryTopic } from '../service';
 
+import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
 
 export const TopicViewPage = () => {
@@ -14,12 +14,11 @@ export const TopicViewPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { data: topic, isLoading, error } = useQueryTopic(id!);
-  const { data: taxonomyData } = useQueryTaxonomy(topic?.taxonomy);
 
   if (isLoading) {
     return (
       <Page sidebar>
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='min-h-screen flex items-center justify-center'>
           <div className='text-center'>
             <Icons name='IconLoader2' className='animate-spin mx-auto mb-4' size={40} />
             <p className='text-gray-600'>{t('common.loading')}</p>
@@ -32,18 +31,7 @@ export const TopicViewPage = () => {
   if (error || !topic) {
     return (
       <Page sidebar>
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-          <Card className='max-w-md w-full text-center p-8'>
-            <Icons name='IconAlertCircle' size={56} className='mx-auto text-red-400 mb-6' />
-            <h3 className='text-xl font-semibold text-gray-900 mb-3'>
-              {t('content.topics.not_found.title')}
-            </h3>
-            <p className='text-gray-500 mb-8'>{t('content.topics.not_found.description')}</p>
-            <Button size='lg' onClick={() => navigate('/content/topics')}>
-              {t('content.topics.back_to_list')}
-            </Button>
-          </Card>
-        </div>
+        <ErrorPage code={404} />
       </Page>
     );
   }
@@ -96,7 +84,7 @@ export const TopicViewPage = () => {
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
       {/* Header */}
-      <div className='bg-white rounded-xl shadow-sm p-6 mb-8'>
+      <div className='bg-white rounded-xl p-6 mb-8'>
         <div className='flex items-center justify-between flex-wrap gap-4'>
           <div className='flex items-center gap-6'>
             <div className='flex items-center gap-4'>
@@ -190,7 +178,7 @@ export const TopicViewPage = () => {
                     {t('topic.fields.taxonomy')}
                   </label>
                   <p className='mt-1 text-sm text-gray-900'>
-                    {taxonomyData?.name || topic.taxonomy || '-'}
+                    {topic.taxonomy?.name || topic.taxonomy_id || '-'}
                   </p>
                 </div>
                 <div>

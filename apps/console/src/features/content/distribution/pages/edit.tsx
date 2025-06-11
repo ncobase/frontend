@@ -154,7 +154,7 @@ export const DistributionEditPage = () => {
         <Section
           title='Distribution Settings'
           icon='IconBroadcast'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             control={control}

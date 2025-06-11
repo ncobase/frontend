@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 
 // Upload configuration type
 export interface UploadConfig {
-  objectId: string;
-  tenantId?: string;
+  ownerId: string;
+  spaceId?: string;
   folderPath?: string;
   accessLevel?: 'public' | 'private' | 'shared';
   isPublic?: boolean;
@@ -55,9 +55,9 @@ export interface UploadState {
 // Default configurations
 export const uploadConfigs = {
   // Tenant logo upload
-  tenantLogo: (tenantId?: string): UploadConfig => ({
-    objectId: tenantId ? `tenant-${tenantId}` : 'tenant',
-    tenantId: tenantId || 'system',
+  tenantLogo: (spaceId?: string): UploadConfig => ({
+    ownerId: spaceId ? `tenant-${spaceId}` : 'tenant',
+    spaceId: spaceId || 'system',
     folderPath: 'logos/tenants',
     accessLevel: 'public',
     isPublic: true,
@@ -75,9 +75,9 @@ export const uploadConfigs = {
   }),
 
   // User avatar upload
-  userAvatar: (userId: string, tenantId?: string): UploadConfig => ({
-    objectId: `user-${userId}`,
-    tenantId: tenantId || 'system',
+  userAvatar: (userId: string, spaceId?: string): UploadConfig => ({
+    ownerId: `user-${userId}`,
+    spaceId: spaceId || 'system',
     folderPath: 'avatars/users',
     accessLevel: 'public',
     isPublic: true,
@@ -95,9 +95,9 @@ export const uploadConfigs = {
   }),
 
   // Document upload
-  document: (objectId: string, tenantId: string, isPublic = false): UploadConfig => ({
-    objectId,
-    tenantId,
+  document: (ownerId: string, spaceId: string, isPublic = false): UploadConfig => ({
+    ownerId,
+    spaceId,
     folderPath: 'documents',
     accessLevel: isPublic ? 'public' : 'private',
     isPublic,
@@ -115,9 +115,9 @@ export const uploadConfigs = {
   }),
 
   // Image upload
-  image: (objectId: string, tenantId: string, options?: Partial<UploadConfig>): UploadConfig => ({
-    objectId,
-    tenantId,
+  image: (ownerId: string, spaceId: string, options?: Partial<UploadConfig>): UploadConfig => ({
+    ownerId,
+    spaceId,
     folderPath: 'images',
     accessLevel: 'private',
     isPublic: false,
@@ -136,9 +136,9 @@ export const uploadConfigs = {
   }),
 
   // File upload (general)
-  file: (objectId: string, tenantId: string, options?: Partial<UploadConfig>): UploadConfig => ({
-    objectId,
-    tenantId,
+  file: (ownerId: string, spaceId: string, options?: Partial<UploadConfig>): UploadConfig => ({
+    ownerId,
+    spaceId,
     folderPath: 'files',
     accessLevel: 'private',
     isPublic: false,
@@ -198,10 +198,10 @@ export const useUpload = (config?: UploadConfig) => {
     formData.append('file', file);
 
     // Add required parameters
-    formData.append('object_id', uploadConfig.objectId);
+    formData.append('owner_id', uploadConfig.ownerId);
 
-    if (uploadConfig.tenantId) {
-      formData.append('tenant_id', uploadConfig.tenantId);
+    if (uploadConfig.spaceId) {
+      formData.append('space_id', uploadConfig.spaceId);
     }
 
     if (uploadConfig.folderPath) {
@@ -428,42 +428,42 @@ export const formatFileSize = (bytes: number): string => {
 };
 
 // Tenant logo upload hook
-export const useTenantLogoUpload = (tenantId?: string) => {
-  return useUpload(uploadConfigs.tenantLogo(tenantId));
+export const useTenantLogoUpload = (spaceId?: string) => {
+  return useUpload(uploadConfigs.tenantLogo(spaceId));
 };
 
 // Avatar upload hook
-export const useAvatarUpload = (userId: string, tenantId?: string) => {
-  return useUpload(uploadConfigs.userAvatar(userId, tenantId));
+export const useAvatarUpload = (userId: string, spaceId?: string) => {
+  return useUpload(uploadConfigs.userAvatar(userId, spaceId));
 };
 
 // Document upload hook
-export const useDocumentUpload = (objectId: string, tenantId: string, isPublic = false) => {
-  return useUpload(uploadConfigs.document(objectId, tenantId, isPublic));
+export const useDocumentUpload = (ownerId: string, spaceId: string, isPublic = false) => {
+  return useUpload(uploadConfigs.document(ownerId, spaceId, isPublic));
 };
 
 // Image upload hook
 export const useImageUpload = (
-  objectId: string,
-  tenantId: string,
+  ownerId: string,
+  spaceId: string,
   options?: Partial<UploadConfig>
 ) => {
-  return useUpload(uploadConfigs.image(objectId, tenantId, options));
+  return useUpload(uploadConfigs.image(ownerId, spaceId, options));
 };
 
 // File upload hook
 export const useFileUpload = (
-  objectId: string,
-  tenantId: string,
+  ownerId: string,
+  spaceId: string,
   options?: Partial<UploadConfig>
 ) => {
-  return useUpload(uploadConfigs.file(objectId, tenantId, options));
+  return useUpload(uploadConfigs.file(ownerId, spaceId, options));
 };
 
 // Uploader integration hook
 export interface UploaderIntegrationConfig {
-  objectId: string;
-  tenantId?: string;
+  ownerId: string;
+  spaceId?: string;
   folderPath?: string;
   autoUpload?: boolean;
   returnType?: 'file' | 'url' | 'result';

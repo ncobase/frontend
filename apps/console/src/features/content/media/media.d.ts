@@ -12,7 +12,7 @@ export interface Media {
   description?: string;
   alt?: string;
   metadata?: Record<string, any>;
-  tenant_id?: string;
+  space_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

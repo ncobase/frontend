@@ -11,7 +11,7 @@ export interface ContentTemplate {
   usage_count: number;
   tags?: string[];
   author_id: string;
-  tenant_id?: string;
+  space_id?: string;
   created_at: string;
   updated_at?: string;
 }

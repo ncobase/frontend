@@ -1,3 +1,5 @@
+import { Taxonomy } from '../taxonomy/taxonomy.d';
+
 export interface Topic {
   id?: string;
   name?: string;
@@ -10,8 +12,9 @@ export interface Topic {
   private?: true;
   status?: number;
   released?: string;
-  taxonomy?: string;
-  tenant?: string;
+  taxonomy?: Taxonomy;
+  taxonomy_id?: string;
+  space_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

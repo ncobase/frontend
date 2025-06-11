@@ -315,7 +315,7 @@ export const EditorTaxonomyForm = ({ record, onSubmit, control, setValue, errors
           subtitle={section.subtitle}
           icon={section.icon}
           collapsible={section.collapsible}
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             id={`edit-taxonomy-${section.id}`}

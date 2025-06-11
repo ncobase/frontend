@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router';
 
 import { useQueryChannel } from '../service';
 
+import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
 
 export const ChannelViewPage = () => {
@@ -17,7 +18,7 @@ export const ChannelViewPage = () => {
   if (isLoading) {
     return (
       <Page sidebar>
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='min-h-screen flex items-center justify-center'>
           <div className='text-center'>
             <Icons name='IconLoader2' className='animate-spin mx-auto mb-4' size={40} />
             <p className='text-gray-600'>Loading channel details...</p>
@@ -30,18 +31,7 @@ export const ChannelViewPage = () => {
   if (error || !channel) {
     return (
       <Page sidebar>
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-          <Card className='max-w-md w-full text-center p-8'>
-            <Icons name='IconAlertCircle' size={56} className='mx-auto text-red-400 mb-6' />
-            <h3 className='text-xl font-semibold text-gray-900 mb-3'>Channel not found</h3>
-            <p className='text-gray-500 mb-8'>
-              The channel you're looking for doesn't exist or you don't have permission to view it.
-            </p>
-            <Button size='lg' onClick={() => navigate('/content/channels')}>
-              Return to Channels
-            </Button>
-          </Card>
-        </div>
+        <ErrorPage statusCode={404} />
       </Page>
     );
   }
@@ -133,7 +123,7 @@ export const ChannelViewPage = () => {
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
       {/* Header */}
-      <div className='bg-white rounded-xl shadow-sm p-6 mb-8'>
+      <div className='bg-white rounded-xl p-6 mb-8'>
         <div className='flex items-center justify-between flex-wrap gap-4'>
           <div className='flex items-center gap-6'>
             <div className='flex items-center gap-4'>

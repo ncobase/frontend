@@ -7,6 +7,7 @@ import { useParams, useNavigate } from 'react-router';
 
 import { useQueryMedia, useUpdateMedia } from '../service';
 
+import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
 
 export const MediaEditPage = () => {
@@ -48,7 +49,7 @@ export const MediaEditPage = () => {
 
   if (isLoading) {
     return (
-      <Page sidebar title='Edit Media'>
+      <Page sidebar>
         <div className='flex items-center justify-center h-64'>
           <Icons name='IconLoader2' className='animate-spin' size={32} />
         </div>
@@ -58,12 +59,8 @@ export const MediaEditPage = () => {
 
   if (!media) {
     return (
-      <Page sidebar title='Edit Media'>
-        <Card className='text-center py-12'>
-          <Icons name='IconAlertCircle' size={48} className='mx-auto text-red-400 mb-4' />
-          <h3 className='text-lg font-medium text-gray-900 mb-2'>Media not found</h3>
-          <Button onClick={() => navigate('/content/media')}>Back to Media</Button>
-        </Card>
+      <Page sidebar>
+        <ErrorPage statusCode={404} />
       </Page>
     );
   }
@@ -104,34 +101,36 @@ export const MediaEditPage = () => {
   return (
     <Page
       sidebar
-      title='Edit Media'
       topbar={
         <Topbar
-          title={media.title}
           left={[
-            <Button variant='outline' size='sm' onClick={() => navigate(`/content/media/${id}`)}>
-              <Icons name='IconArrowLeft' size={16} className='mr-2' />
-              Back
+            <Button variant='ghost' size='sm' onClick={() => navigate(`/content/media/${id}`)}>
+              <Icons name='IconArrowLeft' size={16} />
             </Button>
           ]}
         />
       }
-      className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
+      className='px-4 sm:px-6 lg:px-8 py-8'
     >
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+      <div className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>{media.title}</h1>
+        <p className='text-gray-500'>Edit media details and information</p>
+      </div>
+
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
         {/* Form */}
         <div className='lg:col-span-2'>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
             <Section
               title='Media Information'
               icon='IconPhoto'
-              className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+              className='rounded-xl overflow-hidden shadow-sm transition-all duration-200 hover:shadow-lg border border-gray-100'
             >
               <Form
                 control={control}
                 errors={errors}
                 fields={fields}
-                className='grid grid-cols-1 gap-4'
+                className='grid grid-cols-1 gap-6'
               />
             </Section>
 
@@ -152,8 +151,8 @@ export const MediaEditPage = () => {
 
         {/* Preview */}
         <div>
-          <Card className='p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>Current File</h3>
+          <Card className='p-6 rounded-xl shadow-sm border border-gray-100'>
+            <h3 className='text-lg font-semibold text-gray-900 mb-4'>Preview</h3>
             <div className='bg-gray-50 rounded-lg p-4 text-center'>
               {media.type === 'image' && media.url ? (
                 <img

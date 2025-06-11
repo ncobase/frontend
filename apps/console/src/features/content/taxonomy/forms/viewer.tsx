@@ -74,7 +74,7 @@ export const TaxonomyViewerForm = ({ record }) => {
         <Section
           title={t('taxonomy.fields.description')}
           icon='IconFileDescription'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Card className='p-6'>
             <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>{data.description}</p>
@@ -86,7 +86,7 @@ export const TaxonomyViewerForm = ({ record }) => {
       <Section
         title={t('taxonomy.section.appearance')}
         icon='IconPalette'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Card className='p-6'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-6'>
@@ -142,7 +142,7 @@ export const TaxonomyViewerForm = ({ record }) => {
         <Section
           title={t('taxonomy.section.seo')}
           icon='IconSearch'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Card className='p-6'>
             <div className='space-y-4'>
@@ -179,7 +179,7 @@ export const TaxonomyViewerForm = ({ record }) => {
       <Section
         title={t('taxonomy.section.system')}
         icon='IconDatabase'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Card className='p-6'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -201,7 +201,7 @@ export const TaxonomyViewerForm = ({ record }) => {
             </div>
           </div>
           <div className='mt-4'>
-            <FieldViewer title={t('taxonomy.fields.tenant')}>{data.tenant}</FieldViewer>
+            <FieldViewer title={t('taxonomy.fields.space_id')}>{data.space_id}</FieldViewer>
           </div>
         </Card>
       </Section>
@@ -211,7 +211,7 @@ export const TaxonomyViewerForm = ({ record }) => {
         <Section
           title={t('taxonomy.section.extras')}
           icon='IconSettings'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Card className='p-6'>
             <div className='bg-gray-50 rounded-lg p-4'>

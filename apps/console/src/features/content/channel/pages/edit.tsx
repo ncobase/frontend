@@ -190,7 +190,7 @@ export const ChannelEditPage = () => {
         <Section
           title='Basic Information'
           icon='IconBroadcast'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             control={control}
@@ -204,7 +204,7 @@ export const ChannelEditPage = () => {
         <Section
           title='Channel Settings'
           icon='IconSettings'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             control={control}
@@ -218,7 +218,7 @@ export const ChannelEditPage = () => {
         <Section
           title='Content Types'
           icon='IconFileType'
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             control={control}

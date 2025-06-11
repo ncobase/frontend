@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router';
 
 import { useQueryMedia } from '../service';
 
+import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
 
 export const MediaViewPage = () => {
@@ -12,7 +13,7 @@ export const MediaViewPage = () => {
 
   if (isLoading) {
     return (
-      <Page sidebar title='Media Details'>
+      <Page sidebar>
         <div className='flex items-center justify-center h-64'>
           <Icons name='IconLoader2' className='animate-spin' size={32} />
         </div>
@@ -22,13 +23,8 @@ export const MediaViewPage = () => {
 
   if (error || !media) {
     return (
-      <Page sidebar title='Media Details'>
-        <Card className='text-center py-12'>
-          <Icons name='IconAlertCircle' size={48} className='mx-auto text-red-400 mb-4' />
-          <h3 className='text-lg font-medium text-gray-900 mb-2'>Media not found</h3>
-          <p className='text-gray-500 mb-6'>The media file you're looking for doesn't exist.</p>
-          <Button onClick={() => navigate('/content/media')}>Back to Media</Button>
-        </Card>
+      <Page sidebar>
+        <ErrorPage code={404} />
       </Page>
     );
   }
@@ -65,12 +61,10 @@ export const MediaViewPage = () => {
   return (
     <Page
       sidebar
-      title='Media Details'
       topbar={
         <Topbar
-          title={media.title}
           left={[
-            <Button variant='outline' size='sm' onClick={() => navigate('/content/media')}>
+            <Button variant='text' size='sm' onClick={() => navigate('/content/media')}>
               <Icons name='IconArrowLeft' size={16} className='mr-2' />
               Back
             </Button>
@@ -91,14 +85,22 @@ export const MediaViewPage = () => {
           ]}
         />
       }
-      className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
+      className='px-4 sm:px-6 lg:px-8 py-8'
     >
+      <div className='mb-8'>
+        <h1 className='text-3xl font-bold text-gray-900 mb-2'>{media.title}</h1>
+        <div className='flex items-center space-x-4 text-gray-500'>
+          {getTypeBadge(media.type)}
+          <span>·</span>
+          <span className='text-sm'>{new Date(media.created_at).toLocaleDateString()}</span>
+        </div>
+      </div>
+
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
         {/* Media Preview */}
         <div className='lg:col-span-2'>
-          <Card className='p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>Preview</h3>
-            <div className='bg-gray-50 rounded-lg p-8 flex items-center justify-center min-h-[400px]'>
+          <Card className='overflow-hidden'>
+            <div className='bg-gray-50 p-8 flex items-center justify-center min-h-[400px]'>
               {media.type === 'image' && media.url ? (
                 <img
                   src={media.url}
@@ -153,16 +155,6 @@ export const MediaViewPage = () => {
           <Card className='p-6'>
             <h3 className='text-lg font-medium text-gray-900 mb-4'>Information</h3>
             <div className='space-y-4'>
-              <div>
-                <label className='text-sm font-medium text-gray-500'>Type</label>
-                <div className='mt-1'>{getTypeBadge(media.type)}</div>
-              </div>
-
-              <div>
-                <label className='text-sm font-medium text-gray-500'>File Name</label>
-                <p className='mt-1 text-sm text-gray-900'>{media.title}</p>
-              </div>
-
               {media.size && (
                 <div>
                   <label className='text-sm font-medium text-gray-500'>File Size</label>
@@ -211,13 +203,6 @@ export const MediaViewPage = () => {
                   <p className='mt-1 text-sm text-gray-900'>{media.alt}</p>
                 </div>
               )}
-
-              <div>
-                <label className='text-sm font-medium text-gray-500'>Upload Date</label>
-                <p className='mt-1 text-sm text-gray-900'>
-                  {new Date(media.created_at).toLocaleDateString()}
-                </p>
-              </div>
 
               {media.url && (
                 <div>

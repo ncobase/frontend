@@ -1,16 +1,16 @@
-import { MediaCreatePage } from './pages/create';
 import { MediaEditPage } from './pages/edit';
 import { MediaListPage } from './pages/list';
 import { MediaViewPage } from './pages/view';
 
+import { ErrorPage } from '@/components/errors';
 import { renderRoutes } from '@/router';
 
 export const MediaRoutes = () => {
   const routes = [
     { path: '/', element: <MediaListPage /> },
-    { path: '/create', element: <MediaCreatePage /> },
     { path: '/:id', element: <MediaViewPage /> },
-    { path: '/:id/edit', element: <MediaEditPage /> }
+    { path: '/:id/edit', element: <MediaEditPage /> },
+    { path: '*', element: <ErrorPage code={404} /> }
   ];
   return renderRoutes(routes);
 };

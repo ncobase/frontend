@@ -60,7 +60,6 @@ export const TopicEditPage = () => {
       sidebar
       topbar={
         <Topbar
-          title={t('content.topics.edit')}
           left={[
             <Button
               variant='ghost'
@@ -73,12 +72,7 @@ export const TopicEditPage = () => {
             </Button>
           ]}
           right={[
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => navigate(`/content/topics/${id}`)}
-              size='sm'
-            >
+            <Button variant='outline' size='sm' onClick={() => navigate(`/content/topics/${id}`)}>
               {t('actions.cancel')}
             </Button>,
             <Button onClick={onSubmit} size='sm' loading={updateTopicMutation.isPending}>
@@ -90,6 +84,11 @@ export const TopicEditPage = () => {
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
+      {topic?.title && (
+        <div className='mb-6'>
+          <h1 className='text-2xl font-semibold text-gray-900'>{topic.title}</h1>
+        </div>
+      )}
       <EditorTopicForm
         record={id}
         onSubmit={onSubmit}

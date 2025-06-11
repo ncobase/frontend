@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
-import { Button, Container, Icons, ScrollView } from '@ncobase/react';
+import { Button, Icons } from '@ncobase/react';
 import { useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,6 @@ export const TaxonomyEditPage = () => {
       sidebar
       topbar={
         <Topbar
-          title={t('content.topics.edit')}
           left={[
             <Button
               variant='ghost'
@@ -89,6 +88,11 @@ export const TaxonomyEditPage = () => {
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
+      {taxonomy?.name && (
+        <div className='mb-6'>
+          <h1 className='text-2xl font-semibold text-gray-900'>{taxonomy.name}</h1>
+        </div>
+      )}
       <EditorTaxonomyForm
         record={id}
         onSubmit={onSubmit}

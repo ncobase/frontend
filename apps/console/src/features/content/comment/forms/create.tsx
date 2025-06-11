@@ -74,8 +74,8 @@ export const CreateCommentForms = ({ onSubmit, control, errors }) => {
       elementClassName: 'my-3'
     },
     {
-      title: '所属租户',
-      name: 'tenant',
+      title: '所属空间',
+      name: 'space_id',
       defaultValue: tenant_id,
       type: 'hidden'
     }

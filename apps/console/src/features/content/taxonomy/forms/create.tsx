@@ -229,8 +229,8 @@ export const CreateTaxonomyForm = ({ onSubmit, control, setValue, errors }) => {
           rules: { required: t('forms.select_required') }
         },
         {
-          title: t('taxonomy.fields.tenant_id', 'Tenant'),
-          name: 'tenant_id',
+          title: t('taxonomy.fields.space_id', 'Space'),
+          name: 'space_id',
           type: 'hidden',
           defaultValue: tenant_id
         },
@@ -253,7 +253,7 @@ export const CreateTaxonomyForm = ({ onSubmit, control, setValue, errors }) => {
           subtitle={section.subtitle}
           icon={section.icon}
           collapsible={section.collapsible}
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             id={`create-taxonomy-${section.id}`}

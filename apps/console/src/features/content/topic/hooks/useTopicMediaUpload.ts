@@ -18,8 +18,8 @@ export const useTopicMediaUpload = () => {
       formData.append('file', file);
       formData.append('name', file.name);
       formData.append('type', file.type);
-      formData.append('object_id', 'topic'); // For topic-related media
-      formData.append('tenant_id', 'current'); // Should come from context
+      formData.append('owner_id', 'topic'); // For topic-related media
+      formData.append('space_id', 'current'); // Should come from context
 
       // Simulate progress updates
       const progressInterval = setInterval(() => {

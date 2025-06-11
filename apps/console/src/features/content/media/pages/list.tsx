@@ -328,7 +328,7 @@ export const MediaListPage = () => {
             </div>
           )
         ) : (
-          <div className='flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200'>
+          <div className='flex flex-col items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 py-12'>
             <Icons name='IconPhoto' size={48} className='text-gray-400 mb-4' />
             <h3 className='text-lg font-medium text-gray-900 mb-2'>
               {t('content.media.empty.title')}

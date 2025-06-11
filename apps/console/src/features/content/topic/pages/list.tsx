@@ -100,7 +100,7 @@ export const TopicListPage = () => {
     },
     {
       title: t('topic.fields.taxonomy'),
-      dataIndex: 'taxonomy',
+      dataIndex: 'taxonomy.name',
       parser: (taxonomy: string) => <span className='text-sm text-gray-600'>{taxonomy || '-'}</span>
     },
     {

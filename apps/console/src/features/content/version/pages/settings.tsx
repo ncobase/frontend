@@ -126,7 +126,7 @@ export const VersionSettingsPage = () => {
       <Section
         title={t('version.settings.general')}
         icon='IconSettings'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Form control={control} errors={errors} fields={generalFields} className='space-y-4' />
       </Section>
@@ -134,7 +134,7 @@ export const VersionSettingsPage = () => {
       <Section
         title={t('version.settings.storage')}
         icon='IconDatabase'
-        className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+        className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
       >
         <Form control={control} errors={errors} fields={storageFields} className='space-y-4' />
       </Section>

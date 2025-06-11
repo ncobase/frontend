@@ -18,8 +18,8 @@ export const useTaxonomyMediaUpload = () => {
       formData.append('file', file);
       formData.append('name', file.name);
       formData.append('type', file.type);
-      formData.append('object_id', 'taxonomy'); // For taxonomy-related media
-      formData.append('tenant_id', 'current'); // Should come from context
+      formData.append('owner_id', 'taxonomy'); // For taxonomy-related media
+      formData.append('space_id', 'current'); // Should come from context
 
       // Simulate progress updates
       const progressInterval = setInterval(() => {

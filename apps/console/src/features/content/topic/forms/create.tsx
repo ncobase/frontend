@@ -211,8 +211,8 @@ export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
           description: t('topic.temp_hint', 'Mark as temporary content')
         },
         {
-          title: t('topic.fields.tenant_id', 'Tenant'),
-          name: 'tenant_id',
+          title: t('topic.fields.space_id', 'Space'),
+          name: 'space_id',
           type: 'hidden',
           defaultValue: tenant_id
         }
@@ -229,7 +229,7 @@ export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
           subtitle={section.subtitle}
           icon={section.icon}
           collapsible={section.collapsible}
-          className='mb-6 rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-md'
+          className='mb-6 rounded-lg overflow-hidden transition-shadow hover:shadow-md'
         >
           <Form
             id={`create-topic-${section.id}`}
