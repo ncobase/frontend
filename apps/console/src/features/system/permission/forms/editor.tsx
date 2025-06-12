@@ -52,8 +52,8 @@ export const EditorPermissionForms = ({ record, onSubmit, control, setValue, err
       }
     },
     {
-      title: t('permission.fields.tenant', 'Tenant'),
-      name: 'tenant',
+      title: t('permission.fields.space', 'Space'),
+      name: 'space',
       defaultValue: '',
       type: 'text',
       disabled: true
@@ -113,7 +113,7 @@ export const EditorPermissionForms = ({ record, onSubmit, control, setValue, err
     setValue('subject', data?.subject);
     setValue('group', data?.group);
     setValue('parent', data?.parent);
-    setValue('tenant', data?.tenant);
+    setValue('space', data?.space);
     setValue('default', data?.default);
     setValue('disabled', data?.disabled);
     setValue('description', data?.description);

@@ -138,9 +138,9 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.delete(`${endpoint}/api-keys/${keyId}`);
   },
 
-  // Tenant relationships
-  getUserTenantRoles: async (userId: string, tenantId: string) => {
-    return request.get(`${endpoint}/${userId}/tenants/${tenantId}/roles`);
+  // Space relationships
+  getUserSpaceRoles: async (userId: string, spaceId: string) => {
+    return request.get(`${endpoint}/${userId}/spaces/${spaceId}/roles`);
   }
 });
 
@@ -182,5 +182,5 @@ export const {
   generateApiKey,
   getApiKey,
   deleteApiKey,
-  getUserTenantRoles
+  getUserSpaceRoles
 } = userApi;

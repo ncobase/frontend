@@ -1,5 +1,5 @@
 import { Role } from '../role/role';
-import { Tenant } from '../tenant/tenant';
+import { Space } from '../space/space';
 
 /**
  * User entity - Core user information
@@ -14,7 +14,7 @@ export interface User {
   tfa_enabled?: boolean;
   status: number; // 0: active, 1: inactive, 2: disabled
   extras?: Record<string, any>;
-  tenant_id?: string;
+  space_id?: string;
   created_at?: number;
   updated_at?: number;
 }
@@ -98,10 +98,10 @@ export interface UserMeshes {
   employee?: Employee;
   api_keys?: ApiKey[];
   roles?: string[];
-  tenants?: Tenant[];
+  spaces?: Space[];
   permissions?: string[];
   is_admin?: boolean;
-  tenant_id?: string;
+  space_id?: string;
 }
 
 /**
@@ -117,7 +117,7 @@ export interface UserListParams {
   status?: string | number;
   search?: string;
   role?: string;
-  tenant_id?: string;
+  space_id?: string;
   is_admin?: boolean;
 }
 
@@ -147,7 +147,7 @@ export interface PaginationParams {
 // Employee interfaces
 export interface Employee {
   user_id: string;
-  tenant_id?: string;
+  space_id?: string;
   employee_id?: string;
   department?: string;
   position?: string;
@@ -168,7 +168,7 @@ export interface Employee {
 
 export interface EmployeeBody {
   user_id: string;
-  tenant_id?: string;
+  space_id?: string;
   employee_id?: string;
   department?: string;
   position?: string;
@@ -195,7 +195,7 @@ export interface EmployeeListParams extends PaginationParams {
   work_location?: string;
   skills?: string[];
   certifications?: string[];
-  tenant_id?: string;
+  space_id?: string;
   is_admin?: boolean;
 }
 

@@ -54,14 +54,14 @@ export interface UploadState {
 
 // Default configurations
 export const uploadConfigs = {
-  // Tenant logo upload
-  tenantLogo: (spaceId?: string): UploadConfig => ({
-    ownerId: spaceId ? `tenant-${spaceId}` : 'tenant',
+  // Space logo upload
+  spaceLogo: (spaceId?: string): UploadConfig => ({
+    ownerId: spaceId ? `space-${spaceId}` : 'space',
     spaceId: spaceId || 'system',
-    folderPath: 'logos/tenants',
+    folderPath: 'logos/spaces',
     accessLevel: 'public',
     isPublic: true,
-    tags: ['logo', 'tenant', 'branding'],
+    tags: ['logo', 'space', 'branding'],
     processingOptions: {
       createThumbnail: true,
       resizeImage: true,
@@ -427,9 +427,9 @@ export const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-// Tenant logo upload hook
-export const useTenantLogoUpload = (spaceId?: string) => {
-  return useUpload(uploadConfigs.tenantLogo(spaceId));
+// Space logo upload hook
+export const useSpaceLogoUpload = (spaceId?: string) => {
+  return useUpload(uploadConfigs.spaceLogo(spaceId));
 };
 
 // Avatar upload hook

@@ -26,14 +26,14 @@ import { UserViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
-import { useTenantContext } from '@/features/system/tenant/context';
+import { useSpaceContext } from '@/features/system/space/context';
 
 export const UserListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
-  const { tenant_id } = useTenantContext();
+  const { space_id } = useSpaceContext();
   const toast = useToastMessage();
 
   const { data, fetchData, loading, refetch } = useUserList();
@@ -270,7 +270,7 @@ export const UserListPage = () => {
         isOpen={roleManagementModal.open}
         onClose={() => setRoleManagementModal({ open: false, user: null })}
         user={roleManagementModal.user}
-        currentTenantId={tenant_id}
+        currentSpaceId={space_id}
         onSuccess={() => {
           setRoleManagementModal({ open: false, user: null });
           refetch();

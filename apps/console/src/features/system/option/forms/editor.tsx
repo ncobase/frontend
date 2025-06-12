@@ -93,8 +93,8 @@ export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors 
       help: 'Enable to load this option on system startup'
     },
     {
-      title: t('option.fields.tenant', 'Tenant'),
-      name: 'tenant_id',
+      title: t('option.fields.space', 'Space'),
+      name: 'space_id',
       defaultValue: '',
       type: 'text',
       disabled: true
@@ -123,7 +123,7 @@ export const EditorOptionForms = ({ record, onSubmit, control, setValue, errors 
     setValue('type', data?.type);
     setValue('value', data?.value);
     setValue('autoload', data?.autoload);
-    setValue('tenant_id', data?.tenant_id);
+    setValue('space_id', data?.space_id);
     setValue('created_at', formatDateTime(data?.created_at));
     setValue('updated_at', formatDateTime(data?.updated_at));
   }, [setValue, data, isLoading]);

@@ -2,11 +2,11 @@ import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { FieldConfigProps } from '@/components/form';
-import { useTenantContext } from '@/features/system/tenant/context';
+import { useSpaceContext } from '@/features/system/space/context';
 
 export const CreateCommentForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
-  const { tenant_id } = useTenantContext();
+  const { space_id } = useSpaceContext();
 
   const fields: FieldConfigProps[] = [
     {
@@ -76,7 +76,7 @@ export const CreateCommentForms = ({ onSubmit, control, errors }) => {
     {
       title: '所属空间',
       name: 'space_id',
-      defaultValue: tenant_id,
+      defaultValue: space_id,
       type: 'hidden'
     }
     // {

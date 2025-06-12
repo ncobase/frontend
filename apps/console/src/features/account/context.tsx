@@ -15,7 +15,7 @@ import { TokenPayload } from './token_service';
 
 export const ACCESS_TOKEN_KEY = 'app.access.token';
 export const REFRESH_TOKEN_KEY = 'app.refresh.token';
-export const TENANT_KEY = 'app.tenant.id';
+export const TENANT_KEY = 'app.space.id';
 
 interface AuthContextValue {
   isAuthenticated: boolean;
@@ -23,9 +23,9 @@ interface AuthContextValue {
   user: any;
   roles: string[];
   permissions: string[];
-  tenantId: string;
+  spaceId: string;
   updateTokens: (_accessToken?: string, _refreshToken?: string) => void;
-  switchTenant: (_tenantId: string) => void;
+  switchSpace: (_spaceId: string) => void;
   hasPermission: (_permission: string) => boolean;
   hasRole: (_role: string | string[]) => boolean;
   clearSession: () => void;
@@ -37,9 +37,9 @@ const AuthContext = React.createContext<AuthContextValue>({
   user: null,
   roles: [],
   permissions: [],
-  tenantId: '',
+  spaceId: '',
   updateTokens: () => undefined,
-  switchTenant: () => undefined,
+  switchSpace: () => undefined,
   hasPermission: () => false,
   hasRole: () => false,
   clearSession: () => undefined
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | undefined>(
     isBrowser ? locals.get(ACCESS_TOKEN_KEY) : undefined
   );
-  const [tenantId, setTenantId] = useState<string>(isBrowser ? locals.get(TENANT_KEY) || '' : '');
+  const [spaceId, setSpaceId] = useState<string>(isBrowser ? locals.get(TENANT_KEY) || '' : '');
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
@@ -94,12 +94,12 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         const userData = await accountApi.getCurrentUser();
         setUser(userData);
 
-        // Set tenant from user data if not set
-        if (!tenantId && userData?.tenants?.[0]) {
-          const defaultTenant = userData.tenants[0];
-          setTenantId(defaultTenant.id);
+        // Set space from user data if not set
+        if (!spaceId && userData?.spaces?.[0]) {
+          const defaultSpace = userData.spaces[0];
+          setSpaceId(defaultSpace.id);
           if (isBrowser) {
-            locals.set(TENANT_KEY, defaultTenant.id);
+            locals.set(TENANT_KEY, defaultSpace.id);
           }
         }
       } catch (error) {
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     };
 
     loadUserData();
-  }, [isAuthenticated, tenantId]);
+  }, [isAuthenticated, spaceId]);
 
   const updateTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
     setAccessToken(newAccessToken);
@@ -132,23 +132,23 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
     if (!newAccessToken) {
       setUser(null);
-      setTenantId('');
+      setSpaceId('');
       if (isBrowser) {
         locals.remove(TENANT_KEY);
       }
     }
   }, []);
 
-  const switchTenant = useCallback(
-    (newTenantId: string) => {
-      if (newTenantId === tenantId) return;
+  const switchSpace = useCallback(
+    (newSpaceId: string) => {
+      if (newSpaceId === spaceId) return;
 
-      setTenantId(newTenantId);
+      setSpaceId(newSpaceId);
       if (isBrowser) {
-        locals.set(TENANT_KEY, newTenantId);
+        locals.set(TENANT_KEY, newSpaceId);
       }
     },
-    [tenantId]
+    [spaceId]
   );
 
   const hasPermission = useCallback(
@@ -190,9 +190,9 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       user,
       roles,
       permissions,
-      tenantId,
+      spaceId,
       updateTokens,
-      switchTenant,
+      switchSpace,
       hasPermission,
       hasRole,
       clearSession
@@ -203,9 +203,9 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       user,
       roles,
       permissions,
-      tenantId,
+      spaceId,
       updateTokens,
-      switchTenant,
+      switchSpace,
       hasPermission,
       hasRole,
       clearSession

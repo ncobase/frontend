@@ -51,12 +51,7 @@ export const CreateTaxonomyPage = () => {
             </Button>
           ]}
           right={[
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => navigate('/content/taxonomies')}
-              size='sm'
-            >
+            <Button variant='outline' size='sm' onClick={() => navigate('/content/taxonomies')}>
               {t('actions.cancel')}
             </Button>,
             <Button onClick={onSubmit} size='sm' loading={createTaxonomyMutation.isPending}>

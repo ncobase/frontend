@@ -34,8 +34,8 @@ export const tableColumns = ({ handleView }): TableViewProps['header'] => {
       icon: 'IconAffiliate'
     },
     {
-      dataIndex: 'tenant',
-      title: '所属租户',
+      dataIndex: 'space',
+      title: '所属空间',
       icon: 'IconAffiliate'
     },
     {

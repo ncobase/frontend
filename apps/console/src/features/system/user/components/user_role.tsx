@@ -19,14 +19,14 @@ import {
   useQueryUserRoles,
   useAssignRoles,
   useRemoveRoles,
-  useQueryUserTenantRoles
+  useQueryUserSpaceRoles
 } from '../service';
 
 interface UserRoleProps {
   isOpen: boolean;
   onClose: () => void;
   user: any;
-  currentTenantId?: string;
+  currentSpaceId?: string;
   onSuccess?: () => void;
 }
 
@@ -34,7 +34,7 @@ export const UserRole: React.FC<UserRoleProps> = ({
   isOpen,
   onClose,
   user,
-  currentTenantId,
+  currentSpaceId,
   onSuccess
 }) => {
   const { t } = useTranslation();
@@ -52,18 +52,18 @@ export const UserRole: React.FC<UserRoleProps> = ({
   // Fetch user's current system roles
   const { data: userRoles, isLoading: userRolesLoading } = useQueryUserRoles(user?.id);
 
-  // Fetch user's tenant-specific roles if tenant is selected
-  const { data: userTenantRoles, isLoading: tenantRolesLoading } = useQueryUserTenantRoles(
+  // Fetch user's space-specific roles if space is selected
+  const { data: userSpaceRoles, isLoading: spaceRolesLoading } = useQueryUserSpaceRoles(
     user?.id,
-    currentTenantId,
-    { enabled: !!currentTenantId }
+    currentSpaceId,
+    { enabled: !!currentSpaceId }
   );
 
   const assignRolesMutation = useAssignRoles();
   const removeRolesMutation = useRemoveRoles();
 
   const roles = rolesData?.items || [];
-  const currentUserRoles = activeTab === 'system' ? userRoles || [] : userTenantRoles || [];
+  const currentUserRoles = activeTab === 'system' ? userRoles || [] : userSpaceRoles || [];
 
   useEffect(() => {
     if (currentUserRoles && currentUserRoles.length > 0) {
@@ -96,7 +96,7 @@ export const UserRole: React.FC<UserRoleProps> = ({
         await assignRolesMutation.mutateAsync({
           userId: user.id,
           roleIds: toAdd
-          // tenantId: activeTab === 'tenant' ? currentTenantId : undefined
+          // spaceId: activeTab === 'space' ? currentSpaceId : undefined
         });
       }
 
@@ -105,7 +105,7 @@ export const UserRole: React.FC<UserRoleProps> = ({
         await removeRolesMutation.mutateAsync({
           userId: user.id,
           roleIds: toRemove
-          // tenantId: activeTab === 'tenant' ? currentTenantId : undefined
+          // spaceId: activeTab === 'space' ? currentSpaceId : undefined
         });
       }
 
@@ -127,14 +127,14 @@ export const UserRole: React.FC<UserRoleProps> = ({
     assignRolesMutation,
     removeRolesMutation,
     activeTab,
-    currentTenantId,
+    currentSpaceId,
     toast,
     t,
     onSuccess,
     onClose
   ]);
 
-  const isLoading = rolesLoading || userRolesLoading || tenantRolesLoading;
+  const isLoading = rolesLoading || userRolesLoading || spaceRolesLoading;
 
   if (!user) return null;
 
@@ -161,12 +161,12 @@ export const UserRole: React.FC<UserRoleProps> = ({
           </div>
         </div>
 
-        {/* Tabs for System vs Tenant roles */}
+        {/* Tabs for System vs Space roles */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value='system'>{t('user.roles.system_roles')}</TabsTrigger>
-            {currentTenantId && (
-              <TabsTrigger value='tenant'>{t('user.roles.tenant_roles')}</TabsTrigger>
+            {currentSpaceId && (
+              <TabsTrigger value='space'>{t('user.roles.space_roles')}</TabsTrigger>
             )}
           </TabsList>
 
@@ -182,10 +182,10 @@ export const UserRole: React.FC<UserRoleProps> = ({
             />
           </TabsContent>
 
-          {currentTenantId && (
-            <TabsContent value='tenant' className='space-y-4'>
+          {currentSpaceId && (
+            <TabsContent value='space' className='space-y-4'>
               <div className='bg-blue-50 p-3 rounded-lg mb-4'>
-                <div className='text-blue-800 text-sm'>{t('user.roles.tenant_context_info')}</div>
+                <div className='text-blue-800 text-sm'>{t('user.roles.space_context_info')}</div>
               </div>
               <RoleManagementContent
                 searchTerm={searchTerm}

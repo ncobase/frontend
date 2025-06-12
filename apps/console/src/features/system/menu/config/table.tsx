@@ -164,7 +164,7 @@ const renderMenuType = (type: string) => {
     divider: 'bg-gray-100 text-gray-800',
     group: 'bg-pink-100 text-pink-800',
     account: 'bg-orange-100 text-orange-800',
-    tenant: 'bg-cyan-100 text-cyan-800'
+    space: 'bg-cyan-100 text-cyan-800'
   };
 
   const colorClass = typeColors[type] || 'bg-slate-100 text-slate-800';

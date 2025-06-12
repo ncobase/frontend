@@ -7,7 +7,7 @@ export type QueryFormParams = {
   search?: string;
   group?: string;
   disabled?: boolean | string;
-  tenant?: string;
+  space?: string;
 } & PaginationParams;
 
 export const queryFields = ({

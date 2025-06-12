@@ -14,7 +14,7 @@ export interface TokenPayload {
     user_id: string;
     roles: string[];
     permissions: string[];
-    tenant_id: string;
+    space_id: string;
     is_admin: boolean;
   };
   sub: string;

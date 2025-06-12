@@ -9,7 +9,7 @@ export interface Permission {
   extras?: object | null;
   parent?: string;
   group?: string;
-  tenant?: string;
+  space?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

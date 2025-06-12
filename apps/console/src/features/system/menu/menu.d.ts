@@ -3,7 +3,7 @@ export interface Menu {
   name: string;
   label: string;
   slug?: string;
-  type: 'header' | 'sidebar' | 'account' | 'tenant';
+  type: 'header' | 'sidebar' | 'account' | 'space';
   path?: string;
   target?: string;
   icon?: string;
@@ -24,7 +24,7 @@ export interface MenuBody {
   name: string;
   label: string;
   slug?: string;
-  type: 'header' | 'sidebar' | 'account' | 'tenant';
+  type: 'header' | 'sidebar' | 'account' | 'space';
   path?: string;
   target?: string;
   icon?: string;
@@ -45,7 +45,7 @@ export interface NavigationMenus {
   headers: MenuTree[];
   sidebars: MenuTree[];
   accounts: MenuTree[];
-  tenants: MenuTree[];
+  spaces: MenuTree[];
 }
 
 export interface MenuTrees {

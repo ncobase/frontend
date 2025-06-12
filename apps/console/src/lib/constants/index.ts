@@ -9,11 +9,11 @@ export const XMdUserKey = 'x-md-uid';
 export const XMdUsernameKey = 'x-md-uname';
 // XMdTokenKey - global token
 export const XMdTokenKey = 'x-md-token';
-// XMdTenantKey - global tenant id
-// XMdTenantKey = XMdDomainKey
-export const XMdTenantKey = 'x-md-tid';
+// XMdSpaceKey - global space id
+// XMdSpaceKey = XMdDomainKey
+export const XMdSpaceKey = 'x-md-sid';
 // XMdDomainKey - global domain id
-// XMdDomainKey = XMdTenantKey
+// XMdDomainKey = XMdSpaceKey
 export const XMdDomainKey = 'x-md-did';
 // XMdTotalKey - result total
 export const XMdTotalKey = 'x-md-total';

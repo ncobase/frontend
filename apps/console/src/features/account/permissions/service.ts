@@ -9,7 +9,7 @@ export class Permission {
     roles: string[];
     permissions: string[];
     isAdmin: boolean;
-    tenantId: string;
+    spaceId: string;
     timestamp: number;
   } | null = null;
 
@@ -98,7 +98,7 @@ export class Permission {
       roles: accountMeshes.roles || [],
       permissions: accountMeshes.permissions || [],
       isAdmin: accountMeshes.is_admin || false,
-      tenantId: accountMeshes.tenant_id || '',
+      spaceId: accountMeshes.space_id || '',
       timestamp: Date.now()
     };
   }
@@ -110,7 +110,7 @@ export class Permission {
     roles: string[];
     permissions: string[];
     isAdmin: boolean;
-    tenantId: string;
+    spaceId: string;
   } | null {
     // Try token first
     const decoded = this.getDecodedToken();
@@ -119,7 +119,7 @@ export class Permission {
         roles: decoded.payload?.roles || [],
         permissions: decoded.payload?.permissions || [],
         isAdmin: decoded.payload?.is_admin || false,
-        tenantId: decoded.payload?.tenant_id || ''
+        spaceId: decoded.payload?.space_id || ''
       };
     }
 
@@ -170,13 +170,13 @@ export class Permission {
   }
 
   /**
-   * Get current tenant ID
+   * Get current space ID
    */
-  static getCurrentTenantId(): string {
-    const activeTenantId = locals.get(TENANT_KEY);
-    if (activeTenantId) return activeTenantId;
+  static getCurrentSpaceId(): string {
+    const activeSpaceId = locals.get(TENANT_KEY);
+    if (activeSpaceId) return activeSpaceId;
     const permissions = this.getPermissionsData();
-    return permissions?.tenantId || '';
+    return permissions?.spaceId || '';
   }
 
   /**

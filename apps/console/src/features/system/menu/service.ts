@@ -86,7 +86,7 @@ export const useQueryNavigationMenus = (queryParams = {}) => {
           headers: result?.headers || [],
           sidebars: result?.sidebars || [],
           accounts: result?.accounts || [],
-          tenants: result?.tenants || []
+          spaces: result?.spaces || []
         };
       } catch (error) {
         console.error('Failed to fetch navigation menus:', error);
@@ -94,7 +94,7 @@ export const useQueryNavigationMenus = (queryParams = {}) => {
           headers: [],
           sidebars: [],
           accounts: [],
-          tenants: []
+          spaces: []
         };
       }
     },

@@ -13,7 +13,7 @@ export interface Option {
   created_at?: number;
   updated_by?: string;
   updated_at?: number;
-  tenant_id?: string;
+  space_id?: string;
 }
 
 export interface OptionBody {
@@ -26,7 +26,7 @@ export interface OptionBody {
   validation?: string;
   is_secret?: boolean;
   environment_variable?: string;
-  tenant_id?: string;
+  space_id?: string;
 }
 
 export interface OptionValidationResult {

@@ -15,8 +15,8 @@ export const accountKeys = {
   login: ['accountService', 'login'],
   register: ['accountService', 'register'],
   currentUser: ['accountService', 'currentUser'],
-  tenants: (params = {}) => ['accountService', 'tenants', params],
-  tenant: (params = {}) => ['accountService', 'tenant', params]
+  spaces: (params = {}) => ['accountService', 'spaces', params],
+  space: (params = {}) => ['accountService', 'space', params]
 };
 
 // Login hook

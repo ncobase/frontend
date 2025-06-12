@@ -1,4 +1,4 @@
-import { Tenant, Tenants } from '../system/tenant/tenant';
+import { Space, Spaces } from '../system/space/space';
 
 import { Account, LoginProps, LoginReply, RegisterProps } from './account';
 
@@ -12,14 +12,14 @@ export const accountApi = {
     return request.get(`${accountEndpoint}`);
   },
 
-  // Get user owned tenant
-  getAccountTenant: async (): Promise<Tenant> => {
-    return request.get(`${accountEndpoint}/tenant`);
+  // Get user owned space
+  getAccountSpace: async (): Promise<Space> => {
+    return request.get(`${accountEndpoint}/space`);
   },
 
-  // Get user belonged tenants or related tenants
-  getAccountTenants: async (): Promise<Tenants> => {
-    return request.get(`${accountEndpoint}/tenants`);
+  // Get user belonged spaces or related spaces
+  getAccountSpaces: async (): Promise<Spaces> => {
+    return request.get(`${accountEndpoint}/spaces`);
   }
 
   /**
@@ -81,8 +81,8 @@ export const authApi = {
 };
 
 export const getCurrentUser = accountApi.getCurrentUser;
-export const getAccountTenant = accountApi.getAccountTenant;
-export const getAccountTenants = accountApi.getAccountTenants;
+export const getAccountSpace = accountApi.getAccountSpace;
+export const getAccountSpaces = accountApi.getAccountSpaces;
 export const loginAccount = authApi.login;
 export const registerAccount = authApi.register;
 export const logoutAccount = authApi.logout;

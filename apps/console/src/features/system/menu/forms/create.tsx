@@ -1,14 +1,14 @@
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useTenantContext } from '../../tenant/context';
+import { useSpaceContext } from '../../space/context';
 
 import { FieldConfigProps } from '@/components/form';
 import { useMenusByType } from '@/components/layout/layout.hooks';
 
 export const CreateMenuForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
-  const { tenant_id } = useTenantContext();
+  const { space_id } = useSpaceContext();
 
   // Get existing menus for parent selection
   const allMenus = useMenusByType('sidebars'); // or get all menus
@@ -91,7 +91,7 @@ export const CreateMenuForms = ({ onSubmit, control, errors }) => {
         { label: t('menu.types.divider', 'Divider'), value: 'divider' },
         { label: t('menu.types.group', 'Group'), value: 'group' },
         { label: t('menu.types.account', 'Account'), value: 'account' },
-        { label: t('menu.types.tenant', 'Tenant'), value: 'tenant' }
+        { label: t('menu.types.space', 'Space'), value: 'space' }
       ],
       rules: { required: t('forms.select_required') }
     },
@@ -143,9 +143,9 @@ export const CreateMenuForms = ({ onSubmit, control, errors }) => {
       help: 'Disable this menu item'
     },
     {
-      title: 'Tenant ID',
-      name: 'tenant_id',
-      defaultValue: tenant_id,
+      title: 'Space ID',
+      name: 'space_id',
+      defaultValue: space_id,
       type: 'hidden'
     }
   ];

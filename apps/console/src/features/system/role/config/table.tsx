@@ -34,8 +34,8 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       icon: 'IconUsers'
     },
     {
-      title: t('role.fields.tenant', 'Tenant'),
-      dataIndex: 'tenant',
+      title: t('role.fields.space', 'Space'),
+      dataIndex: 'space',
       parser: (value: string) => <span className='text-slate-600'>{value || '-'}</span>,
       icon: 'IconBuilding'
     },

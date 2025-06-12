@@ -16,7 +16,7 @@ import {
   disableUser,
   deleteApiKey,
   generateApiKey,
-  getUserTenantRoles,
+  getUserSpaceRoles,
   createEmployee,
   deleteEmployee,
   getEmployee,
@@ -337,16 +337,16 @@ export const useDeleteApiKey = () => {
   });
 };
 
-// Query user tenant roles
-export const useQueryUserTenantRoles = (
+// Query user space roles
+export const useQueryUserSpaceRoles = (
   userId: string,
-  tenantId?: string,
+  spaceId?: string,
   options = { enabled: false }
 ) =>
   useQuery({
-    queryKey: ['userService', 'userTenantRoles', { userId, tenantId }],
-    queryFn: () => getUserTenantRoles(userId, tenantId!),
-    enabled: !!userId && !!tenantId && options?.enabled !== false,
+    queryKey: ['userService', 'userSpaceRoles', { userId, spaceId }],
+    queryFn: () => getUserSpaceRoles(userId, spaceId!),
+    enabled: !!userId && !!spaceId && options?.enabled !== false,
     ...options
   });
 

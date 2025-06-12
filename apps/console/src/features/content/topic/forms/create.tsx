@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { useListTaxonomies } from '../../taxonomy/service';
 import { useTopicMediaUpload } from '../hooks/useTopicMediaUpload';
 
-import { useTenantContext } from '@/features/system/tenant/context';
+import { useSpaceContext } from '@/features/system/space/context';
 
 export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { tenant_id } = useTenantContext();
+  const { space_id } = useSpaceContext();
   const [taxonomyOptions, setTaxonomyOptions] = useState([]);
 
   // Fetch taxonomies for dropdown
@@ -214,7 +214,7 @@ export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
           title: t('topic.fields.space_id', 'Space'),
           name: 'space_id',
           type: 'hidden',
-          defaultValue: tenant_id
+          defaultValue: space_id
         }
       ]
     }

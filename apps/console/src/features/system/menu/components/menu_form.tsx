@@ -71,7 +71,7 @@ export const MenuForm = ({ menu, onSubmit, onCancel }) => {
                 { label: t('menu.types.header'), value: 'header' },
                 { label: t('menu.types.sidebar'), value: 'sidebar' },
                 { label: t('menu.types.account'), value: 'account' },
-                { label: t('menu.types.tenant'), value: 'tenant' }
+                { label: t('menu.types.space'), value: 'space' }
               ]}
               {...field}
             />

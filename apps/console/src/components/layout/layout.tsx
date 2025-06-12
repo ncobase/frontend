@@ -19,7 +19,7 @@ const flattenNavigationMenus = (groups: NavigationMenus): MenuTree[] => {
     if (groups.headers && Array.isArray(groups.headers)) flattened.push(...groups.headers);
     if (groups.sidebars && Array.isArray(groups.sidebars)) flattened.push(...groups.sidebars);
     if (groups.accounts && Array.isArray(groups.accounts)) flattened.push(...groups.accounts);
-    if (groups.tenants && Array.isArray(groups.tenants)) flattened.push(...groups.tenants);
+    if (groups.spaces && Array.isArray(groups.spaces)) flattened.push(...groups.spaces);
   } catch (error) {
     console.error('Error flattening menu groups:', error);
   }
@@ -37,7 +37,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     headers: [],
     sidebars: [],
     accounts: [],
-    tenants: []
+    spaces: []
   });
   const [menus, setMenus] = useState<MenuTree[]>([]);
 

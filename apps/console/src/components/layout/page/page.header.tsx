@@ -5,7 +5,7 @@ import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useNavigationMenus } from '../layout.hooks';
-import { AccountDropdown, MainNavigation, TenantDropdown } from '../navigation';
+import { AccountDropdown, MainNavigation, SpaceDropdown } from '../navigation';
 
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
@@ -41,7 +41,7 @@ const HeaderComponent = ({
           headers: filterMenuTree(menuTreeData.headers || []),
           sidebars: filterMenuTree(menuTreeData.sidebars || []),
           accounts: filterMenuTree(menuTreeData.accounts || []),
-          tenants: filterMenuTree(menuTreeData.tenants || [])
+          spaces: filterMenuTree(menuTreeData.spaces || [])
         };
 
         setNavigationMenus(filteredGroups);
@@ -152,7 +152,7 @@ const HeaderComponent = ({
               onTogglePushSettings={handleTogglePushSettings}
               pushEnabled={pushEnabled}
             />
-            <TenantDropdown />
+            <SpaceDropdown />
           </div>
 
           <AccountDropdown />
@@ -197,7 +197,7 @@ const HeaderComponent = ({
             onTogglePushSettings={handleTogglePushSettings}
             pushEnabled={pushEnabled}
           />
-          <TenantDropdown />
+          <SpaceDropdown />
         </div>
 
         <div className='hidden md:flex items-center'>
@@ -210,7 +210,7 @@ const HeaderComponent = ({
             onTogglePushSettings={handleTogglePushSettings}
             pushEnabled={pushEnabled}
           />
-          <TenantDropdown />
+          <SpaceDropdown />
         </div>
         <AccountDropdown />
       </div>

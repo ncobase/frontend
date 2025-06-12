@@ -1,13 +1,13 @@
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useTenantContext } from '../../tenant/context';
+import { useSpaceContext } from '../../space/context';
 
 import { FieldConfigProps } from '@/components/form';
 
 export const CreateOptionForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();
-  const { tenant_id } = useTenantContext();
+  const { space_id } = useSpaceContext();
 
   const fields: FieldConfigProps[] = [
     {
@@ -87,9 +87,9 @@ export const CreateOptionForms = ({ onSubmit, control, errors }) => {
       help: 'Load this option automatically when system starts'
     },
     {
-      title: 'Tenant ID',
-      name: 'tenant_id',
-      defaultValue: tenant_id,
+      title: 'Space ID',
+      name: 'space_id',
+      defaultValue: space_id,
       type: 'hidden'
     }
   ];

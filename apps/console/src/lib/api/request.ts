@@ -4,7 +4,7 @@ import { $Fetch, $fetch, FetchError, FetchOptions } from 'ofetch';
 
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
 import { checkAndRefreshToken } from '@/features/account/token_service';
-import { BearerKey, XMdTenantKey } from '@/lib/constants';
+import { BearerKey, XMdSpaceKey } from '@/lib/constants';
 import { eventEmitter } from '@/lib/events';
 import { isPublicRoute } from '@/router/helpers/utils';
 
@@ -96,11 +96,11 @@ export class Request {
 
   private getHeaders() {
     const token = isBrowser && locals.get(ACCESS_TOKEN_KEY);
-    const tenant = isBrowser && locals.get(TENANT_KEY);
+    const space = isBrowser && locals.get(TENANT_KEY);
 
     return {
       ...this.defaultHeaders,
-      ...(token && tenant && { [XMdTenantKey]: tenant }),
+      ...(token && space && { [XMdSpaceKey]: space }),
       ...(token && { Authorization: `${BearerKey}${token}` })
     };
   }

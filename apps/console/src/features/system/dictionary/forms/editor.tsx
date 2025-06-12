@@ -83,8 +83,8 @@ export const EditorDictionaryForms = ({ record, onSubmit, control, setValue, err
       }
     },
     {
-      title: t('dictionary.fields.tenant', 'Tenant'),
-      name: 'tenant',
+      title: t('dictionary.fields.space', 'Space'),
+      name: 'space',
       defaultValue: '',
       type: 'text',
       disabled: true
@@ -114,7 +114,7 @@ export const EditorDictionaryForms = ({ record, onSubmit, control, setValue, err
     setValue('type', data?.type);
     setValue('value', data?.value);
     setValue('description', data?.description);
-    setValue('tenant', data?.tenant);
+    setValue('space', data?.space);
     setValue('created_at', formatDateTime(data?.created_at));
     setValue('updated_at', formatDateTime(data?.updated_at));
   }, [setValue, data, isLoading]);

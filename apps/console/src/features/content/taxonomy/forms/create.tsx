@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { useTaxonomyMediaUpload } from '../hooks/useTaxonomyMediaUpload';
 import { useListTaxonomies } from '../service';
 
-import { useTenantContext } from '@/features/system/tenant/context';
+import { useSpaceContext } from '@/features/system/space/context';
 
 export const CreateTaxonomyForm = ({ onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { tenant_id } = useTenantContext();
+  const { space_id } = useSpaceContext();
   const [parentOptions, setParentOptions] = useState([]);
 
   // Fetch taxonomies for parent dropdown
@@ -232,7 +232,7 @@ export const CreateTaxonomyForm = ({ onSubmit, control, setValue, errors }) => {
           title: t('taxonomy.fields.space_id', 'Space'),
           name: 'space_id',
           type: 'hidden',
-          defaultValue: tenant_id
+          defaultValue: space_id
         },
         {
           title: t('taxonomy.fields.extras', 'Extra Data'),
