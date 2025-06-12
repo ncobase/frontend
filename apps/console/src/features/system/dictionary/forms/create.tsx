@@ -1,9 +1,8 @@
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useSpaceContext } from '../../space/context';
-
 import { FieldConfigProps } from '@/components/form';
+import { useSpaceContext } from '@/features/space/context';
 
 export const CreateDictionaryForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();

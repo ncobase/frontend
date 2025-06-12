@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useListTaxonomies } from '../../taxonomy/service';
 import { useTopicMediaUpload } from '../hooks/useTopicMediaUpload';
 
-import { useSpaceContext } from '@/features/system/space/context';
+import { useSpaceContext } from '@/features/space/context';
 
 export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();

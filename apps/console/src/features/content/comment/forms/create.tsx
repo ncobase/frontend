@@ -2,7 +2,7 @@ import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { FieldConfigProps } from '@/components/form';
-import { useSpaceContext } from '@/features/system/space/context';
+import { useSpaceContext } from '@/features/space/context';
 
 export const CreateCommentForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();

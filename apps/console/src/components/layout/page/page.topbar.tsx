@@ -3,9 +3,9 @@ import React from 'react';
 import { ShellTopbar } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 
-export interface TopbarProps extends React.ComponentProps<'div'> {
+export interface TopbarProps {
   /** The title of the topbar */
-  title?: string;
+  title?: string | React.ReactNode;
   /**
    * The left side of the topbar
    * @type React.ReactNode[]
@@ -20,6 +20,14 @@ export interface TopbarProps extends React.ComponentProps<'div'> {
    * Accessibility label for the topbar
    */
   ariaLabel?: string;
+  /**
+   * The children of the topbar
+   */
+  children?: React.ReactNode;
+  /**
+   * The class name of the topbar
+   */
+  className?: string;
 }
 
 const TopbarWrapper: React.FC<
@@ -59,9 +67,15 @@ const TopbarComponent: React.FC<TopbarProps> = ({
     <TopbarWrapper className={className} ariaLabel={ariaLabel}>
       {title && (
         <div className='font-medium text-slate-600 shrink-0' id='topbar-title'>
-          {title}
-          {(!!left.length || !!right.length) && (
-            <span className='pl-px ml-4 mr-3 w-px bg-slate-200' aria-hidden='true' />
+          {React.isValidElement(title) ? (
+            title
+          ) : (
+            <>
+              {title}
+              {(!!left.length || !!right.length) && (
+                <span className='pl-px ml-4 mr-3 w-px bg-slate-200' aria-hidden='true' />
+              )}
+            </>
           )}
         </div>
       )}

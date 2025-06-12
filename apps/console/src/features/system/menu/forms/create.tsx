@@ -1,10 +1,9 @@
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { useSpaceContext } from '../../space/context';
-
 import { FieldConfigProps } from '@/components/form';
 import { useMenusByType } from '@/components/layout/layout.hooks';
+import { useSpaceContext } from '@/features/space/context';
 
 export const CreateMenuForms = ({ onSubmit, control, errors }) => {
   const { t } = useTranslation();

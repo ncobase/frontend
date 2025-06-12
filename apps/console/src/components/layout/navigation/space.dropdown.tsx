@@ -17,8 +17,8 @@ import { AvatarButton } from '@/components/avatar/avatar_button';
 import { useAuthContext } from '@/features/account/context';
 import { SpaceSwitcher } from '@/features/account/pages/space_switcher';
 import { useAccount } from '@/features/account/service';
+import { Space } from '@/features/space/space.d';
 import { MenuTree } from '@/features/system/menu/menu';
-import { Space } from '@/features/system/space/space';
 
 const SpaceMenuItems = React.memo(
   ({

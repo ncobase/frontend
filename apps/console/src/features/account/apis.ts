@@ -1,4 +1,4 @@
-import { Space, Spaces } from '../system/space/space';
+import { Space, Spaces } from '../space';
 
 import { Account, LoginProps, LoginReply, RegisterProps } from './account';
 

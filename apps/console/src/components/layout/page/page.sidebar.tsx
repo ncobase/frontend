@@ -229,7 +229,7 @@ const SidebarComponent: React.FC<{
     // Apply permission filtering first
     const permissionFiltered = filterMenuTree(sidebarMenus);
 
-    if (currentPath.length === 0) return permissionFiltered;
+    if (currentPath.length === 0) return [];
 
     // Then filter by current path for context
     const pathFiltered = permissionFiltered.filter(menu => {
@@ -238,7 +238,7 @@ const SidebarComponent: React.FC<{
       return menuPath.length > 0 && currentPath[0] === menuPath[0];
     });
 
-    return pathFiltered.length > 0 ? pathFiltered : permissionFiltered;
+    return pathFiltered;
   }, [sidebarMenus, currentPath, filterMenuTree]);
 
   const isActive = useCallback(
@@ -254,6 +254,10 @@ const SidebarComponent: React.FC<{
     },
     [navigate, canAccessMenu]
   );
+
+  if (filteredSidebarMenus.length === 0) {
+    return null;
+  }
 
   return (
     <ShellSidebar className='flex flex-col' navId='app-sidebar'>

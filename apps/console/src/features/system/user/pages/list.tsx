@@ -26,7 +26,7 @@ import { UserViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
-import { useSpaceContext } from '@/features/system/space/context';
+import { useSpaceContext } from '@/features/space/context';
 
 export const UserListPage = () => {
   const { t } = useTranslation();
@@ -139,7 +139,7 @@ export const UserListPage = () => {
   const onError = useCallback(
     (error: any) => {
       toast.error(t('messages.error'), {
-        description: error.message || t('messages.unknown_error')
+        description: error['message'] || t('messages.unknown_error')
       });
     },
     [t, toast]

@@ -2,7 +2,7 @@ import { OrgListPage } from './pages/list';
 
 import { renderRoutes } from '@/router';
 
-export const GroupRoutes = () => {
+export const OrgRoutes = () => {
   const routes = [
     { path: '/', element: <OrgListPage /> },
     { path: '/:mode', element: <OrgListPage /> },
@@ -11,4 +11,4 @@ export const GroupRoutes = () => {
   return renderRoutes(routes);
 };
 
-export default GroupRoutes;
+export default OrgRoutes;

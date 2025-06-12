@@ -1,5 +1,4 @@
-import { Role } from '../role/role';
-import { Space } from '../space/space';
+import { Space } from '../space';
 
 /**
  * User entity - Core user information

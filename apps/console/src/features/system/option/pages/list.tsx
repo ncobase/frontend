@@ -139,7 +139,7 @@ export const OptionListPage = () => {
         },
         onError: error => {
           toast.error(t('messages.error'), {
-            description: error.message || 'Failed to delete option'
+            description: error['message'] || 'Failed to delete option'
           });
         }
       });
@@ -152,7 +152,7 @@ export const OptionListPage = () => {
         onSuccess,
         onError: error => {
           toast.error(t('messages.error'), {
-            description: error.message || 'Failed to create option'
+            description: error['message'] || 'Failed to create option'
           });
         }
       });
@@ -168,7 +168,7 @@ export const OptionListPage = () => {
           onSuccess,
           onError: error => {
             toast.error(t('messages.error'), {
-              description: error.message || 'Failed to update option'
+              description: error['message'] || 'Failed to update option'
             });
           }
         }

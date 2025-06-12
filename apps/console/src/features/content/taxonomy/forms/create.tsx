@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTaxonomyMediaUpload } from '../hooks/useTaxonomyMediaUpload';
 import { useListTaxonomies } from '../service';
 
-import { useSpaceContext } from '@/features/system/space/context';
+import { useSpaceContext } from '@/features/space/context';
 
 export const CreateTaxonomyForm = ({ onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();

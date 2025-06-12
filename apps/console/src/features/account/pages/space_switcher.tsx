@@ -5,7 +5,7 @@ import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useAuthContext } from '@/features/account/context';
-import { Space } from '@/features/system/space/space';
+import { Space } from '@/features/space';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
 interface SpaceOptionProps extends Space {
