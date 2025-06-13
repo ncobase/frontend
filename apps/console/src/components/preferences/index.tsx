@@ -11,6 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Separator,
   Switch
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
@@ -101,22 +102,34 @@ export const Preferences = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='icon' className='relative text-slate-400/70 [&>svg]:stroke-slate-400/70'>
-          <Icons name='IconSettings' className='stroke-slate-500/85' />
+        <Button variant='icon' className='relative transition-colors duration-200'>
+          <Icons
+            name='IconSettings'
+            className='w-5 h-5 text-slate-400/85 dark:text-slate-300 hover:rotate-90 transition-transform duration-300'
+          />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-80 mt-3.5 p-4 bg-white z-999'>
-        <h3 className='text-lg font-medium mb-4'>{t('preferences.title')}</h3>
+      <PopoverContent className='w-80 mt-3.5 p-6 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-999'>
+        <div className='flex items-center gap-3 mb-6'>
+          <Icons name='IconSettings' className='w-5 h-5 text-slate-600 dark:text-slate-300' />
+          <h3 className='text-lg font-semibold text-slate-900 dark:text-white'>
+            {t('preferences.title')}
+          </h3>
+        </div>
 
-        <div className='space-y-4'>
+        <Separator className='mb-6' />
+
+        <div className='space-y-6'>
           {/* View Mode Preference */}
-          <div className='flex items-center justify-between'>
-            <label className='font-medium'>{t('preferences.view_mode')}</label>
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-slate-700 dark:text-slate-300'>
+              {t('preferences.view_mode')}
+            </label>
             <Select value={viewMode} onValueChange={handleViewModeChange as any}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-full bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'>
                 <SelectValue placeholder={t('preferences.select_view_mode')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'>
                 <SelectItem value='flatten'>{t('preferences.flatten_mode')}</SelectItem>
                 <SelectItem value='modal'>{t('preferences.modal_mode')}</SelectItem>
               </SelectContent>
@@ -124,13 +137,15 @@ export const Preferences = () => {
           </div>
 
           {/* Color Mode Preference */}
-          <div className='flex items-center justify-between'>
-            <label className='font-medium'>{t('preferences.color_mode')}</label>
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-slate-700 dark:text-slate-300'>
+              {t('preferences.color_mode')}
+            </label>
             <Select value={colorMode} onValueChange={handleColorModeChange as any}>
-              <SelectTrigger className='w-[140px]'>
+              <SelectTrigger className='w-full bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'>
                 <SelectValue placeholder={t('preferences.select_color_mode')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'>
                 <SelectItem value='light'>{t('preferences.light_mode')}</SelectItem>
                 <SelectItem value='dark'>{t('preferences.dark_mode')}</SelectItem>
                 <SelectItem value='system'>{t('preferences.system_mode')}</SelectItem>
@@ -139,9 +154,15 @@ export const Preferences = () => {
           </div>
 
           {/* Sidebar Expanded Preference */}
-          <div className='hidden items-center justify-between'>
-            <label className='font-medium'>{t('preferences.sidebar_expanded')}</label>
-            <Switch checked={sidebarExpanded} onCheckedChange={handleSidebarToggle} />
+          <div className='hidden items-center justify-between py-2'>
+            <label className='text-sm font-medium text-slate-700 dark:text-slate-300'>
+              {t('preferences.sidebar_expanded')}
+            </label>
+            <Switch
+              checked={sidebarExpanded}
+              onCheckedChange={handleSidebarToggle}
+              className='data-[state=checked]:bg-blue-600'
+            />
           </div>
         </div>
       </PopoverContent>

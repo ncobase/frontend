@@ -28,14 +28,14 @@ const SubmenuItemRecursive = React.memo(
     if (isGroup(menu)) {
       return (
         <div
-          className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'
+          className='text-slate-600 dark:text-slate-300 pb-2 mb-2 border-dashed first:mt-0 mt-4'
           key={menu.id}
         >
           <span className='font-medium'>{t(menu.label || '') || menu.name}</span>
           <Button
             variant='unstyle'
             size='ratio'
-            className='float-right text-primary-600 p-1'
+            className='float-right text-primary-600 dark:text-primary-400 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors'
             onClick={() => console.log('add events')}
           />
         </div>
@@ -49,8 +49,16 @@ const SubmenuItemRecursive = React.memo(
         <button
           type='button'
           className={cn(
-            'justify-start my-1 px-2.5 py-2 rounded-lg hover:underline text-wrap text-left text-slate-500 hover:text-slate-600',
-            isActive(menu.path || '') && 'text-primary-500  hover:text-primary-500'
+            'justify-start my-1 px-2.5 py-2 rounded-lg text-wrap text-left w-full transition-all',
+            'text-slate-500 dark:text-slate-400',
+            'hover:bg-slate-100 dark:hover:bg-slate-800',
+            'hover:text-slate-700 dark:hover:text-slate-200',
+            isActive(menu.path || '') && [
+              'text-primary-500 dark:text-primary-400',
+              'bg-primary-50 dark:bg-primary-500/10',
+              'hover:text-primary-600 dark:hover:text-primary-300',
+              'hover:bg-primary-100 dark:hover:bg-primary-500/20'
+            ]
           )}
           style={{ paddingLeft: `${(depth + 1) * 1}rem` }}
           onClick={() => menu.path && navigate(menu.path)}
@@ -127,7 +135,10 @@ const SubmenuComponent = ({ ...rest }) => {
   }
 
   return (
-    <ShellSubmenu className='p-5 overflow-auto text-slate-600 font-normal' {...rest}>
+    <ShellSubmenu
+      className='p-5 overflow-auto text-slate-600 dark:text-slate-300 font-normal bg-white dark:bg-slate-900'
+      {...rest}
+    >
       {submenus.map(menu => (
         <SubmenuItemRecursive
           key={menu.id || menu.slug}

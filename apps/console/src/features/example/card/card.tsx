@@ -14,20 +14,34 @@ import { CardLayout } from './layout';
 
 const QueryBar = () => {
   return (
-    <div className='sticky -top-[1rem] z-666 bg-white shadow-xs flex-col grid -mx-4 -mt-4 px-4 divide-y divide-slate-100'>
+    <div className='sticky -top-[1rem] z-666 bg-white dark:bg-slate-900 shadow-xs flex-col grid -mx-4 -mt-4 px-4 divide-y divide-slate-100 dark:divide-slate-700'>
       <div className='py-4 flex items-center justify-start'>
-        <div className='flex items-center text-slate-800'>类别：</div>
+        <div className='flex items-center text-slate-800 dark:text-slate-200'>类别：</div>
         <div className='flex-1 flex gap-x-4 pl-4'>
-          <Button className='focus:ring-0  px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-100/70 text-primary-600'>
+          <Button className='focus:ring-0 px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-100/70 dark:hover:bg-slate-700/70 text-primary-600 dark:text-primary-400'>
             类别
           </Button>
-          <Button variant='unstyle'>类别类别类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别类别类别
+          </Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别
+          </Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别
+          </Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别
+          </Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别
+          </Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别
+          </Button>
+          <Button variant='unstyle' className='dark:text-slate-300'>
+            类别
+          </Button>
         </div>
       </div>
     </div>

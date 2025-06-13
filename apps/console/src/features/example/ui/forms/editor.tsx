@@ -40,14 +40,14 @@ export const EditorPage = () => {
 
   return (
     <Page layout={false}>
-      <div className='h-16 shadow-xs bg-white sticky top-0 right-0 left-0'>
+      <div className='h-16 shadow-xs bg-white dark:bg-slate-900 sticky top-0 right-0 left-0'>
         <Container className='max-w-7xl'>
           <div className='flex items-center justify-center'>
             <div className='flex-1 flex items-center gap-x-4'>
               <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
                 <Icons name='IconArrowLeft' />
               </Button>
-              <div className='text-slate-600 font-medium'>编辑表单</div>
+              <div className='text-slate-600 dark:text-slate-300 font-medium'>编辑表单</div>
             </div>
             <div className='flex gap-x-4'>
               <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>

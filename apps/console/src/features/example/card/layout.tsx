@@ -25,7 +25,7 @@ export const CardTopbar = () => {
       </div>
     ],
     right: [
-      <div className='rounded-md flex items-center justify-between gap-x-1'>
+      <div className='rounded-md flex items-center justify-between gap-x-1 dark:bg-gray-800'>
         <Tooltip side='bottom' content='Filter'>
           <Button variant='unstyle' size='ratio'>
             <Icons name='IconFilter' />
@@ -37,12 +37,12 @@ export const CardTopbar = () => {
           </Button>
         </Tooltip>
       </div>,
-      <div className='bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2'>
+      <div className='bg-slate-100 dark:bg-gray-800 p-1 rounded-md flex items-center justify-between gap-x-2'>
         <Tooltip side='bottom' content='Card Layout'>
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/card')}
           >
             <Icons name='IconLayoutBoard' />
@@ -52,7 +52,7 @@ export const CardTopbar = () => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-2')}
           >
             <Icons name='IconTableColumn' />
@@ -62,14 +62,18 @@ export const CardTopbar = () => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-1')}
           >
             <Icons name='IconTable' />
           </Button>
         </Tooltip>
         <Tooltip side='bottom' content='Full Screen'>
-          <Button variant='unstyle' size='ratio' className='p-1 hover:bg-white'>
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
+          >
             <Icons name='IconArrowsMaximize' />
           </Button>
         </Tooltip>

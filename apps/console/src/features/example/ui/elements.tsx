@@ -94,15 +94,12 @@ export const UITopbar = ({ ...rest }) => {
           </Button>
         </Tooltip>
       </div>,
-      <div
-        className='bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2'
-        key='right-2'
-      >
+      <div className='bg-slate-100 dark:bg-gray-800 p-1 rounded-md flex items-center justify-between gap-x-2'>
         <Tooltip side='bottom' content='Card Layout'>
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/card')}
           >
             <Icons name='IconLayoutBoard' />
@@ -112,24 +109,28 @@ export const UITopbar = ({ ...rest }) => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-2')}
           >
             <Icons name='IconTableColumn' />
           </Button>
         </Tooltip>
-        <Tooltip side='bottom' content='Table Layout'>
+        <Tooltip side='bottom' content='Card Layout'>
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-1')}
           >
             <Icons name='IconTable' />
           </Button>
         </Tooltip>
         <Tooltip side='bottom' content='Full Screen'>
-          <Button variant='unstyle' size='ratio' className='p-1 hover:bg-white'>
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
+          >
             <Icons name='IconArrowsMaximize' />
           </Button>
         </Tooltip>
@@ -295,63 +296,139 @@ export const Elements = ({ ...rest }) => {
           <TabsContent value='basic'>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
               {/* Button Component */}
-              <Card>
-                <CardHeader className='p-4 border-b border-slate-100'>
-                  <CardTitle className='text-lg font-normal'>Button</CardTitle>
+              <Card className='bg-white dark:bg-slate-800 transition-colors duration-200'>
+                <CardHeader className='p-4 border-b border-slate-100 dark:border-slate-700'>
+                  <CardTitle className='text-lg font-normal text-slate-900 dark:text-slate-100'>
+                    Button
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className='p-4 space-y-4'>
+                <CardContent className='p-4 space-y-6'>
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Variants:</div>
-                    <div className='grid grid-cols-2 gap-2'>
-                      <Button variant='primary'>Primary</Button>
-                      <Button variant='outline-primary'>Outline</Button>
-                      <Button variant='secondary'>Secondary</Button>
-                      <Button variant='success'>Success</Button>
-                      <Button variant='warning'>Warning</Button>
-                      <Button variant='danger'>Danger</Button>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>Variants:</div>
+                    <div className='grid grid-cols-2 gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Button
+                        variant='primary'
+                        className='shadow-sm hover:shadow-md transition-shadow duration-200'
+                      >
+                        Primary
+                      </Button>
+                      <Button
+                        variant='outline-primary'
+                        className='hover:bg-primary-50 dark:hover:bg-primary-900/20'
+                      >
+                        Outline
+                      </Button>
+                      <Button
+                        variant='secondary'
+                        className='shadow-sm hover:shadow-md transition-shadow duration-200'
+                      >
+                        Secondary
+                      </Button>
+                      <Button
+                        variant='success'
+                        className='shadow-sm hover:shadow-md transition-shadow duration-200'
+                      >
+                        Success
+                      </Button>
+                      <Button
+                        variant='warning'
+                        className='shadow-sm hover:shadow-md transition-shadow duration-200'
+                      >
+                        Warning
+                      </Button>
+                      <Button
+                        variant='danger'
+                        className='shadow-sm hover:shadow-md transition-shadow duration-200'
+                      >
+                        Danger
+                      </Button>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Sizes:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Button variant='primary' size='xs'>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>Sizes:</div>
+                    <div className='flex flex-wrap items-center gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Button
+                        variant='primary'
+                        size='xs'
+                        className='transform hover:scale-105 transition-transform duration-200'
+                      >
                         Extra Small
                       </Button>
-                      <Button variant='primary' size='sm'>
+                      <Button
+                        variant='primary'
+                        size='sm'
+                        className='transform hover:scale-105 transition-transform duration-200'
+                      >
                         Small
                       </Button>
-                      <Button variant='primary' size='md'>
+                      <Button
+                        variant='primary'
+                        size='md'
+                        className='transform hover:scale-105 transition-transform duration-200'
+                      >
                         Medium
                       </Button>
-                      <Button variant='primary' size='lg'>
+                      <Button
+                        variant='primary'
+                        size='lg'
+                        className='transform hover:scale-105 transition-transform duration-200'
+                      >
                         Large
                       </Button>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>With Icons:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Button variant='primary' startIcon={<Icons name='IconPlus' />}>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      With Icons:
+                    </div>
+                    <div className='flex flex-wrap gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Button
+                        variant='primary'
+                        startIcon={
+                          <Icons
+                            name='IconPlus'
+                            className='transition-transform group-hover:rotate-90 duration-200'
+                          />
+                        }
+                        className='group'
+                      >
                         Add Item
                       </Button>
-                      <Button variant='outline' endIcon={<Icons name='IconArrowRight' />}>
+                      <Button
+                        variant='outline'
+                        endIcon={
+                          <Icons
+                            name='IconArrowRight'
+                            className='transition-transform group-hover:translate-x-1 duration-200'
+                          />
+                        }
+                        className='group'
+                      >
                         Continue
                       </Button>
-                      <Button variant='ghost' size='icon'>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        className='hover:rotate-45 transition-transform duration-200'
+                      >
                         <Icons name='IconSettings' />
                       </Button>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>States:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Button variant='primary' loading>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>States:</div>
+                    <div className='flex flex-wrap gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Button variant='primary' loading className='animate-pulse'>
                         Loading
                       </Button>
-                      <Button variant='secondary' disabled>
+                      <Button
+                        variant='secondary'
+                        disabled
+                        className='opacity-50 cursor-not-allowed'
+                      >
                         Disabled
                       </Button>
                     </div>
@@ -360,91 +437,193 @@ export const Elements = ({ ...rest }) => {
               </Card>
 
               {/* Badge Component */}
-              <Card>
-                <CardHeader className='p-4 border-b border-slate-100'>
-                  <CardTitle className='text-lg font-normal'>Badge</CardTitle>
+              <Card className='bg-white dark:bg-slate-800 transition-colors duration-200'>
+                <CardHeader className='p-4 border-b border-slate-100 dark:border-slate-700'>
+                  <CardTitle className='text-lg font-normal text-slate-900 dark:text-slate-100'>
+                    Badge
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className='p-4 space-y-4'>
+                <CardContent className='p-4 space-y-6'>
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Default badges:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Badge variant='primary' />
-                      <Badge variant='secondary' />
-                      <Badge variant='success' />
-                      <Badge variant='warning' />
-                      <Badge variant='danger' />
-                      <Badge variant='slate' />
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      Default badges:
+                    </div>
+                    <div className='flex flex-wrap gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Badge
+                        variant='primary'
+                        className='transform hover:scale-110 transition-transform duration-200'
+                      />
+                      <Badge
+                        variant='secondary'
+                        className='transform hover:scale-110 transition-transform duration-200'
+                      />
+                      <Badge
+                        variant='success'
+                        className='transform hover:scale-110 transition-transform duration-200'
+                      />
+                      <Badge
+                        variant='warning'
+                        className='transform hover:scale-110 transition-transform duration-200'
+                      />
+                      <Badge
+                        variant='danger'
+                        className='transform hover:scale-110 transition-transform duration-200'
+                      />
+                      <Badge
+                        variant='slate'
+                        className='transform hover:scale-110 transition-transform duration-200'
+                      />
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>With text:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Badge variant='primary'>New</Badge>
-                      <Badge variant='success'>Active</Badge>
-                      <Badge variant='warning'>Pending</Badge>
-                      <Badge variant='danger'>Error</Badge>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      With text:
+                    </div>
+                    <div className='flex flex-wrap gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Badge
+                        variant='primary'
+                        className='shadow-sm hover:shadow-md transition-all duration-200'
+                      >
+                        New
+                      </Badge>
+                      <Badge
+                        variant='success'
+                        className='shadow-sm hover:shadow-md transition-all duration-200'
+                      >
+                        Active
+                      </Badge>
+                      <Badge
+                        variant='warning'
+                        className='shadow-sm hover:shadow-md transition-all duration-200'
+                      >
+                        Pending
+                      </Badge>
+                      <Badge
+                        variant='danger'
+                        className='shadow-sm hover:shadow-md transition-all duration-200'
+                      >
+                        Error
+                      </Badge>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>With icons:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Badge variant='primary'>
-                        <Icons name='IconStar' className='w-3 h-3' />
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      With icons:
+                    </div>
+                    <div className='flex flex-wrap gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Badge
+                        variant='primary'
+                        className='group hover:scale-110 transition-transform duration-200'
+                      >
+                        <Icons
+                          name='IconStar'
+                          className='w-3 h-3 text-white group-hover:animate-spin'
+                        />
                       </Badge>
-                      <Badge variant='success'>
-                        <Icons name='IconCheck' className='w-3 h-3' />
+                      <Badge
+                        variant='success'
+                        className='group hover:scale-110 transition-transform duration-200'
+                      >
+                        <Icons
+                          name='IconCheck'
+                          className='w-3 h-3 text-white group-hover:animate-bounce'
+                        />
                       </Badge>
-                      <Badge variant='warning'>
-                        <Icons name='IconAlert' className='w-3 h-3' />
+                      <Badge
+                        variant='warning'
+                        className='group hover:scale-110 transition-transform duration-200'
+                      >
+                        <Icons
+                          name='IconAlertSquareRounded'
+                          className='w-3 h-3 text-white group-hover:animate-pulse'
+                        />
                       </Badge>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Outline variants:</div>
-                    <div className='flex flex-wrap gap-2'>
-                      <Badge variant='outline-primary'>Primary</Badge>
-                      <Badge variant='outline-success'>Success</Badge>
-                      <Badge variant='outline-warning'>Warning</Badge>
-                      <Badge variant='outline-danger'>Danger</Badge>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      Outline variants:
+                    </div>
+                    <div className='flex flex-wrap gap-3 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Badge
+                        variant='outline-primary'
+                        className='hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors duration-200'
+                      >
+                        Primary
+                      </Badge>
+                      <Badge
+                        variant='outline-success'
+                        className='hover:bg-success-50 dark:hover:bg-success-900/20 transition-colors duration-200'
+                      >
+                        Success
+                      </Badge>
+                      <Badge
+                        variant='outline-warning'
+                        className='hover:bg-warning-50 dark:hover:bg-warning-900/20 transition-colors duration-200'
+                      >
+                        Warning
+                      </Badge>
+                      <Badge
+                        variant='outline-danger'
+                        className='hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors duration-200'
+                      >
+                        Danger
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Avatar Component */}
-              <Card>
-                <CardHeader className='p-4 border-b border-slate-100'>
-                  <CardTitle className='text-lg font-normal'>Avatar</CardTitle>
+              <Card className='bg-white dark:bg-slate-800 transition-colors duration-200'>
+                <CardHeader className='p-4 border-b border-slate-100 dark:border-slate-700'>
+                  <CardTitle className='text-lg font-normal text-slate-900 dark:text-slate-100'>
+                    Avatar
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className='p-4 space-y-4'>
+                <CardContent className='p-4 space-y-6'>
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>With Image:</div>
-                    <div className='flex gap-3'>
-                      <Avatar>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      With Image:
+                    </div>
+                    <div className='flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Avatar className='ring-2 ring-offset-2 ring-primary-400 dark:ring-primary-500 transition-all duration-200 hover:scale-110'>
                         <AvatarImage src='https://github.com/shadcn.png' alt='Avatar' />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarFallback className='bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'>
+                          CN
+                        </AvatarFallback>
                       </Avatar>
-                      <Avatar className='h-12 w-12'>
+                      <Avatar className='h-12 w-12 ring-2 ring-offset-2 ring-secondary-400 dark:ring-secondary-500 transition-all duration-200 hover:scale-110'>
                         <AvatarImage src='https://github.com/shadcn.png' alt='Avatar' />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarFallback className='bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300'>
+                          CN
+                        </AvatarFallback>
                       </Avatar>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Fallbacks:</div>
-                    <div className='flex gap-3'>
-                      <Avatar>
-                        <AvatarFallback>JD</AvatarFallback>
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      Fallbacks:
+                    </div>
+                    <div className='flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <Avatar className='bg-success-100 dark:bg-success-900 ring-2 ring-offset-2 ring-success-400 dark:ring-success-500 transition-all duration-200 hover:scale-110'>
+                        <AvatarFallback className='text-success-700 dark:text-success-300'>
+                          JD
+                        </AvatarFallback>
                       </Avatar>
-                      <Avatar>
-                        <AvatarFallback>AB</AvatarFallback>
+                      <Avatar className='bg-warning-100 dark:bg-warning-900 ring-2 ring-offset-2 ring-warning-400 dark:ring-warning-500 transition-all duration-200 hover:scale-110'>
+                        <AvatarFallback className='text-warning-700 dark:text-warning-300'>
+                          AB
+                        </AvatarFallback>
                       </Avatar>
-                      <Avatar>
-                        <AvatarFallback>XY</AvatarFallback>
+                      <Avatar className='bg-danger-100 dark:bg-danger-900 ring-2 ring-offset-2 ring-danger-400 dark:ring-danger-500 transition-all duration-200 hover:scale-110'>
+                        <AvatarFallback className='text-danger-700 dark:text-danger-300'>
+                          XY
+                        </AvatarFallback>
                       </Avatar>
                     </div>
                   </div>
@@ -452,32 +631,90 @@ export const Elements = ({ ...rest }) => {
               </Card>
 
               {/* Icons Component */}
-              <Card>
-                <CardHeader className='p-4 border-b border-slate-100'>
-                  <CardTitle className='text-lg font-normal'>Icons</CardTitle>
+              <Card className='bg-white dark:bg-slate-800 transition-colors duration-200'>
+                <CardHeader className='p-4 border-b border-slate-100 dark:border-slate-700'>
+                  <CardTitle className='text-lg font-normal text-slate-900 dark:text-slate-100'>
+                    Icons
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className='p-4 space-y-4'>
+                <CardContent className='p-4 space-y-6'>
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Common Icons:</div>
-                    <div className='grid grid-cols-8 gap-3'>
-                      <Icons name='IconHome' />
-                      <Icons name='IconUser' />
-                      <Icons name='IconSettings' />
-                      <Icons name='IconBell' />
-                      <Icons name='IconMail' />
-                      <Icons name='IconSearch' />
-                      <Icons name='IconPlus' />
-                      <Icons name='IconX' />
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      Common Icons:
+                    </div>
+                    <div className='grid grid-cols-4 md:grid-cols-8 gap-4'>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconHome'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconUser'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconSettings'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconBell'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconMail'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconSearch'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconPlus'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
+                      <div className='p-3 rounded-lg bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-200 flex items-center justify-center group cursor-pointer'>
+                        <Icons
+                          name='IconX'
+                          className='text-slate-600 dark:text-slate-300 group-hover:text-primary-500 transition-colors duration-200'
+                        />
+                      </div>
                     </div>
                   </div>
 
                   <div>
-                    <div className='text-slate-800 text-lg mb-2'>Different Sizes:</div>
-                    <div className='flex items-center gap-3'>
-                      <Icons name='IconStar' size={16} />
-                      <Icons name='IconStar' size={24} />
-                      <Icons name='IconStar' size={32} />
-                      <Icons name='IconStar' size={48} />
+                    <div className='text-slate-800 dark:text-slate-200 text-lg mb-3'>
+                      Different Sizes:
+                    </div>
+                    <div className='flex items-center gap-6 p-4 rounded-lg bg-slate-50 dark:bg-slate-700'>
+                      <div className='flex flex-col items-center gap-2'>
+                        <Icons name='IconStar' size={16} className='text-primary-400' />
+                        <span className='text-xs text-slate-500 dark:text-slate-400'>16px</span>
+                      </div>
+                      <div className='flex flex-col items-center gap-2'>
+                        <Icons name='IconStar' size={24} className='text-primary-500' />
+                        <span className='text-xs text-slate-500 dark:text-slate-400'>24px</span>
+                      </div>
+                      <div className='flex flex-col items-center gap-2'>
+                        <Icons name='IconStar' size={32} className='text-primary-600' />
+                        <span className='text-xs text-slate-500 dark:text-slate-400'>32px</span>
+                      </div>
+                      <div className='flex flex-col items-center gap-2'>
+                        <Icons name='IconStar' size={48} className='text-primary-700' />
+                        <span className='text-xs text-slate-500 dark:text-slate-400'>48px</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

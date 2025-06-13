@@ -463,7 +463,7 @@ export const SpaceListPage = () => {
       />
 
       {/* Spaces List */}
-      <div className='bg-white rounded-xl border border-gray-100 overflow-hidden'>
+      <div className='bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden'>
         {spaces.length > 0 ? (
           <TableView
             header={columns}
@@ -475,13 +475,13 @@ export const SpaceListPage = () => {
           />
         ) : (
           <div className='text-center py-16'>
-            <div className='w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg'>
+            <div className='w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg'>
               <Icons name='IconBuilding' size={32} className='text-white' />
             </div>
-            <h3 className='text-lg font-semibold text-gray-900 mb-2'>
+            <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2'>
               {t('space.empty.title', 'No spaces found')}
             </h3>
-            <p className='text-sm text-gray-500 mb-6 max-w-sm mx-auto'>
+            <p className='text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto'>
               {t('space.empty.description', 'Get started by creating your first space.')}
             </p>
             <Button

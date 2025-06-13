@@ -38,7 +38,13 @@ const TopbarWrapper: React.FC<
 > = ({ children, className, ariaLabel = 'Page toolbar' }) => {
   return (
     <ShellTopbar
-      className={cn('px-4 align-middle flex items-center justify-between', className)}
+      className={cn(
+        'px-4 align-middle flex items-center justify-between',
+        'backdrop-blur-sm bg-white/80 dark:bg-slate-900/80',
+        'border-b border-slate-200/80 dark:border-slate-700/80',
+        'transition-colors duration-200',
+        className
+      )}
       role='toolbar'
       aria-label={ariaLabel}
     >
@@ -66,14 +72,28 @@ const TopbarComponent: React.FC<TopbarProps> = ({
   return (
     <TopbarWrapper className={className} ariaLabel={ariaLabel}>
       {title && (
-        <div className='font-medium text-slate-600 shrink-0' id='topbar-title'>
+        <div
+          className={cn(
+            'font-medium shrink-0',
+            'text-slate-700 dark:text-slate-200',
+            'transition-colors duration-200'
+          )}
+          id='topbar-title'
+        >
           {React.isValidElement(title) ? (
             title
           ) : (
             <>
               {title}
               {(!!left.length || !!right.length) && (
-                <span className='pl-px ml-4 mr-3 w-px bg-slate-200' aria-hidden='true' />
+                <span
+                  className={cn(
+                    'pl-px ml-4 mr-3 w-px',
+                    'bg-slate-200/80 dark:bg-slate-700/80',
+                    'transition-colors duration-200'
+                  )}
+                  aria-hidden='true'
+                />
               )}
             </>
           )}
@@ -82,7 +102,7 @@ const TopbarComponent: React.FC<TopbarProps> = ({
 
       {!!left.length && (
         <div
-          className='flex gap-2 shrink-0 mr-auto'
+          className={cn('flex gap-2 shrink-0 mr-auto', 'transition-colors duration-200')}
           role='group'
           aria-labelledby={title ? 'topbar-title' : undefined}
         >
@@ -94,7 +114,10 @@ const TopbarComponent: React.FC<TopbarProps> = ({
 
       {!!right.length && (
         <div
-          className='grow flex justify-end items-center gap-2 shrink-0 ml-auto'
+          className={cn(
+            'grow flex justify-end items-center gap-2 shrink-0 ml-auto',
+            'transition-colors duration-200'
+          )}
           role='group'
           aria-label='Actions'
         >

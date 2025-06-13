@@ -35,14 +35,14 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
 
   return (
     <div className='fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50'>
-      <div className='bg-white border border-gray-200 rounded-xl shadow-2xl p-4 min-w-[400px]'>
+      <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 min-w-[400px]'>
         <div className='flex items-center justify-between gap-4'>
           {/* Selection Info */}
           <div className='flex items-center gap-3'>
             <Badge variant='primary' className='px-3 py-1'>
               {selectedItems.length}
             </Badge>
-            <span className='text-sm font-medium text-gray-700'>
+            <span className='text-sm font-medium text-gray-700 dark:text-gray-200'>
               {t('common.items_selected', { count: selectedItems.length })}
             </span>
           </div>
@@ -55,7 +55,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                 variant='outline'
                 size='sm'
                 onClick={() => onBulkEdit(selectedIds)}
-                className='flex items-center gap-1'
+                className='flex items-center gap-1 dark:border-gray-600 dark:text-gray-200'
               >
                 <Icons name='IconEdit' size={14} />
                 {t('actions.edit')}
@@ -68,7 +68,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                 variant='outline'
                 size='sm'
                 onClick={() => onBulkExport(selectedIds)}
-                className='flex items-center gap-1'
+                className='flex items-center gap-1 dark:border-gray-600 dark:text-gray-200'
               >
                 <Icons name='IconDownload' size={14} />
                 {t('actions.export')}
@@ -82,7 +82,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                 variant={action.variant === 'danger' ? 'danger' : 'outline'}
                 size='sm'
                 onClick={() => action.onClick(selectedIds)}
-                className='flex items-center gap-1'
+                className='flex items-center gap-1 dark:border-gray-600 dark:text-gray-200'
               >
                 <Icons name={action.icon} size={14} />
                 {action.label}
@@ -105,7 +105,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
               variant='ghost'
               size='sm'
               onClick={onClearSelection}
-              className='flex items-center gap-1 ml-2'
+              className='flex items-center gap-1 ml-2 dark:text-gray-200 dark:hover:bg-gray-700'
             >
               <Icons name='IconX' size={14} />
               {t('actions.clear')}

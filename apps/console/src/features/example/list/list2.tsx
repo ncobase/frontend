@@ -120,12 +120,12 @@ export const ListPage2 = () => {
           </Button>
         </Tooltip>
       </div>,
-      <div className='bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2'>
+      <div className='bg-slate-100 dark:bg-gray-800 p-1 rounded-md flex items-center justify-between gap-x-2'>
         <Tooltip side='bottom' content='Card Layout'>
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/card')}
           >
             <Icons name='IconLayoutBoard' />
@@ -135,7 +135,7 @@ export const ListPage2 = () => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-2')}
           >
             <Icons name='IconTableColumn' />
@@ -145,14 +145,18 @@ export const ListPage2 = () => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-1')}
           >
             <Icons name='IconTable' />
           </Button>
         </Tooltip>
         <Tooltip side='bottom' content='Full Screen'>
-          <Button variant='unstyle' size='ratio' className='p-1 hover:bg-white'>
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
+          >
             <Icons name='IconArrowsMaximize' />
           </Button>
         </Tooltip>

@@ -96,29 +96,25 @@ export const Notifications = ({
   pushEnabled = true,
   customTrigger,
   badgeCount,
-  triggerClassName = 'relative text-slate-400/70 [&>svg]:stroke-slate-400/70',
+  triggerClassName = 'relative text-slate-400/85 dark:text-slate-500/70 [&>svg]:stroke-slate-400/70 dark:[&>svg]:stroke-slate-500/70',
   triggerIcon = 'IconBell',
   contentClassName = '',
   emptyMessage
 }: NotificationsProps) => {
   const { t } = useTranslation();
 
-  // Count unread notifications
   const unreadCount = useMemo(() => {
     return items.filter(item => !item.read).length;
   }, [items]);
 
-  // Display count (use provided badge count or unread count)
   const displayCount = badgeCount !== undefined ? badgeCount : unreadCount;
 
-  // Handle clicking on a notification
   const handleNotificationClick = useCallback((notification: NotificationItem) => {
     if (notification.onClick) {
       notification.onClick();
     }
   }, []);
 
-  // Get notification type icon
   const _getTypeIcon = (type: NotificationItem['type'] = 'info') => {
     const icons = {
       info: 'IconInfo',
@@ -129,15 +125,14 @@ export const Notifications = ({
     return icons[type] || 'IconBell';
   };
 
-  // Get type color
   const getTypeColor = (type: NotificationItem['type'] = 'info') => {
     const colors = {
-      info: 'bg-blue-500',
-      success: 'bg-green-500',
-      warning: 'bg-amber-500',
-      error: 'bg-red-500'
+      info: 'bg-blue-500/90 dark:bg-blue-400/90',
+      success: 'bg-green-500/90 dark:bg-green-400/90',
+      warning: 'bg-amber-500/90 dark:bg-amber-400/90',
+      error: 'bg-red-500/90 dark:bg-red-400/90'
     };
-    return colors[type] || 'bg-blue-500';
+    return colors[type] || 'bg-blue-500/90 dark:bg-blue-400/90';
   };
 
   return (
@@ -146,21 +141,25 @@ export const Notifications = ({
         {customTrigger || (
           <Button
             variant='unstyle'
-            className={triggerClassName}
+            className={`${triggerClassName} transition-colors duration-200`}
             aria-label={t('notification.title')}
           >
             {displayCount > 0 && (
-              <Badge className='absolute top-0 right-0 text-[9px] px-1!'>{displayCount}</Badge>
+              <Badge className='absolute top-0 right-0 text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500/90 dark:bg-red-400/90 text-white transform scale-90'>
+                {displayCount}
+              </Badge>
             )}
-            <Icons name={triggerIcon} className='stroke-slate-500/85' />
+            <Icons name={triggerIcon} className='w-5 h-5 text-slate-300 dark:text-slate-300' />
           </Button>
         )}
       </HoverCardTrigger>
-      <HoverCardContent className={`p-0 mt-3.5 w-80 ${contentClassName}`}>
+      <HoverCardContent
+        className={`p-0 mt-3.5 w-80 shadow-lg dark:bg-slate-800 dark:border-slate-700 backdrop-blur-sm ${contentClassName}`}
+      >
         <CardHeader className='flex-row justify-between'>
           <div className='inline-flex flex-col space-y-1.5'>
-            <CardTitle>{t('notification.title')}</CardTitle>
-            <CardDescription>
+            <CardTitle className='dark:text-slate-100'>{t('notification.title')}</CardTitle>
+            <CardDescription className='dark:text-slate-400'>
               {unreadCount > 0
                 ? t('notification.you_have_unread_notification_plural', {
                     count: unreadCount
@@ -174,42 +173,49 @@ export const Notifications = ({
             </Tooltip>
           )}
         </CardHeader>
-        <CardContent className='p-0 px-4 grid gap-4 max-h-[15rem] mb-3 overflow-auto'>
+        <CardContent className='p-0 px-4 grid gap-3 max-h-[15rem] my-3 overflow-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700'>
           {items.length === 0 ? (
-            <div className='text-center py-4 text-slate-400'>
+            <div className='text-center py-4 text-slate-400 dark:text-slate-500'>
               {emptyMessage || t('notification.no_notifications')}
             </div>
           ) : (
             items.slice(0, maxItems).map(notification => (
               <div
                 key={notification.id}
-                className='grid grid-cols-[22px_1fr] items-center last:mb-0 last:pb-0 cursor-pointer hover:bg-slate-50 px-2.5 py-0.5 rounded-md'
+                className='grid grid-cols-[22px_1fr] items-start gap-3 last:mb-0 last:pb-0 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-colors duration-200'
                 onClick={() => handleNotificationClick(notification)}
                 role='button'
                 tabIndex={0}
               >
                 <Badge
                   size='sm'
-                  className={`mt-1 ${getTypeColor(notification.type)}`}
+                  className={`mt-1 ${getTypeColor(notification.type)} shadow-sm`}
                   aria-hidden='true'
                 />
-                <div className='space-y-1'>
+                <div className='space-y-1.5'>
                   <p
-                    className={`text-slate-700 px-0 leading-5 text-justify text-wrap font-medium ${
-                      !notification.read ? 'font-semibold' : ''
+                    className={`text-slate-700 dark:text-slate-200 px-0 leading-5 text-justify text-wrap ${
+                      !notification.read ? 'font-semibold' : 'font-medium'
                     }`}
                   >
                     {notification.title}
                   </p>
                   {notification.description && (
-                    <p className='text-slate-400'>{notification.description}</p>
+                    <p className='text-slate-400 dark:text-slate-500 text-sm'>
+                      {notification.description}
+                    </p>
+                  )}
+                  {notification.timestamp && (
+                    <p className='text-slate-400 dark:text-slate-500 text-xs'>
+                      {notification.timestamp}
+                    </p>
                   )}
                 </div>
               </div>
             ))
           )}
           {items.length > maxItems && (
-            <div className='text-center text-slate-400'>
+            <div className='text-center text-slate-400 dark:text-slate-500 text-sm'>
               {t('notification.and_more_notifications', {
                 count: items.length - maxItems
               })}
@@ -217,9 +223,9 @@ export const Notifications = ({
           )}
         </CardContent>
         {onMarkAllAsRead && items.length > 0 && unreadCount > 0 && (
-          <CardFooter>
+          <CardFooter className='mt-4'>
             <Button className='w-full' onClick={onMarkAllAsRead}>
-              <Icons name='IconCheck' /> {t('actions.mark_all_as_read')}
+              <Icons name='IconCheck' className='mr-2' /> {t('actions.mark_all_as_read')}
             </Button>
           </CardFooter>
         )}

@@ -15,7 +15,7 @@ interface AvatarButtonProps {
 export const AvatarButton = React.forwardRef<HTMLDivElement, AvatarButtonProps>(
   ({ isLoading, className, src, title, alt, ...rest }, ref) => {
     const classes = cn(
-      'inline-flex items-center justify-center size-[1.75rem] font-medium rounded-full bg-slate-50',
+      'inline-flex items-center justify-center size-[1.75rem] font-medium rounded-full bg-slate-50 dark:bg-slate-800 dark:text-slate-200',
       className
     );
     const shouldRenderImage = src && src.trim() !== '';

@@ -168,12 +168,15 @@ export const FilterBar = ({ activeFilter, onFilterChange = undefined, ...rest })
       <div className='rounded-md'>
         {timeFilters.map(filter => (
           <Button
+            size='sm'
             key={filter.id}
             variant={activeFilter === filter.id ? 'primary' : 'outline-slate'}
             className={`${
-              activeFilter === filter.id ? '' : 'bg-white'
+              activeFilter === filter.id ? '' : 'bg-white dark:bg-slate-800'
             } -ms-px rounded-none first:rounded-s-lg first:ms-0 last:rounded-e-lg ${
-              activeFilter === filter.id ? 'border border-slate-200/65' : ''
+              activeFilter === filter.id
+                ? 'border border-slate-200/65 dark:border-slate-700/65'
+                : ''
             }`}
             onClick={() => onFilterChange(filter.id)}
           >
@@ -183,14 +186,37 @@ export const FilterBar = ({ activeFilter, onFilterChange = undefined, ...rest })
       </div>
       {/* Filter options */}
       <div className='flex items-center gap-x-2'>
-        <Button variant='outline-slate' className='shadow-xs'>
-          <Icons name='IconCalendarMonth' />
-          {t('filter.date')}
-        </Button>
-        <Button variant='outline-slate' className='shadow-xs'>
-          <Icons name='IconFilter' />
-          {t('filter.filter')}
-        </Button>
+        <Dropdown>
+          <DropdownTrigger asChild>
+            <Button variant='outline-slate' size='sm'>
+              <Icons name='IconCalendarMonth' />
+              {t('filter.date')}
+              <Icons name='IconChevronDown' className='ml-2 h-4 w-4' />
+            </Button>
+          </DropdownTrigger>
+          <DropdownContent>
+            <DropdownItem>Today</DropdownItem>
+            <DropdownItem>Yesterday</DropdownItem>
+            <DropdownItem>This Week</DropdownItem>
+            <DropdownItem>Last Week</DropdownItem>
+            <DropdownItem>Custom Range</DropdownItem>
+          </DropdownContent>
+        </Dropdown>
+
+        <Dropdown>
+          <DropdownTrigger asChild>
+            <Button variant='outline-slate' size='sm'>
+              <Icons name='IconFilter' />
+              {t('filter.filter')}
+              <Icons name='IconChevronDown' className='ml-2 h-4 w-4' />
+            </Button>
+          </DropdownTrigger>
+          <DropdownContent>
+            <DropdownItem>Category</DropdownItem>
+            <DropdownItem>Price Range</DropdownItem>
+            <DropdownItem>Status</DropdownItem>
+          </DropdownContent>
+        </Dropdown>
       </div>
     </Topbar>
   );
@@ -475,7 +501,7 @@ export const AnalyzePage = ({ ...rest }) => {
                 ))}
               </SelectContent>
             </Select>
-            <Button variant='slate'>
+            <Button variant='outline'>
               User Report <Icons name='IconChevronRight' />
             </Button>
           </CardFooter>

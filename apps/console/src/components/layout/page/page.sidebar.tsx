@@ -48,24 +48,22 @@ const MenuItemRecursive = React.memo(
   }) => {
     const { t } = useTranslation();
 
-    // Permission check
     if (!canAccessMenu(menu)) {
       return null;
     }
 
     if (isDividerLink(menu)) {
-      return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
+      return <div className='h-px w-4/5 mx-auto bg-slate-200 dark:bg-slate-700' role='separator' />;
     }
 
     if (isGroup(menu) && !expandedAccordions) {
       return (
-        <div className='text-slate-600 border-b pb-2 mb-2 border-dashed border-slate-200 first:mt-0 mt-4'>
+        <div className='text-slate-600 dark:text-slate-300 border-b pb-2 mb-2 border-dashed border-slate-200 dark:border-slate-700 first:mt-0 mt-4'>
           <span className='font-medium'>{t(menu.label || '') || menu.name}</span>
         </div>
       );
     }
 
-    // Check accessible children
     const accessibleChildren =
       menu.children?.filter(child => canAccessMenu(child as MenuTree)) || [];
     const hasAccessibleChildren = accessibleChildren.length > 0;
@@ -79,21 +77,29 @@ const MenuItemRecursive = React.memo(
           onValueChange={() => toggleAccordion(menu.id || '')}
           className='w-full'
         >
-          <AccordionItem value={menu.id || ''} className='border-b border-b-gray-50 py-2.5'>
+          <AccordionItem
+            value={menu.id || ''}
+            className='border-b border-b-slate-100 dark:border-b-slate-800 py-2'
+          >
             <AccordionTrigger
               className={cn(
-                'justify-between font-normal no-underline hover:no-underline px-2.5 py-2.5 mx-2.5 text-slate-500 [&>svg]:hover:stroke-slate-400 [&>svg]:focus:stroke-slate-400 hover:opacity-80 focus:opacity-90 hover:bg-slate-100/85 rounded-md',
-                menu.disabled && 'cursor-not-allowed opacity-80'
+                'justify-between font-normal no-underline hover:no-underline px-3 py-2.5 mx-2 text-slate-600 dark:text-slate-300',
+                '[&>svg]:hover:stroke-slate-800 [&>svg]:focus:stroke-slate-800 dark:[&>svg]:hover:stroke-slate-200 dark:[&>svg]:focus:stroke-slate-200',
+                'hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors duration-200',
+                'data-[state=open]:bg-slate-100 dark:data-[state=open]:bg-slate-800',
+                menu.disabled && 'cursor-not-allowed opacity-60'
               )}
               style={{ paddingLeft: `${(0.5 + depth) * 1}rem` }}
               aria-label={`${menu.name || menu.label} submenu`}
             >
               <div className='flex items-center justify-start'>
-                {menu.icon && <Icons name={menu.icon} className='mr-1.5' aria-hidden='true' />}
+                {menu.icon && (
+                  <Icons name={menu.icon} className='mr-2 transition-colors' aria-hidden='true' />
+                )}
                 <span>{t(menu.label || '') || menu.name}</span>
               </div>
             </AccordionTrigger>
-            <AccordionContent className='py-0 bg-slate-50/30 rounded-none'>
+            <AccordionContent className='py-1 bg-slate-50/50 dark:bg-slate-800/50 rounded-lg my-1 mx-2'>
               {accessibleChildren.map(child => (
                 <MenuItemRecursive
                   key={child.id || child.slug}
@@ -114,14 +120,19 @@ const MenuItemRecursive = React.memo(
       );
     }
 
-    // Leaf menu item
     return (
-      <div className='px-2.5 py-1.5 w-full border-b border-b-gray-50 last:border-b-0 last:pb-0'>
+      <div className='px-2 py-1 w-full'>
         <button
           className={cn(
-            'hover:bg-slate-100/85 text-slate-500 rounded-lg w-full text-left inline-flex justify-between px-2.5 py-2',
-            { 'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '', 3) },
-            menu.disabled && 'cursor-not-allowed opacity-80',
+            'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-lg w-full text-left inline-flex justify-between px-3 py-2.5 transition-colors duration-200',
+            {
+              'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white': isActive(
+                menu.path || '',
+                3
+              ),
+              '[&>svg]:stroke-slate-900 dark:[&>svg]:stroke-white': isActive(menu.path || '', 3)
+            },
+            menu.disabled && 'cursor-not-allowed opacity-60',
             className
           )}
           style={{ paddingLeft: `${(0.5 + depth) * 1}rem` }}
@@ -133,7 +144,16 @@ const MenuItemRecursive = React.memo(
           aria-current={isActive(menu.path || '', 3) ? 'page' : undefined}
         >
           <div className='flex items-center justify-start'>
-            {menu.icon && <Icons name={menu.icon} className='mr-1.5' aria-hidden='true' />}
+            {menu.icon && (
+              <Icons
+                name={menu.icon}
+                size={16}
+                className={cn('mr-2 transition-colors text-slate-500 dark:text-slate-300', {
+                  'text-slate-800 dark:text-white': isActive(menu.path || '', 3)
+                })}
+                aria-hidden='true'
+              />
+            )}
             <span style={{ paddingLeft: `${depth * 0.5}rem` }}>
               {t(menu.label || '') || menu.name}
             </span>
@@ -158,29 +178,46 @@ const CollapsedMenuItem = React.memo(
   }) => {
     const { t } = useTranslation();
 
-    // Permission check
     if (!canAccessMenu(menu)) {
       return null;
     }
 
     if (isDividerLink(menu)) {
-      return <div className='h-[0.03125rem] w-1/2 mx-auto bg-slate-200' role='separator' />;
+      return <div className='h-px w-1/2 mx-auto bg-slate-200 dark:bg-slate-700' role='separator' />;
     }
 
     return (
       <Tooltip side='right' content={t(menu.label || '') || menu.name}>
         <button
-          className={cn('px-2.5 py-2 rounded-lg my-1.5 hover:bg-slate-100/85', {
-            'bg-slate-100/90 [&>svg]:stroke-slate-400/90': isActive(menu.path || '')
-          })}
+          type='button'
+          className={cn(
+            'p-2.5 rounded-lg my-1.5 transition-colors duration-200',
+            'hover:bg-slate-100 dark:hover:bg-slate-800',
+            'text-slate-600 dark:text-slate-300',
+            {
+              'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white': isActive(
+                menu.path || ''
+              ),
+              '[&>svg]:stroke-slate-900 dark:[&>svg]:stroke-white': isActive(menu.path || '')
+            }
+          )}
           onClick={() => handleLinkClick(menu)}
           aria-label={(t(menu.label || '') || menu.name) as string}
           aria-current={isActive(menu.path || '') ? 'page' : undefined}
         >
           {menu.icon ? (
-            <Icons name={menu.icon} aria-hidden='true' />
+            <Icons
+              name={menu.icon}
+              size={18}
+              className={cn('transition-colors text-slate-500 dark:text-slate-300', {
+                'text-slate-800 dark:text-white': isActive(menu.path || '')
+              })}
+              aria-hidden='true'
+            />
           ) : (
-            <span aria-hidden='true'>{getInitials(menu.name || menu.label || menu.id || 'M')}</span>
+            <span className='text-sm font-medium' aria-hidden='true'>
+              {getInitials(menu.name || menu.label || menu.id || 'M')}
+            </span>
           )}
         </button>
       </Tooltip>
@@ -196,7 +233,6 @@ const SidebarComponent: React.FC<{
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  // Get sidebar menus and permission check
   const sidebarMenus = useMenusByType('sidebars');
   const { canAccessMenu, filterMenuTree } = useMenuPermissions();
 
@@ -222,16 +258,13 @@ const SidebarComponent: React.FC<{
     setExpandedAccordions(newState);
   }, [expandedAccordions, setExpandedAccordions]);
 
-  // Filter menus by permission and current path
   const currentPath = useMemo(() => pathname.split('/').filter(Boolean), [pathname]);
 
   const filteredSidebarMenus = useMemo(() => {
-    // Apply permission filtering first
     const permissionFiltered = filterMenuTree(sidebarMenus);
 
     if (currentPath.length === 0) return [];
 
-    // Then filter by current path for context
     const pathFiltered = permissionFiltered.filter(menu => {
       if (!menu.path) return false;
       const menuPath = menu.path.split('/').filter(Boolean);
@@ -260,8 +293,11 @@ const SidebarComponent: React.FC<{
   }
 
   return (
-    <ShellSidebar className='flex flex-col' navId='app-sidebar'>
-      <div className='flex-1 flex flex-col items-center overflow-y-auto'>
+    <ShellSidebar
+      className='flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800'
+      navId='app-sidebar'
+    >
+      <div className='flex-1 flex flex-col items-center overflow-y-auto pt-0 pb-4'>
         {filteredSidebarMenus.map((menu: MenuTree) =>
           expanded ? (
             <MenuItemRecursive
@@ -290,7 +326,14 @@ const SidebarComponent: React.FC<{
       <Button
         variant='unstyle'
         size='ratio'
-        className='absolute bottom-4 -right-2.5 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+        className={cn(
+          'absolute bottom-4 -right-2.5 z-9999 rounded-full p-0.5 border transition-colors duration-200',
+          'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800',
+          '[&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-700',
+          'dark:[&>svg]:stroke-slate-400 dark:[&>svg]:hover:stroke-slate-200',
+          'shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] dark:shadow-[0_1px_3px_0_rgba(0,0,0,0.2)]',
+          'border-slate-200 dark:border-slate-700'
+        )}
         title={t(expanded ? 'actions.sidebar_collapse' : 'actions.sidebar_expand')}
         onClick={() => setExpanded?.(!expanded)}
         aria-label={t(expanded ? 'actions.sidebar_collapse' : 'actions.sidebar_expand') as string}

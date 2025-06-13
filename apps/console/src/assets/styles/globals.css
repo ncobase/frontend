@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -117,7 +116,7 @@
   --popover: var(--background);
   --popover-foreground: var(--foreground);
 
-  --primary: var(--color-primary-600);
+  --primary: var(--color-brand-700);
   --primary-foreground: oklch(1 0 0);
 
   --secondary: oklch(0.97 0 264.54);
@@ -212,7 +211,7 @@
   --popover: var(--background);
   --popover-foreground: var(--foreground);
 
-  --primary: var(--color-primary-500);
+  --primary: var(--color-brand-500);
   --primary-foreground: oklch(1 0 0);
 
   --secondary: oklch(0.27 0 0);
@@ -399,7 +398,7 @@
 
   html,
   body {
-    @apply h-full bg-background text-foreground overflow-hidden;
+    @apply h-full bg-white dark:bg-gray-900 text-foreground overflow-hidden;
   }
 
   body {
@@ -493,12 +492,12 @@
   @apply bg-clip-text text-transparent bg-linear-to-r from-primary-600 via-purple-500 to-sky-400;
 
   &:hover {
-    @apply bg-linear-to-r from-purple-600 via-sky-500 to-primary-400;
+    @apply bg-linear-to-r from-purple-600 via-sky-500 to-primary-400 cursor-default;
   }
 }
 
 @utility text-gradient-hover {
-  @apply hover:bg-clip-text hover:text-transparent hover:bg-linear-to-r hover:from-purple-600 hover:via-sky-500 hover:to-primary-400;
+  @apply hover:bg-clip-text hover:text-transparent hover:bg-linear-to-r hover:from-purple-600 hover:via-sky-500 hover:to-primary-400 hover:cursor-default;
 }
 
 @utility group-text-gradient-hover {

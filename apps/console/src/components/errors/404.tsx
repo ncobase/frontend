@@ -33,7 +33,7 @@ export const Error404 = ({ to = null, onRetry }: { to?: string | null; onRetry?:
       <div className='text-center font-medium text-6xl leading-20 text-gradient drop-shadow-xs mb-8'>
         {t('errors.404.title')}
       </div>
-      <span className='mx-auto max-w-md text-secondary-600 mt-4 mb-12 text-center'>
+      <span className='mx-auto max-w-md text-secondary-600 dark:text-secondary-400 mt-4 mb-12 text-center'>
         {t('errors.404.description')}
       </span>
       <div className='flex items-center justify-center gap-4'>

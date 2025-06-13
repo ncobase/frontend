@@ -267,20 +267,34 @@ export const CreatePage = () => {
 
   return (
     <Page layout={false}>
-      <div className='h-16 shadow-xs bg-white sticky top-0 right-0 left-0'>
+      <div className='h-16 shadow-xs bg-white dark:bg-slate-900 sticky top-0 right-0 left-0'>
         <Container className='max-w-7xl'>
           <div className='flex items-center justify-center'>
             <div className='flex-1 flex items-center gap-x-4'>
-              <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
+              <Button
+                variant='outline-slate'
+                onClick={() => navigate(-1)}
+                size='sm'
+                className='dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800'
+              >
                 <Icons name='IconArrowLeft' />
               </Button>
-              <div className='text-slate-600 font-medium'>创建表单</div>
+              <div className='text-slate-600 dark:text-slate-300 font-medium'>创建表单</div>
             </div>
             <div className='flex gap-x-4'>
-              <Button variant='outline-slate' onClick={() => navigate(-1)} size='sm'>
+              <Button
+                variant='outline-slate'
+                onClick={() => navigate(-1)}
+                size='sm'
+                className='dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800'
+              >
                 {t('actions.cancel')}
               </Button>
-              <Button onClick={handleSubmit(onSubmit)} size='sm'>
+              <Button
+                onClick={handleSubmit(onSubmit)}
+                size='sm'
+                className='dark:bg-primary-600 dark:hover:bg-primary-700'
+              >
                 {t('actions.submit')}
               </Button>
             </div>
@@ -293,19 +307,19 @@ export const CreatePage = () => {
             <TabsList className='flex items-center justify-end gap-x-4'>
               <TabsTrigger
                 value='contracts'
-                className='data-[state=active]:border-primary-500 data-[state=active]:text-primary-500'
+                className='data-[state=active]:border-primary-500 data-[state=active]:text-primary-500 dark:data-[state=active]:border-primary-400 dark:data-[state=active]:text-primary-400'
               >
                 合同信息
               </TabsTrigger>
               <TabsTrigger
                 value='material'
-                className='data-[state=active]:border-red-500 data-[state=active]:text-red-500'
+                className='data-[state=active]:border-red-500 data-[state=active]:text-red-500 dark:data-[state=active]:border-red-400 dark:data-[state=active]:text-red-400'
               >
                 物料信息
               </TabsTrigger>
               <TabsTrigger
                 value='customers'
-                className='data-[state=active]:border-green-500 data-[state=active]:text-green-500'
+                className='data-[state=active]:border-green-500 data-[state=active]:text-green-500 dark:data-[state=active]:border-green-400 dark:data-[state=active]:text-green-400'
               >
                 客户信用
               </TabsTrigger>

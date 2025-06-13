@@ -24,115 +24,130 @@ import { parseStatus } from '@/lib/status';
 const QueryBar = () => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
+  const [selectedCategory, setSelectedCategory] = useState('cat1');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('sub1');
+
+  const categories = [
+    { id: 'cat1', name: '销售', subcategories: ['销售业绩', '客户满意度', '合同完成率'] },
+    { id: 'cat2', name: '生产', subcategories: ['产品质量', '生产效率', '设备利用率'] },
+    { id: 'cat3', name: '研发', subcategories: ['创新指标', '专利数量', '项目进度'] },
+    { id: 'cat4', name: '人力', subcategories: ['员工满意度', '培训完成率', '人才保留率'] }
+  ];
+
+  const metrics = [
+    { id: 'metric1', name: '销售额' },
+    { id: 'metric2', name: '利润率' },
+    { id: 'metric3', name: '市场份额' },
+    { id: 'metric4', name: '客户数量' },
+    { id: 'metric5', name: '增长率' }
+  ];
+
+  const toggleExpand = () => setIsExpanded(!isExpanded);
+
   return (
-    <div className='bg-white shadow-xs flex-col grid rounded-md px-4 divide-y divide-slate-100 relative'>
+    <div className='bg-white dark:bg-slate-800 shadow-xs flex-col grid rounded-md px-4 divide-y divide-slate-100 dark:divide-slate-700 relative'>
       <div className='py-4 flex items-center justify-start'>
-        <div className='flex items-center text-slate-800'>类别：</div>
-        <div className='flex-1 flex gap-x-4 pl-4'>
-          <Button variant='primary'>类别</Button>
-          <Button variant='unstyle'>类别类别类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
-          <Button variant='unstyle'>类别</Button>
+        <div className='flex items-center text-slate-800 dark:text-slate-200'>类别：</div>
+        <div className='flex-1 flex flex-wrap gap-4 pl-4'>
+          {categories.map(cat => (
+            <div key={cat.id} className='flex flex-col gap-2'>
+              <Button
+                variant={selectedCategory === cat.id ? 'primary' : 'unstyle'}
+                onClick={() => setSelectedCategory(cat.id)}
+                className='dark:text-slate-200 dark:hover:bg-slate-700'
+              >
+                {cat.name}
+              </Button>
+              {selectedCategory === cat.id && (
+                <div className='flex gap-2 pl-4'>
+                  {cat.subcategories.map((sub, idx) => (
+                    <Button
+                      key={idx}
+                      variant={selectedSubCategory === `sub${idx}` ? 'outline' : 'unstyle'}
+                      onClick={() => setSelectedSubCategory(`sub${idx}`)}
+                      className='text-sm dark:text-slate-300'
+                    >
+                      {sub}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
-      {isExpanded ? (
+      {isExpanded && (
         <>
           <div className='py-4 flex items-center justify-start'>
-            <div className='flex items-center text-slate-800'>指标：</div>
+            <div className='flex items-center text-slate-800 dark:text-slate-200'>指标：</div>
             <div className='flex-1 flex gap-x-4 pl-4'>
-              <div className='inline-flex'>
-                <Checkbox id='hs-default-checkbox1' />
-                <Label htmlFor='hs-default-checkbox1' className='pl-2'>
-                  指标
-                </Label>
-              </div>
-              <div className='inline-flex'>
-                <Checkbox id='hs-default-checkbox2' defaultChecked />
-                <Label htmlFor='hs-default-checkbox2' className='pl-2'>
-                  指标
-                </Label>
-              </div>
-              <div className='inline-flex'>
-                <Checkbox id='hs-default-checkbox3' defaultChecked />
-                <Label htmlFor='hs-default-checkbox3' className='pl-2'>
-                  指标
-                </Label>
-              </div>
-              <div className='inline-flex'>
-                <Checkbox id='hs-default-checkbox4' />
-                <Label htmlFor='hs-default-checkbox4' className='pl-2'>
-                  指标
-                </Label>
-              </div>
-              <div className='inline-flex'>
-                <Checkbox id='hs-default-checkbox5' defaultChecked />
-                <Label htmlFor='hs-default-checkbox5' className='pl-2'>
-                  指标
-                </Label>
-              </div>
+              {metrics.map((metric, idx) => (
+                <div key={idx} className='inline-flex'>
+                  <Checkbox id={`metric-${idx}`} />
+                  <Label htmlFor={`metric-${idx}`} className='pl-2 dark:text-slate-300'>
+                    {metric.name}
+                  </Label>
+                </div>
+              ))}
             </div>
           </div>
-          <div className='py-4 flex items-center justify-start'>
+          <div className='py-4 flex items-center justify-start flex-wrap gap-y-4'>
             <div className='inline-flex mr-6'>
-              <div className='flex items-center text-slate-800'>周期：</div>
+              <div className='flex items-center text-slate-800 dark:text-slate-200'>周期：</div>
               <div className='flex-1 flex gap-x-4 pl-4'>
                 <Select defaultValue='month'>
-                  <SelectTrigger className='py-1 bg-slate-50'>
+                  <SelectTrigger className='py-1 bg-slate-50 dark:bg-slate-700'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='year'>年</SelectItem>
+                    <SelectItem value='quarter'>季</SelectItem>
                     <SelectItem value='month'>月</SelectItem>
+                    <SelectItem value='week'>周</SelectItem>
                     <SelectItem value='day'>日</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className='inline-flex mr-6'>
-              <div className='flex items-center text-slate-800'>日期：</div>
+              <div className='flex items-center text-slate-800 dark:text-slate-200'>日期：</div>
               <div className='flex-1 flex gap-x-4 pl-4'>
                 <Select defaultValue='202305'>
-                  <SelectTrigger className='py-1 bg-slate-50'>
+                  <SelectTrigger className='py-1 bg-slate-50 dark:bg-slate-700'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='202401'>2024 - 01</SelectItem>
-                    <SelectItem value='202305'>2023 - 05</SelectItem>
-                    <SelectItem value='202206'>2022 - 06</SelectItem>
+                    <SelectItem value='202312'>2023 - 12</SelectItem>
+                    <SelectItem value='202311'>2023 - 11</SelectItem>
+                    <SelectItem value='202310'>2023 - 10</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className='inline-flex mr-6'>
-              <div className='flex items-center text-slate-800'>考核对象：</div>
+              <div className='flex items-center text-slate-800 dark:text-slate-200'>考核对象：</div>
               <div className='flex-1 flex gap-x-4 pl-4'>
-                <Select defaultValue='purchase1'>
-                  <SelectTrigger className='py-1 bg-slate-50'>
+                <Select defaultValue='dept1'>
+                  <SelectTrigger className='py-1 bg-slate-50 dark:bg-slate-700'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='sale1'>销售一组</SelectItem>
-                    <SelectItem value='sale2'>销售二组</SelectItem>
-                    <SelectItem value='purchase1'>采购一组</SelectItem>
-                    <SelectItem value='purchase2'>采购二组</SelectItem>
+                    <SelectItem value='dept1'>销售部门</SelectItem>
+                    <SelectItem value='dept2'>生产部门</SelectItem>
+                    <SelectItem value='dept3'>研发部门</SelectItem>
+                    <SelectItem value='dept4'>人力资源部</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           </div>
         </>
-      ) : null}
+      )}
       <Button
         variant='unstyle'
         size='ratio'
-        className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+        className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-9999 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 dark:[&>svg]:stroke-slate-400 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
         title={t(isExpanded ? 'query.collapse' : 'query.expand')}
         onClick={toggleExpand}
       >
@@ -178,12 +193,12 @@ export const ListPage = () => {
           </Button>
         </Tooltip>
       </div>,
-      <div className='bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2'>
+      <div className='bg-slate-100 dark:bg-gray-800 p-1 rounded-md flex items-center justify-between gap-x-2'>
         <Tooltip side='bottom' content='Card Layout'>
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/card')}
           >
             <Icons name='IconLayoutBoard' />
@@ -193,7 +208,7 @@ export const ListPage = () => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-2')}
           >
             <Icons name='IconTableColumn' />
@@ -203,14 +218,18 @@ export const ListPage = () => {
           <Button
             variant='unstyle'
             size='ratio'
-            className='p-1 hover:bg-white'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
             onClick={() => navigate('/example/list-1')}
           >
             <Icons name='IconTable' />
           </Button>
         </Tooltip>
         <Tooltip side='bottom' content='Full Screen'>
-          <Button variant='unstyle' size='ratio' className='p-1 hover:bg-white'>
+          <Button
+            variant='unstyle'
+            size='ratio'
+            className='p-1 hover:bg-white dark:hover:bg-gray-700'
+          >
             <Icons name='IconArrowsMaximize' />
           </Button>
         </Tooltip>

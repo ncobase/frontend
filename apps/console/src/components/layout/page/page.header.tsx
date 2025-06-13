@@ -118,15 +118,24 @@ const HeaderComponent = ({
     [t, toast]
   );
 
+  const headerClassName = cn(
+    'flex items-center border-b-0 backdrop-blur-xl transition-all duration-300',
+    'bg-gradient-to-r from-slate-900/90 via-slate-800/90 to-slate-900/90'
+  );
+
   if (isLoading) {
     return (
-      <ShellHeader
-        className='flex items-center justify-between bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
-        {...rest}
-      >
+      <ShellHeader className={headerClassName} {...rest}>
         <div className='flex items-center flex-shrink-0'>
-          <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
-          <div className='ml-4 text-white/60 text-sm hidden sm:block'>Loading navigation...</div>
+          <Logo
+            className='w-14 h-14 bg-gradient-to-br from-slate-700 to-slate-800 transition-colors duration-300'
+            type='min'
+            height='2.625rem'
+            color='white'
+          />
+          <div className='ml-4 text-slate-600 dark:text-slate-400 text-sm hidden sm:block animate-pulse'>
+            Loading navigation...
+          </div>
         </div>
 
         <div className='flex items-center gap-x-2 sm:gap-x-3 flex-shrink-0 px-4 ml-auto'>
@@ -134,7 +143,7 @@ const HeaderComponent = ({
             <Button
               variant='unstyle'
               size='sm'
-              className='md:hidden text-white/70 hover:text-white p-2'
+              className='md:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2 transition-colors duration-200'
               onClick={onMobileMenuToggle}
               aria-label='Toggle mobile menu'
             >
@@ -162,12 +171,14 @@ const HeaderComponent = ({
   }
 
   return (
-    <ShellHeader
-      className='flex items-center bg-linear-to-r border-b-0 backdrop-blur-sm from-slate-800 via-slate-700 via-20% to-slate-800'
-      {...rest}
-    >
+    <ShellHeader className={headerClassName} {...rest}>
       <div className='flex items-center flex-shrink-0'>
-        <Logo className='w-14 h-14 bg-slate-900' type='min' height='2.625rem' color='white' />
+        <Logo
+          className='w-14 h-14 bg-gradient-to-br from-slate-800 to-slate-900 transition-colors duration-300'
+          type='min'
+          height='2.625rem'
+          color='white'
+        />
       </div>
 
       <div className='hidden md:flex flex-1 min-w-0 overflow-hidden'>
@@ -180,8 +191,8 @@ const HeaderComponent = ({
             variant='unstyle'
             size='sm'
             className={cn(
-              'md:hidden text-white/70 hover:text-white p-2',
-              'hover:bg-white/10 rounded-md transition-colors'
+              'md:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-2',
+              'hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-200'
             )}
             onClick={onMobileMenuToggle}
             aria-label='Toggle mobile menu'
@@ -189,7 +200,8 @@ const HeaderComponent = ({
             <Icons name='IconMenu2' />
           </Button>
         )}
-        <div className='hidden sm:flex md:hidden items-center'>
+
+        <div className='hidden sm:flex md:hidden items-center gap-x-2'>
           <LanguageSwitcher />
           <Notifications
             items={notifications}
@@ -200,7 +212,7 @@ const HeaderComponent = ({
           <SpaceDropdown />
         </div>
 
-        <div className='hidden md:flex items-center'>
+        <div className='hidden md:flex items-center gap-x-2'>
           <Search />
           <LanguageSwitcher />
           <Preferences />
@@ -212,6 +224,8 @@ const HeaderComponent = ({
           />
           <SpaceDropdown />
         </div>
+
+        <div className='border-l border-slate-600 h-5 mx-2' />
         <AccountDropdown />
       </div>
     </ShellHeader>

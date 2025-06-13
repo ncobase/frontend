@@ -55,7 +55,7 @@ export const QueryBar = ({
       id='querybar-form'
       onSubmit={onQuery}
       noValidate
-      className='flex bg-white shadow-xs -mx-4 -mt-4 p-4 relative'
+      className='flex bg-white dark:bg-slate-800 shadow-xs -mx-4 -mt-4 p-4 relative'
     >
       <div
         className='flex-1 w-full'
@@ -86,7 +86,9 @@ export const QueryBar = ({
           >
             {visibleFields.map(({ name, label, component }) => (
               <div key={name} className='flex items-center'>
-                <div className='text-slate-800 whitespace-nowrap'>{label}：</div>
+                <div className='text-slate-800 dark:text-slate-200 whitespace-nowrap'>
+                  {label}：
+                </div>
                 <div className='flex-1 pl-2'>{component}</div>
               </div>
             ))}
@@ -120,7 +122,7 @@ export const QueryBar = ({
         <Button
           variant='unstyle'
           size='ratio'
-          className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 bg-white hover:bg-slate-50 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
+          className='absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 [&>svg]:stroke-slate-500 [&>svg]:hover:stroke-slate-600 dark:[&>svg]:stroke-slate-400 dark:[&>svg]:hover:stroke-slate-300 shadow-[0_1px_3px_0_rgba(0,0,0,0.10)] rounded-full p-0.5 border border-transparent'
           title={t(isExpanded ? 'query.collapse' : 'query.expand')}
           onClick={toggleExpand}
         >

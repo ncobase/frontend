@@ -52,7 +52,13 @@ export const Search = ({
         render={({ field }) => (
           <InputField
             className={cn(
-              'mr-3 py-[3.5px] border-transparent focus:border-slate-600 text-slate-300 [&>*>input]:bg-slate-50/15 backdrop-blur-xs [&>*>input]:hover:border-slate-600 [&>*>input]:hover:bg-slate-50/15',
+              'mr-3 border-transparent h-full',
+              'text-slate-400',
+              '[&>*>input]:h-full [&>*>input]:bg-slate-50/15 dark:[&>*>input]:bg-slate-50/15',
+              '[&>*>input]:hover:border-slate-600 dark:[&>*>input]:hover:border-slate-400',
+              '[&>*>input]:hover:bg-slate-50/15',
+              '[&>*>input]:focus:outline-none',
+              '[&>*>input]:focus:ring-0',
               fieldClassName
             )}
             placeholder={placeholder || t('search.placeholder')}

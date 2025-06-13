@@ -18,7 +18,7 @@ export const DropdownControl = ({ onChange }: { onChange?: (_value: string) => v
   const { t } = useTranslation();
   return (
     <Select defaultValue={filterDays[0].value} onValueChange={onChange}>
-      <SelectTrigger className='w-auto outline-hidden py-1.5 px-1.5 gap-x-1.5 shadow-none border-none bg-slate-100 hover:bg-slate-100/80'>
+      <SelectTrigger className='w-auto outline-hidden py-1.5 px-1.5 gap-x-1.5 shadow-none border-none bg-slate-100 dark:bg-slate-800 hover:bg-slate-100/80 dark:hover:bg-slate-800/80'>
         <Icons name='IconCalendar' />
         <SelectValue />
       </SelectTrigger>
@@ -35,8 +35,9 @@ export const DropdownControl = ({ onChange }: { onChange?: (_value: string) => v
 
 export const LayoutControl = ({ onChange }: { onChange?: () => void }) => {
   const { t } = useTranslation();
-  const wrapperStyle = 'bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2';
-  const childButtonStyle = 'rounded-md p-1 hover:bg-white';
+  const wrapperStyle =
+    'bg-slate-100 dark:bg-slate-800 p-1 rounded-md flex items-center justify-between gap-x-2';
+  const childButtonStyle = 'rounded-md p-1 hover:bg-white dark:hover:bg-slate-700';
   return (
     <div className={wrapperStyle}>
       <Button
@@ -63,8 +64,9 @@ export const LayoutControl = ({ onChange }: { onChange?: () => void }) => {
 
 export const ScreenControl = () => {
   const { t } = useTranslation();
-  const wrapperStyle = 'bg-slate-100 p-1 rounded-md flex items-center justify-between gap-x-2';
-  const childButtonStyle = 'rounded-md p-1 hover:bg-white';
+  const wrapperStyle =
+    'bg-slate-100 dark:bg-slate-800 p-1 rounded-md flex items-center justify-between gap-x-2';
+  const childButtonStyle = 'rounded-md p-1 hover:bg-white dark:hover:bg-slate-700';
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullscreen = () => {
