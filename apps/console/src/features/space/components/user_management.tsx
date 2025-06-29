@@ -295,14 +295,14 @@ export const SpaceUserManagement: React.FC<SpaceUserManagementProps> = ({ space 
 };
 
 const UserRow = ({ user, roles, selected, onSelect, onRemove, t }: any) => {
-  const getRoleNames = (roleIds: string[]) => {
-    return roleIds
-      .map(roleId => {
-        const role = roles.find(r => r.id === roleId);
-        return role ? role.name : roleId;
-      })
-      .join(', ');
-  };
+  // const getRoleNames = (roleIds: string[]) => {
+  //   return roleIds
+  //     .map(roleId => {
+  //       const role = roles.find(r => r.id === roleId);
+  //       return role ? role.name : roleId;
+  //     })
+  //     .join(', ');
+  // };
 
   return (
     <tr className='hover:bg-slate-50'>

@@ -1,6 +1,6 @@
 import { Button, Icons, ScrollView, Container } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { PermissionViewerForms } from '../forms/viewer';
 
@@ -21,7 +21,6 @@ export const PermissionViewerPage = ({ viewMode, record: initialRecord, handleVi
   }
 
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <>

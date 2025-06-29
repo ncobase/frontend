@@ -69,6 +69,7 @@ export const ContentImport: React.FC<ContentImportProps> = ({
         }
 
         setPreviewData(Array.isArray(data) ? data.slice(0, 10) : [data]);
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error('Failed to parse file. Please check the format.');
         setFile(null);

@@ -1,6 +1,6 @@
 import { Button, Icons, ScrollView, Container } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { RoleViewerForms } from '../forms/viewer';
 
@@ -20,7 +20,6 @@ export const RoleViewerPage = ({ viewMode, record: initialRecord, handleView }) 
   }
 
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <>

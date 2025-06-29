@@ -20,12 +20,7 @@ import { useNavigate, useParams } from 'react-router';
 import { SpaceUserBulkActions } from '../../components/user_bulk_actions';
 import { SpaceUserRoleManagement } from '../../components/user_role_management';
 import { useSpaceUserList } from '../../hooks/user';
-import {
-  useAddUserToSpaceRole,
-  useRemoveUserFromSpaceRole,
-  useBulkUpdateUserSpaceRoles,
-  useQuerySpace
-} from '../../service';
+import { useRemoveUserFromSpaceRole, useQuerySpace } from '../../service';
 
 import { BulkActions } from '@/components/bulk_actions';
 import { ErrorPage } from '@/components/errors';
@@ -71,9 +66,7 @@ export const SpaceUserListPage = () => {
   // Data fetching
   const { data: space } = useQuerySpace(spaceId);
   const { data: userData, loading, refetch } = useSpaceUserList(spaceId, searchParams);
-  const addUserMutation = useAddUserToSpaceRole();
   const removeUserMutation = useRemoveUserFromSpaceRole();
-  const bulkUpdateMutation = useBulkUpdateUserSpaceRoles();
 
   const users = userData?.users || [];
 
@@ -282,7 +275,7 @@ export const SpaceUserListPage = () => {
         return (
           <div className='flex flex-wrap gap-1'>
             {roleIds.slice(0, 2).map((roleId: string) => (
-              <Badge key={roleId} variant='outline' size='sm'>
+              <Badge key={roleId} variant='outline-primary' size='sm'>
                 {roleId}
               </Badge>
             ))}

@@ -1,4 +1,4 @@
-import { Button, Badge, Tooltip, Icons, TableViewProps } from '@ncobase/react';
+import { Button, Badge, Tooltip, TableViewProps } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
