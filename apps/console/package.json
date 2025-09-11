@@ -76,7 +76,7 @@
     "postcss": "^8.5.5",
     "postcss-import": "^16.1.0",
     "postcss-nesting": "^13.0.2",
-    "vite": "^5.4.19",
+    "vite": "^5.4.20",
     "vitest": "^3.2.3"
   }
 }
