@@ -13,6 +13,7 @@ import { Footer } from '@/components/footer/footer';
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Page } from '@/components/layout';
 import { Logo } from '@/components/logo';
+import { useNotificationService } from '@/components/notifications/notification.service';
 import { useRegisterAccount } from '@/features/account/service';
 import { useRedirectFromUrl } from '@/router';
 
@@ -21,6 +22,7 @@ export const Register = () => {
   const navigate = useNavigate();
   const redirect = useRedirectFromUrl();
   const queryClient = useQueryClient();
+  const { addNotification } = useNotificationService();
 
   const {
     control,
@@ -31,13 +33,11 @@ export const Register = () => {
 
   const onError = error => {
     const { reason, message } = error?._data || ({} as ExplicitAny);
-    // TODO: Notification
-    const _notificationProps = {
-      title: reason,
-      message: message || t(`componnets:errorPage.${reason?.toLowerCase() || 'unknown.label'}`),
-      color: 'red',
-      withCloseButton: false
-    };
+    addNotification({
+      title: reason || t('common.error'),
+      description: message || t(`componnets:errorPage.${reason?.toLowerCase() || 'unknown.label'}`),
+      type: 'error'
+    });
   };
 
   const { mutate: onRegisterAccount } = useRegisterAccount({

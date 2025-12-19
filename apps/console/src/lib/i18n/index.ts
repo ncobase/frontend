@@ -43,7 +43,7 @@ i18n
     backend: {
       // TODO: change to api url
       // Language resource path
-      // loadPath: `${request.config.baseURL}/locales/{{lng}}.json`,
+      // loadPath: `${Request.baseConfig.baseURL}/locales/{{lng}}.json`,
       loadPath: '/assets/locales/{{lng}}.json',
 
       // Add version control
