@@ -8,7 +8,8 @@ import { useQueryDictionary } from '../service';
 
 export const EditorDictionaryForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {}, isLoading } = useQueryDictionary(record);
+  const { data: rawData = {}, isLoading } = useQueryDictionary(record);
+  const data = rawData as any;
 
   const fields: FieldConfigProps[] = [
     {

@@ -4,5 +4,6 @@ packages:
   - plugins/*
 
 onlyBuiltDependencies:
+  - '@swc/core'
   - '@tailwindcss/oxide'
   - esbuild
