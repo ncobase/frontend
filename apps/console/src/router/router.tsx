@@ -24,6 +24,8 @@ const ExampleRoutes = lazy(() => import('@/features/example/routes'));
 const SystemRoutes = lazy(() => import('@/features/system/routes'));
 const NCoreRoutes = lazy(() => import('@/features/ncore/routes'));
 const SpaceRoutes = lazy(() => import('@/features/space/routes'));
+const ResourceRoutes = lazy(() => import('@/features/resource/routes'));
+const PaymentRoutes = lazy(() => import('@/features/payment/routes'));
 
 const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
@@ -135,6 +137,22 @@ const routes = [
     element: (
       <Guard permissions={['read:example', 'write:example']} any>
         <ExampleRoutes />
+      </Guard>
+    )
+  },
+  {
+    path: '/res/*',
+    element: (
+      <Guard>
+        <ResourceRoutes />
+      </Guard>
+    )
+  },
+  {
+    path: '/pay/*',
+    element: (
+      <Guard admin>
+        <PaymentRoutes />
       </Guard>
     )
   }

@@ -1,4 +1,4 @@
-import '@/assets/styles/globals.css';
+import '@/assets/styles/styles.css';
 
 /** Tailwind's Preflight Style Override */
 const naiveStyleOverride = () => {
