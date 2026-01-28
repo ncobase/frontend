@@ -166,7 +166,7 @@ export const ResourceListPage = () => {
       <CurdView
         viewMode={vmode}
         title={t('resource.title', 'Resource Manager')}
-        topbarLeft={topbarLeftSection({ handleView, handleUpload })}
+        topbarLeft={topbarLeftSection({ handleUpload })}
         topbarRight={[]}
         columns={tableColumns({ handleView, handleDelete })}
         data={data?.items || []}

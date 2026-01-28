@@ -43,7 +43,7 @@ const StatCard = ({
 
 export const ResourceAdminPage = () => {
   const { t } = useTranslation();
-  const { data: stats, isLoading } = useGetAdminStats();
+  const { data: stats } = useGetAdminStats();
   const { data: quota } = useGetQuota();
 
   return (

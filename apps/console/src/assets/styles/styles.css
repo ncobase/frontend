@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -76,21 +77,21 @@
   --color-warning-900: #78350f;
   --color-warning-950: #451a03;
 
-  --text-xs: 0.6875rem; /* 11px */
+  --text-xs: 0.6875rem;
   --text-xs--line-height: 1rem;
-  --text-sm: 0.75rem; /* 12px */
+  --text-sm: 0.75rem;
   --text-sm--line-height: 1.125rem;
-  --text-base: 0.875rem; /* 14px */
+  --text-base: 0.875rem;
   --text-base--line-height: 1.25rem;
-  --text-lg: 1rem; /* 16px */
+  --text-lg: 1rem;
   --text-lg--line-height: 1.5rem;
-  --text-xl: 1.125rem; /* 18px */
+  --text-xl: 1.125rem;
   --text-xl--line-height: 1.75rem;
-  --text-2xl: 1.25rem; /* 20px */
-  --text-3xl: 1.5rem; /* 24px */
-  --text-4xl: 1.875rem; /* 30px */
-  --text-5xl: 2.25rem; /* 36px */
-  --text-6xl: 3rem; /* 48px */
+  --text-2xl: 1.25rem;
+  --text-3xl: 1.5rem;
+  --text-4xl: 1.875rem;
+  --text-5xl: 2.25rem;
+  --text-6xl: 3rem;
 
   @keyframes leftToaster {
     from {

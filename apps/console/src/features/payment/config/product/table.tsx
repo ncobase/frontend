@@ -12,8 +12,8 @@ export const tableColumns = ({
   handleView,
   handleDelete
 }: {
-  handleView: (record: PaymentProduct, mode: string) => void;
-  handleDelete: (record: PaymentProduct) => void;
+  handleView: (_record: PaymentProduct, _mode: string) => void;
+  handleDelete: (_record: PaymentProduct) => void;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
 

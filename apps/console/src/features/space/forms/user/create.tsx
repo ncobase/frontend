@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useListRoles } from '@/features/system/role/service';
 
-export const CreateSpaceUserForm = ({ spaceId, onSubmit, control, errors }) => {
+export const CreateSpaceUserForm = ({ spaceId: _spaceId, onSubmit, control, errors }) => {
   const { t } = useTranslation();
   const { data: rolesData } = useListRoles({ limit: 100 });
   const roles = rolesData?.items || [];

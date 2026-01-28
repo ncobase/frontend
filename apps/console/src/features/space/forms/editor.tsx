@@ -11,10 +11,6 @@ export const EditSpaceForm = ({ record, onSubmit, control, setValue, errors }) =
   const { t } = useTranslation();
   const { data = {}, isLoading } = useQuerySpace(record);
 
-  const handleLogoUploadComplete = (uploadResult: any) => {
-    setValue('logo', uploadResult.download_url || uploadResult.path);
-  };
-
   const formSections: FormSection[] = [
     {
       id: 'basic',

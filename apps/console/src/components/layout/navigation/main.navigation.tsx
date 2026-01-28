@@ -14,8 +14,6 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { isDividerLink } from '../page/page.helper';
 
-import classes from './navigator.module.css';
-
 import { MenuTree } from '@/features/system/menu/menu';
 
 interface MainNavigationProps {
@@ -197,11 +195,16 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     const isMenuActive = isActive(path || '');
 
     // Render dropdown for menu
+    const linkBase = cn(
+      'py-2 px-2.5 mr-3 rounded-none hover:bg-transparent border-b-2 border-transparent text-white hover:opacity-85 cursor-pointer inline-flex items-center whitespace-nowrap',
+      'max-md:px-2 max-md:mr-2 max-sm:px-1.5 max-sm:mr-1.5'
+    );
+
     if (hasChildren && withSubmenu) {
       return (
         <Dropdown key={id || label}>
-          <DropdownTrigger className={classes.link} onClick={handleClick}>
-            <span className={classes.linkLabel}>{t(label || '') || 'Menu'}</span>
+          <DropdownTrigger className={linkBase} onClick={handleClick}>
+            <span className='mr-2'>{t(label || '') || 'Menu'}</span>
             <Icons name='IconChevronDown' />
           </DropdownTrigger>
           <DropdownContent className='w-48 max-h-96 overflow-y-auto'>
@@ -217,7 +220,7 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
         key={id || label}
         ref={isMenuActive ? activeMenuRef : undefined}
         title={(t(label || '') || 'Menu') as string}
-        className={`${classes.link} ${isMenuActive ? classes.linkActive : ''} flex-shrink-0`}
+        className={cn(linkBase, 'flex-shrink-0', isMenuActive && 'border-white')}
         onClick={handleClick}
       >
         {t(label || '') || 'Menu'}
@@ -228,15 +231,16 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
   if (!menus.length) return null;
 
   return (
-    <div className={cn('flex items-center ml-4 relative', classes.navigationContainer)}>
+    <div className='flex items-center ml-4 relative min-w-0'>
       {showScrollButtons && canScrollLeft && (
         <Button
           variant='icon'
           className={cn(
             'absolute left-0 top-1/2 -translate-y-1/2 z-20',
             'text-[color-mix(in_srgb,var(--foreground-color,#fff)_60%,transparent)] hover:text-[color-mix(in_srgb,var(--foreground-color,#fff)_90%,transparent)]',
-            'w-6 h-6 p-0 rounded-r-full rounded-l-none',
-            classes.scrollButton
+            'w-6 h-6 p-0 rounded-r-full rounded-l-none transition-all duration-150 ease-in-out',
+            'hover:bg-white/5 hover:text-white/95 hover:scale-105 backdrop-blur-[4px]',
+            'max-md:w-5 max-md:h-5 max-sm:w-4 max-sm:h-4'
           )}
           onClick={() => scroll('left')}
           aria-label='Scroll left'
@@ -249,14 +253,9 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
         className={cn(
           'flex items-center gap-3 overflow-x-auto scrollbar-hide',
           'scroll-smooth w-full',
-          classes.scrollContainer,
           showScrollButtons && canScrollLeft && 'pl-8',
           showScrollButtons && canScrollRight && 'pr-8'
         )}
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
-        }}
       >
         {menus.map(renderLink)}
       </div>
@@ -266,8 +265,9 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
           className={cn(
             'absolute right-0 top-1/2 -translate-y-1/2 z-20',
             'text-[color-mix(in_srgb,var(--foreground-color,#fff)_60%,transparent)] hover:text-[color-mix(in_srgb,var(--foreground-color,#fff)_90%,transparent)]',
-            'w-6 h-6 p-0 rounded-l-full rounded-r-none',
-            classes.scrollButton
+            'w-6 h-6 p-0 rounded-l-full rounded-r-none transition-all duration-150 ease-in-out',
+            'hover:bg-white/5 hover:text-white/95 hover:scale-105 backdrop-blur-[4px]',
+            'max-md:w-5 max-md:h-5 max-sm:w-4 max-sm:h-4'
           )}
           onClick={() => scroll('right')}
           aria-label='Scroll right'

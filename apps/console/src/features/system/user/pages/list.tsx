@@ -12,12 +12,7 @@ import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
 import { useUserList } from '../hooks';
-import {
-  useCreateUserWithProfile,
-  useUpdateUserWithProfile,
-  useDeleteUser,
-  useUpdateStatus
-} from '../service';
+import { useCreateUserWithProfile, useUpdateUserWithProfile, useDeleteUser } from '../service';
 import { User } from '../user';
 
 import { CreateUserPage } from './create';
@@ -74,7 +69,6 @@ export const UserListPage = () => {
   const createUserMutation = useCreateUserWithProfile();
   const updateUserMutation = useUpdateUserWithProfile();
   const deleteUserMutation = useDeleteUser();
-  const updateStatusMutation = useUpdateStatus();
 
   useEffect(() => {
     if (mode) {
@@ -183,26 +177,6 @@ export const UserListPage = () => {
       }
     });
   }, [deleteDialog.user, deleteUserMutation, onSuccess, onError, t]);
-
-  const handleStatusToggle = useCallback(
-    (user: User) => {
-      const newStatus = user.status === 0 ? 2 : 0; // Toggle between active and disabled
-      updateStatusMutation.mutate(
-        { username: user.username, status: newStatus },
-        {
-          onSuccess: () => {
-            toast.success(t('messages.success'), {
-              description:
-                newStatus === 0 ? t('user.messages.enabled') : t('user.messages.disabled')
-            });
-            refetch();
-          },
-          onError
-        }
-      );
-    },
-    [updateStatusMutation, toast, t, refetch, onError]
-  );
 
   const handleConfirm = useCallback(
     handleFormSubmit((data: any) => {

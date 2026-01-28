@@ -14,6 +14,12 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@ncobase/react": [
+        "./src/components/ui/index.ts"
+      ],
+      "@ncobase/react/*": [
+        "./src/components/ui/*"
       ]
     }
   },

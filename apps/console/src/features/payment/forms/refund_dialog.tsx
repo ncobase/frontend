@@ -9,7 +9,7 @@ interface RefundDialogProps {
   isOpen: boolean;
   order: PaymentOrder | null;
   onClose: () => void;
-  onConfirm: (orderId: string, amount?: number, reason?: string) => void;
+  onConfirm: (_orderId: string, _amount?: number, _reason?: string) => void;
 }
 
 export const RefundDialog = ({ isOpen, order, onClose, onConfirm }: RefundDialogProps) => {

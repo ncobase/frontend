@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { Button, Icons } from '@ncobase/react';
+import { Icons } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 interface UploadZoneProps {
-  onFiles: (files: File[]) => void;
+  onFiles: (_files: File[]) => void;
   accept?: string;
   multiple?: boolean;
   maxSize?: number;

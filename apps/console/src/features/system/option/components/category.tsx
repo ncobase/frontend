@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 
 export const OptionCategory: React.FC = () => {
   const { t } = useTranslation();
-  const [categories, setCategories] = useState([]);
-  const [editingCategory, setEditingCategory] = useState(null);
-  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [, setEditingCategory] = useState(null);
+  const [, setShowCategoryForm] = useState(false);
 
   const predefinedCategories = [
     { key: 'general', name: t('options.categories.general'), icon: 'IconSettings' },

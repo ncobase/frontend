@@ -43,10 +43,10 @@ interface SpaceSettingsProps {
   initialTab?: string;
   onSuccess?: () => void;
   // Navigation callbacks
-  onNavigateToQuotas?: (space: any) => void;
-  onNavigateToBilling?: (space: any) => void;
-  onNavigateToView?: (space: any) => void;
-  onNavigateToEdit?: (space: any) => void;
+  onNavigateToQuotas?: (_space: any) => void;
+  onNavigateToBilling?: (_space: any) => void;
+  onNavigateToView?: (_space: any) => void;
+  onNavigateToEdit?: (_space: any) => void;
 }
 
 export const SpaceSettings: React.FC<SpaceSettingsProps> = ({
@@ -207,13 +207,12 @@ export const SpaceSettings: React.FC<SpaceSettingsProps> = ({
 
             {/* Users Management */}
             <TabsContent value='users' className='space-y-4'>
-              <UsersManagementTab spaceId={space.id} users={spaceUsers} t={t} />
+              <UsersManagementTab users={spaceUsers} t={t} />
             </TabsContent>
 
             {/* Quotas Overview with navigation */}
             <TabsContent value='quotas' className='space-y-4'>
               <QuotasOverviewTab
-                spaceId={space.id}
                 quotas={spaceQuotas}
                 t={t}
                 onNavigateToQuotas={() => onNavigateToQuotas?.(space)}
@@ -223,7 +222,6 @@ export const SpaceSettings: React.FC<SpaceSettingsProps> = ({
             {/* Billing Overview with navigation */}
             <TabsContent value='billing' className='space-y-4'>
               <BillingOverviewTab
-                spaceId={space.id}
                 summary={billingSummary}
                 t={t}
                 onNavigateToBilling={() => onNavigateToBilling?.(space)}
@@ -305,7 +303,7 @@ const SpaceStatusBanner = ({ space, t, onNavigateToView, onNavigateToEdit }) => 
 );
 
 // QuotasOverviewTab with navigation
-const QuotasOverviewTab = ({ spaceId, quotas, t, onNavigateToQuotas }) => {
+const QuotasOverviewTab = ({ quotas, t, onNavigateToQuotas }) => {
   const quotaList = quotas || [];
 
   return (
@@ -408,7 +406,7 @@ const QuotasOverviewTab = ({ spaceId, quotas, t, onNavigateToQuotas }) => {
 };
 
 // BillingOverviewTab with navigation
-const BillingOverviewTab = ({ spaceId, summary, t, onNavigateToBilling }) => (
+const BillingOverviewTab = ({ summary, t, onNavigateToBilling }) => (
   <div className='space-y-6'>
     {/* Billing Summary */}
     {summary && (
@@ -646,7 +644,7 @@ const GeneralSettingsTab = ({ control, errors, t }) => (
 );
 
 // Users Management Tab with TableView (same as before but with enhanced actions)
-const UsersManagementTab = ({ spaceId, users, t }) => {
+const UsersManagementTab = ({ users, t }) => {
   const userList = users?.users || [];
   const userCount = userList.length;
 

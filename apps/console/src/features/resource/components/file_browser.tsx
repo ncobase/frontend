@@ -7,8 +7,8 @@ import { ResourceFile } from '../resource';
 
 interface FileBrowserProps {
   files: ResourceFile[];
-  onFileClick: (file: ResourceFile) => void;
-  onFileDelete?: (file: ResourceFile) => void;
+  onFileClick: (_file: ResourceFile) => void;
+  onFileDelete?: (_file: ResourceFile) => void;
 }
 
 const formatFileSize = (bytes?: number) => {

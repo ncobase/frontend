@@ -45,7 +45,6 @@ import {
   Divider,
   Skeleton,
   ColorPicker,
-  IconPicker,
   RadioGroup,
   CheckboxGroup,
   MultiSelect,
@@ -147,12 +146,11 @@ export const Elements = ({ ...rest }) => {
 
   // State management
   const [basicFiles, setBasicFiles] = useState<File[] | null>([]);
-  const [multipleFiles, setMultipleFiles] = useState<File[]>([]);
   const [selectedColor, setSelectedColor] = useState('#2563EB');
-  const [selectedIcon, setSelectedIcon] = useState('IconStar');
+  const [selectedIcon] = useState('IconStar');
   const [switchValue, setSwitchValue] = useState(false);
   const [sliderValue, setSliderValue] = useState([50]);
-  const [progressValue, setProgressValue] = useState(60);
+  const [progressValue] = useState(60);
   const [radioValue, setRadioValue] = useState('option1');
   const [checkboxValues, setCheckboxValues] = useState<string[]>(['option1']);
   const [multiSelectValue, setMultiSelectValue] = useState<string[]>([]);
@@ -171,7 +169,6 @@ export const Elements = ({ ...rest }) => {
 
   // Upload configuration
   const imageUpload = useUpload(uploadConfigs.image('example-images', 'system'));
-  const documentUpload = useUpload(uploadConfigs.document('example-docs', 'system', true));
 
   // Upload handlers
   const handleImageUpload = useCallback(
@@ -186,36 +183,8 @@ export const Elements = ({ ...rest }) => {
     [imageUpload]
   );
 
-  const handleDocumentUpload = useCallback(
-    async (file: File) => {
-      try {
-        return await documentUpload.uploadFile(file);
-      } catch (error) {
-        console.error('Document upload failed:', error);
-        throw error;
-      }
-    },
-    [documentUpload]
-  );
-
   const handleBasicFileChange = useCallback((value: File | File[] | null) => {
     setBasicFiles(Array.isArray(value) ? value : value ? [value] : []);
-  }, []);
-
-  const handleMultipleFilesChange = useCallback((value: File | File[] | null) => {
-    const filesArray = Array.isArray(value) ? value : value ? [value] : [];
-    setMultipleFiles(filesArray);
-
-    if (filesArray.length > 0) {
-      console.log('Multiple files selected:', {
-        count: filesArray.length,
-        files: filesArray.map(file => ({
-          name: file.name,
-          size: file.size,
-          type: file.type
-        }))
-      });
-    }
   }, []);
 
   // Toast handlers

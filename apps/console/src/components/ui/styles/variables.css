@@ -1,0 +1,193 @@
+/* CSS Variables version */
+:root {
+  /* Color palette */
+  --nco-primary: #2d39e3;
+  --nco-primary-foreground: #ffffff;
+  --nco-secondary: #64748b;
+  --nco-secondary-foreground: #ffffff;
+  --nco-success: #10b981;
+  --nco-success-foreground: #ffffff;
+  --nco-warning: #f59e0b;
+  --nco-warning-foreground: #ffffff;
+  --nco-danger: #ef4444;
+  --nco-danger-foreground: #ffffff;
+
+  /* Spacing */
+  --nco-spacing-1: 0.25rem;
+  --nco-spacing-2: 0.5rem;
+  --nco-spacing-3: 0.75rem;
+  --nco-spacing-4: 1rem;
+  --nco-spacing-6: 1.5rem;
+  --nco-spacing-8: 2rem;
+
+  /* Radius */
+  --nco-radius-sm: 0.25rem;
+  --nco-radius-md: 0.375rem;
+  --nco-radius-lg: 0.5rem;
+
+  /* Typography */
+  --nco-font-size-sm: 0.875rem;
+  --nco-font-size-base: 1rem;
+  --nco-font-size-lg: 1.125rem;
+
+  /* Shadows */
+  --nco-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --nco-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+  /* Borders */
+  --nco-border: #e2e8f0;
+  --nco-background: #ffffff;
+  --nco-foreground: #0f172a;
+}
+
+.dark {
+  --nco-border: #334155;
+  --nco-background: #0f172a;
+  --nco-foreground: #f8fafc;
+}
+
+/* Base styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.5;
+  color: var(--nco-foreground);
+  background-color: var(--nco-background);
+  margin: 0;
+}
+
+/* Component styles */
+.nco-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--nco-spacing-2);
+  padding: var(--nco-spacing-2) var(--nco-spacing-4);
+  border-radius: var(--nco-radius-md);
+  font-weight: 500;
+  font-size: var(--nco-font-size-sm);
+  line-height: 1;
+  white-space: nowrap;
+  transition: all 200ms;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.nco-button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.nco-button--primary {
+  background-color: var(--nco-primary);
+  color: var(--nco-primary-foreground);
+}
+
+.nco-button--primary:hover {
+  opacity: 0.9;
+}
+
+.nco-button--secondary {
+  background-color: var(--nco-secondary);
+  color: var(--nco-secondary-foreground);
+}
+
+.nco-button--outline {
+  background-color: transparent;
+  border: 1px solid var(--nco-primary);
+  color: var(--nco-primary);
+}
+
+.nco-button--ghost {
+  background-color: transparent;
+  color: var(--nco-foreground);
+}
+
+.nco-button--ghost:hover {
+  background-color: var(--nco-border);
+}
+
+.nco-card {
+  background-color: var(--nco-background);
+  border-radius: var(--nco-radius-lg);
+  box-shadow: var(--nco-shadow-sm);
+  border: 1px solid var(--nco-border);
+  overflow: hidden;
+}
+
+.nco-card-header {
+  padding: var(--nco-spacing-6);
+  border-bottom: 1px solid var(--nco-border);
+}
+
+.nco-card-content {
+  padding: var(--nco-spacing-6);
+}
+
+.nco-editor {
+  border-radius: var(--nco-radius-md);
+  border: 1px solid var(--nco-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--nco-background);
+}
+
+.nco-editor-content {
+  padding: var(--nco-spacing-4);
+  min-height: 16rem;
+  color: var(--nco-foreground);
+}
+
+.nco-editor-content .ProseMirror {
+  outline: none;
+  min-height: 16rem;
+}
+
+.nco-input {
+  display: flex;
+  padding: var(--nco-spacing-2) var(--nco-spacing-3);
+  width: 100%;
+  border-radius: var(--nco-radius-md);
+  border: 1px solid var(--nco-border);
+  background-color: var(--nco-background);
+  font-size: var(--nco-font-size-sm);
+  transition: border-color 200ms;
+  outline: none;
+}
+
+.nco-input:focus {
+  border-color: var(--nco-primary);
+  box-shadow: 0 0 0 2px var(--nco-primary);
+  opacity: 0.2;
+}
+
+.nco-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.nco-modal-content {
+  background-color: var(--nco-background);
+  border-radius: var(--nco-radius-lg);
+  box-shadow: var(--nco-shadow-md);
+  max-width: 32rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: var(--nco-spacing-4);
+}

@@ -4,7 +4,7 @@ import { Button, Icons } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 interface UploadFormProps {
-  onUpload: (files: FileList) => void;
+  onUpload: (_files: FileList) => void;
   uploading?: boolean;
 }
 

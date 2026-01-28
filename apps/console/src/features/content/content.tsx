@@ -6,7 +6,6 @@ import { useListChannels } from './channel/service';
 import { QuickActions } from './components/QuickActions';
 import { useListDistributions } from './distribution/service';
 import { useListMedia } from './media/service';
-import { useListTaxonomies } from './taxonomy/service';
 import { useListTopics } from './topic/service';
 
 import { Page, Topbar } from '@/components/layout';
@@ -16,20 +15,16 @@ export const ContentPage = () => {
   const { t } = useTranslation();
 
   // Fetch data for dashboard
-  const { data: taxonomiesData } = useListTaxonomies({ limit: 100, children: true });
   const { data: topicsData } = useListTopics({ limit: 100 });
   const { data: mediaData } = useListMedia({ limit: 100 });
   const { data: channelsData } = useListChannels({ limit: 100 });
   const { data: distributionsData } = useListDistributions({ limit: 100 });
 
   // Calculate stats
-  const taxonomyCount = taxonomiesData?.total || 0;
   const topicCount = topicsData?.total || 0;
   const mediaCount = mediaData?.total || 0;
   const channelCount = channelsData?.total || 0;
   const distributionCount = distributionsData?.total || 0;
-  const publishedTopicCount = topicsData?.items?.filter(topic => topic.status === 1).length || 0;
-  const draftTopicCount = topicsData?.items?.filter(topic => topic.status === 0).length || 0;
   const activeChannelCount =
     channelsData?.items?.filter(channel => channel.status === 0).length || 0;
 
@@ -98,7 +93,7 @@ export const ContentPage = () => {
           <div className='flex justify-between items-center'>
             <div>
               <div className='text-gray-500 mb-1 text-sm'>{t('content.stats.total_topics')}</div>
-              <div className='text-2xl font-semibold'>{taxonomyCount}</div>
+              <div className='text-2xl font-semibold'>{topicCount}</div>
             </div>
             <div className='w-10 h-10 rounded-lg flex items-center justify-center bg-green-100'>
               <Icons name='IconBookmark' size={20} className='text-green-600' />

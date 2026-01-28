@@ -32,12 +32,6 @@ export const SEOAnalysisComponent: React.FC<SEOAnalysisProps> = ({ contentId, co
     return 'text-red-600';
   };
 
-  const getScoreVariant = (score: number) => {
-    if (score >= 80) return 'success';
-    if (score >= 60) return 'warning';
-    return 'danger';
-  };
-
   const getPriorityIcon = (type: string) => {
     switch (type) {
       case 'critical':

@@ -333,10 +333,10 @@ export function getTimeRange(range: string) {
 }
 
 // Debounce function for search
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (..._args: any[]) => any>(
   func: T,
   wait: number
-): (...args: Parameters<T>) => void {
+): (..._args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
 
   return (...args: Parameters<T>) => {
@@ -473,10 +473,10 @@ export function deepClone<T>(obj: T): T {
 }
 
 // Throttle function
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (..._args: any[]) => any>(
   func: T,
   limit: number
-): (...args: Parameters<T>) => void {
+): (..._args: Parameters<T>) => void {
   let inThrottle: boolean;
 
   return (...args: Parameters<T>) => {

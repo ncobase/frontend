@@ -32,7 +32,7 @@ import {
 
 interface SpaceBillingManagementProps {
   space: any;
-  onNavigateToSettings?: (space: any) => void;
+  onNavigateToSettings?: (_space: any) => void;
 }
 
 export const SpaceBillingManagement: React.FC<SpaceBillingManagementProps> = ({

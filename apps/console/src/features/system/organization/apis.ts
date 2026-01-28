@@ -2,7 +2,7 @@ import { Org } from './org';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
 
-const extensionMethods = ({ request, endpoint }: ApiContext) => ({});
+const extensionMethods = ({ request: _request, endpoint: _endpoint }: ApiContext) => ({});
 
 export const orgApi = createApi<Org>('/sys/orgs', {
   extensions: extensionMethods

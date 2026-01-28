@@ -121,6 +121,8 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
     [handleSubmit, simulateImport, onSubmit]
   );
 
+  const previewFormSubmit = useCallback(handleSubmit(handlePreview), [handleSubmit, handlePreview]);
+
   return (
     <Card>
       <CardContent className='p-0'>
@@ -354,6 +356,12 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
             <Button type='button' variant='outline' onClick={onCancel}>
               {t('actions.cancel', 'Cancel')}
             </Button>
+            {!importResult && (
+              <Button type='button' variant='outline-primary' onClick={previewFormSubmit}>
+                <Icons name='IconEye' className='mr-2' />
+                {t('space.import.preview', 'Preview')}
+              </Button>
+            )}
             {!importResult && (
               <Button type='submit' disabled={isImporting}>
                 <Icons name='IconUpload' className='mr-2' />

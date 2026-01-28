@@ -2,7 +2,6 @@ import { Button, Icons } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
-import { SubscriptionStatus } from '../../components/subscription_status';
 import { SubscriptionViewer } from '../../forms/subscription_viewer';
 import { useGetSubscription } from '../../service';
 

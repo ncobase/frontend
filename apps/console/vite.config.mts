@@ -37,7 +37,8 @@ export default (({ mode }: ConfigEnv): UserConfig => {
     resolve: {
       alias: [
         { find: '@', replacement: pathResolve('src') },
-        { find: '#', replacement: pathResolve('types') }
+        { find: '#', replacement: pathResolve('types') },
+        { find: '@ncobase/react', replacement: pathResolve('src/components/ui') }
       ]
     },
     build: {

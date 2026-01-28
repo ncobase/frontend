@@ -17,16 +17,12 @@ export const VersionHistoryPage = () => {
   const navigate = useNavigate();
   const [selectedVersion, setSelectedVersion] = useState<ContentVersion | null>(null);
 
-  const { data: versionsData, isLoading } = useContentVersions(contentId!, contentType!);
+  const { data: versionsData } = useContentVersions(contentId!, contentType!);
   const versions = versionsData?.items || [];
   const currentVersion = versions.find(v => v.is_current);
 
   const handleVersionSelect = (version: ContentVersion) => {
     setSelectedVersion(version);
-  };
-
-  const handleCompareVersions = (versionA: string, versionB: string) => {
-    navigate(`/content/version/${contentType}/${contentId}/compare/${versionA}/${versionB}`);
   };
 
   return (

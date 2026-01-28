@@ -7,8 +7,8 @@ export const tableColumns = ({
   handleView,
   handleDelete
 }: {
-  handleView: (record: PaymentChannel, mode: string) => void;
-  handleDelete: (record: PaymentChannel) => void;
+  handleView: (_record: PaymentChannel, _mode: string) => void;
+  handleDelete: (_record: PaymentChannel) => void;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
 

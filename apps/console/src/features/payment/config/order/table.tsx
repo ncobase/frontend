@@ -22,8 +22,8 @@ export const tableColumns = ({
   handleView,
   handleRefund
 }: {
-  handleView: (record: PaymentOrder, mode: string) => void;
-  handleRefund: (record: PaymentOrder) => void;
+  handleView: (_record: PaymentOrder, _mode: string) => void;
+  handleRefund: (_record: PaymentOrder) => void;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
 

@@ -15,8 +15,7 @@ import { useTranslation } from 'react-i18next';
 import {
   useQueryUserSpaceRoles,
   useAddUserToSpaceRole,
-  useRemoveUserFromSpaceRole,
-  useUpdateUserSpaceRole
+  useRemoveUserFromSpaceRole
 } from '../service';
 
 import { useListRoles } from '@/features/system/role/service';
@@ -45,7 +44,6 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
   const { data: rolesData } = useListRoles({ limit: 100 });
   const addRoleMutation = useAddUserToSpaceRole();
   const removeRoleMutation = useRemoveUserFromSpaceRole();
-  const updateRoleMutation = useUpdateUserSpaceRole();
 
   const {
     control,

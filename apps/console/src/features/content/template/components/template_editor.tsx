@@ -21,7 +21,6 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({ template, onSave
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors, isDirty }
   } = useForm<ContentTemplate>({
     defaultValues: template || {
@@ -41,8 +40,6 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({ template, onSave
     control,
     name: 'fields'
   });
-
-  const watchedData = watch();
 
   const handleSaveTemplate = handleSubmit(data => {
     // Ensure field orders are set correctly

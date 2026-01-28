@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button, Icons, Container, ScrollView } from '@ncobase/react';
+import { Button, Icons } from '@ncobase/react';
 import { useToastMessage } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';

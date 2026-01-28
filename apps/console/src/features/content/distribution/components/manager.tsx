@@ -24,7 +24,7 @@ export const DistributionManager: React.FC<DistributionManagerProps> = ({
   const [selectedChannels, setSelectedChannels] = useState<string[]>(
     existingDistributions.map(d => d.channel_id).filter(Boolean) as string[]
   );
-  const [scheduleSettings, setScheduleSettings] = useState<Record<string, any>>({});
+  const [scheduleSettings] = useState<Record<string, any>>({});
 
   const toast = useToastMessage();
   const { data: channelsData } = useListChannels({ limit: 100, status: 0 });

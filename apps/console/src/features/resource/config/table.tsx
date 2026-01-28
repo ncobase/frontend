@@ -29,8 +29,8 @@ export const tableColumns = ({
   handleView,
   handleDelete
 }: {
-  handleView: (record: ResourceFile, mode: string) => void;
-  handleDelete: (record: ResourceFile) => void;
+  handleView: (_record: ResourceFile, _mode: string) => void;
+  handleDelete: (_record: ResourceFile) => void;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
 

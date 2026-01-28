@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { CommonViewComponent, CommonViewProps, isCreateType, isEditType } from './common';
 
 export interface ModalViewProps<T extends object>
-  extends Omit<ModalProps<T>, 'record'>,
-    CommonViewProps<T> {
+  extends Omit<ModalProps<T>, 'record'>, CommonViewProps<T> {
   record?: T | null;
   onConfirm?: () => void;
 }

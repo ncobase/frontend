@@ -1,8 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { Button, Icons, Badge, TableView } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { useWorkflows, useDeleteWorkflow } from '../service';
@@ -12,8 +11,7 @@ import { Page } from '@/components/layout';
 
 export const WorkflowListPage = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useState({ search: '', type: '', limit: 50 });
+  const searchParams = { search: '', type: '', limit: 50 };
 
   const { data: workflowData, isLoading, refetch } = useWorkflows(searchParams);
   const deleteWorkflowMutation = useDeleteWorkflow();

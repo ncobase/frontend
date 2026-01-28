@@ -1,4 +1,4 @@
-import { Button, ScrollView, Container, Icons } from '@ncobase/react';
+import { Button, Icons } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
