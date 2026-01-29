@@ -870,10 +870,11 @@ export const generateRelationsServiceCode = (
   if (entityRelations.length === 0) return '';
 
   const code = `import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { Request } from '@/lib/api/request';
 
 // This is a simple utility hook to manage relations
 export const use${featureConfig.name}Relations = () => {
+  const request = new Request(fetch);
   // Cache fetched options for selects
   const [cachedOptions, setCachedOptions] = useState<Record<string, any[]>>({});
 
@@ -887,9 +888,7 @@ ${entityRelations
     }
 
     try {
-      // This should be replaced with actual API call to fetch the related entity
-      const response = await fetch(\`/api/${rel.targetEntity.toLowerCase()}s\`);
-      const data = await response.json();
+      const data = await request.get(\`/api/${rel.targetEntity.toLowerCase()}s\`);
 
       // Cache the results
       setCachedOptions(prev => ({

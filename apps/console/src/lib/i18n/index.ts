@@ -43,9 +43,12 @@ i18n
     backend: {
       // TODO: change to api url
       // Language resource path
-      // loadPath: `${Request.baseConfig.baseURL}/locales/{{lng}}.json`,
+      // loadPath: (() => {
+      //   const base =
+      //     (import.meta.env.VITE_I18N_URL || Request.baseConfig.baseURL || '').replace(/\/$/, '');
+      //   return base ? `${base}/locales/{{lng}}.json` : '/assets/locales/{{lng}}.json';
+      // })(),
       loadPath: '/assets/locales/{{lng}}.json',
-
       // Add version control
       queryStringParams: {
         v: versionInfo?.commit || 'latest'

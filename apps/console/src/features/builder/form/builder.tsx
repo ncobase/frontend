@@ -1096,10 +1096,7 @@ export default MyForm;`;
             </div>
 
             <div className='mb-2 border-b border-slate-100 pb-2'>
-              <FieldRender
-                {...field}
-                onChange={() => {}} // Placeholder onChange
-              />
+              <FieldRender {...field} onChange={() => undefined} />
             </div>
           </div>
         )}
