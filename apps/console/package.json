@@ -8,6 +8,7 @@
     "postinstall": "esno scripts/postinstall.ts",
     "dev": "vite",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "test": "vitest run",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "deploy:prod": "npx rimraf serverless.yaml && cp infra/serverless/tencent_cloud_prod.yaml serverless.yaml && sls deploy -s prod && npx rimraf serverless.yaml"

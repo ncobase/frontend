@@ -9,6 +9,20 @@ function pathResolve(dir: string) {
   return resolve(process.cwd(), '.', dir);
 }
 
+const manualChunks = (id: string): string | undefined => {
+  if (!id.includes('node_modules')) {
+    return undefined;
+  }
+
+  if (id.includes('monaco-editor')) return 'vendor_monaco';
+  if (id.includes('echarts')) return 'vendor_echarts';
+  if (id.includes('recharts')) return 'vendor_recharts';
+  if (id.includes('lodash')) return 'vendor_lodash';
+  if (id.includes('@tiptap') || id.includes('prosemirror')) return 'vendor_editor';
+
+  return undefined;
+};
+
 const setupPlugins = ({}: ImportMetaEnv) => ([
   react(),
   tailwindcss()
@@ -49,6 +63,7 @@ export default (({ mode }: ConfigEnv): UserConfig => {
         treeshake: false,
         output: {
           compact: true,
+          manualChunks,
           chunkFileNames: 'assets/js/[name].[hash].js',
           entryFileNames: 'assets/js/[name].[hash].js',
           assetFileNames: ({ name }) => {

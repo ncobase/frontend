@@ -20,6 +20,7 @@ export const getBrowserName = (userAgent?: string, deviceInfo?: Record<string, a
 
   const ua = userAgent.toLowerCase();
 
+  if (ua.includes('edg/')) return 'Edge';
   if (ua.includes('chrome') && !ua.includes('edge')) return 'Chrome';
   if (ua.includes('firefox')) return 'Firefox';
   if (ua.includes('safari') && !ua.includes('chrome')) return 'Safari';
@@ -39,11 +40,11 @@ export const getOperatingSystem = (
 
   const ua = userAgent.toLowerCase();
 
+  if (ua.includes('android')) return 'Android';
+  if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ios')) return 'iOS';
   if (ua.includes('windows')) return 'Windows';
   if (ua.includes('mac os')) return 'macOS';
   if (ua.includes('linux')) return 'Linux';
-  if (ua.includes('android')) return 'Android';
-  if (ua.includes('ios')) return 'iOS';
 
   return 'Unknown OS';
 };

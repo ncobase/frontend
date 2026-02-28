@@ -15,7 +15,12 @@ export const paginateByCursor = <T extends { id?: string }>(
     return { items: [], total: 0, has_next: false };
   }
 
-  const startIndex = cursor ? items.findIndex(item => item.id === cursor) + 1 : 0;
+  const currentIndex = cursor ? items.findIndex(item => item.id === cursor) : -1;
+  if (cursor && currentIndex < 0) {
+    return { items: [], total, has_next: false };
+  }
+
+  const startIndex = currentIndex + 1;
   const endIndex = Math.min(startIndex + limit, items.length);
 
   if (startIndex >= 0 && startIndex < items.length) {
@@ -26,5 +31,5 @@ export const paginateByCursor = <T extends { id?: string }>(
     return { items: paginatedItems, total: total, next, has_next: hasNext };
   }
 
-  return { items: [], total: 0, has_next: false };
+  return { items: [], total, has_next: false };
 };

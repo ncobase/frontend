@@ -1,6 +1,8 @@
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
+import { i18n } from '@/lib/i18n';
+
 type StatusValue = 'Normal' | 'Disabled' | 'Unknown';
 type ProcessStatusValue =
   | 'Normal'
@@ -98,7 +100,7 @@ type StatusParserType = 'status' | 'publishStatus' | 'processStatus';
 export const useParseStatus = () => {
   const { t } = useTranslation();
 
-  const parseStatus = (
+  const parseStatusWithT = (
     value: InputStatusType | InputProcessStatusType | InputPublishStatusType,
     type: StatusParserType = 'status'
   ): string => {
@@ -128,7 +130,7 @@ export const useParseStatus = () => {
     }
   };
 
-  return { parseStatus };
+  return { parseStatus: parseStatusWithT };
 };
 
 /**
@@ -138,8 +140,27 @@ export const useParseStatus = () => {
  * @returns Localized status string.
  */
 export const parseStatus = (value: any, type: StatusParserType = 'status'): string => {
-  const parser = useParseStatus();
-  return parser.parseStatus(value, type);
+  const t = i18n.t.bind(i18n) as TFunction;
+  const unknownString = t('enums.status.unknown');
+
+  switch (type) {
+    case 'status': {
+      const map = getStatusMap(t);
+      const stringValue = String(value);
+      if (stringValue in map) {
+        return map[stringValue];
+      }
+      return parseBaseValue(t, value);
+    }
+    case 'processStatus': {
+      const map = getProcessStatusMap(t);
+      return map[value as number] || unknownString;
+    }
+    case 'publishStatus':
+      return parsePublishValue(t, value as InputPublishStatusType);
+    default:
+      return parseBaseValue(t, value);
+  }
 };
 
 export type {
