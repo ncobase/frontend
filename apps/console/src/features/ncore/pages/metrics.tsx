@@ -261,7 +261,9 @@ export const ExtensionMetricsPage = () => {
               <Button
                 onClick={autoRefresh.toggle}
                 variant={autoRefresh.enabled ? 'primary' : 'outline'}
-                icon={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'}
+                startIcon={
+                  <Icons name={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'} />
+                }
                 size='sm'
                 className='min-w-[90px]'
               >
@@ -272,7 +274,7 @@ export const ExtensionMetricsPage = () => {
                 <Button
                   onClick={handleRefresh}
                   variant='outline'
-                  icon='IconRefresh'
+                  startIcon={<Icons name='IconRefresh' />}
                   disabled={extensionLoading}
                   size='sm'
                   className='hover:bg-slate-100'
@@ -284,7 +286,7 @@ export const ExtensionMetricsPage = () => {
               <Button
                 onClick={() => refreshMutation.mutate({})}
                 variant='primary'
-                icon='IconSettings'
+                startIcon={<Icons name='IconSettings' />}
                 loading={refreshMutation.isPending}
                 size='sm'
                 className='min-w-[140px]'
@@ -791,7 +793,7 @@ export const ExtensionMetricsPage = () => {
                         size='sm'
                         variant='outline-slate'
                         onClick={() => setShowEventsModal(true)}
-                        icon='IconEye'
+                        startIcon={<Icons name='IconEye' />}
                       >
                         View Details
                       </Button>

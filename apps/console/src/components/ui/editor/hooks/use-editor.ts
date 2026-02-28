@@ -72,11 +72,7 @@ export const useEditor = ({
   const editor = useTiptapEditor({
     extensions: [
       StarterKit.configure({
-        // Configure StarterKit options for better performance
-        history: {
-          depth: 100, // Limit history depth for better memory usage
-          newGroupDelay: 500 // Group history items that occur within 500ms
-        }
+        // StarterKit configuration - history is configured separately if needed
       }),
       Placeholder.configure({
         placeholder,

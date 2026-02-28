@@ -1,10 +1,11 @@
 import { CodeHighlighter, FieldViewer } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 
+import { Dictionary } from '../dictionary';
 import { useQueryDictionary } from '../service';
 
-export const DictionaryViewerForms = ({ record }) => {
-  const { data = {} } = useQueryDictionary(record);
+export const DictionaryViewerForms = ({ record }: { record: string }) => {
+  const { data = {} as Dictionary } = useQueryDictionary(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>

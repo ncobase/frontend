@@ -4,11 +4,12 @@ import { FieldConfigProps, Form } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
+import { Menu } from '../menu';
 import { useQueryMenu } from '../service';
 
 export const EditorMenuForms = ({ record, onSubmit, control, setValue, errors }) => {
   const { t } = useTranslation();
-  const { data = {} } = useQueryMenu(record);
+  const { data = {} as Menu } = useQueryMenu(record);
 
   const fields: FieldConfigProps[] = [
     {
@@ -97,7 +98,8 @@ export const EditorMenuForms = ({ record, onSubmit, control, setValue, errors })
     if (!data) return;
     setValue('id', data?.id);
     setValue('name', data?.name);
-    setValue('parent', data?.parent);
+    // setValue('parent', data?.parent); // Use parent_id instead
+    setValue('parent', data?.parent_id);
     setValue('label', data?.label);
     setValue('icon', data?.icon);
     setValue('slug', data?.slug);

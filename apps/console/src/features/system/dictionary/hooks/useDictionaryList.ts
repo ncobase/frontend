@@ -3,7 +3,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { isEqual } from 'lodash';
 
 import { QueryFormParams } from '../config/query';
-import { Dictionaries } from '../dictionary';
+import { Dictionary } from '../dictionary';
 import { useListDictionaries } from '../service';
 
 export const useDictionaryList = (initialParams: QueryFormParams = { limit: 20 }) => {
@@ -40,7 +40,7 @@ export const useDictionaryList = (initialParams: QueryFormParams = { limit: 20 }
   }, [queryParams]);
 
   return {
-    data: data as Dictionaries | undefined,
+    data: data as { items: Dictionary[]; total: number } | undefined,
     queryParams,
     loading: isLoading,
     error,

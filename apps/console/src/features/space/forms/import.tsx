@@ -329,7 +329,7 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
                 </div>
 
                 {importResult.errors.length > 0 && (
-                  <Alert variant='warning'>
+                  <Alert variant='destructive'>
                     <div className='space-y-2'>
                       <div className='font-medium'>{t('space.import.errors_found')}</div>
                       <ul className='text-sm list-disc list-inside space-y-1'>

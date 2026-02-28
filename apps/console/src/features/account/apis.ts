@@ -1,8 +1,12 @@
-import { Space, Spaces } from '../space';
-
 import { Account, LoginProps, LoginReply, RegisterProps } from './account';
 
+import type { Space } from '@/features/space/space';
 import { request } from '@/lib/api/request';
+
+export interface Spaces {
+  items: Space[];
+  total: number;
+}
 
 const accountEndpoint = '/account';
 

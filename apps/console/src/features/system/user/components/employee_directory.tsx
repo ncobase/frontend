@@ -5,7 +5,15 @@ import { useTranslation } from 'react-i18next';
 
 import { getEmployees } from '../apis';
 
-export const EmployeeDirectory: React.FC = () => {
+interface EmployeeDirectoryProps {
+  onCreateEmployee?: () => void;
+  onEditEmployee?: (_employee: any) => void;
+}
+
+export const EmployeeDirectory: React.FC<EmployeeDirectoryProps> = ({
+  onCreateEmployee: _onCreateEmployee,
+  onEditEmployee: _onEditEmployee
+}) => {
   const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);

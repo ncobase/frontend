@@ -234,7 +234,8 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
     <div className='flex items-center ml-4 relative min-w-0'>
       {showScrollButtons && canScrollLeft && (
         <Button
-          variant='icon'
+          size='icon'
+          variant='ghost'
           className={cn(
             'absolute left-0 top-1/2 -translate-y-1/2 z-20',
             'text-[color-mix(in_srgb,var(--foreground-color,#fff)_60%,transparent)] hover:text-[color-mix(in_srgb,var(--foreground-color,#fff)_90%,transparent)]',
@@ -261,7 +262,8 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({ menus = [], with
       </div>
       {showScrollButtons && canScrollRight && (
         <Button
-          variant='icon'
+          size='icon'
+          variant='ghost'
           className={cn(
             'absolute right-0 top-1/2 -translate-y-1/2 z-20',
             'text-[color-mix(in_srgb,var(--foreground-color,#fff)_60%,transparent)] hover:text-[color-mix(in_srgb,var(--foreground-color,#fff)_90%,transparent)]',

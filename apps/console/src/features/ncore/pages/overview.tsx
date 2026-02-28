@@ -262,7 +262,9 @@ export const ExtensionOverviewPage = () => {
             <Button
               size='sm'
               variant={autoRefresh.enabled ? 'primary' : 'outline-slate'}
-              icon={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'}
+              startIcon={
+                <Icons name={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'} />
+              }
               onClick={autoRefresh.toggle}
             >
               {autoRefresh.enabled ? 'Pause' : 'Resume'} Live
@@ -270,7 +272,7 @@ export const ExtensionOverviewPage = () => {
             <Button
               size='sm'
               variant='outline-slate'
-              icon='IconRefresh'
+              startIcon={<Icons name='IconRefresh' />}
               onClick={handleRefresh}
               disabled={extensionsLoading}
             >
@@ -363,7 +365,9 @@ export const ExtensionOverviewPage = () => {
                 size='sm'
                 variant='outline-slate'
                 onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}
-                icon={sortOrder === 'asc' ? 'IconSortAscending' : 'IconSortDescending'}
+                startIcon={
+                  <Icons name={sortOrder === 'asc' ? 'IconSortAscending' : 'IconSortDescending'} />
+                }
               >
                 {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
               </Button>

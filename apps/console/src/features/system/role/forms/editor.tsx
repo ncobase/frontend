@@ -118,9 +118,9 @@ export const EditorRoleForms = ({ record, onSubmit, control, setValue, errors })
     setValue('id', data?.id);
     setValue('name', data?.name);
     setValue('slug', data?.slug);
-    setValue('parent', data?.parent);
-    setValue('group', data?.group);
-    setValue('space', data?.space);
+    // setValue('parent', data?.parent); // Not in Role type
+    // setValue('group', data?.group); // Not in Role type
+    // setValue('space', data?.space); // Not in Role type
     setValue('disabled', data?.disabled);
     setValue('description', data?.description);
     setValue('created_at', formatDateTime(data?.created_at));

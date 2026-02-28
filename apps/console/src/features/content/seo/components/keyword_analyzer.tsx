@@ -32,10 +32,12 @@ export const KeywordAnalyzer: React.FC<KeywordAnalyzerProps> = ({ content, keywo
   }, [content, keywords]);
 
   const getDensityLevel = (density: number) => {
-    if (density < 0.5) return { level: 'low', variant: 'secondary', color: 'text-gray-600' };
-    if (density < 2) return { level: 'good', variant: 'success', color: 'text-green-600' };
-    if (density < 4) return { level: 'high', variant: 'warning', color: 'text-yellow-600' };
-    return { level: 'excessive', variant: 'danger', color: 'text-red-600' };
+    if (density < 0.5)
+      return { level: 'low', variant: 'secondary' as const, color: 'text-gray-600' };
+    if (density < 2) return { level: 'good', variant: 'success' as const, color: 'text-green-600' };
+    if (density < 4)
+      return { level: 'high', variant: 'warning' as const, color: 'text-yellow-600' };
+    return { level: 'excessive', variant: 'danger' as const, color: 'text-red-600' };
   };
 
   return (

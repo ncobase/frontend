@@ -1,11 +1,12 @@
 import { FieldViewer } from '@ncobase/react';
 
+import { Role } from '../role';
 import { useQueryRole } from '../service';
 
 import { parseStatus } from '@/lib/status';
 
-export const RoleViewerForms = ({ record }) => {
-  const { data = {} } = useQueryRole(record);
+export const RoleViewerForms = ({ record }: { record: string }) => {
+  const { data = {} as Role } = useQueryRole(record);
 
   return (
     <div className='grid grid-cols-2 gap-4 mt-4'>
@@ -15,8 +16,8 @@ export const RoleViewerForms = ({ record }) => {
       </div>
       <FieldViewer title='编号'>{data?.id}</FieldViewer>
       <FieldViewer title='名称'>{data?.name}</FieldViewer>
-      <FieldViewer title='父级'>{data?.parent}</FieldViewer>
-      <FieldViewer title='所属部门'>{data?.group}</FieldViewer>
+      {/* <FieldViewer title='父级'>{data?.parent}</FieldViewer> */}
+      {/* <FieldViewer title='所属部门'>{data?.group}</FieldViewer> */}
       <FieldViewer title='是否禁用'>{parseStatus(!data.disabled)}</FieldViewer>
       <FieldViewer title='描述' className='col-span-full'>
         {data?.description}

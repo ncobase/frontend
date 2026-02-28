@@ -6,7 +6,8 @@ import { useAuthContext } from '@/features/account/context';
 import { Guard } from '@/router/helpers';
 
 export const PermissionPage = () => {
-  const { isAdmin, roles, permissions, hasPermission, hasRole } = useAuthContext();
+  const { roles, permissions, hasPermission, hasRole } = useAuthContext();
+  // const isAdmin = hasRole('admin'); // isAdmin is not in AuthContextValue
   return (
     <CardLayout>
       <h2 className='text-xl font-bold mb-4'>Permission System</h2>
@@ -14,9 +15,9 @@ export const PermissionPage = () => {
       <div className='mb-6 p-4 bg-slate-50 rounded-md'>
         <h3 className='font-medium mb-2'>Current User Permissions:</h3>
 
-        <div className='mb-4'>
+        {/* <div className='mb-4'>
           <span className='font-semibold'>Is Admin:</span> {isAdmin ? 'Yes' : 'No'}
-        </div>
+        </div> */}
 
         <div className='mb-4'>
           <span className='font-semibold'>Roles:</span>

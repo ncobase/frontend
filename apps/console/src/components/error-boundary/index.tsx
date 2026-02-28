@@ -36,7 +36,7 @@ const FallbackComponent = ({
         }
       >
         <CodeHighlighter language='json' className='h-full my-0! text-wrap'>
-          {error?.error?.stack || 'Unknown error occurred'}
+          {(error?.error as Error)?.stack || 'Unknown error occurred'}
         </CodeHighlighter>
       </Dialog>
     </Container>
@@ -143,7 +143,7 @@ export const ErrorBoundary: React.FC<React.PropsWithChildren> = ({ children }) =
   };
 
   // Handle React error boundary fallback
-  const handleErrorBoundary = (error: Error, errorInfo: any) => {
+  const handleErrorBoundary = (error: unknown, errorInfo: React.ErrorInfo) => {
     console.error('React Error Boundary caught an error:', error, errorInfo);
     toast.error('Application Error', {
       description: 'An unexpected error occurred. Please refresh the page.',
@@ -185,7 +185,7 @@ export const ErrorBoundary: React.FC<React.PropsWithChildren> = ({ children }) =
   // Otherwise, use React Error Boundary for component errors
   return (
     <ReactErrorBoundary
-      FallbackComponent={FallbackComponent}
+      fallbackRender={props => <FallbackComponent error={props} />}
       onError={handleErrorBoundary}
       onReset={resetError}
     >

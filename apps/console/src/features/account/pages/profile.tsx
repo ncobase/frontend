@@ -113,12 +113,14 @@ export const Profile = () => {
                   {profile?.last_name}
                 </div>
               </div>
+              {/* Language field commented out - not in UserProfile type
               <div className='col-span-full'>
                 <span className='block font-medium leading-6 text-slate-800'>语言</span>
                 <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
                   {profile?.language}
                 </div>
               </div>
+              */}
               <div className='col-span-full'>
                 <span className='block font-medium leading-6 text-slate-800'>关于</span>
                 <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>

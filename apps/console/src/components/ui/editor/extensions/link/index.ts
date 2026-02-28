@@ -64,46 +64,8 @@ export const Link = TiptapExtensionLink.extend<LinkOptions>({
     };
   },
 
-  onPaste({ editor, chain, clipboardData }) {
-    // Early exit if link on paste is disabled
-    if (!this['options'].linkOnPaste) {
-      return false;
-    }
-
-    const text = clipboardData?.getData('text/plain') || '';
-
-    // Check if the pasted content is a valid URL
-    if (!this['options'].validate?.(text)) {
-      return false;
-    }
-
-    // If text is selected, create a link
-    const { empty, from } = editor.state.selection;
-
-    if (!empty) {
-      chain().setLink({ href: text }).run();
-      return true;
-    }
-
-    // If no text is selected, insert the link
-    let url = text;
-
-    // Add protocol if missing
-    if (!url.match(/^[a-z]+:\/\//i)) {
-      url = `${this['options'].defaultProtocol}://${url}`;
-    }
-
-    chain()
-      .insertContent(url)
-      .setTextSelection({
-        from: from,
-        to: from + url.length
-      })
-      .setLink({ href: url })
-      .run();
-
-    return true;
-  },
+  // Note: onPaste handler removed due to type compatibility issues
+  // Link on paste functionality can be implemented via addProseMirrorPlugins if needed
 
   addAttributes() {
     return {

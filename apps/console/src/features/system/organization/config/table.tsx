@@ -3,7 +3,7 @@ import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useQueryUser } from '../../user/service';
-import { Group } from '../org';
+import { Org } from '../org';
 
 import { parseStatus } from '@/lib/status';
 
@@ -38,7 +38,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     {
       title: '是否禁用',
       dataIndex: 'disabled',
-      parser: (value: string, _record: Group) => parseStatus(!value),
+      parser: (value: string, _record: Org) => parseStatus(!value),
       icon: 'IconFlagCog'
     },
     {
@@ -63,12 +63,12 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.edit'),
           icon: 'IconPencil',
-          onClick: (record: Group) => handleView(record, 'edit')
+          onClick: (record: Org) => handleView(record, 'edit')
         },
         {
           title: t('actions.delete'),
           icon: 'IconTrash',
-          onClick: (record: Group) => {
+          onClick: (record: Org) => {
             handleDelete(record, 'delete');
           }
         }

@@ -102,7 +102,7 @@ export const Preferences = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='icon' className='relative transition-colors duration-200'>
+        <Button size='icon' variant='ghost' className='relative transition-colors duration-200'>
           <Icons
             name='IconSettings'
             className='w-5 h-5 text-slate-400/85 dark:text-slate-300 hover:rotate-90 transition-transform duration-300'

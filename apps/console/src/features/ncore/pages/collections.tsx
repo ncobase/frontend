@@ -412,7 +412,7 @@ export const ExtensionCollectionsPage = () => {
                     size='sm'
                     variant='outline-slate'
                     onClick={() => setShowQueryModal(true)}
-                    icon='IconSearch'
+                    startIcon={<Icons name='IconSearch' />}
                   >
                     Query
                   </Button>
@@ -420,7 +420,7 @@ export const ExtensionCollectionsPage = () => {
                     size='sm'
                     variant='outline-slate'
                     onClick={() => setShowExportModal(true)}
-                    icon='IconDownload'
+                    startIcon={<Icons name='IconDownload' />}
                   >
                     Export
                   </Button>
@@ -430,7 +430,7 @@ export const ExtensionCollectionsPage = () => {
                 size='sm'
                 variant='outline-slate'
                 onClick={() => autoRefresh.toggle()}
-                icon='IconRefresh'
+                startIcon={<Icons name='IconRefresh' />}
               >
                 Refresh
               </Button>

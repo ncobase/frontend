@@ -22,17 +22,17 @@ export const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ instance, compac
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'pending':
-        return { variant: 'warning', icon: 'IconClock', label: 'Pending' };
+        return { variant: 'warning' as const, icon: 'IconClock', label: 'Pending' };
       case 'in_progress':
-        return { variant: 'primary', icon: 'IconProgress', label: 'In Progress' };
+        return { variant: 'primary' as const, icon: 'IconProgress', label: 'In Progress' };
       case 'completed':
-        return { variant: 'success', icon: 'IconCheck', label: 'Completed' };
+        return { variant: 'success' as const, icon: 'IconCheck', label: 'Completed' };
       case 'rejected':
-        return { variant: 'danger', icon: 'IconX', label: 'Rejected' };
+        return { variant: 'danger' as const, icon: 'IconX', label: 'Rejected' };
       case 'cancelled':
-        return { variant: 'secondary', icon: 'IconBan', label: 'Cancelled' };
+        return { variant: 'secondary' as const, icon: 'IconBan', label: 'Cancelled' };
       default:
-        return { variant: 'secondary', icon: 'IconQuestionMark', label: 'Unknown' };
+        return { variant: 'secondary' as const, icon: 'IconQuestionMark', label: 'Unknown' };
     }
   };
 

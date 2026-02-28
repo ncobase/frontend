@@ -24,7 +24,7 @@ export const LanguageSwitcher: React.FC = () => {
    * Display current language flag or global icon
    */
   const renderLanguageTrigger = () => (
-    <Button variant='icon' className='text-muted-foreground hover:bg-transparent'>
+    <Button size='icon' variant='ghost' className='text-muted-foreground hover:bg-transparent'>
       {currentLanguage.flag ? (
         <span className='text-base'>{currentLanguage.flag}</span>
       ) : (

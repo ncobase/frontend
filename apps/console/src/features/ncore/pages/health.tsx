@@ -237,7 +237,9 @@ export const ExtensionHealthPage = () => {
             <Button
               onClick={autoRefresh.toggle}
               variant={autoRefresh.enabled ? 'primary' : 'outline-slate'}
-              icon={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'}
+              startIcon={
+                <Icons name={autoRefresh.enabled ? 'IconPlayerPause' : 'IconPlayerPlay'} />
+              }
               size='sm'
               className={`
                 transition-all duration-300 ease-in-out
@@ -249,7 +251,7 @@ export const ExtensionHealthPage = () => {
             <Button
               onClick={refreshAll}
               variant='outline-slate'
-              icon='IconRefresh'
+              startIcon={<Icons name='IconRefresh' />}
               disabled={healthLoading}
               size='sm'
               className={`
