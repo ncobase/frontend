@@ -106,6 +106,10 @@ export const OptionListPage = () => {
     handleView(null, 'create');
   }, [handleView]);
 
+  const handleRuntimeSettings = useCallback(() => {
+    navigate('/system/options/runtime-settings');
+  }, [navigate]);
+
   const handleDuplicate = useCallback(
     (record: Option) => {
       const duplicateRecord = {
@@ -192,7 +196,8 @@ export const OptionListPage = () => {
     }),
     topbarLeft: topbarLeftSection({
       setShowBulkImport,
-      handleCreate
+      handleCreate,
+      handleRuntimeSettings
     }),
     topbarRight: topbarRightSection,
     title: t('system.option.title', 'System Options')
