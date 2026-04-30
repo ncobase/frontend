@@ -1,18 +1,22 @@
-import { AnalyzePage } from './analyze/analyze';
-import { AuthExample } from './auth';
-import { ExampleCardRoutes } from './card';
-import { Masonry } from './card/masonry';
-import { I18nExample } from './i18n';
-import { ListPage, ListPage2 } from './list';
-import { LoadingStatesExample } from './loading';
-import { NotificationExample } from './notification/notification';
-import { PortalExample } from './portal/portal';
-import { ResponsiveDesignExample } from './responsive';
-import { AdvancedSearchExample } from './search';
-import { ThemeSwitcherExample } from './theme';
-import { ExampleUIRoutes } from './ui';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const AnalyzePage = lazyNamed(() => import('./analyze/analyze'), 'AnalyzePage');
+const AuthExample = lazyNamed(() => import('./auth'), 'AuthExample');
+const ExampleCardRoutes = lazyNamed(() => import('./card/routes'), 'ExampleCardRoutes');
+const Masonry = lazyNamed(() => import('./card/masonry'), 'Masonry');
+const I18nExample = lazyNamed(() => import('./i18n'), 'I18nExample');
+const ListPage = lazyNamed(() => import('./list/list'), 'ListPage');
+const ListPage2 = lazyNamed(() => import('./list/list2'), 'ListPage2');
+const LoadingStatesExample = lazyNamed(() => import('./loading'), 'LoadingStatesExample');
+const NotificationExample = lazyNamed(
+  () => import('./notification/notification'),
+  'NotificationExample'
+);
+const PortalExample = lazyNamed(() => import('./portal/portal'), 'PortalExample');
+const ResponsiveDesignExample = lazyNamed(() => import('./responsive'), 'ResponsiveDesignExample');
+const AdvancedSearchExample = lazyNamed(() => import('./search'), 'AdvancedSearchExample');
+const ThemeSwitcherExample = lazyNamed(() => import('./theme'), 'ThemeSwitcherExample');
+const ExampleUIRoutes = lazyNamed(() => import('./ui/routes'), 'ExampleUIRoutes');
 
 export const ExampleRoutes = () => {
   const routes = [

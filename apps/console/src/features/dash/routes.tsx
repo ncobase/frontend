@@ -1,6 +1,6 @@
-import { AnalyzesPage } from '../example/analyze';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const AnalyzesPage = lazyNamed(() => import('../example/analyze'), 'AnalyzesPage');
 
 export const DashRoutes = () => {
   const routes = [{ path: '/', element: <AnalyzesPage /> }];

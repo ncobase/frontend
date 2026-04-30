@@ -1,14 +1,16 @@
-import AccessRoutes from './access/routes';
-import { BasicRoutes } from './basic/routes';
-import { DictionaryRoutes } from './dictionary/routes';
-import { MenuRoutes } from './menu/routes';
-import { OptionRoutes } from './option/routes';
-import { OrgRoutes } from './organization/routes';
-import { PermissionRoutes } from './permission/routes';
-import { RoleRoutes } from './role/routes';
-import { UserRoutes } from './user/routes';
+import { lazy } from 'react';
 
-import { Guard, renderRoutes } from '@/router';
+import { Guard, lazyNamed, renderRoutes } from '@/router';
+
+const AccessRoutes = lazy(() => import('./access/routes'));
+const BasicRoutes = lazy(() => import('./basic/routes'));
+const DictionaryRoutes = lazy(() => import('./dictionary/routes'));
+const MenuRoutes = lazy(() => import('./menu/routes'));
+const OptionRoutes = lazyNamed(() => import('./option/routes'), 'OptionRoutes');
+const OrgRoutes = lazy(() => import('./organization/routes'));
+const PermissionRoutes = lazy(() => import('./permission/routes'));
+const RoleRoutes = lazy(() => import('./role/routes'));
+const UserRoutes = lazy(() => import('./user/routes'));
 
 export const SystemRoutes = () => {
   const routes = [

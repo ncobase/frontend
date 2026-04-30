@@ -1,6 +1,6 @@
-import { CommentListPage } from './pages/list';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const CommentListPage = lazyNamed(() => import('./pages/list'), 'CommentListPage');
 
 export const CommentRoutes = () => {
   const routes = [

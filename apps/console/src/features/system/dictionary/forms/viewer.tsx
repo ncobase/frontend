@@ -1,8 +1,10 @@
-import { CodeHighlighter, FieldViewer } from '@ncobase/react';
+import { FieldViewer } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 
 import { Dictionary } from '../dictionary';
 import { useQueryDictionary } from '../service';
+
+import { CodeHighlighter } from '@/components/ui/code-highlighter';
 
 export const DictionaryViewerForms = ({ record }: { record: string }) => {
   const { data = {} as Dictionary } = useQueryDictionary(record);

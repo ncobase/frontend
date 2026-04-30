@@ -1,7 +1,6 @@
 import React from 'react';
 
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
 
 import { useTable } from '../table.context';
 
@@ -15,11 +14,11 @@ export const ImportExportFeature: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const input = event.currentTarget;
+    const extension = file.name.split('.').pop()?.toLowerCase();
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = async e => {
       try {
-        const extension = file.name.split('.').pop()?.toLowerCase();
-
         if (extension === 'csv') {
           // Parse CSV
           const csvData = Papa.parse(e.target?.result as string, {
@@ -34,6 +33,7 @@ export const ImportExportFeature: React.FC = () => {
           }
         } else if (['xlsx', 'xls'].includes(extension || '')) {
           // Parse Excel
+          const XLSX = await import('xlsx');
           const workbook = XLSX.read(e.target?.result, { type: 'binary' });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
@@ -44,10 +44,12 @@ export const ImportExportFeature: React.FC = () => {
         }
       } catch (error) {
         console.error('Error parsing file:', error);
+      } finally {
+        input.value = '';
       }
     };
 
-    if (['csv', 'txt'].includes(file.name.split('.').pop()?.toLowerCase() || '')) {
+    if (['csv', 'txt'].includes(extension || '')) {
       reader.readAsText(file);
     } else {
       reader.readAsBinaryString(file);
@@ -86,7 +88,7 @@ export const ImportExportFeature: React.FC = () => {
     document.body.removeChild(link);
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (!internalData || internalData.length === 0) return;
 
     const visibleColumns = columns.filter(col => col.visible !== false);
@@ -105,6 +107,7 @@ export const ImportExportFeature: React.FC = () => {
       return exportRow;
     });
 
+    const XLSX = await import('xlsx');
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Table Data');

@@ -1,6 +1,6 @@
-import { OrgListPage } from './pages/list';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const OrgListPage = lazyNamed(() => import('./pages/list'), 'OrgListPage');
 
 export const OrgRoutes = () => {
   const routes = [

@@ -1,6 +1,6 @@
-import { RoleListPage } from './pages/list';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const RoleListPage = lazyNamed(() => import('./pages/list'), 'RoleListPage');
 
 export const RoleRoutes = () => {
   const routes = [

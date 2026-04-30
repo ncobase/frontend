@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
 
-import { Card, Button, Icons, Editor } from '@ncobase/react';
+import { Card, Button, Icons } from '@ncobase/react';
 
 import { CardLayout } from '../layout';
 
+import { Editor } from '@/components/ui/editor';
 import { useLanguage } from '@/hooks/use_language';
 
 // Mock image upload function

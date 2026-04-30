@@ -1,10 +1,10 @@
-import { TemplateCreatePage } from './pages/create';
-import { TemplateEditPage } from './pages/edit';
-import { TemplateListPage } from './pages/list';
-import { TemplateMarketPage } from './pages/market';
-import { TemplateViewPage } from './pages/view';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const TemplateCreatePage = lazyNamed(() => import('./pages/create'), 'TemplateCreatePage');
+const TemplateEditPage = lazyNamed(() => import('./pages/edit'), 'TemplateEditPage');
+const TemplateListPage = lazyNamed(() => import('./pages/list'), 'TemplateListPage');
+const TemplateMarketPage = lazyNamed(() => import('./pages/market'), 'TemplateMarketPage');
+const TemplateViewPage = lazyNamed(() => import('./pages/view'), 'TemplateViewPage');
 
 export const TemplateRoutes = () => {
   const routes = [

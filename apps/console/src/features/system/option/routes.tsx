@@ -1,7 +1,7 @@
-import { OptionListPage } from './pages/list';
-import { RuntimeSettingsPage } from './pages/runtime';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const OptionListPage = lazyNamed(() => import('./pages/list'), 'OptionListPage');
+const RuntimeSettingsPage = lazyNamed(() => import('./pages/runtime'), 'RuntimeSettingsPage');
 
 export const OptionRoutes = () => {
   const routes = [

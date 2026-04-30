@@ -1,9 +1,9 @@
-import { SEOAnalyticsPage } from './pages/analytics';
-import { SEOAuditPage } from './pages/audit';
-import { SEODashboardPage } from './pages/dashboard';
-import { SEOSettingsPage } from './pages/settings';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const SEOAnalyticsPage = lazyNamed(() => import('./pages/analytics'), 'SEOAnalyticsPage');
+const SEOAuditPage = lazyNamed(() => import('./pages/audit'), 'SEOAuditPage');
+const SEODashboardPage = lazyNamed(() => import('./pages/dashboard'), 'SEODashboardPage');
+const SEOSettingsPage = lazyNamed(() => import('./pages/settings'), 'SEOSettingsPage');
 
 export const SEORoutes = () => {
   const routes = [

@@ -1,6 +1,6 @@
-import { MenuListPage } from './pages/list';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const MenuListPage = lazyNamed(() => import('./pages/list'), 'MenuListPage');
 
 export const MenuRoutes = () => {
   const routes = [

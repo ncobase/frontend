@@ -1,9 +1,9 @@
-import { MediaEditPage } from './pages/edit';
-import { MediaListPage } from './pages/list';
-import { MediaViewPage } from './pages/view';
-
 import { ErrorPage } from '@/components/errors';
-import { renderRoutes } from '@/router';
+import { lazyNamed, renderRoutes } from '@/router';
+
+const MediaEditPage = lazyNamed(() => import('./pages/edit'), 'MediaEditPage');
+const MediaListPage = lazyNamed(() => import('./pages/list'), 'MediaListPage');
+const MediaViewPage = lazyNamed(() => import('./pages/view'), 'MediaViewPage');
 
 export const MediaRoutes = () => {
   const routes = [

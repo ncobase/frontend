@@ -1,8 +1,11 @@
-import { VersionComparisonPage } from './pages/comparison';
-import { VersionHistoryPage } from './pages/history';
-import { VersionSettingsPage } from './pages/settings';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const VersionComparisonPage = lazyNamed(
+  () => import('./pages/comparison'),
+  'VersionComparisonPage'
+);
+const VersionHistoryPage = lazyNamed(() => import('./pages/history'), 'VersionHistoryPage');
+const VersionSettingsPage = lazyNamed(() => import('./pages/settings'), 'VersionSettingsPage');
 
 export const VersionRoutes = () => {
   const routes = [

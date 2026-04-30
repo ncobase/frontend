@@ -1,14 +1,23 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 
 import { Button } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { BusinessDashboard } from './business';
-import { ChartDashboard } from './chart-dashboard';
-import { ECommerceDashboard } from './e-commerce';
-import { OperationsDashboard } from './monitoring';
-
 import { Page, Topbar } from '@/components/layout';
+import { Spinner } from '@/components/loading/spinner';
+
+const BusinessDashboard = lazy(() =>
+  import('./business').then(module => ({ default: module.BusinessDashboard }))
+);
+const ChartDashboard = lazy(() =>
+  import('./chart-dashboard').then(module => ({ default: module.ChartDashboard }))
+);
+const ECommerceDashboard = lazy(() =>
+  import('./e-commerce').then(module => ({ default: module.ECommerceDashboard }))
+);
+const OperationsDashboard = lazy(() =>
+  import('./monitoring').then(module => ({ default: module.OperationsDashboard }))
+);
 
 const tabs = [
   { id: 'ecommerce', label: 'E-Commerce', component: ECommerceDashboard },
@@ -58,7 +67,7 @@ export const AnalyzesPage = () => {
       title={activeTabTitle}
       topbar={<TabSwitchBar activeTab={activeTab} onTabChange={onTabChange} />}
     >
-      {ActiveComponent && <ActiveComponent />}
+      <Suspense fallback={<Spinner />}>{ActiveComponent && <ActiveComponent />}</Suspense>
     </Page>
   );
 };

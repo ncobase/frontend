@@ -1,6 +1,6 @@
-import { PermissionListPage } from './pages/list';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const PermissionListPage = lazyNamed(() => import('./pages/list'), 'PermissionListPage');
 
 export const PermissionRoutes = () => {
   const routes = [

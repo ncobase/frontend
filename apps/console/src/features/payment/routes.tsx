@@ -1,18 +1,24 @@
 import { Navigate } from 'react-router';
 
-import { ChannelCreatePage } from './pages/channel/create';
-import { ChannelEditPage } from './pages/channel/edit';
-import { ChannelListPage } from './pages/channel/list';
-import { OrderListPage } from './pages/order/list';
-import { OrderViewPage } from './pages/order/view';
-import { PaymentOverviewPage } from './pages/overview';
-import { ProductCreatePage } from './pages/product/create';
-import { ProductEditPage } from './pages/product/edit';
-import { ProductListPage } from './pages/product/list';
-import { SubscriptionListPage } from './pages/subscription/list';
-import { SubscriptionViewPage } from './pages/subscription/view';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const ChannelCreatePage = lazyNamed(() => import('./pages/channel/create'), 'ChannelCreatePage');
+const ChannelEditPage = lazyNamed(() => import('./pages/channel/edit'), 'ChannelEditPage');
+const ChannelListPage = lazyNamed(() => import('./pages/channel/list'), 'ChannelListPage');
+const OrderListPage = lazyNamed(() => import('./pages/order/list'), 'OrderListPage');
+const OrderViewPage = lazyNamed(() => import('./pages/order/view'), 'OrderViewPage');
+const PaymentOverviewPage = lazyNamed(() => import('./pages/overview'), 'PaymentOverviewPage');
+const ProductCreatePage = lazyNamed(() => import('./pages/product/create'), 'ProductCreatePage');
+const ProductEditPage = lazyNamed(() => import('./pages/product/edit'), 'ProductEditPage');
+const ProductListPage = lazyNamed(() => import('./pages/product/list'), 'ProductListPage');
+const SubscriptionListPage = lazyNamed(
+  () => import('./pages/subscription/list'),
+  'SubscriptionListPage'
+);
+const SubscriptionViewPage = lazyNamed(
+  () => import('./pages/subscription/view'),
+  'SubscriptionViewPage'
+);
 
 export const PaymentRoutes = () => {
   const routes = [

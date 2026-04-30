@@ -1,6 +1,6 @@
-import { SystemSettingsPage } from './system';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const SystemSettingsPage = lazyNamed(() => import('./system'), 'SystemSettingsPage');
 
 export const BasicRoutes = () => {
   const routes = [{ path: '/', element: <SystemSettingsPage /> }];

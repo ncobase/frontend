@@ -1,9 +1,9 @@
-import { CreateTaxonomyPage } from './pages/create';
-import { TaxonomyEditPage } from './pages/edit';
-import { TaxonomyListPage } from './pages/list';
-import { TaxonomyViewPage } from './pages/view';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const CreateTaxonomyPage = lazyNamed(() => import('./pages/create'), 'CreateTaxonomyPage');
+const TaxonomyEditPage = lazyNamed(() => import('./pages/edit'), 'TaxonomyEditPage');
+const TaxonomyListPage = lazyNamed(() => import('./pages/list'), 'TaxonomyListPage');
+const TaxonomyViewPage = lazyNamed(() => import('./pages/view'), 'TaxonomyViewPage');
 
 export const TaxonomyRoutes = () => {
   const routes = [

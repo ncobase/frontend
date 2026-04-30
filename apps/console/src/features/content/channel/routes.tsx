@@ -1,9 +1,9 @@
-import { ChannelCreatePage } from './pages/create';
-import { ChannelEditPage } from './pages/edit';
-import { ChannelListPage } from './pages/list';
-import { ChannelViewPage } from './pages/view';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const ChannelCreatePage = lazyNamed(() => import('./pages/create'), 'ChannelCreatePage');
+const ChannelEditPage = lazyNamed(() => import('./pages/edit'), 'ChannelEditPage');
+const ChannelListPage = lazyNamed(() => import('./pages/list'), 'ChannelListPage');
+const ChannelViewPage = lazyNamed(() => import('./pages/view'), 'ChannelViewPage');
 
 export const ChannelRoutes = () => {
   const routes = [

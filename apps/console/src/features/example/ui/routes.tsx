@@ -1,7 +1,9 @@
-import { Elements } from './elements';
-import { CreatePage, EditorPage, ViewerPage } from './forms';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const Elements = lazyNamed(() => import('./elements'), 'Elements');
+const CreatePage = lazyNamed(() => import('./forms/create'), 'CreatePage');
+const EditorPage = lazyNamed(() => import('./forms/editor'), 'EditorPage');
+const ViewerPage = lazyNamed(() => import('./forms/viewer'), 'ViewerPage');
 
 export const ExampleUIRoutes = () => {
   const routes = [

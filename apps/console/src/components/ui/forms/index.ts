@@ -1,7 +1,6 @@
 export * from './components';
 export * from './fields';
 export * from './hooks';
-export * from './uploader';
 export * from './context';
 export * from './render';
 export * from './viewer';

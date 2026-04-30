@@ -1,9 +1,9 @@
-import { DistributionCreatePage } from './pages/create';
-import { DistributionEditPage } from './pages/edit';
-import { DistributionListPage } from './pages/list';
-import { DistributionViewPage } from './pages/view';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const DistributionCreatePage = lazyNamed(() => import('./pages/create'), 'DistributionCreatePage');
+const DistributionEditPage = lazyNamed(() => import('./pages/edit'), 'DistributionEditPage');
+const DistributionListPage = lazyNamed(() => import('./pages/list'), 'DistributionListPage');
+const DistributionViewPage = lazyNamed(() => import('./pages/view'), 'DistributionViewPage');
 
 export const DistributionRoutes = () => {
   const routes = [

@@ -1,17 +1,19 @@
-import { ChannelRoutes } from './channel/routes';
-import { CommentRoutes } from './comment/routes';
-import { ContentPage } from './content';
-import { DistributionRoutes } from './distribution/routes';
-import { MediaRoutes } from './media/routes';
-import { ScheduleRoutes } from './schedule/routes';
-import { SEORoutes } from './seo/routes';
-import { TaxonomyRoutes } from './taxonomy/routes';
-import { TemplateRoutes } from './template/routes';
-import { TopicRoutes } from './topic/routes';
-import { VersionRoutes } from './version/routes';
-import { WorkflowRoutes } from './workflow/routes';
+import { lazy } from 'react';
 
-import { renderRoutes } from '@/router';
+import { lazyNamed, renderRoutes } from '@/router';
+
+const ContentPage = lazyNamed(() => import('./content'), 'ContentPage');
+const ChannelRoutes = lazy(() => import('./channel/routes'));
+const CommentRoutes = lazy(() => import('./comment/routes'));
+const DistributionRoutes = lazy(() => import('./distribution/routes'));
+const MediaRoutes = lazy(() => import('./media/routes'));
+const ScheduleRoutes = lazy(() => import('./schedule/routes'));
+const SEORoutes = lazy(() => import('./seo/routes'));
+const TaxonomyRoutes = lazy(() => import('./taxonomy/routes'));
+const TemplateRoutes = lazy(() => import('./template/routes'));
+const TopicRoutes = lazy(() => import('./topic/routes'));
+const VersionRoutes = lazy(() => import('./version/routes'));
+const WorkflowRoutes = lazy(() => import('./workflow/routes'));
 
 export const ContentRoutes = () => {
   const routes = [

@@ -1,8 +1,10 @@
-import { CodeHighlighter, FieldViewer } from '@ncobase/react';
+import { FieldViewer } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 
 import { Option } from '../option.d';
 import { useQueryOption } from '../service';
+
+import { CodeHighlighter } from '@/components/ui/code-highlighter';
 
 export const OptionViewerForms = ({ record }) => {
   const { data = {} as Option, isLoading } = useQueryOption(record);

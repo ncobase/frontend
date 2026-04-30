@@ -9,11 +9,66 @@ function pathResolve(dir: string) {
   return resolve(process.cwd(), '.', dir);
 }
 
+const normalizePath = (id: string) => id.replaceAll('\\', '/');
+const isNodePackage = (id: string, packageName: string) =>
+  id.includes(`/node_modules/${packageName}/`);
+
+const moduleSideEffects = (id: string): boolean => {
+  const normalizedId = normalizePath(id);
+
+  if (normalizedId.includes('.css')) return true;
+  if (
+    normalizedId.includes('/apps/console/src/components/ui/') ||
+    normalizedId.includes('/packages/react/src/') ||
+    normalizedId.includes('/packages/charts/src/')
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
 const manualChunks = (id: string): string | undefined => {
-  const normalizedId = id.replaceAll('\\', '/');
+  const normalizedId = normalizePath(id);
+
+  if (normalizedId.includes('vite/preload-helper')) return 'preload_helper';
 
   if (!normalizedId.includes('node_modules')) return undefined;
 
+  if (
+    isNodePackage(normalizedId, 'react') ||
+    isNodePackage(normalizedId, 'react-dom') ||
+    isNodePackage(normalizedId, 'scheduler') ||
+    isNodePackage(normalizedId, 'react-router')
+  ) {
+    return 'vendor_react';
+  }
+  if (isNodePackage(normalizedId, '@tanstack/react-query')) return 'vendor_query';
+  if (
+    isNodePackage(normalizedId, 'i18next') ||
+    isNodePackage(normalizedId, 'i18next-http-backend') ||
+    isNodePackage(normalizedId, 'react-i18next')
+  ) {
+    return 'vendor_i18n';
+  }
+  if (normalizedId.includes('/node_modules/@radix-ui/')) return 'vendor_radix';
+  if (
+    isNodePackage(normalizedId, 'clsx') ||
+    isNodePackage(normalizedId, 'tailwind-merge') ||
+    isNodePackage(normalizedId, 'class-variance-authority')
+  ) {
+    return 'vendor_ui_utils';
+  }
+  if (
+    isNodePackage(normalizedId, 'prop-types') ||
+    isNodePackage(normalizedId, 'react-is') ||
+    isNodePackage(normalizedId, 'hoist-non-react-statics')
+  ) {
+    return 'vendor_react_compat';
+  }
+  if (isNodePackage(normalizedId, 'jsencrypt') || isNodePackage(normalizedId, 'nanoid')) {
+    return 'vendor_runtime_utils';
+  }
   if (normalizedId.includes('@tabler/icons-react/dist/esm/icons/')) {
     return 'vendor_tabler_icons';
   }
@@ -23,9 +78,11 @@ const manualChunks = (id: string): string | undefined => {
   ) {
     return 'vendor_tabler_icons';
   }
-  if (normalizedId.includes('monaco-editor')) return 'vendor_monaco';
-  if (normalizedId.includes('zrender') || normalizedId.includes('echarts')) return 'vendor_echarts';
   if (normalizedId.includes('recharts')) return 'vendor_recharts';
+  if (normalizedId.includes('monaco-editor')) return 'vendor_monaco';
+  if (isNodePackage(normalizedId, 'zrender') || isNodePackage(normalizedId, 'echarts')) {
+    return 'vendor_echarts';
+  }
   if (normalizedId.includes('lodash')) return 'vendor_lodash';
   if (normalizedId.includes('xlsx')) return 'vendor_xlsx';
   if (normalizedId.includes('react-syntax-highlighter')) return 'vendor_syntax_highlighter';
@@ -76,6 +133,9 @@ export default (({ mode }: ConfigEnv): UserConfig => {
       target: 'es2015',
       cssTarget: 'chrome80',
       rollupOptions: {
+        treeshake: {
+          moduleSideEffects
+        },
         output: {
           compact: true,
           manualChunks,

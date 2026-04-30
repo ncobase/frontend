@@ -1,8 +1,9 @@
-import { ResourceAdminPage } from './pages/admin';
-import { ResourceListPage } from './pages/list';
-import { ResourceViewPage } from './pages/view';
-
+import { lazyNamed } from '@/router';
 import { Guard, renderRoutes } from '@/router/helpers';
+
+const ResourceAdminPage = lazyNamed(() => import('./pages/admin'), 'ResourceAdminPage');
+const ResourceListPage = lazyNamed(() => import('./pages/list'), 'ResourceListPage');
+const ResourceViewPage = lazyNamed(() => import('./pages/view'), 'ResourceViewPage');
 
 export const ResourceRoutes = () => {
   const routes = [

@@ -24,7 +24,6 @@ import {
   TabsTrigger,
   Textarea,
   Tooltip,
-  Uploader,
   Alert,
   AlertDialog,
   Avatar,
@@ -58,6 +57,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { Page, Topbar } from '@/components/layout';
+import { Uploader } from '@/components/ui/forms/uploader';
 import { uploadConfigs, useUpload } from '@/hooks';
 
 export const UITopbar = ({ ...rest }) => {

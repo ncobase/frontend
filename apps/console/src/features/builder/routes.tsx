@@ -1,7 +1,7 @@
-import { FeatureBuilderPage } from './feature';
-import { FormBuilderPage } from './form';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const FeatureBuilderPage = lazyNamed(() => import('./feature'), 'FeatureBuilderPage');
+const FormBuilderPage = lazyNamed(() => import('./form'), 'FormBuilderPage');
 
 export const BuilderRoutes = () => {
   const routes = [

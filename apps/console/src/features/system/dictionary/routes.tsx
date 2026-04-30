@@ -1,6 +1,6 @@
-import { DictionaryListPage } from './pages/list';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const DictionaryListPage = lazyNamed(() => import('./pages/list'), 'DictionaryListPage');
 
 export const DictionaryRoutes = () => {
   const routes = [

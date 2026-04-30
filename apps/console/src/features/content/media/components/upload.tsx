@@ -1,10 +1,11 @@
 import React from 'react';
 
 import { Modal } from '@ncobase/react';
-import { UploaderField } from '@ncobase/react';
 
 import type { Media } from '../media';
 import { useMediaResourceUpload } from '../media_resource';
+
+import { UploaderField } from '@/components/ui/forms/fields/uploader';
 
 interface MediaUploadProps {
   isOpen: boolean;

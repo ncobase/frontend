@@ -4,7 +4,6 @@ import {
   Button,
   Form,
   Section,
-  EditorField,
   InputField,
   SelectField,
   MultiSelectField,
@@ -13,6 +12,8 @@ import {
 import { useForm } from 'react-hook-form';
 
 import { CardLayout } from '../layout';
+
+import { EditorField } from '@/components/ui/forms/fields/editor';
 
 export const LogPage = () => {
   const [formData, setFormData] = useState({});

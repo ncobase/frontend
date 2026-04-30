@@ -4,14 +4,18 @@ import { Alert, AlertDescription, Button, Icons } from '@ncobase/react';
 import { Navigate } from 'react-router';
 
 import { useNCoreAvailability } from './hooks';
-import { ExtensionCollectionsPage } from './pages/collections';
-import { ExtensionHealthPage } from './pages/health';
-import { ExtensionMetricsPage } from './pages/metrics';
-import { ExtensionOverviewPage } from './pages/overview';
 
 import { Page } from '@/components/layout';
 import { Spinner } from '@/components/loading/spinner';
-import { renderRoutes } from '@/router';
+import { lazyNamed, renderRoutes } from '@/router';
+
+const ExtensionCollectionsPage = lazyNamed(
+  () => import('./pages/collections'),
+  'ExtensionCollectionsPage'
+);
+const ExtensionHealthPage = lazyNamed(() => import('./pages/health'), 'ExtensionHealthPage');
+const ExtensionMetricsPage = lazyNamed(() => import('./pages/metrics'), 'ExtensionMetricsPage');
+const ExtensionOverviewPage = lazyNamed(() => import('./pages/overview'), 'ExtensionOverviewPage');
 
 const NCoreUnavailablePage = ({
   reason,

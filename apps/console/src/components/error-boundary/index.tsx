@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 
-import { Button, CodeHighlighter, Container, Dialog, useToastMessage } from '@ncobase/react';
+import { Button, Container, Dialog, useToastMessage } from '@ncobase/react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
 import { ErrorPage } from '../errors';
 
 import { eventEmitter } from '@/lib/events';
+
+const CodeHighlighter = lazy(() =>
+  import('@/components/ui/code-highlighter').then(module => ({ default: module.CodeHighlighter }))
+);
 
 interface ErrorState {
   hasError: boolean;
@@ -35,9 +39,13 @@ const FallbackComponent = ({
           </Button>
         }
       >
-        <CodeHighlighter language='json' className='h-full my-0! text-wrap'>
-          {(error?.error as Error)?.stack || 'Unknown error occurred'}
-        </CodeHighlighter>
+        <Suspense
+          fallback={<div className='h-full rounded-md bg-slate-950 text-slate-100 animate-pulse' />}
+        >
+          <CodeHighlighter language='json' className='h-full my-0! text-wrap'>
+            {(error?.error as Error)?.stack || 'Unknown error occurred'}
+          </CodeHighlighter>
+        </Suspense>
       </Dialog>
     </Container>
   );

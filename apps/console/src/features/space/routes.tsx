@@ -1,13 +1,13 @@
-import { CreateSpacePage } from './pages/create';
-import { SpaceEditPage } from './pages/edit';
-import { SpaceListPage } from './pages/list';
-import { CreateSpaceUserPage } from './pages/user/create';
-import { SpaceUserEditPage } from './pages/user/edit';
-import { SpaceUserListPage } from './pages/user/list';
-import { SpaceUserViewPage } from './pages/user/view';
-import { SpaceViewPage } from './pages/view';
+import { lazyNamed, renderRoutes } from '@/router';
 
-import { renderRoutes } from '@/router';
+const CreateSpacePage = lazyNamed(() => import('./pages/create'), 'CreateSpacePage');
+const SpaceEditPage = lazyNamed(() => import('./pages/edit'), 'SpaceEditPage');
+const SpaceListPage = lazyNamed(() => import('./pages/list'), 'SpaceListPage');
+const CreateSpaceUserPage = lazyNamed(() => import('./pages/user/create'), 'CreateSpaceUserPage');
+const SpaceUserEditPage = lazyNamed(() => import('./pages/user/edit'), 'SpaceUserEditPage');
+const SpaceUserListPage = lazyNamed(() => import('./pages/user/list'), 'SpaceUserListPage');
+const SpaceUserViewPage = lazyNamed(() => import('./pages/user/view'), 'SpaceUserViewPage');
+const SpaceViewPage = lazyNamed(() => import('./pages/view'), 'SpaceViewPage');
 
 export const SpaceRoutes = () => {
   const routes = [
