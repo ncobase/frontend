@@ -95,6 +95,7 @@ export const TopicEditPage = () => {
         control={control}
         setValue={setValue}
         errors={errors}
+        disabled={updateTopicMutation.isPending}
       />
     </Page>
   );

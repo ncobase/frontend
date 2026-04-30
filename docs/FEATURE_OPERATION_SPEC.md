@@ -98,15 +98,21 @@ which cross-feature effects they must handle.
 
 - Entry: `/content/topics`, `/content/taxonomies`.
 - Actions: list/filter, create, edit, view, delete, create topic within taxonomy context, upload
-  thumbnail media.
+  thumbnail media, and manage featured/gallery/attachment topic media.
 - API: `/cms/topics`, `/cms/taxonomies`, `/res`, `/cms/media`, `/cms/topic-media`.
 - Cross-effects: topic create/update may require taxonomy validation, media association, distribution
   invalidation, and content overview refresh.
 - Current media behavior: thumbnail uploader uses `useTopicMediaUpload`, which uploads through `/res`
   and creates a CMS media record before writing the media URL back to the form.
-- Required UX: settle id/slug display and route usage; show taxonomy validation errors inline; wire
-  `TopicMediaManager` into create/edit so featured/gallery/attachment media can be selected, uploaded,
-  removed, reordered, and saved with the topic.
+- Current topic form behavior:
+  - Create includes `TopicMediaField`, stores selected media relations locally, and sends them with
+    the create payload so relations are synchronized after the topic receives an id.
+  - Edit includes `TopicMediaField` for the persisted topic id and saves relation changes
+    immediately through topic-media sync.
+  - The manager supports upload, gallery selection, duplicate movement between featured/gallery/
+    attachment, remove, reorder, loading/error/disabled states, and save feedback.
+- Required UX: settle id/slug display and route usage; show taxonomy validation errors inline; add
+  browser integration coverage for create staging, edit immediate save, ordering, and failure states.
 
 ### Media and Resource Picker
 
@@ -124,8 +130,10 @@ which cross-feature effects they must handle.
   - `TopicMediaManager` queries `/cms/topic-media/by-topic/:topicId`.
   - Saving reconciles desired featured/gallery/attachment items against persisted relations and calls
     create, update, or delete on `/cms/topic-media`.
-  - Unsaved topic flows can pass local media selections through `onSave`; persisted topic flows write
-    immediately through the topic-media sync mutation.
+  - Unsaved topic creation stores local selections and synchronizes relations after topic creation;
+    persisted topic edit writes immediately through the topic-media sync mutation.
+  - The same media cannot be duplicated across types; selecting it in another type moves the relation
+    because backend topic/media uniqueness is enforced per pair.
 - Cross-effects: media references resource files through `resource_id`; resource deletion queries CMS
   media references and must also surface topic references once reverse lookup exists.
 - Required next UX: shared picker for existing `/res` file selection, direct resource/media reference

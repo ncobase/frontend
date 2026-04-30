@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { Button, Icons } from '@ncobase/react';
 import { useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
@@ -6,6 +8,7 @@ import { useNavigate } from 'react-router';
 
 import { CreateTopicForm } from '../forms/create';
 import { useCreateTopic } from '../service';
+import type { TopicMedia } from '../topic_media';
 
 import { Page, Topbar } from '@/components/layout';
 
@@ -13,6 +16,7 @@ export const CreateTopicPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToastMessage();
+  const [topicMedia, setTopicMedia] = useState<TopicMedia[]>([]);
 
   const {
     control,
@@ -24,7 +28,7 @@ export const CreateTopicPage = () => {
 
   const onSubmit = handleSubmit(async data => {
     try {
-      await createTopicMutation.mutateAsync(data);
+      await createTopicMutation.mutateAsync({ ...data, media: topicMedia });
       toast.success(t('topic.create.success'));
       navigate('/content/topics');
     } catch (error) {
@@ -63,7 +67,15 @@ export const CreateTopicPage = () => {
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
-      <CreateTopicForm onSubmit={onSubmit} control={control} setValue={setValue} errors={errors} />
+      <CreateTopicForm
+        onSubmit={onSubmit}
+        control={control}
+        setValue={setValue}
+        errors={errors}
+        topicMedia={topicMedia}
+        onTopicMediaChange={setTopicMedia}
+        disabled={createTopicMutation.isPending}
+      />
     </Page>
   );
 };

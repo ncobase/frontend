@@ -4,11 +4,31 @@ import { Form, FormSection, Section } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { useListTaxonomies } from '../../taxonomy/service';
+import { TopicMediaField } from '../components/media_manager';
 import { useTopicMediaUpload } from '../hooks/useTopicMediaUpload';
+import type { TopicMedia } from '../topic_media';
 
 import { useSpaceContext } from '@/features/space/context';
 
-export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
+interface CreateTopicFormProps {
+  onSubmit: (_event?: React.BaseSyntheticEvent) => void;
+  control: any;
+  setValue: (_name: string, _value: any) => void;
+  errors: any;
+  topicMedia?: TopicMedia[];
+  onTopicMediaChange?: (_topicMedia: TopicMedia[]) => void;
+  disabled?: boolean;
+}
+
+export const CreateTopicForm = ({
+  onSubmit,
+  control,
+  setValue,
+  errors,
+  topicMedia = [],
+  onTopicMediaChange,
+  disabled = false
+}: CreateTopicFormProps) => {
   const { t } = useTranslation();
   const { space_id } = useSpaceContext();
   const [taxonomyOptions, setTaxonomyOptions] = useState([]);
@@ -239,6 +259,9 @@ export const CreateTopicForm = ({ onSubmit, control, setValue, errors }) => {
             errors={errors}
             fields={section.fields}
           />
+          {section.id === 'media' && (
+            <TopicMediaField value={topicMedia} onChange={onTopicMediaChange} disabled={disabled} />
+          )}
         </Section>
       ))}
     </div>

@@ -5,10 +5,27 @@ import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
 import { useListTaxonomies } from '../../taxonomy/service';
+import { TopicMediaField } from '../components/media_manager';
 import { useTopicMediaUpload } from '../hooks/useTopicMediaUpload';
 import { useQueryTopic } from '../service';
 
-export const EditorTopicForm = ({ record, onSubmit, control, setValue, errors }) => {
+interface EditorTopicFormProps {
+  record: string;
+  onSubmit: (_event?: React.BaseSyntheticEvent) => void;
+  control: any;
+  setValue: (_name: string, _value: any) => void;
+  errors: any;
+  disabled?: boolean;
+}
+
+export const EditorTopicForm = ({
+  record,
+  onSubmit,
+  control,
+  setValue,
+  errors,
+  disabled = false
+}: EditorTopicFormProps) => {
   const { t } = useTranslation();
   const { data = {}, isLoading } = useQueryTopic(record);
   const [taxonomyOptions, setTaxonomyOptions] = useState([]);
@@ -298,6 +315,7 @@ export const EditorTopicForm = ({ record, onSubmit, control, setValue, errors })
             errors={errors}
             fields={section.fields}
           />
+          {section.id === 'media' && <TopicMediaField topicId={record} disabled={disabled} />}
         </Section>
       ))}
     </div>
