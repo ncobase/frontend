@@ -1,20 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
-import { ResourceQuota } from '../resource';
-
-const formatBytes = (bytes: number) => {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let i = 0;
-  let size = bytes;
-  while (size >= 1024 && i < units.length - 1) {
-    size /= 1024;
-    i++;
-  }
-  return `${size.toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
-};
+import { ResourceUsage } from '../resource';
+import { formatBytes } from '../upload_payload';
 
 interface QuotaDisplayProps {
-  quota: ResourceQuota | null | undefined;
+  quota: ResourceUsage | null | undefined;
 }
 
 export const QuotaDisplay = ({ quota }: QuotaDisplayProps) => {
@@ -22,7 +12,7 @@ export const QuotaDisplay = ({ quota }: QuotaDisplayProps) => {
 
   if (!quota) return null;
 
-  const percent = Math.min(quota.usage_percent, 100);
+  const percent = Math.min(quota.usage_percent || 0, 100);
   const barColor = percent >= 90 ? 'bg-red-500' : percent >= 75 ? 'bg-orange-500' : 'bg-blue-500';
 
   return (
@@ -32,7 +22,8 @@ export const QuotaDisplay = ({ quota }: QuotaDisplayProps) => {
           {t('resource.quota.storage', 'Storage')}
         </span>
         <span className='text-xs text-slate-500'>
-          {formatBytes(quota.usage)} / {formatBytes(quota.quota)}
+          {quota.formatted_usage || formatBytes(quota.usage)} /{' '}
+          {quota.formatted_quota || formatBytes(quota.quota)}
         </span>
       </div>
       <div className='w-full bg-slate-100 rounded-full h-2'>
@@ -43,7 +34,7 @@ export const QuotaDisplay = ({ quota }: QuotaDisplayProps) => {
       </div>
       <div className='flex items-center justify-between mt-2'>
         <span className='text-xs text-slate-400'>
-          {t('resource.quota.files', 'Files')}: {quota.file_count}
+          {t('resource.quota.files', 'Files')}: {quota.file_count || 0}
         </span>
         <span className='text-xs text-slate-400'>{percent.toFixed(1)}%</span>
       </div>

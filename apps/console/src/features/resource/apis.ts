@@ -1,6 +1,14 @@
 import { isBrowser, locals, buildQueryString } from '@ncobase/utils';
 
-import { ResourceFile, StorageStats, ResourceQuota, FileVersion, ShareLink } from './resource';
+import {
+  ResourceBatchUploadResult,
+  ResourceFile,
+  StorageStats,
+  ResourceQuota,
+  ResourceUsage,
+  FileVersion,
+  ShareLink
+} from './resource';
 
 import { ACCESS_TOKEN_KEY } from '@/features/account/context';
 import { tokenService } from '@/features/account/token_service';
@@ -77,7 +85,10 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   // Batch
-  batchUpload: (data: FormData, params?: Record<string, any>): Promise<ResourceFile[]> => {
+  batchUpload: (
+    data: FormData,
+    params?: Record<string, any>
+  ): Promise<ResourceBatchUploadResult> => {
     return request.post(`${endpoint}/batch/upload`, ensureOwnerIdFormData(data, params));
   },
 
@@ -91,7 +102,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.get(`${endpoint}/quota`);
   },
 
-  getUsage: (): Promise<{ usage: number; file_count: number }> => {
+  getUsage: (): Promise<ResourceUsage> => {
     return request.get(`${endpoint}/usage`);
   },
 

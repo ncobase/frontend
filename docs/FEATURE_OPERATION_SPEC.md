@@ -34,7 +34,8 @@ which cross-feature effects they must handle.
 - API: `POST /refresh-token`.
 - Success effects: replace access/refresh tokens and clear permission token cache.
 - Failure states: clear session, redirect to `/login?redirect=...`.
-- Gaps: space switch does not yet trigger token refresh for the new space domain.
+- Space switch: active space changes refresh the access token, reset domain cache, and refetch
+  account/navigation context.
 
 ### Logout
 
@@ -133,8 +134,11 @@ marked beta, or implemented backend-first before production exposure.
 - API: `/res`, `/res/search`, `/res/:slug/*`, `/res/batch/*`, `/res/admin/*`.
 - Required permissions: `read:resources`, `manage:resources`, admin for admin routes.
 - Cross-effects: resource files can back CMS media; delete/access changes must consider references.
-- Required UX: quota before upload, file rejection reasons, progress, partial batch results, share
-  scope, and clear private/public/shared state.
+- Current upload UX: upload modal has a local file queue, zero-byte/oversize rejection reasons,
+  quota visibility and pre-check, private/shared/public access selection, public flag, path prefix,
+  tags, image thumbnail options, single-file `file` upload, and multi-file `files` batch upload.
+- Required next UX: per-file progress, retry failed batch items, share scope, and reference warnings
+  before deleting files used by CMS media.
 
 ## Spaces
 

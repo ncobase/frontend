@@ -7,7 +7,9 @@ import {
   upload,
   updateResource,
   getQuota,
+  getUsage,
   getAdminStats,
+  batchUpload,
   batchDelete,
   batchCleanup,
   getVersions,
@@ -22,6 +24,7 @@ export const resourceKeys = {
   get: (id?: string) => ['resourceService', 'file', { id }],
   versions: (id?: string) => ['resourceService', 'versions', { id }],
   quota: () => ['resourceService', 'quota'],
+  usage: () => ['resourceService', 'usage'],
   stats: () => ['resourceService', 'stats']
 };
 
@@ -52,6 +55,13 @@ export const useGetQuota = () =>
     queryFn: () => getQuota()
   });
 
+export const useGetUsage = (enabled = true) =>
+  useQuery({
+    queryKey: resourceKeys.usage(),
+    queryFn: () => getUsage(),
+    enabled
+  });
+
 export const useGetAdminStats = () =>
   useQuery({
     queryKey: resourceKeys.stats(),
@@ -65,6 +75,19 @@ export const useUploadResource = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
       queryClient.invalidateQueries({ queryKey: resourceKeys.quota() });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.usage() });
+    }
+  });
+};
+
+export const useBatchUploadResources = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: FormData) => batchUpload(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.quota() });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.usage() });
     }
   });
 };
@@ -90,6 +113,7 @@ export const useDeleteResource = () => {
       queryClient.removeQueries({ queryKey: resourceKeys.get(deletedId) });
       queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
       queryClient.invalidateQueries({ queryKey: resourceKeys.quota() });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.usage() });
     }
   });
 };
@@ -123,6 +147,7 @@ export const useBatchDelete = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
       queryClient.invalidateQueries({ queryKey: resourceKeys.quota() });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.usage() });
     }
   });
 };

@@ -2,7 +2,7 @@ import { Icons } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { QuotaDisplay } from '../components/quota_display';
-import { useGetAdminStats, useGetQuota } from '../service';
+import { useGetAdminStats, useGetUsage } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
 
@@ -44,7 +44,7 @@ const StatCard = ({
 export const ResourceAdminPage = () => {
   const { t } = useTranslation();
   const { data: stats } = useGetAdminStats();
-  const { data: quota } = useGetQuota();
+  const { data: usage } = useGetUsage();
 
   return (
     <Page
@@ -122,7 +122,7 @@ export const ResourceAdminPage = () => {
           <h3 className='text-sm font-medium text-slate-700 mb-3'>
             {t('resource.admin.my_quota', 'My Quota')}
           </h3>
-          <QuotaDisplay quota={quota} />
+          <QuotaDisplay quota={usage} />
         </div>
       </div>
     </Page>

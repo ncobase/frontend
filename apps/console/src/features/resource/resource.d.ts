@@ -31,11 +31,52 @@ export interface ResourceFile {
 export type ResourceFileListResponse = PaginationResult<ResourceFile>;
 
 export interface ResourceQuota {
-  user_id: string;
   quota: number;
+}
+
+export interface ResourceUsage {
+  user_id?: string;
   usage: number;
+  quota: number;
   usage_percent: number;
+  quota_exceeded?: boolean;
+  formatted_usage?: string;
+  formatted_quota?: string;
   file_count: number;
+}
+
+export type ResourceAccessLevel = 'public' | 'private' | 'shared';
+
+export interface ResourceUploadOptions {
+  access_level: ResourceAccessLevel;
+  is_public?: boolean;
+  path_prefix?: string;
+  tags?: string[];
+  expires_at?: number;
+  processing_options?: {
+    create_thumbnail?: boolean;
+    resize_image?: boolean;
+    max_width?: number;
+    max_height?: number;
+    compress_image?: boolean;
+    compression_quality?: number;
+    convert_format?: string;
+  };
+}
+
+export interface ResourceUploadSubmission {
+  files: File[];
+  options: ResourceUploadOptions;
+}
+
+export interface ResourceBatchUploadResult {
+  operation_id?: string;
+  total_files: number;
+  success_count: number;
+  failure_count: number;
+  files: ResourceFile[];
+  failed_files?: string[];
+  errors?: string[];
 }
 
 export interface StorageStats {

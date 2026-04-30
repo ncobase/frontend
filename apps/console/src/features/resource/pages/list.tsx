@@ -12,8 +12,15 @@ import { ResourceEditorForm } from '../forms/editor';
 import { UploadForm } from '../forms/upload';
 import { ResourceViewer } from '../forms/viewer';
 import { useResourceList } from '../hooks';
-import { ResourceFile } from '../resource';
-import { useDeleteResource, useUpdateResource, useUploadResource } from '../service';
+import { ResourceBatchUploadResult, ResourceFile, ResourceUploadSubmission } from '../resource';
+import {
+  useBatchUploadResources,
+  useDeleteResource,
+  useGetUsage,
+  useUpdateResource,
+  useUploadResource
+} from '../service';
+import { buildResourceUploadFormData } from '../upload_payload';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
@@ -51,6 +58,9 @@ export const ResourceListPage = () => {
   const updateMutation = useUpdateResource();
   const deleteMutation = useDeleteResource();
   const uploadMutation = useUploadResource();
+  const batchUploadMutation = useBatchUploadResources();
+  const { data: usage } = useGetUsage(uploadModal);
+  const uploading = uploadMutation.isPending || batchUploadMutation.isPending;
 
   const onQuery = handleQuerySubmit(async queryData => {
     const cleanedData = Object.entries(queryData).reduce((acc: any, [key, value]) => {
@@ -140,21 +150,61 @@ export const ResourceListPage = () => {
   }, []);
 
   const handleFileUpload = useCallback(
-    (files: FileList) => {
-      const formData = new FormData();
-      Array.from(files).forEach(file => {
-        formData.append('file', file);
-      });
-      uploadMutation.mutate(formData, {
-        onSuccess: () => {
+    ({ files, options }: ResourceUploadSubmission) => {
+      if (files.length === 0) return;
+
+      if (files.length === 1) {
+        const formData = buildResourceUploadFormData(files, options, 'file');
+        uploadMutation.mutate(formData, {
+          onSuccess: () => {
+            setUploadModal(false);
+            toast.success(t('messages.success'), {
+              description: t('resource.messages.upload_success', 'File uploaded')
+            });
+            refetch();
+          },
+          onError
+        });
+        return;
+      }
+
+      const formData = buildResourceUploadFormData(files, options, 'files');
+      batchUploadMutation.mutate(formData, {
+        onSuccess: (result: ResourceBatchUploadResult) => {
+          const total = result.total_files || files.length;
+          const success = result.success_count ?? result.files?.length ?? 0;
+          const failed = result.failure_count ?? total - success;
+
           setUploadModal(false);
-          onSuccess(t('resource.messages.upload_success', 'File uploaded'));
+          if (failed > 0) {
+            toast.warning(t('messages.warning', 'Warning'), {
+              description: t(
+                'resource.messages.upload_partial',
+                '{{success}}/{{total}} files uploaded. {{failed}} failed.',
+                { success, total, failed }
+              )
+            });
+          } else {
+            toast.success(t('messages.success'), {
+              description: t(
+                'resource.messages.upload_many_success',
+                '{{success}} files uploaded',
+                { success }
+              )
+            });
+          }
+          refetch();
         },
         onError
       });
     },
-    [uploadMutation, onSuccess, onError, t]
+    [batchUploadMutation, onError, refetch, t, toast, uploadMutation]
   );
+
+  const handleCloseUpload = useCallback(() => {
+    if (uploading) return;
+    setUploadModal(false);
+  }, [uploading]);
 
   const handleConfirm = useCallback(
     handleFormSubmit((data: any) => handleUpdate(data)),
@@ -187,11 +237,16 @@ export const ResourceListPage = () => {
 
       <Modal
         isOpen={uploadModal}
-        onCancel={() => setUploadModal(false)}
+        onCancel={handleCloseUpload}
         title={t('resource.upload.title', 'Upload Files')}
-        className='max-w-lg'
+        className='max-w-3xl'
       >
-        <UploadForm onUpload={handleFileUpload} uploading={uploadMutation.isPending} />
+        <UploadForm
+          onUpload={handleFileUpload}
+          onCancel={handleCloseUpload}
+          uploading={uploading}
+          usage={usage}
+        />
       </Modal>
 
       <AlertDialog
