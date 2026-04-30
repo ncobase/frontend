@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { ConfigEnv, loadEnv, UserConfig } from 'vite';
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite';
 
 import pkg from './package.json';
 
@@ -10,15 +10,30 @@ function pathResolve(dir: string) {
 }
 
 const manualChunks = (id: string): string | undefined => {
-  if (!id.includes('node_modules')) {
-    return undefined;
-  }
+  const normalizedId = id.replaceAll('\\', '/');
 
-  if (id.includes('monaco-editor')) return 'vendor_monaco';
-  if (id.includes('echarts')) return 'vendor_echarts';
-  if (id.includes('recharts')) return 'vendor_recharts';
-  if (id.includes('lodash')) return 'vendor_lodash';
-  if (id.includes('@tiptap') || id.includes('prosemirror')) return 'vendor_editor';
+  if (!normalizedId.includes('node_modules')) return undefined;
+
+  if (normalizedId.includes('@tabler/icons-react/dist/esm/icons/')) {
+    return 'vendor_tabler_icons';
+  }
+  if (
+    normalizedId.includes('@tabler/icons-react/dist/esm/createReactComponent') ||
+    normalizedId.includes('@tabler/icons-react/dist/esm/defaultAttributes')
+  ) {
+    return 'vendor_tabler_icons';
+  }
+  if (normalizedId.includes('monaco-editor')) return 'vendor_monaco';
+  if (normalizedId.includes('zrender') || normalizedId.includes('echarts')) return 'vendor_echarts';
+  if (normalizedId.includes('recharts')) return 'vendor_recharts';
+  if (normalizedId.includes('lodash')) return 'vendor_lodash';
+  if (normalizedId.includes('xlsx')) return 'vendor_xlsx';
+  if (normalizedId.includes('react-syntax-highlighter')) return 'vendor_syntax_highlighter';
+  if (normalizedId.includes('highlight.js') || normalizedId.includes('lowlight')) {
+    return 'vendor_highlight';
+  }
+  if (normalizedId.includes('@tiptap')) return 'vendor_tiptap';
+  if (normalizedId.includes('prosemirror')) return 'vendor_prosemirror';
 
   return undefined;
 };
@@ -52,6 +67,7 @@ export default (({ mode }: ConfigEnv): UserConfig => {
       alias: [
         { find: '@', replacement: pathResolve('src') },
         { find: '#', replacement: pathResolve('types') },
+        { find: '@ncobase/charts', replacement: pathResolve('../../packages/charts/src') },
         { find: '@ncobase/react', replacement: pathResolve('src/components/ui') }
       ]
     },
@@ -60,7 +76,6 @@ export default (({ mode }: ConfigEnv): UserConfig => {
       target: 'es2015',
       cssTarget: 'chrome80',
       rollupOptions: {
-        treeshake: false,
         output: {
           compact: true,
           manualChunks,
@@ -77,7 +92,8 @@ export default (({ mode }: ConfigEnv): UserConfig => {
           }
         }
       },
-      reportCompressedSize: false
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: 1200
     },
     optimizeDeps: {
       esbuildOptions: {

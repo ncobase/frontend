@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Modal } from '../modal/modal';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/forms';
-import { TablerIconsNamespace, Icons } from '@/components/ui/icon';
+import { Icons, TablerIconsNamespace } from '@/components/ui/icon';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+const ICON_PREVIEW_LIMIT = 180;
+const allIconNames = Object.keys(TablerIconsNamespace).sort();
 
 type IconPickerProps = {
   opened: boolean;
@@ -50,13 +53,15 @@ export const IconPicker = ({
     onVisible?.(false);
   };
 
+  const filteredIconNames = useMemo(
+    () => allIconNames.filter(key => key.toLowerCase().includes(debouncedSearchTerm.toLowerCase())),
+    [debouncedSearchTerm]
+  );
+
   const renderIcons = (isFilled: boolean) => {
-    return Object.keys(TablerIconsNamespace)
-      .filter(key => {
-        const isIconFilled = key.endsWith('Filled');
-        const matchesSearch = key.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-        return isFilled === isIconFilled && matchesSearch;
-      })
+    return filteredIconNames
+      .filter(key => key.endsWith('Filled') === isFilled)
+      .slice(0, ICON_PREVIEW_LIMIT)
       .map(key => (
         <Button
           key={key}
