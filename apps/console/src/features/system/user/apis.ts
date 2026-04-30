@@ -49,11 +49,11 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Status management
   enableUser: async (id: string): Promise<UserMeshes> => {
-    return request.put(`${endpoint}/${id}/enable`);
+    return request.patch(`${endpoint}/${id}/status`, { status: 0 });
   },
 
   disableUser: async (id: string): Promise<UserMeshes> => {
-    return request.put(`${endpoint}/${id}/disable`);
+    return request.patch(`${endpoint}/${id}/status`, { status: 2 });
   },
 
   updateStatus: async (username: string, status: number): Promise<User> => {
@@ -84,19 +84,19 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Employee management
   getEmployee: async (userId: string): Promise<Employee> => {
-    return request.get(`${endpoint}/${userId}/employee`);
+    return request.get(`/sys/employees/${userId}`);
   },
 
   createEmployee: async (payload: any): Promise<Employee> => {
-    return request.post(`${endpoint}/employees`, payload);
+    return request.post('/sys/employees', payload);
   },
 
   updateEmployee: async (userId: string, payload: any): Promise<Employee> => {
-    return request.put(`${endpoint}/${userId}/employee`, payload);
+    return request.put(`/sys/employees/${userId}`, payload);
   },
 
   deleteEmployee: async (userId: string): Promise<void> => {
-    return request.delete(`${endpoint}/${userId}/employee`);
+    return request.delete(`/sys/employees/${userId}`);
   },
 
   getEmployees: async (params: any): Promise<{ items: Employee[] }> => {
@@ -106,15 +106,15 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
         queryParams.append(key, params[key]);
       }
     }
-    return request.get(`${endpoint}/employees?${queryParams.toString()}`);
+    return request.get(`/sys/employees?${queryParams.toString()}`);
   },
 
   getEmployeesByDepartment: async (department: string): Promise<Employee[]> => {
-    return request.get(`${endpoint}/employees/department/${department}`);
+    return request.get(`/sys/employees/department/${department}`);
   },
 
   getEmployeesByManager: async (managerId: string): Promise<Employee[]> => {
-    return request.get(`${endpoint}/employees/manager/${managerId}`);
+    return request.get(`/sys/employees/manager/${managerId}`);
   },
 
   // API Key management

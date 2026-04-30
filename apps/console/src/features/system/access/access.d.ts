@@ -65,3 +65,18 @@ export interface ActivityListParams {
   sort_by?: string;
   order?: string;
 }
+
+export interface ActivityAnalyticsItem {
+  type?: string;
+  user_id?: string;
+  date?: string;
+  count: number;
+}
+
+export interface ActivityAnalyticsResult {
+  total_activities: number;
+  sample: number;
+  activities_by_type: ActivityAnalyticsItem[];
+  activities_by_user: ActivityAnalyticsItem[];
+  recent_trends: ActivityAnalyticsItem[];
+}

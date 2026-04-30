@@ -18,3 +18,10 @@ export interface DictionaryBody {
   value: string;
   description?: string;
 }
+
+export interface DictionaryUsage {
+  module: string;
+  location: string;
+  count: number;
+  reference_id?: string;
+}

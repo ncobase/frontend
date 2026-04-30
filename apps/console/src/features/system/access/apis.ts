@@ -4,7 +4,8 @@ import {
   ActivityListParams,
   CasbinRule,
   Activity,
-  CreateActivityRequest
+  CreateActivityRequest,
+  ActivityAnalyticsResult
 } from './access.d';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
@@ -69,7 +70,11 @@ const activityExtensions = ({ request, endpoint }: ApiContext) => ({
   },
 
   // Get activity analytics
-  getAnalytics: async (params?: { from_date?: number; to_date?: number; group_by?: string }) => {
+  getAnalytics: async (params?: {
+    from_date?: number;
+    to_date?: number;
+    group_by?: string;
+  }): Promise<ActivityAnalyticsResult> => {
     const searchParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

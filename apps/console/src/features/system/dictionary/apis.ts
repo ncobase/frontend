@@ -1,4 +1,4 @@
-import { Dictionary } from './dictionary.d';
+import { Dictionary, DictionaryUsage } from './dictionary.d';
 
 import { createApi, ApiContext } from '@/lib/api/factory';
 
@@ -19,13 +19,14 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   // Get dictionary usage information
-  getUsage: async (id: string) => {
-    return request.get(`${endpoint}/${id}/usage`);
+  getUsage: async (id: string): Promise<DictionaryUsage[]> => {
+    return request.get(`${endpoint}/${encodeURIComponent(id)}/usage`);
   },
 
   // Get all dictionaries
   getAllDictionaries: async (): Promise<Dictionary[]> => {
-    return request.get(`${endpoint}/all`);
+    const response = await request.get(`${endpoint}`, { params: { limit: 10000 } });
+    return Array.isArray(response) ? response : response?.items || response?.data?.items || [];
   }
 });
 

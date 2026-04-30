@@ -15,7 +15,7 @@ export const ActivityViewer: React.FC = () => {
     type: '',
     from_date: '',
     to_date: '',
-    search: ''
+    q: ''
   });
 
   useEffect(() => {
@@ -52,8 +52,8 @@ export const ActivityViewer: React.FC = () => {
         <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
           <InputField
             placeholder={t('activity.filters.search_placeholder')}
-            value={filters.search}
-            onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
+            value={filters.q}
+            onChange={e => setFilters(prev => ({ ...prev, q: e.target.value }))}
             prependIcon='IconSearch'
           />
 
@@ -80,7 +80,7 @@ export const ActivityViewer: React.FC = () => {
                   type: '',
                   from_date: '',
                   to_date: '',
-                  search: ''
+                  q: ''
                 })
               }
             >

@@ -4,10 +4,11 @@ import { Badge } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { getDictionaryUsage } from '../apis';
+import { DictionaryUsage } from '../dictionary.d';
 
 export const DictionaryUsageTracker: React.FC<{ dictionaryId: string }> = ({ dictionaryId }) => {
   const { t } = useTranslation();
-  const [usage, setUsage] = useState([]);
+  const [usage, setUsage] = useState<DictionaryUsage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

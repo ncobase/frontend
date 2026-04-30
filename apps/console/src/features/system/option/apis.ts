@@ -20,9 +20,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Delete options by prefix
   deleteByPrefix: async (prefix: string) => {
-    return request.delete(`${endpoint}/prefix`, {
-      body: { prefix }
-    });
+    return request.delete(`${endpoint}/prefix?prefix=${encodeURIComponent(prefix)}`);
   },
 
   // Export options as JSON

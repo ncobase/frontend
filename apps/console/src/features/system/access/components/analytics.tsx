@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { Icons, Badge } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
+import { ActivityAnalyticsResult } from '../access.d';
 import { getActivityAnalytics } from '../apis';
 
 export const ActivityAnalytics: React.FC = () => {
   const { t } = useTranslation();
-  const [analytics, setAnalytics] = useState({
+  const [analytics, setAnalytics] = useState<ActivityAnalyticsResult>({
     total_activities: 0,
+    sample: 0,
     activities_by_type: [],
     activities_by_user: [],
     recent_trends: []
