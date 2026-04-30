@@ -1,6 +1,12 @@
 import { Card, Button, Icons } from '@ncobase/react';
 import { useParams, useNavigate } from 'react-router';
 
+import {
+  getMediaDownloadUrl,
+  getMediaMimeType,
+  getMediaPreviewUrl,
+  getMediaSize
+} from '../media_resource';
 import { useQueryMedia } from '../service';
 
 import { ErrorPage } from '@/components/errors';
@@ -58,6 +64,11 @@ export const MediaViewPage = () => {
     );
   };
 
+  const previewUrl = getMediaPreviewUrl(media);
+  const downloadUrl = getMediaDownloadUrl(media);
+  const mimeType = getMediaMimeType(media);
+  const size = getMediaSize(media);
+
   return (
     <Page
       sidebar
@@ -78,7 +89,12 @@ export const MediaViewPage = () => {
               <Icons name='IconEdit' size={16} className='mr-2' />
               Edit
             </Button>,
-            <Button variant='outline' size='sm' onClick={() => window.open(media.url, '_blank')}>
+            <Button
+              variant='outline'
+              size='sm'
+              disabled={!downloadUrl}
+              onClick={() => window.open(downloadUrl, '_blank')}
+            >
               <Icons name='IconDownload' size={16} className='mr-2' />
               Download
             </Button>
@@ -101,28 +117,28 @@ export const MediaViewPage = () => {
         <div className='lg:col-span-2'>
           <Card className='overflow-hidden'>
             <div className='bg-gray-50 p-8 flex items-center justify-center min-h-[400px]'>
-              {media.type === 'image' && media.url ? (
+              {media.type === 'image' && previewUrl ? (
                 <img
-                  src={media.url}
+                  src={previewUrl}
                   alt={media.alt || media.title}
                   className='max-w-full max-h-96 object-contain rounded-lg shadow-sm'
                 />
-              ) : media.type === 'video' && media.url ? (
+              ) : media.type === 'video' && downloadUrl ? (
                 <video
-                  src={media.url}
+                  src={downloadUrl}
                   controls
                   className='max-w-full max-h-96 rounded-lg shadow-sm'
                 >
                   Your browser does not support the video tag.
                 </video>
-              ) : media.type === 'audio' && media.url ? (
+              ) : media.type === 'audio' && downloadUrl ? (
                 <div className='w-full max-w-md'>
                   <div className='text-center mb-4'>
                     <Icons name='IconMusic' size={64} className='mx-auto text-gray-400 mb-2' />
                     <p className='text-sm text-gray-600'>{media.title}</p>
                   </div>
                   <audio controls className='w-full'>
-                    <source src={media.url} type={media.mime_type} />
+                    <source src={downloadUrl} type={mimeType} />
                     Your browser does not support the audio element.
                   </audio>
                 </div>
@@ -134,11 +150,11 @@ export const MediaViewPage = () => {
                     className='mx-auto text-gray-400 mb-4'
                   />
                   <p className='text-gray-600 mb-4'>Preview not available for this file type</p>
-                  {media.url && (
+                  {downloadUrl && (
                     <Button
                       variant='outline'
                       size='sm'
-                      onClick={() => window.open(media.url, '_blank')}
+                      onClick={() => window.open(downloadUrl, '_blank')}
                     >
                       <Icons name='IconExternalLink' size={16} className='mr-2' />
                       Open File
@@ -155,17 +171,17 @@ export const MediaViewPage = () => {
           <Card className='p-6'>
             <h3 className='text-lg font-medium text-gray-900 mb-4'>Information</h3>
             <div className='space-y-4'>
-              {media.size && (
+              {size ? (
                 <div>
                   <label className='text-sm font-medium text-gray-500'>File Size</label>
-                  <p className='mt-1 text-sm text-gray-900'>{(media.size / 1024).toFixed(1)} KB</p>
+                  <p className='mt-1 text-sm text-gray-900'>{(size / 1024).toFixed(1)} KB</p>
                 </div>
-              )}
+              ) : null}
 
-              {media.mime_type && (
+              {mimeType && (
                 <div>
                   <label className='text-sm font-medium text-gray-500'>MIME Type</label>
-                  <p className='mt-1 text-sm text-gray-900'>{media.mime_type}</p>
+                  <p className='mt-1 text-sm text-gray-900'>{mimeType}</p>
                 </div>
               )}
 
@@ -204,20 +220,20 @@ export const MediaViewPage = () => {
                 </div>
               )}
 
-              {media.url && (
+              {downloadUrl && (
                 <div>
                   <label className='text-sm font-medium text-gray-500'>URL</label>
                   <div className='mt-1 flex items-center space-x-2'>
                     <input
                       type='text'
-                      value={media.url}
+                      value={downloadUrl}
                       readOnly
                       className='flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-300 rounded px-2 py-1'
                     />
                     <Button
                       variant='outline'
                       size='sm'
-                      onClick={() => navigator.clipboard.writeText(media.url)}
+                      onClick={() => navigator.clipboard.writeText(downloadUrl)}
                     >
                       <Icons name='IconCopy' size={14} />
                     </Button>

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { Button, Icons, Modal } from '@ncobase/react';
 
 import { MediaGallery } from '../../media/components/gallery';
 import { MediaUpload } from '../../media/components/upload';
-import { TopicMedia } from '../service';
+import { getMediaPreviewUrl } from '../../media/media_resource';
+import { type TopicMedia, useQueryTopicMedia, useSyncTopicMedia } from '../service';
 
 interface TopicMediaManagerProps {
   isOpen: boolean;
@@ -23,45 +24,89 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
 }) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [showMediaUpload, setShowMediaUpload] = useState(false);
+  const { data: persistedMedia = [], isLoading } = useQueryTopicMedia(topicId || '');
+  const syncTopicMediaMutation = useSyncTopicMedia();
+  const sourceMedia = useMemo(
+    () => (topicId ? persistedMedia : existingMedia),
+    [existingMedia, persistedMedia, topicId]
+  );
   const [mediaByType, setMediaByType] = useState<Record<string, any[]>>({
-    featured: existingMedia.filter(m => m.type === 'featured'),
-    gallery: existingMedia.filter(m => m.type === 'gallery'),
-    attachment: existingMedia.filter(m => m.type === 'attachment')
+    featured: sourceMedia.filter(m => m.type === 'featured'),
+    gallery: sourceMedia.filter(m => m.type === 'gallery'),
+    attachment: sourceMedia.filter(m => m.type === 'attachment')
   });
   const [currentType, setCurrentType] = useState<string>('gallery');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setMediaByType({
+      featured: sourceMedia.filter(m => m.type === 'featured'),
+      gallery: sourceMedia.filter(m => m.type === 'gallery'),
+      attachment: sourceMedia.filter(m => m.type === 'attachment')
+    });
+  }, [isOpen, sourceMedia]);
 
   const handleMediaSelect = (media: any, type: string) => {
     setMediaByType(prev => ({
       ...prev,
-      [type]: [
-        ...prev[type],
-        {
-          media,
-          type,
-          topic_id: topicId,
-          media_id: media.id,
-          order: prev[type].length
-        }
-      ]
+      [type]:
+        type === 'featured'
+          ? [
+              {
+                media,
+                type,
+                topic_id: topicId,
+                media_id: media.id,
+                order: 0
+              }
+            ]
+          : prev[type].some(item => item.media_id === media.id || item.media?.id === media.id)
+            ? prev[type]
+            : [
+                ...prev[type],
+                {
+                  media,
+                  type,
+                  topic_id: topicId,
+                  media_id: media.id,
+                  order: prev[type].length
+                }
+              ]
     }));
     setShowMediaGallery(false);
   };
 
-  const handleRemoveMedia = (mediaId: string, type: string) => {
+  const handleRemoveMedia = (mediaId: string | undefined, type: string) => {
+    if (!mediaId) return;
     setMediaByType(prev => ({
       ...prev,
-      [type]: prev[type].filter(item => item.media?.id !== mediaId)
+      [type]: prev[type].filter(item => item.media_id !== mediaId && item.media?.id !== mediaId)
     }));
   };
 
-  const handleSave = () => {
-    const allMedia = Object.values(mediaByType).flat();
-    onSave?.(allMedia);
+  const handleSave = async () => {
+    const allMedia = Object.values(mediaByType)
+      .flat()
+      .map((item, index) => ({ ...item, order: item.order ?? index }));
+    const savedMedia = topicId
+      ? await syncTopicMediaMutation.mutateAsync({ topicId, media: allMedia })
+      : allMedia;
+    onSave?.(savedMedia);
     onClose();
   };
 
+  const handleUploadSuccess = (media: any) => {
+    const items = Array.isArray(media) ? media : [media];
+    items.filter(Boolean).forEach(item => handleMediaSelect(item, currentType));
+  };
+
+  const selectedMedia = Object.values(mediaByType)
+    .flat()
+    .map(item => item.media)
+    .filter(Boolean);
+
   const renderMediaSection = (type: string, title: string, maxItems?: number) => {
-    const mediaList = mediaByType[type];
+    const mediaList = mediaByType[type] || [];
     const canAddMore = !maxItems || mediaList.length < maxItems;
 
     return (
@@ -103,9 +148,9 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
                 <div
                   className={`bg-gray-100 rounded-lg overflow-hidden ${type === 'featured' ? 'aspect-video' : 'aspect-square'}`}
                 >
-                  {item.media?.type === 'image' && item.media?.url ? (
+                  {item.media?.type === 'image' && getMediaPreviewUrl(item.media) ? (
                     <img
-                      src={item.media.url}
+                      src={getMediaPreviewUrl(item.media)}
                       alt={item.media.title}
                       className='w-full h-full object-cover'
                     />
@@ -126,7 +171,7 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
                   )}
                 </div>
                 <button
-                  onClick={() => handleRemoveMedia(item.media?.id, type)}
+                  onClick={() => handleRemoveMedia(item.media_id || item.media?.id, type)}
                   className='absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center'
                 >
                   <Icons name='IconX' size={12} />
@@ -168,8 +213,16 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
       >
         <div className='space-y-8'>
           {renderMediaSection('featured', 'Featured Image', 1)}
-          {renderMediaSection('gallery', 'Gallery Images')}
-          {renderMediaSection('attachment', 'Attachments')}
+          {isLoading ? (
+            <div className='flex items-center justify-center h-24'>
+              <Icons name='IconLoader2' className='animate-spin' size={24} />
+            </div>
+          ) : (
+            <>
+              {renderMediaSection('gallery', 'Gallery Images')}
+              {renderMediaSection('attachment', 'Attachments')}
+            </>
+          )}
         </div>
       </Modal>
 
@@ -177,13 +230,14 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
         isOpen={showMediaGallery}
         onClose={() => setShowMediaGallery(false)}
         onSelect={media => handleMediaSelect(media, currentType)}
+        selectedMedia={selectedMedia}
         multiSelect={currentType !== 'featured'}
       />
 
       <MediaUpload
         isOpen={showMediaUpload}
         onClose={() => setShowMediaUpload(false)}
-        onSuccess={media => handleMediaSelect(media, currentType)}
+        onSuccess={handleUploadSuccess}
       />
     </>
   );

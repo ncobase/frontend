@@ -9,7 +9,13 @@ import { BulkActions } from '../../components/BulkActions';
 import { ContentSearch } from '../../components/ContentSearch';
 import { useContentOperations } from '../../hooks/useContentOperations';
 import { MediaUpload } from '../components/upload';
-import { Media } from '../media';
+import type { Media } from '../media';
+import {
+  getMediaDownloadUrl,
+  getMediaMimeType,
+  getMediaPreviewUrl,
+  getMediaSize
+} from '../media_resource';
 import { useListMedia } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
@@ -96,35 +102,38 @@ export const MediaListPage = () => {
     {
       title: t('media.fields.title'),
       dataIndex: 'title',
-      parser: (_: any, media: Media) => (
-        <div className='flex items-center space-x-3'>
-          <div className='w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden'>
-            {media.type === 'image' && media.url ? (
-              <img
-                src={media.url}
-                alt={media.alt || media.title}
-                className='w-full h-full object-cover'
-              />
-            ) : (
-              <Icons
-                name={
-                  media.type === 'video'
-                    ? 'IconMovie'
-                    : media.type === 'audio'
-                      ? 'IconMusic'
-                      : 'IconFile'
-                }
-                size={20}
-                className='text-gray-400'
-              />
-            )}
+      parser: (_: any, media: Media) => {
+        const previewUrl = getMediaPreviewUrl(media);
+        return (
+          <div className='flex items-center space-x-3'>
+            <div className='w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden'>
+              {media.type === 'image' && previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt={media.alt || media.title}
+                  className='w-full h-full object-cover'
+                />
+              ) : (
+                <Icons
+                  name={
+                    media.type === 'video'
+                      ? 'IconMovie'
+                      : media.type === 'audio'
+                        ? 'IconMusic'
+                        : 'IconFile'
+                  }
+                  size={20}
+                  className='text-gray-400'
+                />
+              )}
+            </div>
+            <div>
+              <div className='font-medium text-gray-900'>{media.title}</div>
+              <div className='text-sm text-gray-500'>{getMediaMimeType(media)}</div>
+            </div>
           </div>
-          <div>
-            <div className='font-medium text-gray-900'>{media.title}</div>
-            <div className='text-sm text-gray-500'>{media.mime_type}</div>
-          </div>
-        </div>
-      )
+        );
+      }
     },
     {
       title: t('media.fields.type'),
@@ -136,11 +145,14 @@ export const MediaListPage = () => {
       title: t('media.fields.size'),
       dataIndex: 'size',
       width: 100,
-      parser: (size: number) => (
-        <span className='text-sm text-gray-600'>
-          {size ? `${(size / 1024).toFixed(1)} KB` : '-'}
-        </span>
-      )
+      parser: (_size: number, media: Media) => {
+        const size = getMediaSize(media);
+        return (
+          <span className='text-sm text-gray-600'>
+            {size ? `${(size / 1024).toFixed(1)} KB` : '-'}
+          </span>
+        );
+      }
     },
     {
       title: t('media.fields.dimensions'),
@@ -177,8 +189,12 @@ export const MediaListPage = () => {
             <Icons name='IconEdit' size={14} className='mr-1' />
             {t('actions.edit')}
           </Button>
-          {media.url && (
-            <Button variant='text' size='xs' onClick={() => window.open(media.url, '_blank')}>
+          {getMediaDownloadUrl(media) && (
+            <Button
+              variant='text'
+              size='xs'
+              onClick={() => window.open(getMediaDownloadUrl(media), '_blank')}
+            >
               <Icons name='IconDownload' size={14} className='mr-1' />
               {t('actions.download')}
             </Button>
@@ -191,13 +207,16 @@ export const MediaListPage = () => {
   // Grid item renderer
   const renderMediaCard = (media: Media) => {
     const isSelectedItem = isSelected(media);
+    const previewUrl = getMediaPreviewUrl(media);
+    const downloadUrl = getMediaDownloadUrl(media);
+    const size = getMediaSize(media);
 
     return (
       <Card key={media.id} className='relative group overflow-hidden'>
         <div className='aspect-[4/3] bg-gray-100 flex items-center justify-center'>
-          {media.type === 'image' && media.url ? (
+          {media.type === 'image' && previewUrl ? (
             <img
-              src={media.url}
+              src={previewUrl}
               alt={media.alt || media.title}
               className='w-full h-full object-cover'
             />
@@ -246,11 +265,11 @@ export const MediaListPage = () => {
             >
               <Icons name='IconEdit' size={16} />
             </Button>
-            {media.url && (
+            {downloadUrl && (
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => window.open(media.url, '_blank')}
+                onClick={() => window.open(downloadUrl, '_blank')}
                 className='bg-white text-gray-700 hover:bg-gray-100'
               >
                 <Icons name='IconDownload' size={16} />
@@ -263,8 +282,8 @@ export const MediaListPage = () => {
         <div className='px-2 py-4 space-y-2'>
           <h3 className='font-medium text-xs truncate'>{media.title}</h3>
           <div className='flex items-center justify-between text-xs text-gray-500 mt-0.5'>
-            <span className='truncate max-w-[60%]'>{media.mime_type}</span>
-            {media.size && <span>{(media.size / 1024).toFixed(1)} KB</span>}
+            <span className='truncate max-w-[60%]'>{getMediaMimeType(media)}</span>
+            {size ? <span>{(size / 1024).toFixed(1)} KB</span> : null}
           </div>
         </div>
       </Card>

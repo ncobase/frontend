@@ -1,18 +1,26 @@
 import { AnyObject } from '@ncobase/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { createTopic, deleteTopic, getTopic, getTopics, updateTopic } from './apis';
-import { QueryFormParams, Topic } from './topic';
+import {
+  createTopic,
+  createTopicMedia,
+  deleteTopic,
+  deleteTopicMedia,
+  getTopic,
+  getTopicMediaByTopic,
+  getTopics,
+  updateTopic,
+  updateTopicMedia
+} from './apis';
+import type { QueryFormParams, Topic } from './topic';
+import type { TopicMedia } from './topic_media';
+import {
+  normalizeTopicMedia,
+  reconcileTopicMediaChanges,
+  topicMediaItems
+} from './topic_media_helpers';
 
-// Topic media related types
-export interface TopicMedia {
-  id?: string;
-  topic_id?: string;
-  media_id?: string;
-  type?: 'featured' | 'gallery' | 'attachment';
-  order?: number;
-  media?: any;
-}
+export { reconcileTopicMediaChanges } from './topic_media_helpers';
 
 interface TopicKeys {
   create: ['topicService', 'create'];
@@ -30,6 +38,27 @@ export const topicKeys: TopicKeys = {
   update: ['topicService', 'update'],
   list: (queryParams = {}) => ['topicService', 'topics', queryParams],
   media: ({ topicId } = {}) => ['topicService', 'topicMedia', { topicId }]
+};
+
+export const syncTopicMedia = async (topicId: string, media: TopicMedia[]) => {
+  const desired = normalizeTopicMedia(topicId, media);
+  const current = topicMediaItems(await getTopicMediaByTopic(topicId, { limit: 100 }));
+  const changes = reconcileTopicMediaChanges(current, desired);
+
+  await Promise.all(
+    changes.remove.map(item => (item.id ? deleteTopicMedia(item.id) : Promise.resolve()))
+  );
+
+  await Promise.all(
+    changes.update.map(item => {
+      const existing = current.find(currentItem => currentItem.media_id === item.media_id);
+      return existing?.id ? updateTopicMedia({ ...existing, ...item, id: existing.id }) : item;
+    })
+  );
+
+  await Promise.all(changes.create.map(item => createTopicMedia(item as Omit<TopicMedia, 'id'>)));
+
+  return topicMediaItems(await getTopicMediaByTopic(topicId, { limit: 100 }));
 };
 
 // Query a specific topic by ID or Slug
@@ -54,11 +83,7 @@ export const useListTopics = (queryParams: QueryFormParams) => {
 export const useQueryTopicMedia = (topicId: string) =>
   useQuery({
     queryKey: topicKeys.media({ topicId }),
-    queryFn: async () => {
-      // This would call the topic-media API endpoint
-      // For now, return empty array as placeholder
-      return [];
-    },
+    queryFn: async () => topicMediaItems(await getTopicMediaByTopic(topicId, { limit: 100 })),
     enabled: !!topicId
   });
 
@@ -73,11 +98,8 @@ export const useCreateTopic = () => {
       // Create topic first
       const topic = await createTopic(topicData);
 
-      // If media provided, associate them with the topic
-      if (media && media.length > 0) {
-        // This would call the topic-media API to create associations
-        // For now, we'll just log it
-        console.log('Associating media with topic:', media);
+      if (media && media.length > 0 && topic.id) {
+        await syncTopicMedia(topic.id, media);
       }
 
       return topic;
@@ -104,10 +126,8 @@ export const useUpdateTopic = () => {
       // Update topic first
       const topic = await updateTopic(topicData);
 
-      // If media provided, update associations
-      if (media && media.length > 0) {
-        // This would call the topic-media API to update associations
-        console.log('Updating media associations for topic:', media);
+      if (media && topic.id) {
+        await syncTopicMedia(topic.id, media);
       }
 
       return topic;
@@ -159,11 +179,7 @@ export const useCreateTopicMedia = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: TopicMedia) => {
-      // This would call the topic-media API
-      // For now, return the payload as mock response
-      return { id: Date.now().toString(), ...payload };
-    },
+    mutationFn: (payload: TopicMedia) => createTopicMedia(payload as Omit<TopicMedia, 'id'>),
     onSuccess: (_, variables) => {
       if (variables.topic_id) {
         queryClient.invalidateQueries({
@@ -179,7 +195,7 @@ export const useDeleteTopicMedia = () => {
 
   return useMutation({
     mutationFn: async (payload: { id: string; topicId: string }) => {
-      // This would call the topic-media delete API
+      await deleteTopicMedia(payload.id);
       return payload;
     },
     onSuccess: (_, variables) => {
@@ -189,3 +205,19 @@ export const useDeleteTopicMedia = () => {
     }
   });
 };
+
+export const useSyncTopicMedia = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ topicId, media }: { topicId: string; media: TopicMedia[] }) =>
+      syncTopicMedia(topicId, media),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: topicKeys.media({ topicId: variables.topicId })
+      });
+    }
+  });
+};
+
+export type { TopicMedia };

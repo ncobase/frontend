@@ -25,6 +25,7 @@ export interface Media {
   alt?: string;
   metadata?: Record<string, any>;
   space_id?: string;
+  owner_id?: string;
   created_by?: string;
   created_at?: string;
   updated_by?: string;

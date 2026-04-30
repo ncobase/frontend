@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 import { Button, Icons, Modal } from '@ncobase/react';
 
-import { Media } from '../media';
+import type { Media } from '../media';
+import { getMediaPreviewUrl, getMediaSize } from '../media_resource';
 import { useListMedia } from '../service';
 
 interface MediaGalleryProps {
@@ -49,6 +50,8 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
 
   const renderMediaItem = (media: Media) => {
     const isSelectedItem = isSelected(media);
+    const previewUrl = getMediaPreviewUrl(media);
+    const size = getMediaSize(media);
 
     return (
       <div
@@ -61,9 +64,9 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
         onClick={() => handleSelect(media)}
       >
         <div className='aspect-square bg-gray-100 flex items-center justify-center'>
-          {media.type === 'image' && media.url ? (
+          {media.type === 'image' && previewUrl ? (
             <img
-              src={media.url}
+              src={previewUrl}
               alt={media.alt || media.title}
               className='w-full h-full object-cover'
             />
@@ -95,9 +98,7 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({
         {/* Media info */}
         <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2'>
           <p className='text-white text-xs font-medium truncate'>{media.title}</p>
-          <p className='text-gray-300 text-xs'>
-            {media.size && `${(media.size / 1024).toFixed(1)} KB`}
-          </p>
+          <p className='text-gray-300 text-xs'>{size ? `${(size / 1024).toFixed(1)} KB` : ''}</p>
         </div>
       </div>
     );

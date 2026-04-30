@@ -3,88 +3,24 @@ import React from 'react';
 import { Modal } from '@ncobase/react';
 import { UploaderField } from '@ncobase/react';
 
-import { useCreateMedia } from '../service';
+import type { Media } from '../media';
+import { useMediaResourceUpload } from '../media_resource';
 
 interface MediaUploadProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (_media: any) => void;
+  onSuccess?: (_media: Media | Media[]) => void;
   accept?: Record<string, string[]>;
   maxSize?: number;
 }
 
 // Upload hook for media files
 const useMediaUpload = () => {
-  const createMediaMutation = useCreateMedia();
-
-  const uploadFile = async (file: File) => {
-    // Use resource plugin API for file upload
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('name', file.name);
-    formData.append('type', file.type);
-    formData.append('owner_id', 'media'); // For media objects
-    formData.append('space_id', 'current'); // Should come from context
-
-    try {
-      // Call resource API
-      const response = await fetch('/api/res', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      const result = await response.json();
-
-      // Create media record
-      const mediaData = {
-        title: file.name,
-        type: file.type.startsWith('image/')
-          ? 'image'
-          : file.type.startsWith('video/')
-            ? 'video'
-            : file.type.startsWith('audio/')
-              ? 'audio'
-              : 'file',
-        url: result.download_url,
-        path: result.path,
-        mime_type: file.type,
-        size: file.size,
-        description: `Uploaded file: ${file.name}`
-      };
-
-      await createMediaMutation.mutateAsync(
-        mediaData as {
-          type: 'image' | 'video' | 'audio' | 'file';
-          title: string;
-          url: string;
-          path: string;
-          mime_type: string;
-          size: number;
-          description: string;
-        }
-      );
-
-      return { ...result, ...mediaData };
-    } catch (error) {
-      console.error('Upload error:', error);
-      throw error;
-    }
-  };
-
-  return {
-    uploadFile,
-    uploading: createMediaMutation.isPending,
-    progress: 0, // Can be enhanced with actual progress
-    error: null,
-    result: null
-  };
+  return useMediaResourceUpload({
+    source: 'media',
+    pathPrefix: 'content/media',
+    tags: ['library']
+  });
 };
 
 export const MediaUpload: React.FC<MediaUploadProps> = ({
@@ -112,7 +48,10 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
           returnType='result'
           useUploadHook={useMediaUpload}
           onUploadSuccess={result => {
-            onSuccess?.(result);
+            const mediaResult = Array.isArray(result)
+              ? result.map(item => item.media || item)
+              : result?.media || result;
+            onSuccess?.(mediaResult);
             onClose();
           }}
           placeholderText={{

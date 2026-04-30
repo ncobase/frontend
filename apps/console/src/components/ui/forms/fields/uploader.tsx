@@ -39,58 +39,35 @@ export const UploaderField = React.forwardRef<HTMLDivElement, UploaderFieldProps
     const currentValue = value ?? defaultValue;
 
     const handleValueChange = useCallback(
-      async (newValue: File | File[] | null) => {
-        // If not uploading automatically, just pass the file(s) through
+      (newValue: File | File[] | null) => {
         if (!uploadOnChange || !uploadHook || !newValue) {
-          onChange?.(newValue);
-          return;
-        }
-
-        try {
-          const filesToUpload = Array.isArray(newValue)
-            ? newValue.filter((item): item is File => item instanceof File)
-            : newValue instanceof File
-              ? [newValue]
-              : [];
-
-          if (filesToUpload.length === 0) {
-            onChange?.(newValue);
-            return;
-          }
-
-          // Upload files
-          const results = await Promise.all(filesToUpload.map(file => uploadHook.uploadFile(file)));
-
-          onUploadSuccess?.(Array.isArray(newValue) ? results : results[0]);
-
-          // Return appropriate value based on returnType
-          switch (returnType) {
-            case 'url':
-              if (Array.isArray(newValue)) {
-                const urls = results.map(
-                  result => result.download_url || result.path || result.url
-                );
-                onChange?.(urls);
-              } else {
-                const url = results[0]?.download_url || results[0]?.path || results[0]?.url;
-                onChange?.(url);
-              }
-              break;
-            case 'result':
-              onChange?.(Array.isArray(newValue) ? results : results[0]);
-              break;
-            default:
-              // 'file' - keep original files
-              onChange?.(newValue);
-          }
-        } catch (error) {
-          console.error('Upload failed in UploaderField:', error);
-          onUploadError?.(error);
-          // Still pass through the files even if upload failed
           onChange?.(newValue);
         }
       },
-      [onChange, uploadOnChange, uploadHook, returnType, onUploadSuccess, onUploadError]
+      [onChange, uploadOnChange, uploadHook]
+    );
+
+    const handleUploadComplete = useCallback(
+      (result: any | any[], files: File[]) => {
+        onUploadSuccess?.(result);
+        const results = Array.isArray(result) ? result : [result];
+
+        switch (returnType) {
+          case 'url':
+            onChange?.(
+              Array.isArray(result)
+                ? results.map(item => item.download_url || item.path || item.url)
+                : results[0]?.download_url || results[0]?.path || results[0]?.url
+            );
+            break;
+          case 'result':
+            onChange?.(result);
+            break;
+          default:
+            onChange?.(Array.isArray(result) ? files : files[0]);
+        }
+      },
+      [onChange, onUploadSuccess, returnType]
     );
 
     // Upload function for auto-upload
@@ -111,7 +88,7 @@ export const UploaderField = React.forwardRef<HTMLDivElement, UploaderFieldProps
           onValueChange={handleValueChange}
           autoUpload={uploadOnChange}
           uploadFunction={uploadOnChange ? uploadFunction : undefined}
-          onUploadSuccess={onUploadSuccess}
+          onUploadComplete={handleUploadComplete}
           onUploadError={onUploadError}
           {...rest}
         />

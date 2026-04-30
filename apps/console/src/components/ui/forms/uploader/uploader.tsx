@@ -205,6 +205,7 @@ export interface UploaderProps extends FileUploaderProps {
   onUploadStart?: (_file: File) => void;
   onUploadProgress?: (_progress: number, _file: File) => void;
   onUploadSuccess?: (_result: any, _file: File) => void;
+  onUploadComplete?: (_result: any | any[], _files: File[]) => void;
   onUploadError?: (_error: Error, _file: File) => void;
 }
 
@@ -229,6 +230,7 @@ export const Uploader: React.FC<UploaderProps> = ({
   onUploadStart,
   onUploadProgress,
   onUploadSuccess,
+  onUploadComplete,
   onUploadError,
   ...props
 }) => {
@@ -293,7 +295,7 @@ export const Uploader: React.FC<UploaderProps> = ({
 
   const handleUpload = useCallback(
     async (file: File) => {
-      if (!uploadFunction) return;
+      if (!uploadFunction) return undefined;
 
       // Validate file
       const validationError = validateFileBeforeUpload(file);
@@ -306,8 +308,10 @@ export const Uploader: React.FC<UploaderProps> = ({
           fileName: file.name
         });
         onUploadError?.(new Error(validationError), file);
-        return;
+        throw new Error(validationError);
       }
+
+      let progressInterval: ReturnType<typeof setInterval> | undefined;
 
       try {
         setUploadState({
@@ -321,7 +325,7 @@ export const Uploader: React.FC<UploaderProps> = ({
         onUploadStart?.(file);
 
         // Simple progress simulation
-        const progressInterval = setInterval(() => {
+        progressInterval = setInterval(() => {
           setUploadState(prev => {
             if (prev.status !== 'uploading') return prev;
             const newProgress = Math.min(prev.progress + Math.random() * 20, 90);
@@ -332,8 +336,6 @@ export const Uploader: React.FC<UploaderProps> = ({
 
         const result = await uploadFunction(file);
 
-        clearInterval(progressInterval);
-
         setUploadState({
           status: 'success',
           progress: 100,
@@ -343,6 +345,7 @@ export const Uploader: React.FC<UploaderProps> = ({
         });
 
         onUploadSuccess?.(result, file);
+        return result;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Upload failed';
         setUploadState({
@@ -353,6 +356,11 @@ export const Uploader: React.FC<UploaderProps> = ({
           fileName: file.name
         });
         onUploadError?.(error instanceof Error ? error : new Error('Upload failed'), file);
+        throw error;
+      } finally {
+        if (progressInterval) {
+          clearInterval(progressInterval);
+        }
       }
     },
     [
@@ -370,18 +378,23 @@ export const Uploader: React.FC<UploaderProps> = ({
       onValueChange?.(newValue);
 
       if (autoUpload && uploadFunction && newValue) {
-        const fileToUpload = Array.isArray(newValue)
-          ? newValue.find((item): item is File => item instanceof File)
+        const filesToUpload = Array.isArray(newValue)
+          ? newValue.filter((item): item is File => item instanceof File)
           : newValue instanceof File
-            ? newValue
-            : null;
+            ? [newValue]
+            : [];
 
-        if (fileToUpload) {
-          await handleUpload(fileToUpload);
+        if (filesToUpload.length > 0) {
+          try {
+            const results = await Promise.all(filesToUpload.map(file => handleUpload(file)));
+            onUploadComplete?.(Array.isArray(newValue) ? results : results[0], filesToUpload);
+          } catch {
+            // Per-file upload state and onUploadError have already been reported.
+          }
         }
       }
     },
-    [onValueChange, autoUpload, uploadFunction, handleUpload]
+    [onValueChange, autoUpload, uploadFunction, handleUpload, onUploadComplete]
   );
 
   const renderFileItems = useCallback(() => {

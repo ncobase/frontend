@@ -1,7 +1,11 @@
 import { useState, useCallback } from 'react';
 
 import { useToastMessage } from '@ncobase/react';
+import { locals } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
+
+import { ACCESS_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
+import { BearerKey, XMdSpaceKey } from '@/lib/constants';
 
 // Upload configuration type
 export interface UploadConfig {
@@ -205,7 +209,7 @@ export const useUpload = (config?: UploadConfig) => {
     }
 
     if (uploadConfig.folderPath) {
-      formData.append('folder_path', uploadConfig.folderPath);
+      formData.append('path_prefix', uploadConfig.folderPath);
     }
 
     if (uploadConfig.accessLevel) {
@@ -269,7 +273,16 @@ export const useUpload = (config?: UploadConfig) => {
           xhr.addEventListener('load', () => {
             if (xhr.status >= 200 && xhr.status < 300) {
               try {
-                const result = JSON.parse(xhr.responseText) as UploadResult;
+                const result = JSON.parse(xhr.responseText) as UploadResult & {
+                  download_url?: string;
+                  thumbnail_url?: string;
+                };
+                if (result.download_url && !result.downloadUrl) {
+                  result.downloadUrl = result.download_url;
+                }
+                if (result.thumbnail_url && !result.thumbnailUrl) {
+                  result.thumbnailUrl = result.thumbnail_url;
+                }
                 setState(prev => ({
                   ...prev,
                   uploading: false,
@@ -327,6 +340,15 @@ export const useUpload = (config?: UploadConfig) => {
 
           // Open request
           xhr.open('POST', finalConfig.endpoint || '/api/res');
+
+          const token = locals.get(ACCESS_TOKEN_KEY);
+          const space = finalConfig.spaceId || locals.get(TENANT_KEY);
+          if (token) {
+            xhr.setRequestHeader('Authorization', `${BearerKey}${token}`);
+          }
+          if (space) {
+            xhr.setRequestHeader(XMdSpaceKey, space);
+          }
 
           // Set timeout (30 seconds)
           xhr.timeout = 30000;

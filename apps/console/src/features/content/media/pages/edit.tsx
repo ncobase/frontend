@@ -5,6 +5,7 @@ import { useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router';
 
+import { getMediaMimeType, getMediaPreviewUrl, getMediaSize } from '../media_resource';
 import { useQueryMedia, useUpdateMedia } from '../service';
 
 import { ErrorPage } from '@/components/errors';
@@ -97,6 +98,9 @@ export const MediaEditPage = () => {
       placeholder: 'Enter alt text for accessibility'
     }
   ];
+  const previewUrl = getMediaPreviewUrl(media);
+  const mimeType = getMediaMimeType(media);
+  const size = getMediaSize(media);
 
   return (
     <Page
@@ -154,9 +158,9 @@ export const MediaEditPage = () => {
           <Card className='p-6 rounded-xl shadow-sm border border-gray-100'>
             <h3 className='text-lg font-semibold text-gray-900 mb-4'>Preview</h3>
             <div className='bg-gray-50 rounded-lg p-4 text-center'>
-              {media.type === 'image' && media.url ? (
+              {media.type === 'image' && previewUrl ? (
                 <img
-                  src={media.url}
+                  src={previewUrl}
                   alt={media.alt || media.title}
                   className='w-full max-h-48 object-contain rounded'
                 />
@@ -182,12 +186,12 @@ export const MediaEditPage = () => {
               <div className='flex justify-between'>
                 <span className='text-gray-500'>Size:</span>
                 <span className='text-gray-900'>
-                  {media.size ? `${(media.size / 1024).toFixed(1)} KB` : 'Unknown'}
+                  {size ? `${(size / 1024).toFixed(1)} KB` : 'Unknown'}
                 </span>
               </div>
               <div className='flex justify-between'>
                 <span className='text-gray-500'>Type:</span>
-                <span className='text-gray-900'>{media.mime_type}</span>
+                <span className='text-gray-900'>{mimeType}</span>
               </div>
               {media.width && media.height && (
                 <div className='flex justify-between'>
