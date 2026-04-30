@@ -1,27 +1,32 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { Button, Modal } from '@ncobase/react';
+import { Button, Modal, useToastMessage } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { useAuthContext } from '@/features/account/context';
+import { refreshAccessToken } from '@/features/account/token_service';
 import type { Space } from '@/features/space/space';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
 interface SpaceOptionProps extends Space {
   isSelected: boolean;
+  isSwitching?: boolean;
   onSelect: (_id: string) => void;
 }
 
 const SpaceOption = React.memo(
-  ({ id, logo, name, slug, isSelected, onSelect }: SpaceOptionProps) => {
+  ({ id, logo, name, slug, isSelected, isSwitching, onSelect }: SpaceOptionProps) => {
     return (
       <Button
         variant='unstyle'
         className={cn(
           'px-3 py-6 bg-transparent hover:bg-slate-50 rounded-md w-full',
-          isSelected && 'bg-slate-50 disabled hidden'
+          isSelected && 'bg-slate-50 disabled hidden',
+          isSwitching && 'opacity-60 pointer-events-none'
         )}
+        disabled={isSelected || isSwitching}
         onClick={() => onSelect(id)}
       >
         <div className='flex'>
@@ -52,23 +57,55 @@ export const SpaceSwitcher = ({
   onVisible?: (_visible: boolean) => void;
 }) => {
   const { t } = useTranslation();
-  const { isAuthenticated, spaceId, switchSpace } = useAuthContext();
+  const toast = useToastMessage();
+  const queryClient = useQueryClient();
+  const { isAuthenticated, spaceId, switchSpace, updateTokens } = useAuthContext();
   const redirect = useRedirectFromUrl();
+  const [switchingSpaceId, setSwitchingSpaceId] = useState<string>();
 
   const hasSpace = !!spaceId;
 
   const onSelect = useCallback(
-    (id: string) => {
-      if (!id || !spaceId) return;
-      if (id !== spaceId) {
-        switchSpace(id);
-        redirect();
+    async (id: string) => {
+      if (!id || id === spaceId) {
+        onVisible?.(false);
+        return;
       }
-      if (onVisible) {
-        onVisible(false);
+
+      const previousSpaceId = spaceId;
+      setSwitchingSpaceId(id);
+
+      try {
+        switchSpace(id);
+
+        const tokens = await refreshAccessToken();
+        updateTokens(tokens.access_token, tokens.refresh_token);
+
+        await queryClient.invalidateQueries();
+        await queryClient.refetchQueries({ queryKey: ['accountService'], type: 'active' });
+        await queryClient.refetchQueries({
+          queryKey: ['menuService', 'navigation'],
+          type: 'active'
+        });
+
+        redirect();
+        onVisible?.(false);
+        toast.success(t('space_switcher.switch_success', 'Space switched'));
+      } catch (error) {
+        switchSpace(previousSpaceId || '');
+
+        console.error('Failed to switch space:', error);
+        toast.error(t('space_switcher.switch_error', 'Failed to switch space'), {
+          description: t(
+            'space_switcher.switch_error_description',
+            'Your session could not be refreshed for the selected space.'
+          )
+        });
+      } finally {
+        setSwitchingSpaceId(undefined);
       }
     },
-    [spaceId, redirect, onVisible, switchSpace]
+    [spaceId, switchSpace, updateTokens, queryClient, redirect, onVisible, toast, t]
   );
 
   useEffect(() => {
@@ -103,6 +140,7 @@ export const SpaceSwitcher = ({
             key={space.id}
             {...space}
             isSelected={space.id === spaceId}
+            isSwitching={switchingSpaceId === space.id}
             onSelect={onSelect}
           />
         ))}

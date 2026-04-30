@@ -11,7 +11,7 @@ import { isBrowser, locals } from '@ncobase/utils';
 import { jwtDecode } from 'jwt-decode';
 
 import { accountApi } from './apis';
-import { TokenPayload } from './token_service';
+import type { TokenPayload } from './token_service';
 
 export const ACCESS_TOKEN_KEY = 'app.access.token';
 export const REFRESH_TOKEN_KEY = 'app.refresh.token';
@@ -145,7 +145,11 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
       setSpaceId(newSpaceId);
       if (isBrowser) {
-        locals.set(TENANT_KEY, newSpaceId);
+        if (newSpaceId) {
+          locals.set(TENANT_KEY, newSpaceId);
+        } else {
+          locals.remove(TENANT_KEY);
+        }
       }
     },
     [spaceId]

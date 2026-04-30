@@ -31,41 +31,33 @@ const HeaderComponent = ({
   const { data: menuTreeData, isLoading, error } = useQueryNavigationMenus();
   const toast = useToastMessage();
   const [pushEnabled, setPushEnabled] = useState(true);
-  const [isMenusSet, setIsMenusSet] = useState(false);
 
   const { filterMenuTree, canAccessMenu } = useMenuPermissions();
 
   useEffect(() => {
-    if (menuTreeData && typeof menuTreeData === 'object' && !isMenusSet) {
-      try {
-        const filteredGroups = {
-          headers: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.headers || [])),
-          sidebars: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.sidebars || [])),
-          accounts: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.accounts || [])),
-          spaces: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.spaces || []))
-        };
+    if (!menuTreeData || typeof menuTreeData !== 'object') return;
 
-        setNavigationMenus(filteredGroups);
-        setIsMenusSet(true);
-      } catch (filterError) {
-        console.error('Error applying menu permissions:', filterError);
-        toast.error(t('menu.permission_filter_error', 'Failed to apply menu permissions'));
-        setIsMenusSet(true);
-      }
-    }
+    try {
+      const filteredGroups = {
+        headers: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.headers || [])),
+        sidebars: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.sidebars || [])),
+        accounts: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.accounts || [])),
+        spaces: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.spaces || []))
+      };
 
-    if (error && !isMenusSet) {
-      console.error('Failed to load menu data:', error);
-      toast.error(t('menu.load_error', 'Failed to load navigation menu'));
-      setIsMenusSet(true);
+      setNavigationMenus(filteredGroups);
+    } catch (filterError) {
+      console.error('Error applying menu permissions:', filterError);
+      toast.error(t('menu.permission_filter_error', 'Failed to apply menu permissions'));
     }
-  }, [menuTreeData, error, setNavigationMenus, toast, t, isMenusSet, filterMenuTree]);
+  }, [menuTreeData, setNavigationMenus, toast, t, filterMenuTree]);
 
   useEffect(() => {
-    if (!menuTreeData && !isLoading) {
-      setIsMenusSet(false);
-    }
-  }, [menuTreeData, isLoading]);
+    if (!error || isLoading) return;
+
+    console.error('Failed to load menu data:', error);
+    toast.error(t('menu.load_error', 'Failed to load navigation menu'));
+  }, [error, isLoading, toast, t]);
 
   const headerMenus = useMemo(() => {
     if (!navigationMenus.headers) return [];
