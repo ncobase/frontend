@@ -20,21 +20,13 @@ export const CreateOrgForms = ({ onSubmit, control, errors }) => {
       title: 'Leader',
       name: 'leader',
       defaultValue: {},
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      type: 'text'
     },
     {
       title: '上级组织',
       name: 'parent',
       defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      type: 'text'
     },
     {
       title: '是否停用',

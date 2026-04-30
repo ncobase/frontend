@@ -1,4 +1,4 @@
-import { Button, Form, InputField } from '@ncobase/react';
+import { Button, Form, InputField, useToastMessage } from '@ncobase/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -13,6 +13,7 @@ import { Logo } from '@/components/logo';
 export const ForgetPassword = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useToastMessage();
 
   const {
     control,
@@ -21,8 +22,13 @@ export const ForgetPassword = () => {
     formState: { errors }
   } = useForm<ForgetPasswordProps>();
 
-  const onSubmit = formData => {
-    console.log(formData);
+  const onSubmit = () => {
+    toast.info(t('account.forget_password.unavailable_title', 'Password reset is not configured'), {
+      description: t(
+        'account.forget_password.unavailable_description',
+        'Contact an administrator to reset your password.'
+      )
+    });
   };
 
   return (

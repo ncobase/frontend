@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import { useToastMessage, Modal, InputField, Icons, Badge, Checkbox } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { useListRoles } from '../../role/service';
 import { Permission } from '../permission';
+import { useAssignPermissionsToRole } from '../service';
 
 export const PermissionRoleAssignment = ({
   isOpen,
@@ -23,11 +24,19 @@ export const PermissionRoleAssignment = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: rolesData, isLoading } = useListRoles({ limit: 50, search: searchTerm });
+  const assignPermissionsMutation = useAssignPermissionsToRole();
   const roles = rolesData?.items || [];
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedRoles([]);
+      setSearchTerm('');
+    }
+  }, [isOpen, permission?.id]);
 
   const filteredRoles = roles.filter(
     role =>
-      role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (role.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       role.slug?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -41,13 +50,11 @@ export const PermissionRoleAssignment = ({
     if (!permission?.id || selectedRoles.length === 0) return;
 
     try {
-      // Call API to assign permissions to roles
       await Promise.all(
         selectedRoles.map(roleId =>
-          fetch(`/api/roles/${roleId}/permissions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ permissionIds: [permission.id] })
+          assignPermissionsMutation.mutateAsync({
+            roleId,
+            permissionIds: [permission.id]
           })
         )
       );
@@ -63,7 +70,7 @@ export const PermissionRoleAssignment = ({
         description: error['message'] || t('permission.messages.assign_failed')
       });
     }
-  }, [permission?.id, selectedRoles, toast, t, onSuccess, onClose]);
+  }, [permission?.id, selectedRoles, assignPermissionsMutation, toast, t, onSuccess, onClose]);
 
   if (!permission) return null;
 
@@ -74,6 +81,7 @@ export const PermissionRoleAssignment = ({
       title={t('permission.assign_roles.title')}
       description={`${t('permission.assign_roles.description')} "${permission.name}"`}
       confirmText={t('actions.assign')}
+      confirmDisabled={assignPermissionsMutation.isPending || selectedRoles.length === 0}
       onConfirm={selectedRoles.length > 0 ? handleAssign : undefined}
       className='max-w-2xl'
     >

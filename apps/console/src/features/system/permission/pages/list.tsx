@@ -126,6 +126,15 @@ export const PermissionListPage = () => {
     setRoleAssignmentModal({ open: true, permission });
   }, []);
 
+  const handleToggleSelect = useCallback((permission: Permission) => {
+    setSelectedPermissions(prev => {
+      const isSelected = prev.some(selected => selected.id === permission.id);
+      return isSelected
+        ? prev.filter(selected => selected.id !== permission.id)
+        : [...prev, permission];
+    });
+  }, []);
+
   const handleConfirm = useCallback(
     handleFormSubmit((data: Permission) => {
       return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
@@ -159,6 +168,8 @@ export const PermissionListPage = () => {
         onResetQuery={onResetQuery}
         fetchData={fetchData}
         loading={loading}
+        onSelectRow={handleToggleSelect}
+        onSelectAllRows={rows => setSelectedPermissions(rows)}
         createComponent={
           <CreatePermissionPage
             viewMode={vmode}

@@ -41,13 +41,7 @@ i18n
 
     // Language resource loading configuration
     backend: {
-      // TODO: change to api url
-      // Language resource path
-      // loadPath: (() => {
-      //   const base =
-      //     (import.meta.env.VITE_I18N_URL || Request.baseConfig.baseURL || '').replace(/\/$/, '');
-      //   return base ? `${base}/locales/{{lng}}.json` : '/assets/locales/{{lng}}.json';
-      // })(),
+      // Language resources are served with the console assets.
       loadPath: '/assets/locales/{{lng}}.json',
       // Add version control
       queryStringParams: {

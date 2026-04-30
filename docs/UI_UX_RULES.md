@@ -19,6 +19,8 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Use a list-first experience for management domains unless the feature is primarily a focused tool.
 - Page titles, table headings, actions, and status labels should be concise and scan-friendly.
 - Do not add marketing-style hero sections to console workflows.
+- Do not expose action buttons whose handler only logs, opens a native prompt, or leaves the user
+  without visible success/error state.
 
 ## Lists and Tables
 
@@ -27,6 +29,8 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Default sort must be stable and documented for each domain.
 - Bulk actions must show selected count, disabled state while running, and partial success/failure
   results.
+- `CurdView` screens that define bulk actions must pass row and select-all selection events through to
+  `TableView` so selected-count state matches the table.
 - Row actions should use icons when the command is familiar, with tooltips for less obvious actions.
 
 ## Forms
@@ -34,6 +38,7 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Forms must show field-level validation errors returned by the backend when available.
 - Save buttons must reflect dirty, saving, disabled, success, and failure states.
 - Edit forms with unsaved changes should confirm before leaving.
+- Back, cancel, and discard reminder actions must share the same unsaved-change confirmation path.
 - Create/edit/view layouts must use the same field grouping when possible.
 - Select fields backed by dictionaries/options should refetch or mark stale after dictionary/option
   changes.
@@ -59,6 +64,8 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 
 - Delete, batch delete, disable, hide, refund, cancel subscription, publicize file, and plugin
   load/unload/reload all require confirmation.
+- Use `AlertDialog` for destructive and irreversible choices; use `Modal` with explicit form fields
+  when the operation needs a reason, name, destination, or JSON/value input.
 - Confirmation copy must name the target and describe scope, reversibility, and audit behavior.
 - Irreversible or production-impacting actions should require a stronger confirmation than a single
   click.

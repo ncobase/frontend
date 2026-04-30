@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-import { Card, Button, Icons, Badge, TableView } from '@ncobase/react';
+import { Card, Button, Icons, Badge, TableView, Modal, Textarea } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -20,6 +20,11 @@ export const DistributionListPage = () => {
   const [searchParams, setSearchParams] = useState({ search: '', status: '', limit: 50 });
   const [selectedItems, setSelectedItems] = useState<Distribution[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [cancelDialog, setCancelDialog] = useState<{
+    open: boolean;
+    distributionId: string;
+    reason: string;
+  }>({ open: false, distributionId: '', reason: '' });
 
   const { data: distributionData, isLoading, refetch } = useListDistributions(searchParams);
   const { bulkDeleteDistributions } = useContentOperations();
@@ -83,6 +88,35 @@ export const DistributionListPage = () => {
       }
     },
     [cancelMutation, refetch]
+  );
+
+  const openCancelDialog = useCallback((distributionId: string) => {
+    setCancelDialog({ open: true, distributionId, reason: '' });
+  }, []);
+
+  const confirmCancel = useCallback(async () => {
+    if (!cancelDialog.distributionId || !cancelDialog.reason.trim()) return;
+    await handleCancel(cancelDialog.distributionId, cancelDialog.reason.trim());
+    setCancelDialog({ open: false, distributionId: '', reason: '' });
+  }, [cancelDialog, handleCancel]);
+
+  const handleExport = useCallback(
+    (ids: string[]) => {
+      const items = distributions.filter(distribution => ids.includes(distribution.id));
+      const payload = {
+        exported_at: new Date().toISOString(),
+        count: items.length,
+        items
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `distributions-export-${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+    [distributions]
   );
 
   const isSelected = useCallback(
@@ -205,12 +239,7 @@ export const DistributionListPage = () => {
             <Button
               variant='text'
               size='xs'
-              onClick={() => {
-                const reason = prompt(t('distribution.cancel_reason_prompt'));
-                if (reason) {
-                  handleCancel(distribution.id, reason);
-                }
-              }}
+              onClick={() => openCancelDialog(distribution.id)}
               loading={cancelMutation.isPending}
             >
               <Icons name='IconX' size={14} className='mr-1' />
@@ -318,12 +347,7 @@ export const DistributionListPage = () => {
             <Button
               variant='outline'
               size='sm'
-              onClick={() => {
-                const reason = prompt(t('distribution.cancel_reason_prompt'));
-                if (reason) {
-                  handleCancel(distribution.id, reason);
-                }
-              }}
+              onClick={() => openCancelDialog(distribution.id)}
               loading={cancelMutation.isPending}
             >
               <Icons name='IconX' size={16} className='mr-1' />
@@ -431,10 +455,27 @@ export const DistributionListPage = () => {
         selectedItems={selectedItems}
         onClearSelection={() => setSelectedItems([])}
         onBulkDelete={handleBulkDelete}
-        onBulkExport={ids => {
-          console.log('Export distributions:', ids);
-        }}
+        onBulkExport={handleExport}
       />
+      <Modal
+        isOpen={cancelDialog.open}
+        onCancel={() => setCancelDialog({ open: false, distributionId: '', reason: '' })}
+        title={t('distribution.cancel_title', 'Cancel Distribution')}
+        description={t(
+          'distribution.cancel_description',
+          'Provide a reason before cancelling this distribution.'
+        )}
+        confirmText={t('actions.cancel', 'Cancel')}
+        confirmDisabled={!cancelDialog.reason.trim() || cancelMutation.isPending}
+        onConfirm={confirmCancel}
+      >
+        <Textarea
+          label={t('distribution.cancel_reason', 'Cancellation reason')}
+          value={cancelDialog.reason}
+          onChange={e => setCancelDialog(prev => ({ ...prev, reason: e.target.value }))}
+          rows={4}
+        />
+      </Modal>
     </Page>
   );
 };

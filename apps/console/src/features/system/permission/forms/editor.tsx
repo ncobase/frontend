@@ -34,22 +34,14 @@ export const EditorPermissionForms = ({ record, onSubmit, control, setValue, err
       name: 'group',
       defaultValue: '',
       placeholder: 'Select group',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search group');
-      }
+      type: 'text'
     },
     {
       title: t('permission.fields.parent', 'Parent Permission'),
       name: 'parent',
       defaultValue: '',
       placeholder: 'Select parent permission',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search parent permission');
-      }
+      type: 'text'
     },
     {
       title: t('permission.fields.space', 'Space'),

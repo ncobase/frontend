@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Card, Button, Icons, Badge } from '@ncobase/react';
+import { Card, Button, Icons, Badge, Modal, Textarea } from '@ncobase/react';
 import { useToastMessage } from '@ncobase/react';
 import { useParams, useNavigate } from 'react-router';
 
@@ -13,6 +13,8 @@ export const DistributionViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToastMessage();
+  const [cancelReason, setCancelReason] = useState('');
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const { data: distribution, isLoading, error, refetch } = useQueryDistribution(id!);
   const publishMutation = usePublishDistribution();
@@ -53,12 +55,14 @@ export const DistributionViewPage = () => {
   };
 
   const handleCancel = async () => {
-    const reason = prompt('Please enter a reason for cancellation:');
+    const reason = cancelReason.trim();
     if (!reason) return;
 
     try {
       await cancelMutation.mutateAsync({ id: distribution.id, reason });
       toast.success('Distribution cancelled successfully');
+      setCancelReason('');
+      setShowCancelDialog(false);
       refetch();
       // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     } catch (error) {
@@ -112,7 +116,7 @@ export const DistributionViewPage = () => {
                 <Button
                   variant='outline'
                   size='sm'
-                  onClick={handleCancel}
+                  onClick={() => setShowCancelDialog(true)}
                   loading={cancelMutation.isPending}
                 >
                   <Icons name='IconX' size={16} className='mr-2' />
@@ -415,6 +419,25 @@ export const DistributionViewPage = () => {
           </Card>
         </div>
       </div>
+      <Modal
+        isOpen={showCancelDialog}
+        onCancel={() => {
+          setShowCancelDialog(false);
+          setCancelReason('');
+        }}
+        title='Cancel Distribution'
+        description='Provide a reason before cancelling this distribution.'
+        confirmText='Cancel Distribution'
+        confirmDisabled={!cancelReason.trim() || cancelMutation.isPending}
+        onConfirm={handleCancel}
+      >
+        <Textarea
+          label='Cancellation reason'
+          value={cancelReason}
+          onChange={e => setCancelReason(e.target.value)}
+          rows={4}
+        />
+      </Modal>
     </Page>
   );
 };

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   Button,
@@ -68,7 +68,14 @@ export const SpaceUserListPage = () => {
   const { data: userData, loading, refetch } = useSpaceUserList(spaceId, searchParams);
   const removeUserMutation = useRemoveUserFromSpaceRole();
 
-  const users = userData?.users || [];
+  const users = useMemo(
+    () =>
+      (userData?.users || []).map(user => ({
+        ...user,
+        id: user.user_id || user.id
+      })),
+    [userData?.users]
+  );
 
   const handleSearch = useCallback((query: string, filters: any) => {
     setSearchParams(prev => ({
@@ -458,14 +465,6 @@ export const SpaceUserListPage = () => {
         selectedItems={selectedUsers}
         onClearSelection={() => setSelectedUsers([])}
         onBulkDelete={ids => handleBulkDelete(ids)}
-        customActions={[
-          {
-            label: t('space.users.bulk.assign_roles'),
-            icon: 'IconUserPlus',
-            onClick: ids => console.log('Bulk assign roles:', ids),
-            variant: 'primary'
-          }
-        ]}
       />
 
       {/* Bulk Actions Component (Space-specific) */}

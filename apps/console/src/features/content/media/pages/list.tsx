@@ -68,6 +68,28 @@ export const MediaListPage = () => {
     }));
   }, [setUrlSearchParams, urlSearchParams]);
 
+  const handleExport = useCallback(
+    (ids: string[]) => {
+      const items = mediaItems.filter(media => ids.includes(media.id));
+      const payload = {
+        exported_at: new Date().toISOString(),
+        count: items.length,
+        filters: {
+          resource_id: resourceIdFilter || undefined
+        },
+        items
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `media-export-${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+    [mediaItems, resourceIdFilter]
+  );
+
   const handleToggleSelect = useCallback((item: Media) => {
     setSelectedItems(prev => {
       const isSelected = prev.some(selected => selected.id === item.id);
@@ -430,9 +452,7 @@ export const MediaListPage = () => {
         selectedItems={selectedItems}
         onClearSelection={() => setSelectedItems([])}
         onBulkDelete={handleBulkDelete}
-        onBulkExport={ids => {
-          console.log('Export media:', ids);
-        }}
+        onBulkExport={handleExport}
       />
 
       {/* Upload Modal */}

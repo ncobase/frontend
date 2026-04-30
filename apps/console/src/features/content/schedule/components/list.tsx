@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Icons, Badge, TableView } from '@ncobase/react';
+import { AlertDialog, Button, Icons, Badge, TableView, Modal, Textarea } from '@ncobase/react';
 import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,11 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
     status: '',
     limit: 50
   });
+  const [executeDialog, setExecuteDialog] = useState<ContentSchedule | null>(null);
+  const [cancelDialog, setCancelDialog] = useState<{
+    schedule: ContentSchedule | null;
+    reason: string;
+  }>({ schedule: null, reason: '' });
 
   const { data: schedulesData, isLoading } = useSchedules(filters);
   const executeScheduleMutation = useExecuteSchedule();
@@ -57,27 +62,26 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
     return icons[actionType] || 'IconClock';
   };
 
-  const handleExecute = async (schedule: ContentSchedule) => {
-    if (confirm(t('schedule.execute.confirm'))) {
-      try {
-        await executeScheduleMutation.mutateAsync(schedule.id!);
-      } catch (error) {
-        console.error('Failed to execute schedule:', error);
-      }
+  const handleExecute = async () => {
+    if (!executeDialog?.id) return;
+    try {
+      await executeScheduleMutation.mutateAsync(executeDialog.id);
+      setExecuteDialog(null);
+    } catch (error) {
+      console.error('Failed to execute schedule:', error);
     }
   };
 
-  const handleCancel = async (schedule: ContentSchedule) => {
-    const reason = prompt(t('schedule.cancel.reason_prompt'));
-    if (reason !== null) {
-      try {
-        await cancelScheduleMutation.mutateAsync({
-          scheduleId: schedule.id!,
-          reason
-        });
-      } catch (error) {
-        console.error('Failed to cancel schedule:', error);
-      }
+  const handleCancel = async () => {
+    if (!cancelDialog.schedule?.id) return;
+    try {
+      await cancelScheduleMutation.mutateAsync({
+        scheduleId: cancelDialog.schedule.id,
+        reason: cancelDialog.reason.trim()
+      });
+      setCancelDialog({ schedule: null, reason: '' });
+    } catch (error) {
+      console.error('Failed to cancel schedule:', error);
     }
   };
 
@@ -129,7 +133,7 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
               <Button
                 variant='text'
                 size='xs'
-                onClick={() => handleExecute(schedule)}
+                onClick={() => setExecuteDialog(schedule)}
                 loading={executeScheduleMutation.isPending}
               >
                 <Icons name='IconPlay' size={14} className='mr-1' />
@@ -142,7 +146,7 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
               <Button
                 variant='text'
                 size='xs'
-                onClick={() => handleCancel(schedule)}
+                onClick={() => setCancelDialog({ schedule, reason: '' })}
                 loading={cancelScheduleMutation.isPending}
                 className='text-red-600'
               >
@@ -182,6 +186,32 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
           <p className='text-sm text-gray-500'>{t('schedule.list.empty.description')}</p>
         </div>
       )}
+      <AlertDialog
+        title={t('schedule.execute.title', 'Execute Schedule')}
+        description={t('schedule.execute.confirm')}
+        isOpen={!!executeDialog}
+        onChange={() => setExecuteDialog(null)}
+        cancelText={t('actions.cancel')}
+        confirmText={t('schedule.actions.execute')}
+        onCancel={() => setExecuteDialog(null)}
+        onConfirm={handleExecute}
+      />
+      <Modal
+        isOpen={!!cancelDialog.schedule}
+        onCancel={() => setCancelDialog({ schedule: null, reason: '' })}
+        title={t('schedule.cancel.title', 'Cancel Schedule')}
+        description={t('schedule.cancel.description', 'Provide a cancellation reason.')}
+        confirmText={t('actions.cancel')}
+        confirmDisabled={cancelScheduleMutation.isPending}
+        onConfirm={handleCancel}
+      >
+        <Textarea
+          label={t('schedule.cancel.reason', 'Reason')}
+          value={cancelDialog.reason}
+          onChange={e => setCancelDialog(prev => ({ ...prev, reason: e.target.value }))}
+          rows={4}
+        />
+      </Modal>
     </div>
   );
 };

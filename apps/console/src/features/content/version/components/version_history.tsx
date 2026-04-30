@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Icons, Badge, Card } from '@ncobase/react';
+import { AlertDialog, Button, Icons, Badge, Card } from '@ncobase/react';
 import { formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
   const { t } = useTranslation();
   const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
+  const [restoreTarget, setRestoreTarget] = useState<ContentVersion | null>(null);
 
   const { data: versionsData, isLoading } = useContentVersions(contentId, contentType);
   const restoreVersionMutation = useRestoreVersion();
@@ -41,16 +42,19 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
     }
   };
 
-  const handleRestore = async (version: ContentVersion) => {
-    if (confirm(t('version.restore.confirm'))) {
-      try {
-        await restoreVersionMutation.mutateAsync({
-          contentId,
-          versionId: version.id!
-        });
-      } catch (error) {
-        console.error('Failed to restore version:', error);
-      }
+  const handleRestore = async () => {
+    if (!restoreTarget?.id) {
+      return;
+    }
+
+    try {
+      await restoreVersionMutation.mutateAsync({
+        contentId,
+        versionId: restoreTarget.id
+      });
+      setRestoreTarget(null);
+    } catch (error) {
+      console.error('Failed to restore version:', error);
     }
   };
 
@@ -176,7 +180,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                       size='sm'
                       onClick={e => {
                         e.stopPropagation();
-                        handleRestore(version);
+                        setRestoreTarget(version);
                       }}
                       loading={restoreVersionMutation.isPending}
                     >
@@ -214,6 +218,17 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
           onClose={() => setShowComparison(false)}
         />
       )}
+
+      <AlertDialog
+        title={t('version.restore.title', 'Restore Version')}
+        description={t('version.restore.confirm')}
+        isOpen={!!restoreTarget}
+        onChange={() => setRestoreTarget(null)}
+        cancelText={t('actions.cancel')}
+        confirmText={t('version.restore.action', 'Restore')}
+        onCancel={() => setRestoreTarget(null)}
+        onConfirm={handleRestore}
+      />
     </div>
   );
 };

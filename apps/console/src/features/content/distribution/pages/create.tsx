@@ -49,8 +49,6 @@ export const DistributionCreatePage = () => {
         status: data.scheduled_at ? 1 : 0 // Set to scheduled if date provided
       };
 
-      console.log(submitData);
-
       await createDistributionMutation.mutateAsync(submitData);
       toast.success('Distribution created successfully');
       navigate('/content/distributions');

@@ -24,7 +24,7 @@ import { SpaceSettings } from '../components/settings';
 import { SpaceExportForm } from '../forms/export';
 import { SpaceImportForm } from '../forms/import';
 import { useSpaceList } from '../hooks';
-import { useDeleteSpace, useUpdateSpace } from '../service';
+import { useCreateSpace, useDeleteSpace, useUpdateSpace } from '../service';
 import { Space } from '../space';
 
 import { BulkActions } from '@/components/bulk_actions';
@@ -72,6 +72,7 @@ export const SpaceListPage = () => {
   const { data: spaceData, loading, refetch } = useSpaceList(searchParams);
   const deleteSpaceMutation = useDeleteSpace();
   const updateSpaceMutation = useUpdateSpace();
+  const createSpaceMutation = useCreateSpace();
 
   const spaces = spaceData?.items || [];
 
@@ -184,20 +185,55 @@ export const SpaceListPage = () => {
   }, []);
 
   const handleImportSubmit = useCallback(
-    (data: any) => {
-      console.log('Import data:', data);
-      setImportModal(false);
-      toast.success(t('messages.success'), {
-        description: t('space.import.success')
-      });
-      refetch();
+    async (data: any) => {
+      const items = data.items || [];
+      if (!items.length) {
+        toast.error(t('messages.error'), {
+          description: t('space.import.no_items', 'No importable spaces found')
+        });
+        return;
+      }
+
+      try {
+        await Promise.all(
+          items.map((item: Space) =>
+            createSpaceMutation.mutateAsync({
+              name: item.name,
+              slug: item.slug,
+              type: item.type || 'private',
+              title: item.title,
+              url: item.url,
+              logo: item.logo,
+              logo_alt: item.logo_alt,
+              keywords: item.keywords,
+              copyright: item.copyright,
+              description: item.description,
+              order: item.order,
+              disabled: item.disabled,
+              extras: item.extras
+            })
+          )
+        );
+        setImportModal(false);
+        toast.success(t('messages.success'), {
+          description: t('space.import.success_count', {
+            defaultValue: 'Imported {{count}} spaces',
+            count: items.length
+          })
+        });
+        refetch();
+      } catch (error) {
+        toast.error(t('messages.error'), {
+          description: error['message'] || t('space.import.failed', 'Failed to import spaces')
+        });
+        throw error;
+      }
     },
-    [toast, t, refetch]
+    [createSpaceMutation, toast, t, refetch]
   );
 
   const handleExportSubmit = useCallback(
-    (data: any) => {
-      console.log('Export data:', data);
+    (_data: any) => {
       setExportModal(false);
       toast.success(t('messages.success'), {
         description: t('space.export.success')
@@ -568,6 +604,7 @@ export const SpaceListPage = () => {
           onSubmit={handleExportSubmit}
           onCancel={() => setExportModal(false)}
           spaceCount={spaceData?.total || 0}
+          spaces={spaces}
           selectedSpaces={selectedItems}
         />
       </Modal>

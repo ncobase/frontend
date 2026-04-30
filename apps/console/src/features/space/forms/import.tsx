@@ -5,7 +5,6 @@ import {
   CardContent,
   Section,
   SelectField,
-  UploaderField,
   Textarea,
   Button,
   Icons,
@@ -47,12 +46,11 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
           const parsed = JSON.parse(data.jsonData);
           return Array.isArray(parsed) ? parsed : [parsed];
         } else if (data.format === 'file' && data.file) {
-          // File processing would be handled by the parent component
           return [];
         }
         return [];
       } catch (error) {
-        console.error('Error processing import data:', error);
+        void error;
         throw new Error(t('space.import.invalid_format'));
       }
     },
@@ -73,52 +71,41 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
     [processImportData]
   );
 
-  // Simulate import progress
-  const simulateImport = useCallback(
+  const executeImport = useCallback(
     async data => {
       setIsImporting(true);
       setImportProgress(0);
 
       const items = processImportData(data);
       const total = items.length;
-      let success = 0;
-      let failed = 0;
-      const errors: string[] = [];
-
-      for (let i = 0; i < total; i++) {
-        // Simulate processing time
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Simulate success/failure
-        if (Math.random() > 0.1) {
-          // 90% success rate
-          success++;
-        } else {
-          failed++;
-          errors.push(`Item ${i + 1}: ${t('space.import.validation_error')}`);
-        }
-
-        setImportProgress(((i + 1) / total) * 100);
+      if (!total) {
+        throw new Error(t('space.import.no_items', 'No importable spaces found'));
       }
 
-      setImportResult({ total, success, failed, errors });
+      setImportProgress(30);
+      await onSubmit?.({ ...data, items });
+      setImportProgress(100);
+      setImportResult({ total, success: total, failed: 0, errors: [] });
       setIsImporting(false);
     },
-    [processImportData, t]
+    [onSubmit, processImportData, t]
   );
 
   const importFormSubmit = useCallback(
     handleSubmit(async data => {
       try {
-        await simulateImport(data);
-        if (onSubmit) {
-          onSubmit(data);
-        }
+        await executeImport(data);
       } catch (error) {
-        console.error('Import failed:', error);
+        setIsImporting(false);
+        setImportResult({
+          total: 0,
+          success: 0,
+          failed: 1,
+          errors: [error['message'] || t('space.import.failed', 'Import failed')]
+        });
       }
     }),
-    [handleSubmit, simulateImport, onSubmit]
+    [handleSubmit, executeImport, t]
   );
 
   const previewFormSubmit = useCallback(handleSubmit(handlePreview), [handleSubmit, handlePreview]);
@@ -146,17 +133,13 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
               <Controller
                 name='format'
                 control={control}
-                defaultValue='file'
+                defaultValue='json'
                 rules={{ required: true }}
                 render={({ field }) => (
                   <SelectField
                     label={t('space.import.format', 'Import Format')}
                     {...field}
                     options={[
-                      {
-                        label: t('space.import.file_format', 'File Upload (CSV, JSON, Excel)'),
-                        value: 'file'
-                      },
                       {
                         label: t('space.import.json_format', 'JSON Data'),
                         value: 'json'
@@ -165,25 +148,6 @@ export const SpaceImportForm = ({ onSubmit, onCancel }) => {
                   />
                 )}
               />
-
-              {formatType === 'file' && (
-                <Controller
-                  name='file'
-                  control={control}
-                  render={({ field }) => (
-                    <UploaderField
-                      label={t('space.import.file', 'Upload File')}
-                      {...field}
-                      accept='.json,.csv,.xlsx,.xls'
-                      maxSize={10 * 1024 * 1024} // 10MB
-                      description={t(
-                        'space.import.file_hint',
-                        'Supported: CSV, JSON, Excel (max 10MB)'
-                      )}
-                    />
-                  )}
-                />
-              )}
 
               {formatType === 'json' && (
                 <Controller

@@ -30,8 +30,6 @@ export const ApiKey: React.FC<{ userId: string }> = ({ userId }) => {
     try {
       setLoading(true);
       const keys = await getUserApiKeys(userId);
-      console.log(keys);
-
       setApiKey(keys);
     } catch (error) {
       console.error('Failed to load API keys:', error);

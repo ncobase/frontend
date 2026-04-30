@@ -1,7 +1,7 @@
 // ./apps/console/src/features/space/pages/user/edit.tsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Button, Icons } from '@ncobase/react';
+import { AlertDialog, Button, Icons } from '@ncobase/react';
 import { useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,7 @@ export const SpaceUserEditPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToastMessage();
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   const { data: space } = useQuerySpace(spaceId!);
   const { data: userSpaceData, isLoading: spaceDataLoading } = useQueryUserSpaceRoles(
@@ -78,12 +79,15 @@ export const SpaceUserEditPage = () => {
 
   const handleCancel = () => {
     if (isDirty) {
-      if (window.confirm(t('space.users.edit.unsaved_changes_warning'))) {
-        navigate(`/spaces/${spaceId}/users/view/${userId}`);
-      }
+      setDiscardConfirmOpen(true);
     } else {
       navigate(`/spaces/${spaceId}/users/view/${userId}`);
     }
+  };
+
+  const discardChanges = () => {
+    setDiscardConfirmOpen(false);
+    navigate(`/spaces/${spaceId}/users/view/${userId}`);
   };
 
   if (isLoading) {
@@ -128,7 +132,7 @@ export const SpaceUserEditPage = () => {
             <Button
               variant='ghost'
               size='sm'
-              onClick={() => navigate(`/spaces/${spaceId}/users/view/${userId}`)}
+              onClick={handleCancel}
               className='flex items-center gap-2'
             >
               <Icons name='IconArrowLeft' size={16} />
@@ -219,6 +223,17 @@ export const SpaceUserEditPage = () => {
           </div>
         </div>
       )}
+
+      <AlertDialog
+        title={t('space.users.edit.discard_title', 'Discard changes')}
+        description={t('space.users.edit.unsaved_changes_warning')}
+        isOpen={discardConfirmOpen}
+        onChange={() => setDiscardConfirmOpen(false)}
+        cancelText={t('actions.cancel')}
+        confirmText={t('actions.discard')}
+        onCancel={() => setDiscardConfirmOpen(false)}
+        onConfirm={discardChanges}
+      />
     </Page>
   );
 };

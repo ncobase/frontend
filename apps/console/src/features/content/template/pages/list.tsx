@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Icons, Card, Badge, TableView } from '@ncobase/react';
+import { AlertDialog, Button, Icons, Card, Badge, TableView } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -19,6 +19,7 @@ export const TemplateListPage = () => {
     category: '',
     limit: 50
   });
+  const [deleteDialog, setDeleteDialog] = useState<ContentTemplate | null>(null);
 
   const { data: templatesData, isLoading } = useTemplates(filters);
   const deleteTemplateMutation = useDeleteTemplate();
@@ -26,12 +27,11 @@ export const TemplateListPage = () => {
   const templates = templatesData?.items || [];
 
   const handleDelete = async (template: ContentTemplate) => {
-    if (confirm(t('template.delete.confirm'))) {
-      try {
-        await deleteTemplateMutation.mutateAsync(template.id!);
-      } catch (error) {
-        console.error('Failed to delete template:', error);
-      }
+    try {
+      await deleteTemplateMutation.mutateAsync(template.id!);
+      setDeleteDialog(null);
+    } catch (error) {
+      console.error('Failed to delete template:', error);
     }
   };
 
@@ -113,7 +113,7 @@ export const TemplateListPage = () => {
           <Button
             variant='text'
             size='xs'
-            onClick={() => handleDelete(template)}
+            onClick={() => setDeleteDialog(template)}
             className='text-red-600'
           >
             <Icons name='IconTrash' size={14} className='mr-1' />
@@ -177,6 +177,16 @@ export const TemplateListPage = () => {
           </div>
         </Card>
       )}
+      <AlertDialog
+        title={t('template.delete.title', 'Delete Template')}
+        description={t('template.delete.confirm')}
+        isOpen={!!deleteDialog}
+        onChange={() => setDeleteDialog(null)}
+        cancelText={t('actions.cancel')}
+        confirmText={t('actions.delete')}
+        onCancel={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+      />
     </Page>
   );
 };

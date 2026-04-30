@@ -24,11 +24,7 @@ export const EditorMenuForms = ({ record, onSubmit, control, setValue, errors })
       title: '上级菜单',
       name: 'parent',
       defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      type: 'text'
     },
     {
       title: 'i18n 标签',

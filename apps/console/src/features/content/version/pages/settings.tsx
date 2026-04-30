@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { Button, Icons, Card, Form, Section } from '@ncobase/react';
+import { Button, Icons, Card, Form, Section, useToastMessage } from '@ncobase/react';
+import { locals } from '@ncobase/utils';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -20,11 +21,20 @@ interface VersionSettings {
 export const VersionSettingsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useToastMessage();
   const [isLoading, setIsLoading] = useState(false);
+  const storedSettings = useMemo(() => {
+    try {
+      return JSON.parse(locals.get('content.version.settings') || '{}');
+    } catch {
+      return {};
+    }
+  }, []);
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isDirty }
   } = useForm<VersionSettings>({
     defaultValues: {
@@ -34,16 +44,19 @@ export const VersionSettingsPage = () => {
       compress_old_versions: true,
       notify_on_restore: true,
       require_change_summary: false,
-      enable_auto_cleanup: true
+      enable_auto_cleanup: true,
+      ...storedSettings
     }
   });
 
   const onSubmit = handleSubmit(async data => {
     setIsLoading(true);
     try {
-      // Save settings logic here
-      console.log('Saving version settings:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      locals.set('content.version.settings', JSON.stringify(data));
+      reset(data);
+      toast.success(t('messages.success'), {
+        description: t('version.settings.save_success', 'Version settings saved')
+      });
     } catch (error) {
       console.error('Failed to save settings:', error);
     } finally {

@@ -1,53 +1,73 @@
-import { Button, Icons, TableViewProps } from '@ncobase/react';
-import { formatDateTime } from '@ncobase/utils';
+import { Badge, Button, TableViewProps, Tooltip } from '@ncobase/react';
+import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 
-import { parseStatus } from '@/lib/status';
+import type { Comment } from '../comment';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  handleToggleApproved
+}): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
-      title: '名称',
-      dataIndex: 'name',
-      parser: (value, record) => (
-        <Button variant='link' size='md' onClick={() => handleView({ id: record?.id }, 'view')}>
-          {value}
+      title: t('comment.fields.content', 'Content'),
+      dataIndex: 'content',
+      parser: (value: string, record: Comment) => (
+        <Button variant='link' size='md' onClick={() => handleView(record, 'view')}>
+          <span className='line-clamp-2 max-w-md text-left'>
+            {value || t('comment.empty_content', 'Empty comment')}
+          </span>
         </Button>
       ),
-      icon: 'IconFlame'
+      icon: 'IconMessageCircle'
     },
     {
-      title: '别名',
-      dataIndex: 'slug',
-      icon: 'IconAffiliate'
+      title: t('comment.fields.author', 'Author'),
+      dataIndex: 'author',
+      parser: value => renderAuthor(value),
+      icon: 'IconUser'
     },
     {
-      title: '路径',
-      dataIndex: 'path',
-      icon: 'IconRoute'
+      title: t('comment.fields.approved', 'Approval'),
+      dataIndex: 'approved',
+      parser: value =>
+        value ? (
+          <Badge variant='success'>{t('comment.status.approved', 'Approved')}</Badge>
+        ) : (
+          <Badge variant='warning'>{t('comment.status.pending', 'Pending')}</Badge>
+        ),
+      icon: 'IconShieldCheck'
     },
     {
-      title: '图标',
-      dataIndex: 'icon',
-      parser: value => <Icons name={value} size={16} />,
-      icon: 'IconCategory'
+      title: t('comment.fields.reply_to', 'Reply To'),
+      dataIndex: 'reply_to',
+      parser: value => <span className='font-mono text-xs text-slate-600'>{value || '-'}</span>,
+      icon: 'IconCornerDownRight'
     },
     {
-      title: '状态',
-      dataIndex: 'disabled',
-      parser: value => parseStatus(!value),
-      icon: 'IconFlagCog'
-    },
-    {
-      title: '创建日期',
+      title: t('comment.fields.created_at', 'Created'),
       dataIndex: 'created_at',
-      parser: value => formatDateTime(value),
+      parser: value =>
+        value ? (
+          <Tooltip content={formatDateTime(value, 'dateTime')}>
+            <span>{formatRelativeTime(new Date(value))}</span>
+          </Tooltip>
+        ) : (
+          '-'
+        ),
       icon: 'IconCalendarMonth'
     },
     {
-      title: 'operation-column',
+      title: t('common.actions', 'Actions'),
+      dataIndex: 'operation-column',
       actions: [
+        {
+          title: t('actions.view', 'View'),
+          icon: 'IconEye',
+          onClick: (record: Comment) => handleView(record, 'view')
+        },
         {
           title: t('actions.edit'),
           icon: 'IconPencil',
@@ -56,17 +76,16 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.duplicate'),
           icon: 'IconCopy',
-          onClick: () => console.log('duplicate events')
+          onClick: (record: Comment) =>
+            handleView({ ...record, id: undefined, content: record.content || '' }, 'create')
         },
         {
-          title: t('actions.shared'),
-          icon: 'IconShare2',
-          onClick: () => console.log('share events')
-        },
-        {
-          title: t('actions.disable'),
-          icon: 'IconCircleMinus',
-          onClick: () => console.log('disable events')
+          title: (record: Comment) =>
+            record.approved
+              ? t('comment.actions.mark_pending', 'Mark Pending')
+              : t('comment.actions.approve', 'Approve'),
+          icon: (record: Comment) => (record.approved ? 'IconClockPause' : 'IconCircleCheck'),
+          onClick: (record: Comment) => handleToggleApproved(record)
         },
         {
           title: t('actions.delete'),
@@ -78,4 +97,17 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
       ]
     }
   ];
+};
+
+const renderAuthor = (author: any) => {
+  if (!author) return '-';
+  if (typeof author === 'string') return author;
+  return (
+    <div className='min-w-0'>
+      <div className='truncate font-medium'>
+        {author.name || author.username || author.id || '-'}
+      </div>
+      {author.email && <div className='truncate text-xs text-slate-500'>{author.email}</div>}
+    </div>
+  );
 };

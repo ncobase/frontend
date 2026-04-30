@@ -50,22 +50,14 @@ export const EditorRoleForms = ({ record, onSubmit, control, setValue, errors })
       name: 'parent',
       defaultValue: '',
       placeholder: 'Select parent role',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search parent role');
-      }
+      type: 'text'
     },
     {
       title: t('role.fields.group', 'Group'),
       name: 'group',
       defaultValue: '',
       placeholder: 'Select group',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('Search group');
-      }
+      type: 'text'
     },
     {
       title: t('role.fields.space', 'Space'),

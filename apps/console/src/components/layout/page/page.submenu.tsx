@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { Button, ShellSubmenu } from '@ncobase/react';
+import { ShellSubmenu } from '@ncobase/react';
 import { cn, isPathMatching } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
@@ -32,12 +32,6 @@ const SubmenuItemRecursive = React.memo(
           key={menu.id}
         >
           <span className='font-medium'>{t(menu.label || '') || menu.name}</span>
-          <Button
-            variant='unstyle'
-            size='ratio'
-            className='float-right text-primary-600 dark:text-primary-400 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors'
-            onClick={() => console.log('add events')}
-          />
         </div>
       );
     }

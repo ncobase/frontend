@@ -302,17 +302,6 @@ export const WorkflowViewPage = () => {
                     variant='outline'
                     className='w-full justify-start'
                     onClick={() => {
-                      // Copy workflow functionality
-                      console.log('Copy workflow:', workflow.id);
-                    }}
-                  >
-                    <Icons name='IconCopy' size={16} className='mr-2' />
-                    {t('workflow.actions.duplicate')}
-                  </Button>
-                  <Button
-                    variant='outline'
-                    className='w-full justify-start'
-                    onClick={() => {
                       // Export workflow functionality
                       const dataStr = JSON.stringify(workflow, null, 2);
                       const dataBlob = new Blob([dataStr], { type: 'application/json' });

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Button, Icons, Card, Badge } from '@ncobase/react';
+import { Button, Icons, Card, Badge, Modal, InputField } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router';
@@ -14,18 +14,22 @@ export const TemplateViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [duplicateName, setDuplicateName] = useState('');
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   const { data: template, isLoading } = useTemplate(id!);
   const duplicateTemplateMutation = useDuplicateTemplate();
 
   const handleDuplicate = async () => {
-    const name = prompt(t('template.duplicate.name_prompt'), `${template?.name} Copy`);
+    const name = duplicateName.trim();
     if (name && template?.id) {
       try {
         const result = await duplicateTemplateMutation.mutateAsync({
           templateId: template.id,
           name
         });
+        setDuplicateName('');
+        setShowDuplicateDialog(false);
         navigate(`/content/templates/${result.id}/edit`);
       } catch (error) {
         console.error('Failed to duplicate template:', error);
@@ -102,7 +106,10 @@ export const TemplateViewPage = () => {
             <div className='flex items-center gap-3'>
               <Button
                 variant='outline'
-                onClick={handleDuplicate}
+                onClick={() => {
+                  setDuplicateName(`${template?.name} Copy`);
+                  setShowDuplicateDialog(true);
+                }}
                 loading={duplicateTemplateMutation.isPending}
               >
                 <Icons name='IconCopy' size={16} className='mr-2' />
@@ -122,6 +129,24 @@ export const TemplateViewPage = () => {
             </div>
           </div>
         </div>
+
+        <Modal
+          isOpen={showDuplicateDialog}
+          onCancel={() => {
+            setShowDuplicateDialog(false);
+            setDuplicateName('');
+          }}
+          title={t('template.duplicate.title', 'Duplicate Template')}
+          confirmText={t('actions.duplicate')}
+          confirmDisabled={!duplicateName.trim() || duplicateTemplateMutation.isPending}
+          onConfirm={handleDuplicate}
+        >
+          <InputField
+            label={t('template.fields.name')}
+            value={duplicateName}
+            onChange={e => setDuplicateName(e.target.value)}
+          />
+        </Modal>
 
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
           {/* Template Preview */}

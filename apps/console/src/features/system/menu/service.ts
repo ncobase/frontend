@@ -165,7 +165,7 @@ export const useMoveMenu = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, parentId, order }: { id: string; parentId: string; order: number }) =>
+    mutationFn: ({ id, parentId, order }: { id: string; parentId: string | null; order: number }) =>
       moveMenu(id, parentId, order),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menuService'] });

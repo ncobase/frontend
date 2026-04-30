@@ -34,9 +34,6 @@ export const TemplateMarketPage = () => {
 
   const handleInstallTemplate = async (template: ContentTemplate) => {
     try {
-      // Install template logic
-      console.log('Installing template:', template.id);
-      // Redirect to create content with template
       navigate(`/content/topics/create?template=${template.id}`);
     } catch (error) {
       console.error('Failed to install template:', error);

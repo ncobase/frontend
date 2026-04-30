@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Button, Icons } from '@ncobase/react';
+import { AlertDialog, Button, Icons } from '@ncobase/react';
 import { useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,7 @@ export const SpaceEditPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useToastMessage();
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   const { data: space, isLoading } = useQuerySpace(slug!);
   const {
@@ -62,12 +63,15 @@ export const SpaceEditPage = () => {
 
   const handleCancel = () => {
     if (isDirty) {
-      if (window.confirm(t('space.edit.unsaved_changes_warning'))) {
-        navigate(`/spaces/${space.id}`);
-      }
+      setDiscardConfirmOpen(true);
     } else {
       navigate(`/spaces/${space.id}`);
     }
+  };
+
+  const discardChanges = () => {
+    setDiscardConfirmOpen(false);
+    navigate(`/spaces/${space.id}`);
   };
 
   if (isLoading) {
@@ -110,7 +114,7 @@ export const SpaceEditPage = () => {
             <Button
               variant='ghost'
               size='sm'
-              onClick={() => navigate(`/spaces/${space.id}`)}
+              onClick={handleCancel}
               className='flex items-center gap-2'
             >
               <Icons name='IconArrowLeft' size={16} />
@@ -202,6 +206,17 @@ export const SpaceEditPage = () => {
           </div>
         </div>
       )}
+
+      <AlertDialog
+        title={t('space.edit.discard_title', 'Discard changes')}
+        description={t('space.edit.unsaved_changes_warning')}
+        isOpen={discardConfirmOpen}
+        onChange={() => setDiscardConfirmOpen(false)}
+        cancelText={t('actions.cancel')}
+        confirmText={t('actions.discard')}
+        onCancel={() => setDiscardConfirmOpen(false)}
+        onConfirm={discardChanges}
+      />
     </Page>
   );
 };

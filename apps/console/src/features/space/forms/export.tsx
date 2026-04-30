@@ -14,7 +14,13 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSpaces = [] }) => {
+export const SpaceExportForm = ({
+  onSubmit,
+  onCancel,
+  spaceCount = 0,
+  selectedSpaces = [],
+  spaces = []
+}) => {
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
@@ -40,17 +46,35 @@ export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSp
   const selectedScope = watch('scope');
   const exportFormat = watch('format');
 
+  const getExportRows = useCallback(() => {
+    switch (selectedScope) {
+      case 'selected':
+        return selectedSpaces;
+      case 'active':
+        return spaces.filter(space => !space.disabled);
+      case 'disabled':
+        return spaces.filter(space => space.disabled);
+      case 'all':
+      default:
+        return spaces;
+    }
+  }, [selectedScope, selectedSpaces, spaces]);
+
   // Calculate export count based on scope
   const getExportCount = useCallback(() => {
     switch (selectedScope) {
       case 'selected':
         return selectedSpaces.length;
+      case 'active':
+        return spaces.filter(space => !space.disabled).length;
+      case 'disabled':
+        return spaces.filter(space => space.disabled).length;
       case 'all':
-        return spaceCount;
+        return spaces.length || spaceCount;
       default:
         return 0;
     }
-  }, [selectedScope, selectedSpaces.length, spaceCount]);
+  }, [selectedScope, selectedSpaces.length, spaceCount, spaces]);
 
   // Simulate export process
   const simulateExport = useCallback(
@@ -58,7 +82,8 @@ export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSp
       setIsExporting(true);
       setExportProgress(0);
 
-      const count = getExportCount();
+      const rows = getExportRows();
+      const count = rows.length;
 
       // Simulate export progress
       for (let i = 0; i <= 100; i += 10) {
@@ -69,16 +94,23 @@ export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSp
       setExportComplete(true);
       setIsExporting(false);
 
-      // Simulate file download
       const exportData = {
         format: data.format,
         count,
         timestamp: new Date().toISOString(),
-        data: [] // This would contain actual space data
+        options: {
+          includeMetadata: data.includeMetadata,
+          includeSettings: data.includeSettings,
+          includeUsers: data.includeUsers,
+          includeQuotas: data.includeQuotas,
+          includeBilling: data.includeBilling
+        },
+        data: rows
       };
 
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json'
+      const content = data.format === 'csv' ? toCsv(rows) : JSON.stringify(exportData, null, 2);
+      const blob = new Blob([content], {
+        type: data.format === 'csv' ? 'text/csv' : 'application/json'
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -89,7 +121,7 @@ export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSp
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     },
-    [getExportCount]
+    [getExportRows]
   );
 
   const exportFormSubmit = useCallback(
@@ -132,8 +164,7 @@ export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSp
                     {...field}
                     options={[
                       { label: 'JSON', value: 'json' },
-                      { label: 'CSV', value: 'csv' },
-                      { label: 'Excel (XLSX)', value: 'xlsx' }
+                      { label: 'CSV', value: 'csv' }
                     ]}
                   />
                 )}
@@ -345,4 +376,28 @@ export const SpaceExportForm = ({ onSubmit, onCancel, spaceCount = 0, selectedSp
       </CardContent>
     </Card>
   );
+};
+
+const toCsv = (rows: any[]) => {
+  const columns = [
+    'id',
+    'name',
+    'slug',
+    'type',
+    'title',
+    'url',
+    'description',
+    'disabled',
+    'order',
+    'created_at',
+    'updated_at'
+  ];
+  const escape = (value: any) => {
+    const text = value === undefined || value === null ? '' : String(value);
+    return `"${text.replace(/"/g, '""')}"`;
+  };
+  return [
+    columns.join(','),
+    ...rows.map(row => columns.map(column => escape(row[column])).join(','))
+  ].join('\n');
 };

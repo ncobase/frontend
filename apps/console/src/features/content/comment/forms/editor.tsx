@@ -12,65 +12,31 @@ export const EditorCommentForms = ({ record, onSubmit, control, setValue, errors
 
   const fields: FieldConfigProps[] = [
     {
-      title: '名称',
-      name: 'name',
+      title: t('comment.fields.content', 'Content'),
+      name: 'content',
       defaultValue: '',
-      placeholder: '请输入名称',
-      type: 'text',
+      placeholder: t('comment.placeholders.content', 'Write the comment content'),
+      type: 'textarea',
+      className: 'col-span-full',
       rules: { required: t('forms.input_required') }
     },
     {
-      title: '上级菜单',
+      title: t('comment.fields.reply_to', 'Reply To'),
+      name: 'reply_to',
+      defaultValue: '',
+      type: 'text',
+      placeholder: t('comment.placeholders.reply_to', 'Comment ID to reply to')
+    },
+    {
+      title: t('comment.fields.parent', 'Parent'),
       name: 'parent',
       defaultValue: '',
       type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
+      placeholder: t('comment.placeholders.parent', 'Parent thread ID')
     },
     {
-      title: 'i18n 标签',
-      name: 'label',
-      placeholder: '请输入 i18n 标签',
-      defaultValue: '',
-      type: 'text'
-    },
-    {
-      title: '图标',
-      name: 'icon',
-      defaultValue: '',
-      type: 'text',
-      appendIcon: 'IconSearch',
-      appendIconClick: () => {
-        console.log('appendIconClick');
-      }
-    },
-    { title: '别名', name: 'slug', defaultValue: '', type: 'text' },
-    { title: '路径 / URL', name: 'path', defaultValue: '', type: 'text' },
-    { title: '类型', name: 'type', defaultValue: '', type: 'text' },
-    {
-      title: '打开方式',
-      name: 'target',
-      defaultValue: '_self',
-      type: 'select',
-      options: [
-        { label: '当前窗口', value: '_self' },
-        { label: '新窗口', value: '_blank' }
-      ]
-    },
-    { title: '权限标识', name: 'perms', defaultValue: '', type: 'text' },
-    {
-      title: '是否显示',
-      name: 'hidden',
-      defaultValue: false,
-      type: 'switch',
-      elementClassName: 'my-3'
-    },
-    { title: '排序', name: 'order', defaultValue: 99, type: 'number' },
-    {
-      title: '是否停用',
-      name: 'disabled',
+      title: t('comment.fields.approved', 'Approved'),
+      name: 'approved',
       defaultValue: false,
       type: 'switch',
       elementClassName: 'my-3'
@@ -100,19 +66,11 @@ export const EditorCommentForms = ({ record, onSubmit, control, setValue, errors
   useEffect(() => {
     if (!data) return;
     setValue('id', data?.id);
-    // setValue('name', data?.name);
-    // setValue('parent', data?.parent);
-    // setValue('label', data?.label);
-    // setValue('icon', data?.icon);
-    // setValue('slug', data?.slug);
-    // setValue('path', data?.path);
-    // setValue('type', data?.type);
-    // setValue('target', data?.target);
-    // setValue('perms', data?.perms);
-    // setValue('hidden', data?.hidden);
-    // setValue('order', data?.order);
-    // setValue('disabled', data?.disabled);
-    // setValue('extras', data?.extras);
+    setValue('content', data?.content);
+    setValue('reply_to', data?.reply_to);
+    setValue('parent', data?.parent);
+    setValue('approved', data?.approved);
+    setValue('extras', data?.extras);
     setValue('created_at', formatDateTime(data?.created_at));
     setValue('updated_at', formatDateTime(data?.updated_at));
   }, [setValue, data]);

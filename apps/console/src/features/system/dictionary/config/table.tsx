@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { Dictionary } from '../dictionary';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  handleValidate
+}): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
@@ -105,13 +109,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.validate', 'Validate'),
           icon: 'IconShieldCheck',
-          onClick: (record: Dictionary) => {
-            if (record.type === 'enum') {
-              console.log('Open enum validation dialog for:', record.slug);
-            } else {
-              console.log('Validation not available for type:', record.type);
-            }
-          }
+          onClick: (record: Dictionary) => handleValidate(record)
         },
         {
           title: t('actions.delete', 'Delete'),

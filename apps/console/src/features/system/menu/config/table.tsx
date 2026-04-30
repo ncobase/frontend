@@ -8,7 +8,8 @@ import { MenuTree } from '../menu';
 export const tableColumns = ({
   handleView,
   handleDelete,
-  handleToggleStatus
+  handleToggleStatus,
+  handleMove
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
@@ -137,9 +138,7 @@ export const tableColumns = ({
         {
           title: t('actions.move', 'Move'),
           icon: 'IconArrowsMove',
-          onClick: (record: MenuTree) => {
-            console.log('Open move dialog for menu:', record.id);
-          }
+          onClick: (record: MenuTree) => handleMove?.(record)
         },
         {
           title: t('actions.delete', 'Delete'),

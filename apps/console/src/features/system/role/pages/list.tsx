@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
+import { RolePermissionAssignment } from '../components/permission_assignment';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection, topbarRightSection } from '../config/topbar';
@@ -28,6 +29,10 @@ export const RoleListPage = () => {
 
   const [viewType, setViewType] = useState<string | undefined>(mode);
   const [selectedRecord, setSelectedRecord] = useState<Role | null>(null);
+  const [permissionModal, setPermissionModal] = useState<{
+    open: boolean;
+    role: Role | null;
+  }>({ open: false, role: null });
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -113,6 +118,10 @@ export const RoleListPage = () => {
     [deleteRoleMutation, onSuccess]
   );
 
+  const handlePermissions = useCallback((role: Role) => {
+    setPermissionModal({ open: true, role });
+  }, []);
+
   const handleConfirm = useCallback(
     handleFormSubmit((data: Role) => {
       return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
@@ -121,51 +130,59 @@ export const RoleListPage = () => {
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete }),
+    columns: tableColumns({ handleView, handleDelete, handlePermissions }),
     topbarLeft: topbarLeftSection({ handleView }),
     topbarRight: topbarRightSection,
     title: t('system.roles.title')
   };
 
   return (
-    <CurdView
-      viewMode={vmode}
-      title={tableConfig.title}
-      topbarLeft={tableConfig.topbarLeft}
-      topbarRight={tableConfig.topbarRight}
-      columns={tableConfig.columns}
-      data={data?.items || []}
-      selected
-      queryFields={queryFields({ queryControl })}
-      onQuery={onQuery}
-      onResetQuery={onResetQuery}
-      fetchData={fetchData}
-      loading={loading}
-      createComponent={
-        <CreateRolePage
-          viewMode={vmode}
-          onSubmit={handleConfirm}
-          control={formControl}
-          errors={formErrors}
-        />
-      }
-      viewComponent={record => (
-        <RoleViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
-      )}
-      editComponent={record => (
-        <EditorRolePage
-          viewMode={vmode}
-          record={record?.id}
-          onSubmit={handleConfirm}
-          control={formControl}
-          setValue={setFormValue}
-          errors={formErrors}
-        />
-      )}
-      type={viewType}
-      record={selectedRecord}
-      onConfirm={handleConfirm}
-      onCancel={handleClose}
-    />
+    <>
+      <CurdView
+        viewMode={vmode}
+        title={tableConfig.title}
+        topbarLeft={tableConfig.topbarLeft}
+        topbarRight={tableConfig.topbarRight}
+        columns={tableConfig.columns}
+        data={data?.items || []}
+        selected
+        queryFields={queryFields({ queryControl })}
+        onQuery={onQuery}
+        onResetQuery={onResetQuery}
+        fetchData={fetchData}
+        loading={loading}
+        createComponent={
+          <CreateRolePage
+            viewMode={vmode}
+            onSubmit={handleConfirm}
+            control={formControl}
+            errors={formErrors}
+          />
+        }
+        viewComponent={record => (
+          <RoleViewerPage viewMode={vmode} handleView={handleView} record={record?.id} />
+        )}
+        editComponent={record => (
+          <EditorRolePage
+            viewMode={vmode}
+            record={record?.id}
+            onSubmit={handleConfirm}
+            control={formControl}
+            setValue={setFormValue}
+            errors={formErrors}
+          />
+        )}
+        type={viewType}
+        record={selectedRecord}
+        onConfirm={handleConfirm}
+        onCancel={handleClose}
+      />
+      <RolePermissionAssignment
+        isOpen={permissionModal.open}
+        onClose={() => setPermissionModal({ open: false, role: null })}
+        role={permissionModal.role}
+        onSuccess={refetch}
+      />
+    </>
   );
 };

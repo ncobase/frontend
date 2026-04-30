@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { Button, Icons, Form, Section } from '@ncobase/react';
+import { Button, Icons, Form, Section, useToastMessage } from '@ncobase/react';
+import { locals } from '@ncobase/utils';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -23,11 +24,20 @@ interface SEOSettings {
 export const SEOSettingsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useToastMessage();
   const [isLoading, setIsLoading] = useState(false);
+  const storedSettings = useMemo(() => {
+    try {
+      return JSON.parse(locals.get('content.seo.settings') || '{}');
+    } catch {
+      return {};
+    }
+  }, []);
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isDirty }
   } = useForm<SEOSettings>({
     defaultValues: {
@@ -40,15 +50,19 @@ export const SEOSettingsPage = () => {
       enable_schema_markup: true,
       sitemap_auto_generate: true,
       robots_txt_auto_generate: false,
-      canonical_domain: 'https://example.com'
+      canonical_domain: 'https://example.com',
+      ...storedSettings
     }
   });
 
   const onSubmit = handleSubmit(async data => {
     setIsLoading(true);
     try {
-      console.log('Saving SEO settings:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      locals.set('content.seo.settings', JSON.stringify(data));
+      reset(data);
+      toast.success(t('messages.success'), {
+        description: t('seo.settings.save_success', 'SEO settings saved')
+      });
     } catch (error) {
       console.error('Failed to save settings:', error);
     } finally {

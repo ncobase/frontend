@@ -9,6 +9,8 @@ which cross-feature effects they must handle.
 - Create/update/delete mutations must show saving/deleting state, success feedback, and field or
   request errors.
 - Dangerous operations must use a confirmation dialog that names the target and describes impact.
+- Product routes must not ship placeholder handlers, debug-only `console.log` actions, or native browser
+  `prompt`/`confirm` flows when the project dialog/toast system can express the operation.
 - Successful mutations invalidate the exact React Query keys that changed; broad invalidation is a
   fallback only when the impact is cross-cutting.
 - Permission failures render 403 or a local unavailable state; they must not look like generic
@@ -44,6 +46,7 @@ which cross-feature effects they must handle.
 - Success effects: clear tokens, AuthContext, permission cache, and React Query cache; navigate to
   login.
 - Failure states: server logout failure still performs local cleanup and reports a warning.
+- Quick logout uses the project confirmation dialog before calling the logout mutation.
 
 ### Session Management
 
@@ -72,6 +75,13 @@ which cross-feature effects they must handle.
   activities.
 - API: `/sys/roles`, `/sys/permissions`, `/sys/policies`, `/sys/activities`.
 - Cross-effects: role/permission changes affect menus, token permissions, and current route access.
+- Current assignment behavior:
+  - Permission list row selection feeds bulk state so assignment actions only appear with selected
+    permissions.
+  - Assign-permission-to-role uses typed role assignment hooks instead of raw `fetch`, disables confirm
+    until roles are selected, and resets state on close.
+  - Role list permission assignment opens a modal, loads current role permissions, computes added and
+    removed ids, and calls assign/remove hooks before closing.
 - Required UX: show affected users/menus before destructive changes; prompt users to refresh token or
   re-login after RBAC changes.
 
@@ -81,6 +91,9 @@ which cross-feature effects they must handle.
 - Actions: CRUD, move, reorder, enable/disable, show/hide, navigation preview.
 - API: `/sys/menus`, `/sys/menus/tree`, `/sys/menus/navigation`, `/sys/menus/authorized/:userId`.
 - Cache effects: invalidate `menuService` list/tree/navigation queries.
+- Current move behavior: the table action opens a modal with parent and order fields, rejects moving a
+  menu under itself or a descendant, sends `parent_id` including explicit `null`, and refetches menu
+  data after success.
 - Required UX: validate unique path/slug, detect missing `perms`, show whether a menu is hidden by
   feature exposure.
 
@@ -90,6 +103,9 @@ which cross-feature effects they must handle.
 - Actions: CRUD, validate dictionary option value, batch load, delete by prefix, export options.
 - API: `/sys/dictionaries`, `/sys/options`.
 - Cross-effects: forms using dictionaries/options need refetch or stale indicators after changes.
+- Current validation behavior: dictionary table validation opens a modal, parses JSON when required,
+  validates enum/object/number/boolean/scalar expectations, and shows normalized JSON preview or
+  deterministic validation errors.
 - Required UX: usage/impact query before delete or prefix delete.
 
 ## Content
@@ -159,6 +175,9 @@ which cross-feature effects they must handle.
 - API: `/cms/channels`, `/cms/distributions`, publish/cancel actions.
 - Cross-effects: channel `allowed_types`, `auto_publish`, and `require_review` must constrain topic
   publish/distribution behavior.
+- Current distribution behavior: list export downloads selected row JSON, cancel requires a reason in
+  a modal, detail cancel uses the same modal pattern, and edit routes open the edit page rather than
+  create.
 - Required UX: status badges, publish/cancel confirmation, failure reason, retry path.
 
 ### Advanced Content Capabilities
@@ -166,6 +185,21 @@ which cross-feature effects they must handle.
 Comments, tags, SEO, workflow, templates, versions, schedules, trash, and approval pages are not a
 complete backend-backed product surface in the current `ncobase` backend. They must be hidden,
 marked beta, or implemented backend-first before production exposure.
+
+Current frontend closure from the feature/UI pass:
+
+- Comments: list columns represent comment content, author, approval, reply target, and timestamps;
+  create/edit forms expose content, reply target, parent thread, approval, and space; list approval
+  actions call update mutation.
+- Media: selected-row export downloads JSON instead of logging.
+- Templates: duplicate uses a named input modal; delete uses `AlertDialog`; market install debug
+  logging was removed until a real install contract exists.
+- Workflows: delete uses `AlertDialog`; view no longer exposes a duplicate action without behavior.
+- Schedules: execute and cancel use project dialogs, cancel captures a reason, and operations call
+  their mutations with loading state.
+- Versions: restore uses `AlertDialog` before calling the restore mutation.
+- SEO/version settings: settings persist to local storage with dirty-state reset and success feedback
+  until backend option contracts are available.
 
 ## Resources
 
@@ -192,6 +226,11 @@ marked beta, or implemented backend-first before production exposure.
 - API: `/sys/spaces` and nested space subroutes.
 - Cross-effects: changing active space affects token permissions, navigation, resource ownership,
   content visibility, payment/billing, and cached queries.
+- Current import/export behavior: import accepts JSON arrays or objects with `items`, creates spaces
+  through `useCreateSpace`, reports deterministic parse/validation errors, and export writes current
+  rows to JSON or CSV.
+- Current edit behavior: space edit and space-user edit show unsaved reminders and use `AlertDialog`
+  before discard from cancel, reminder, or back navigation.
 - Required UX: after switching space, clear or refetch account, navigation, and domain queries.
 
 ## Payment

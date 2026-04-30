@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { Role } from '../role';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  handlePermissions
+}): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
     {
@@ -98,7 +102,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
         {
           title: t('actions.permissions', 'Permissions'),
           icon: 'IconLock',
-          onClick: () => console.log('manage permissions')
+          onClick: (record: Role) => handlePermissions(record)
         },
         {
           title: t('actions.delete', 'Delete'),

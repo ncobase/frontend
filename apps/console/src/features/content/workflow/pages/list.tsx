@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-import { Button, Icons, Badge, TableView } from '@ncobase/react';
+import { AlertDialog, Button, Icons, Badge, TableView } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useNavigate } from 'react-router';
 
@@ -12,6 +12,7 @@ import { Page } from '@/components/layout';
 export const WorkflowListPage = () => {
   const navigate = useNavigate();
   const searchParams = { search: '', type: '', limit: 50 };
+  const [deleteDialog, setDeleteDialog] = useState<Workflow | null>(null);
 
   const { data: workflowData, isLoading, refetch } = useWorkflows(searchParams);
   const deleteWorkflowMutation = useDeleteWorkflow();
@@ -20,13 +21,12 @@ export const WorkflowListPage = () => {
 
   const handleDelete = useCallback(
     async (workflow: Workflow) => {
-      if (confirm('Are you sure you want to delete this workflow?')) {
-        try {
-          await deleteWorkflowMutation.mutateAsync(workflow.id!);
-          refetch();
-        } catch (error) {
-          console.error('Failed to delete workflow:', error);
-        }
+      try {
+        await deleteWorkflowMutation.mutateAsync(workflow.id!);
+        setDeleteDialog(null);
+        refetch();
+      } catch (error) {
+        console.error('Failed to delete workflow:', error);
       }
     },
     [deleteWorkflowMutation, refetch]
@@ -115,7 +115,7 @@ export const WorkflowListPage = () => {
           <Button
             variant='text'
             size='xs'
-            onClick={() => handleDelete(workflow)}
+            onClick={() => setDeleteDialog(workflow)}
             className='text-red-600'
           >
             <Icons name='IconTrash' size={14} className='mr-1' />
@@ -164,6 +164,16 @@ export const WorkflowListPage = () => {
           )}
         </div>
       </div>
+      <AlertDialog
+        title='Delete Workflow'
+        description={`Delete "${deleteDialog?.name || ''}"? This cannot be undone.`}
+        isOpen={!!deleteDialog}
+        onChange={() => setDeleteDialog(null)}
+        cancelText='Cancel'
+        confirmText='Delete'
+        onCancel={() => setDeleteDialog(null)}
+        onConfirm={() => deleteDialog && handleDelete(deleteDialog)}
+      />
     </Page>
   );
 };

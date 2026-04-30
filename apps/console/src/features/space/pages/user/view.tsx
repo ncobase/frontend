@@ -17,8 +17,6 @@ export const SpaceUserViewPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  console.log(spaceId, userId);
-
   const [roleManagementModal, setRoleManagementModal] = useState(false);
 
   const { data: _space } = useQuerySpace(spaceId!);
@@ -42,8 +40,6 @@ export const SpaceUserViewPage = () => {
       </Page>
     );
   }
-
-  console.log(userSpaceData, userData);
 
   if (!userSpaceData || !userData) {
     return (

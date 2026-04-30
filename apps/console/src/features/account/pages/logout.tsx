@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Icons } from '@ncobase/react';
+import { AlertDialog, Icons } from '@ncobase/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 
@@ -119,20 +119,36 @@ export const QuickLogout = ({
   confirmMessage?: string;
 }) => {
   const logout = useLogout();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleLogout = () => {
-    if (window.confirm(confirmMessage)) {
-      logout();
-    }
+    setConfirmOpen(true);
+  };
+
+  const confirmLogout = () => {
+    setConfirmOpen(false);
+    logout();
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      className={`flex items-center space-x-2 text-red-600 hover:text-red-700 ${className}`}
-    >
-      <Icons name='IconLogout' className='w-4 h-4' />
-      {children && <span>{children}</span>}
-    </button>
+    <>
+      <button
+        onClick={handleLogout}
+        className={`flex items-center space-x-2 text-red-600 hover:text-red-700 ${className}`}
+      >
+        <Icons name='IconLogout' className='w-4 h-4' />
+        {children && <span>{children}</span>}
+      </button>
+      <AlertDialog
+        title='Sign out'
+        description={confirmMessage}
+        isOpen={confirmOpen}
+        onChange={() => setConfirmOpen(false)}
+        cancelText='Cancel'
+        confirmText='Sign out'
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={confirmLogout}
+      />
+    </>
   );
 };

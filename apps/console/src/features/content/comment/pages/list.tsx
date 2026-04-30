@@ -22,7 +22,7 @@ export const CommentListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [queryParams, setQueryParams] = useState<QueryFormParams>({ limit: 20 });
-  const { data, refetch } = useListComments(queryParams);
+  const { data, isLoading, refetch } = useListComments(queryParams);
   const { vmode } = useLayoutContext();
 
   const {
@@ -109,6 +109,23 @@ export const CommentListPage = () => {
     [deleteCommentMutation, onSuccess]
   );
 
+  const handleToggleApproved = useCallback(
+    (record: Comment) => {
+      updateCommentMutation.mutate(
+        {
+          ...record,
+          approved: !record.approved
+        },
+        {
+          onSuccess: () => {
+            refetch();
+          }
+        }
+      );
+    },
+    [updateCommentMutation, refetch]
+  );
+
   const handleConfirm = useCallback(
     handleFormSubmit((data: Comment) => {
       return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
@@ -136,12 +153,14 @@ export const CommentListPage = () => {
       title={t('content.comments.title')}
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
-      columns={tableColumns({ handleView, handleDelete })}
+      columns={tableColumns({ handleView, handleDelete, handleToggleApproved })}
+      data={data?.items || []}
       selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}
       onResetQuery={onResetQuery}
       fetchData={fetchData}
+      loading={isLoading}
       createComponent={
         <CreateCommentPage
           viewMode={vmode}
