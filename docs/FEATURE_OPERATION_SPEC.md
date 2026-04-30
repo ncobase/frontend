@@ -134,11 +134,19 @@ which cross-feature effects they must handle.
     persisted topic edit writes immediately through the topic-media sync mutation.
   - The same media cannot be duplicated across types; selecting it in another type moves the relation
     because backend topic/media uniqueness is enforced per pair.
+  - Media detail queries `/cms/topic-media?media_id=...` to show topic usage and navigate back to the
+    topic record.
+- Current reference behavior:
+  - CMS media detail links to `/res/view/:resourceId` and downloads resource-backed media through the
+    protected `/res/:id/download` API instead of relying only on direct URLs.
+  - Resource detail queries `/cms/media?resource_id=...` and links back to each CMS media record.
+  - Media list accepts `?resource_id=...` so resource references can open a filtered CMS media view.
 - Cross-effects: media references resource files through `resource_id`; resource deletion queries CMS
-  media references and must also surface topic references once reverse lookup exists.
-- Required next UX: shared picker for existing `/res` file selection, direct resource/media reference
-  navigation, per-file progress, retry failed uploads, protected preview states for private files, and
-  reference warnings for bulk delete.
+  media references and still needs a combined impact view that also aggregates topic usage for the
+  referenced media.
+- Required next UX: shared picker for existing `/res` file selection, per-file progress, retry failed
+  uploads, protected preview states for private files, and richer batch reference warnings that show
+  the exact CMS media/topic impact before bulk delete.
 
 ### Channels and Distributions
 
@@ -166,11 +174,11 @@ marked beta, or implemented backend-first before production exposure.
 - Current upload UX: upload modal has a local file queue, zero-byte/oversize rejection reasons,
   quota visibility and pre-check, private/shared/public access selection, public flag, path prefix,
   tags, image thumbnail options, single-file `file` upload, and multi-file `files` batch upload.
-- Current sharing/delete UX: table actions expose share link generation with public/shared scope and
-  expiration, and delete confirmation queries CMS media by `resource_id` to block deletion while
-  visible references exist.
-- Required next UX: per-file progress, retry failed batch items, bulk reference review, and direct
-  navigation from resource references to CMS media records.
+- Current sharing/delete/reference UX: table actions expose share link generation with public/shared
+  scope and expiration; delete confirmation queries CMS media by `resource_id` to block deletion
+  while visible references exist and links to those media records; resource detail shows CMS media
+  references and can open a filtered `/content/media?resource_id=...` list.
+- Required next UX: per-file progress, retry failed batch items, and richer bulk reference review.
 
 ## Spaces
 

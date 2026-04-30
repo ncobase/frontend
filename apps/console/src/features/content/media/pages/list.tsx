@@ -1,21 +1,17 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
-import { Card, Button, Icons, Badge, TableView } from '@ncobase/react';
+import { Card, Button, Icons, Badge, TableView, useToastMessage } from '@ncobase/react';
 import { formatDateTime } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { BulkActions } from '../../components/BulkActions';
 import { ContentSearch } from '../../components/ContentSearch';
 import { useContentOperations } from '../../hooks/useContentOperations';
 import { MediaUpload } from '../components/upload';
 import type { Media } from '../media';
-import {
-  getMediaDownloadUrl,
-  getMediaMimeType,
-  getMediaPreviewUrl,
-  getMediaSize
-} from '../media_resource';
+import { canDownloadMedia, downloadMediaFile } from '../media_download';
+import { getMediaMimeType, getMediaPreviewUrl, getMediaSize } from '../media_resource';
 import { useListMedia } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
@@ -23,15 +19,32 @@ import { Page, Topbar } from '@/components/layout';
 export const MediaListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useState({ search: '', type: '', limit: 50 });
+  const toast = useToastMessage();
+  const [urlSearchParams, setUrlSearchParams] = useSearchParams();
+  const resourceIdFilter = urlSearchParams.get('resource_id') || '';
+  const [searchParams, setSearchParams] = useState<Record<string, any>>({
+    search: '',
+    type: '',
+    resource_id: resourceIdFilter,
+    limit: 50
+  });
   const [selectedItems, setSelectedItems] = useState<Media[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const { data: mediaData, isLoading, refetch } = useListMedia(searchParams);
   const { bulkDeleteMedia } = useContentOperations();
 
   const mediaItems = mediaData?.items || [];
+
+  useEffect(() => {
+    setSearchParams(prev => ({
+      ...prev,
+      resource_id: resourceIdFilter,
+      cursor: ''
+    }));
+  }, [resourceIdFilter]);
 
   const handleSearch = useCallback((query: string, filters: any) => {
     setSearchParams(prev => ({
@@ -41,6 +54,17 @@ export const MediaListPage = () => {
       cursor: ''
     }));
   }, []);
+
+  const handleClearResourceFilter = useCallback(() => {
+    const nextParams = new URLSearchParams(urlSearchParams);
+    nextParams.delete('resource_id');
+    setUrlSearchParams(nextParams, { replace: true });
+    setSearchParams(prev => ({
+      ...prev,
+      resource_id: '',
+      cursor: ''
+    }));
+  }, [setUrlSearchParams, urlSearchParams]);
 
   const handleToggleSelect = useCallback((item: Media) => {
     setSelectedItems(prev => {
@@ -62,6 +86,22 @@ export const MediaListPage = () => {
       }
     },
     [bulkDeleteMedia, refetch]
+  );
+
+  const handleDownloadMedia = useCallback(
+    async (media: Media) => {
+      setDownloadingId(media.id || null);
+      try {
+        await downloadMediaFile(media);
+      } catch (error: any) {
+        toast.error(t('messages.error', 'Error'), {
+          description: error?.message || t('media.download_failed', 'Failed to download media')
+        });
+      } finally {
+        setDownloadingId(null);
+      }
+    },
+    [t, toast]
   );
 
   const isSelected = useCallback(
@@ -189,11 +229,12 @@ export const MediaListPage = () => {
             <Icons name='IconEdit' size={14} className='mr-1' />
             {t('actions.edit')}
           </Button>
-          {getMediaDownloadUrl(media) && (
+          {canDownloadMedia(media) && (
             <Button
               variant='text'
               size='xs'
-              onClick={() => window.open(getMediaDownloadUrl(media), '_blank')}
+              isLoading={downloadingId === media.id}
+              onClick={() => handleDownloadMedia(media)}
             >
               <Icons name='IconDownload' size={14} className='mr-1' />
               {t('actions.download')}
@@ -208,7 +249,6 @@ export const MediaListPage = () => {
   const renderMediaCard = (media: Media) => {
     const isSelectedItem = isSelected(media);
     const previewUrl = getMediaPreviewUrl(media);
-    const downloadUrl = getMediaDownloadUrl(media);
     const size = getMediaSize(media);
 
     return (
@@ -265,11 +305,12 @@ export const MediaListPage = () => {
             >
               <Icons name='IconEdit' size={16} />
             </Button>
-            {downloadUrl && (
+            {canDownloadMedia(media) && (
               <Button
                 variant='ghost'
                 size='sm'
-                onClick={() => window.open(downloadUrl, '_blank')}
+                isLoading={downloadingId === media.id}
+                onClick={() => handleDownloadMedia(media)}
                 className='bg-white text-gray-700 hover:bg-gray-100'
               >
                 <Icons name='IconDownload' size={16} />
@@ -321,6 +362,21 @@ export const MediaListPage = () => {
         showFilters={true}
         filterOptions={filterOptions}
       />
+
+      {resourceIdFilter && (
+        <div className='flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800'>
+          <div className='flex min-w-0 items-center gap-2'>
+            <Icons name='IconLink' size={16} className='shrink-0' />
+            <span className='min-w-0 truncate'>
+              {t('media.filters.resource_id', 'Filtered by resource')}{' '}
+              <code className='rounded bg-white/70 px-1 py-0.5'>{resourceIdFilter}</code>
+            </span>
+          </div>
+          <Button variant='outline' size='xs' onClick={handleClearResourceFilter}>
+            {t('actions.clear', 'Clear')}
+          </Button>
+        </div>
+      )}
 
       {/* Media List */}
       <div>

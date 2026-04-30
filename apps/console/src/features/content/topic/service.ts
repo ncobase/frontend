@@ -8,6 +8,7 @@ import {
   deleteTopicMedia,
   getTopic,
   getTopicMediaByTopic,
+  getTopicMediaList,
   getTopics,
   updateTopic,
   updateTopicMedia
@@ -29,6 +30,9 @@ interface TopicKeys {
   update: ['topicService', 'update'];
   list: (_options?: QueryFormParams) => ['topicService', 'topics', QueryFormParams];
   media: (_options?: { topicId?: string }) => ['topicService', 'topicMedia', { topicId?: string }];
+  mediaReferences: (_options?: {
+    mediaId?: string;
+  }) => ['topicService', 'topicMediaByMedia', { mediaId?: string }];
 }
 
 export const topicKeys: TopicKeys = {
@@ -37,7 +41,8 @@ export const topicKeys: TopicKeys = {
   tree: (queryParams = {}) => ['topicService', 'tree', queryParams],
   update: ['topicService', 'update'],
   list: (queryParams = {}) => ['topicService', 'topics', queryParams],
-  media: ({ topicId } = {}) => ['topicService', 'topicMedia', { topicId }]
+  media: ({ topicId } = {}) => ['topicService', 'topicMedia', { topicId }],
+  mediaReferences: ({ mediaId } = {}) => ['topicService', 'topicMediaByMedia', { mediaId }]
 };
 
 export const syncTopicMedia = async (topicId: string, media: TopicMedia[]) => {
@@ -85,6 +90,13 @@ export const useQueryTopicMedia = (topicId: string) =>
     queryKey: topicKeys.media({ topicId }),
     queryFn: async () => topicMediaItems(await getTopicMediaByTopic(topicId, { limit: 100 })),
     enabled: !!topicId
+  });
+
+export const useListTopicMediaByMedia = (mediaId: string, limit = 20) =>
+  useQuery({
+    queryKey: topicKeys.mediaReferences({ mediaId }),
+    queryFn: async () => topicMediaItems(await getTopicMediaList({ media_id: mediaId, limit })),
+    enabled: !!mediaId
   });
 
 // Create topic mutation with media support

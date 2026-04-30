@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { canDownloadMedia, getMediaDownloadFileName } from './media_download';
 import {
   buildMediaRecordFromResource,
   getMediaDownloadUrl,
@@ -81,5 +82,26 @@ describe('content media resource helpers', () => {
     expect(getMediaDownloadUrl(media)).toBe('/download');
     expect(getMediaMimeType(media)).toBe('image/webp');
     expect(getMediaSize(media)).toBe(1000);
+  });
+
+  it('treats resource-backed private media as downloadable through protected resource API', () => {
+    expect(canDownloadMedia({ resource_id: 'res_1', title: 'private.pdf', type: 'file' })).toBe(
+      true
+    );
+    expect(getMediaDownloadFileName({ resource_id: 'res_1', title: 'private.pdf' })).toBe(
+      'private.pdf'
+    );
+    expect(
+      getMediaDownloadFileName({
+        title: 'Fallback',
+        resource: {
+          id: 'res_1',
+          name: 'contract.pdf',
+          path: 'content/media/contract.pdf',
+          type: 'application/pdf',
+          storage: 'local'
+        }
+      })
+    ).toBe('contract.pdf');
   });
 });

@@ -1,6 +1,9 @@
-import { Card, Button, Icons } from '@ncobase/react';
+import { useState } from 'react';
+
+import { Card, Button, Icons, useToastMessage } from '@ncobase/react';
 import { useParams, useNavigate } from 'react-router';
 
+import { canDownloadMedia, downloadMediaFile } from '../media_download';
 import {
   getMediaDownloadUrl,
   getMediaMimeType,
@@ -11,11 +14,19 @@ import { useQueryMedia } from '../service';
 
 import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
+import { useListTopicMediaByMedia } from '@/features/content/topic/service';
 
 export const MediaViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToastMessage();
   const { data: media, isLoading, error } = useQueryMedia(id!);
+  const {
+    data: topicReferences = [],
+    isLoading: topicReferencesLoading,
+    isError: topicReferencesError
+  } = useListTopicMediaByMedia(id || '');
+  const [downloading, setDownloading] = useState(false);
 
   if (isLoading) {
     return (
@@ -64,10 +75,25 @@ export const MediaViewPage = () => {
     );
   };
 
+  const handleDownload = async () => {
+    if (!media) return;
+    setDownloading(true);
+    try {
+      await downloadMediaFile(media);
+    } catch (downloadError: any) {
+      toast.error('Failed to download media', {
+        description: downloadError?.message || 'Download failed'
+      });
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const previewUrl = getMediaPreviewUrl(media);
-  const downloadUrl = getMediaDownloadUrl(media);
+  const playbackUrl = getMediaDownloadUrl(media);
   const mimeType = getMediaMimeType(media);
   const size = getMediaSize(media);
+  const downloadable = canDownloadMedia(media);
 
   return (
     <Page
@@ -92,8 +118,9 @@ export const MediaViewPage = () => {
             <Button
               variant='outline'
               size='sm'
-              disabled={!downloadUrl}
-              onClick={() => window.open(downloadUrl, '_blank')}
+              disabled={!downloadable}
+              isLoading={downloading}
+              onClick={handleDownload}
             >
               <Icons name='IconDownload' size={16} className='mr-2' />
               Download
@@ -123,22 +150,22 @@ export const MediaViewPage = () => {
                   alt={media.alt || media.title}
                   className='max-w-full max-h-96 object-contain rounded-lg shadow-sm'
                 />
-              ) : media.type === 'video' && downloadUrl ? (
+              ) : media.type === 'video' && playbackUrl ? (
                 <video
-                  src={downloadUrl}
+                  src={playbackUrl}
                   controls
                   className='max-w-full max-h-96 rounded-lg shadow-sm'
                 >
                   Your browser does not support the video tag.
                 </video>
-              ) : media.type === 'audio' && downloadUrl ? (
+              ) : media.type === 'audio' && playbackUrl ? (
                 <div className='w-full max-w-md'>
                   <div className='text-center mb-4'>
                     <Icons name='IconMusic' size={64} className='mx-auto text-gray-400 mb-2' />
                     <p className='text-sm text-gray-600'>{media.title}</p>
                   </div>
                   <audio controls className='w-full'>
-                    <source src={downloadUrl} type={mimeType} />
+                    <source src={playbackUrl} type={mimeType} />
                     Your browser does not support the audio element.
                   </audio>
                 </div>
@@ -150,14 +177,10 @@ export const MediaViewPage = () => {
                     className='mx-auto text-gray-400 mb-4'
                   />
                   <p className='text-gray-600 mb-4'>Preview not available for this file type</p>
-                  {downloadUrl && (
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => window.open(downloadUrl, '_blank')}
-                    >
+                  {downloadable && (
+                    <Button variant='outline' size='sm' onClick={handleDownload}>
                       <Icons name='IconExternalLink' size={16} className='mr-2' />
-                      Open File
+                      Download File
                     </Button>
                   )}
                 </div>
@@ -220,27 +243,98 @@ export const MediaViewPage = () => {
                 </div>
               )}
 
-              {downloadUrl && (
-                <div>
-                  <label className='text-sm font-medium text-gray-500'>URL</label>
-                  <div className='mt-1 flex items-center space-x-2'>
-                    <input
-                      type='text'
-                      value={downloadUrl}
-                      readOnly
-                      className='flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-300 rounded px-2 py-1'
-                    />
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => navigator.clipboard.writeText(downloadUrl)}
-                    >
-                      <Icons name='IconCopy' size={14} />
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <div>
+                <label className='text-sm font-medium text-gray-500'>Resource ID</label>
+                <p className='mt-1 break-all text-sm text-gray-900'>{media.resource_id || '-'}</p>
+              </div>
             </div>
+          </Card>
+
+          <Card className='p-6'>
+            <h3 className='text-lg font-medium text-gray-900 mb-4'>Resource Link</h3>
+            {media.resource_id ? (
+              <div className='space-y-4'>
+                <div>
+                  <label className='text-sm font-medium text-gray-500'>File</label>
+                  <p className='mt-1 break-all text-sm text-gray-900'>
+                    {media.resource?.name || media.path || media.resource_id}
+                  </p>
+                </div>
+                {media.resource?.path && (
+                  <div>
+                    <label className='text-sm font-medium text-gray-500'>Path</label>
+                    <p className='mt-1 break-all text-sm text-gray-900'>{media.resource.path}</p>
+                  </div>
+                )}
+                {media.resource?.is_expired && (
+                  <div className='rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-700'>
+                    The linked resource URL is expired. Open the resource detail to refresh access.
+                  </div>
+                )}
+                <div className='flex flex-wrap gap-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => navigate(`/res/view/${media.resource_id}`)}
+                  >
+                    <Icons name='IconExternalLink' size={14} className='mr-1' />
+                    View Resource
+                  </Button>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={handleDownload}
+                    isLoading={downloading}
+                  >
+                    <Icons name='IconDownload' size={14} className='mr-1' />
+                    Download
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className='rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500'>
+                This media record is not linked to a managed resource file.
+              </div>
+            )}
+          </Card>
+
+          <Card className='p-6'>
+            <h3 className='text-lg font-medium text-gray-900 mb-4'>Topic Usage</h3>
+            {topicReferencesLoading ? (
+              <div className='flex items-center gap-2 text-sm text-gray-500'>
+                <Icons name='IconLoader2' className='animate-spin' size={16} />
+                Loading topic references...
+              </div>
+            ) : topicReferencesError ? (
+              <div className='rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-700'>
+                Failed to load topic references.
+              </div>
+            ) : topicReferences.length > 0 ? (
+              <div className='space-y-2'>
+                {topicReferences.map(reference => (
+                  <button
+                    key={reference.id || `${reference.topic_id}-${reference.media_id}`}
+                    type='button'
+                    onClick={() => navigate(`/content/topics/${reference.topic_id}`)}
+                    className='flex w-full items-center justify-between gap-3 rounded-md border border-slate-200 px-3 py-2 text-left text-sm transition-colors hover:bg-slate-50'
+                  >
+                    <span className='min-w-0'>
+                      <span className='block truncate font-medium text-slate-900'>
+                        {reference.topic_id}
+                      </span>
+                      <span className='text-xs text-slate-500'>
+                        {reference.type || 'gallery'} · order {reference.order ?? 0}
+                      </span>
+                    </span>
+                    <Icons name='IconExternalLink' size={14} className='shrink-0 text-slate-400' />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className='rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500'>
+                No topic is using this media.
+              </div>
+            )}
           </Card>
 
           {/* Metadata */}

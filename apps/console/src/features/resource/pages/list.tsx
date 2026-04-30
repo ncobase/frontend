@@ -535,9 +535,17 @@ export const ResourceListPage = () => {
               </p>
               <div className='mt-2 space-y-1'>
                 {(mediaReferences?.items || []).slice(0, 5).map((media: any) => (
-                  <p key={media.id} className='truncate text-xs text-orange-700'>
+                  <button
+                    key={media.id}
+                    type='button'
+                    onClick={() => {
+                      setDeleteDialog({ open: false, file: null });
+                      navigate(`/content/media/${media.id}`);
+                    }}
+                    className='block w-full truncate text-left text-xs text-orange-700 underline-offset-2 hover:underline'
+                  >
                     {media.title || media.id}
-                  </p>
+                  </button>
                 ))}
               </div>
             </div>
