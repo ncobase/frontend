@@ -1,6 +1,6 @@
 import { ResourceUploadOptions } from './resource';
 
-export const RESOURCE_MAX_UPLOAD_BYTES = 2048 * 1024 * 1024;
+export const RESOURCE_MAX_UPLOAD_BYTES = 5368709120;
 
 export const formatBytes = (bytes?: number | null) => {
   if (!bytes || bytes <= 0) return '0 B';
@@ -24,6 +24,63 @@ export const normalizeResourceTags = (tags?: string | string[]) => {
     .split(',')
     .map(tag => tag.trim())
     .filter(Boolean);
+};
+
+export const normalizeAllowedResourceTypes = (allowedTypes?: string[]) => {
+  const normalized = (allowedTypes || [])
+    .map(type =>
+      String(type || '')
+        .trim()
+        .toLowerCase()
+    )
+    .filter(Boolean);
+
+  return normalized.length > 0 ? Array.from(new Set(normalized)) : ['*'];
+};
+
+const getExtension = (filename?: string) => {
+  const value = String(filename || '')
+    .trim()
+    .toLowerCase();
+  const index = value.lastIndexOf('.');
+  return index >= 0 ? value.slice(index) : '';
+};
+
+const matchesMime = (contentType: string, allowedType: string) => {
+  if (!contentType) return false;
+  if (allowedType === contentType) return true;
+  if (!allowedType.endsWith('/*')) return false;
+  return contentType.startsWith(`${allowedType.slice(0, -1)}`);
+};
+
+export const isResourceFileTypeAllowed = (
+  file: Pick<File, 'name' | 'type'>,
+  allowedTypes?: string[]
+) => {
+  const normalized = normalizeAllowedResourceTypes(allowedTypes);
+  if (normalized.includes('*') || normalized.includes('*/*')) return true;
+
+  const contentType = String(file.type || '').toLowerCase();
+  const extension = getExtension(file.name);
+
+  return normalized.some(type => {
+    if (!type) return false;
+    if (type.startsWith('.')) return type === extension;
+    if (type.includes('/')) return matchesMime(contentType, type);
+    return `.${type}` === extension;
+  });
+};
+
+export const fileInputAcceptValue = (allowedTypes?: string[]) => {
+  const normalized = normalizeAllowedResourceTypes(allowedTypes);
+  if (normalized.includes('*') || normalized.includes('*/*')) return undefined;
+  return normalized.join(',');
+};
+
+export const summarizeAllowedResourceTypes = (allowedTypes?: string[]) => {
+  const normalized = normalizeAllowedResourceTypes(allowedTypes);
+  if (normalized.includes('*') || normalized.includes('*/*')) return 'All file types';
+  return normalized.join(', ');
 };
 
 const appendIfPresent = (data: FormData, key: string, value: unknown) => {

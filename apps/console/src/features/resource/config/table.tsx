@@ -28,10 +28,12 @@ const categoryIcon: Record<string, string> = {
 export const tableColumns = ({
   handleView,
   handleShare,
+  handleDownload,
   handleDelete
 }: {
   handleView: (_record: ResourceFile, _mode: string) => void;
   handleShare: (_record: ResourceFile) => void;
+  handleDownload: (_record: ResourceFile) => void;
   handleDelete: (_record: ResourceFile) => void;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
@@ -132,6 +134,11 @@ export const tableColumns = ({
           title: t('resource.actions.share', 'Share'),
           icon: 'IconShare',
           onClick: (record: ResourceFile) => handleShare(record)
+        },
+        {
+          title: t('resource.actions.download', 'Download'),
+          icon: 'IconDownload',
+          onClick: (record: ResourceFile) => handleDownload(record)
         },
         {
           title: t('actions.delete', 'Delete'),

@@ -2,12 +2,19 @@ import { isBrowser, locals, buildQueryString } from '@ncobase/utils';
 
 import {
   ResourceBatchUploadResult,
+  ResourceBatchDeleteResult,
+  ResourceBatchStatus,
   ResourceFile,
   StorageStats,
+  StorageHealth,
+  BatchCleanupResult,
+  BatchJobListResponse,
+  OptimizeResult,
   ResourceQuota,
   ResourceUsage,
   FileVersion,
-  ShareLink
+  ShareLink,
+  ResourceProcessingOptions
 } from './resource';
 import { normalizeResourceTags } from './upload_payload';
 
@@ -85,6 +92,10 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.get(`${endpoint}/thumb/${slug}`);
   },
 
+  createThumbnail: (slug: string, options: ResourceProcessingOptions): Promise<ResourceFile> => {
+    return request.post(`${endpoint}/${slug}/thumbnail`, options);
+  },
+
   // Batch
   batchUpload: (
     data: FormData,
@@ -93,9 +104,25 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.post(`${endpoint}/batch/upload`, ensureOwnerIdFormData(data, params));
   },
 
-  batchDelete: (ids: string[], params?: Record<string, any>): Promise<void> => {
+  batchProcess: (
+    ids: string[],
+    options?: ResourceProcessingOptions,
+    params?: Record<string, any>
+  ): Promise<ResourceFile[]> => {
+    const finalParams = withOwnerId(params) || {};
+    return request.post(`${endpoint}/batch/process`, { ids, options, ...finalParams });
+  },
+
+  batchDelete: (
+    ids: string[],
+    params?: Record<string, any>
+  ): Promise<ResourceBatchDeleteResult> => {
     const finalParams = withOwnerId(params) || {};
     return request.post(`${endpoint}/batch/delete`, { ids, ...finalParams });
+  },
+
+  getBatchStatus: (jobId: string): Promise<ResourceBatchStatus> => {
+    return request.get(`${endpoint}/status/${jobId}`);
   },
 
   // Quota
@@ -117,8 +144,25 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.get(`${endpoint}/admin/stats`);
   },
 
-  batchCleanup: (payload: { type: string; dry_run?: boolean }): Promise<any> => {
+  batchCleanup: (payload: {
+    type: string;
+    dry_run?: boolean;
+    max_items?: number;
+  }): Promise<BatchCleanupResult> => {
     return request.post(`${endpoint}/admin/batch/cleanup`, payload);
+  },
+
+  listBatchJobs: (params: Record<string, any> = {}): Promise<BatchJobListResponse> => {
+    const query = new URLSearchParams(params).toString();
+    return request.get(`${endpoint}/admin/batch/jobs${query ? `?${query}` : ''}`);
+  },
+
+  optimizeStorage: (): Promise<OptimizeResult> => {
+    return request.post(`${endpoint}/admin/storage/optimize`);
+  },
+
+  getStorageHealth: (): Promise<StorageHealth> => {
+    return request.get(`${endpoint}/admin/storage/health`);
   },
 
   // Upload (multipart)
@@ -143,8 +187,8 @@ export const resourceApi = createApi<ResourceFile>('/res', {
     }
     append('expires_at', payload.expires_at);
 
-    const tags = normalizeResourceTags(payload.tags as string[] | string);
-    if (tags.length > 0) {
+    if (Array.isArray(payload.tags) || typeof payload.tags === 'string') {
+      const tags = normalizeResourceTags(payload.tags as string[] | string);
       data.append('tags', tags.join(','));
     }
 
@@ -171,12 +215,18 @@ export const {
   shareFile,
   updateAccess,
   getThumbnail,
+  createThumbnail,
   batchUpload,
+  batchProcess,
   batchDelete,
+  getBatchStatus,
   getQuota,
   getUsage,
   getAdminFiles,
   getAdminStats,
   batchCleanup,
+  listBatchJobs,
+  optimizeStorage,
+  getStorageHealth,
   upload
 } = resourceApi;

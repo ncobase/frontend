@@ -14,7 +14,8 @@ import {
 } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
-import { ResourceAccessLevel, ResourceFile, ShareLink } from '../resource';
+import { ResourceAccessLevel, ResourceFile, ResourceRuntimePolicy, ShareLink } from '../resource';
+import { DEFAULT_RESOURCE_RUNTIME_POLICY } from '../resource_policy';
 import { useShareFile } from '../service';
 
 interface ShareDialogProps {
@@ -22,6 +23,8 @@ interface ShareDialogProps {
   file: ResourceFile | null;
   onClose: () => void;
   onSuccess?: () => void;
+  policy?: ResourceRuntimePolicy;
+  policyLoading?: boolean;
 }
 
 const toAbsoluteUrl = (url?: string) => {
@@ -36,9 +39,18 @@ const formatExpiration = (expiresAt?: number | string) => {
   return Number.isNaN(date.getTime()) ? '' : date.toLocaleString();
 };
 
-export const ShareDialog = ({ isOpen, file, onClose, onSuccess }: ShareDialogProps) => {
+export const ShareDialog = ({
+  isOpen,
+  file,
+  onClose,
+  onSuccess,
+  policy,
+  policyLoading
+}: ShareDialogProps) => {
   const { t } = useTranslation();
   const toast = useToastMessage();
+  const runtimePolicy = policy || DEFAULT_RESOURCE_RUNTIME_POLICY;
+  const publicLinksAllowed = runtimePolicy.storage.allow_public_links !== false;
   const [accessLevel, setAccessLevel] = useState<ResourceAccessLevel>('shared');
   const [expirationHours, setExpirationHours] = useState(24);
   const [shareLink, setShareLink] = useState<ShareLink | null>(null);
@@ -58,6 +70,16 @@ export const ShareDialog = ({ isOpen, file, onClose, onSuccess }: ShareDialogPro
   if (!file) return null;
 
   const handleShare = () => {
+    if (!publicLinksAllowed) {
+      toast.warning(t('messages.warning', 'Warning'), {
+        description: t(
+          'resource.policy.public_links_disabled',
+          'Public and shared links are disabled'
+        )
+      });
+      return;
+    }
+
     shareMutation.mutate(
       {
         id: file.id,
@@ -134,13 +156,18 @@ export const ShareDialog = ({ isOpen, file, onClose, onSuccess }: ShareDialogPro
                 <Select
                   value={accessLevel}
                   onValueChange={(value: ResourceAccessLevel) => setAccessLevel(value)}
+                  disabled={!publicLinksAllowed}
                 >
                   <SelectTrigger className='w-full bg-white border-slate-200'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className='bg-white border-slate-200'>
-                    <SelectItem value='shared'>{t('resource.access.shared', 'Shared')}</SelectItem>
-                    <SelectItem value='public'>{t('resource.access.public', 'Public')}</SelectItem>
+                    <SelectItem value='shared' disabled={!publicLinksAllowed}>
+                      {t('resource.access.shared', 'Shared')}
+                    </SelectItem>
+                    <SelectItem value='public' disabled={!publicLinksAllowed}>
+                      {t('resource.access.public', 'Public')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -156,20 +183,28 @@ export const ShareDialog = ({ isOpen, file, onClose, onSuccess }: ShareDialogPro
                   value={expirationHours}
                   onChange={e => setExpirationHours(Number(e.target.value) || 24)}
                   className='w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
+                  disabled={!publicLinksAllowed}
                 />
               </div>
             </div>
 
             <div className='rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500'>
-              {accessLevel === 'public'
+              {!publicLinksAllowed
                 ? t(
-                    'resource.share.public_note',
-                    'Public sharing allows direct download until the configured expiration time.'
+                    'resource.share.disabled_by_policy',
+                    'Sharing is disabled by the current storage policy.'
                   )
-                : t(
-                    'resource.share.shared_note',
-                    'Shared links use a token and do not expose the file as a public resource.'
-                  )}
+                : policyLoading
+                  ? t('common.loading', 'Loading...')
+                  : accessLevel === 'public'
+                    ? t(
+                        'resource.share.public_note',
+                        'Public sharing allows direct download until the configured expiration time.'
+                      )
+                    : t(
+                        'resource.share.shared_note',
+                        'Shared links use a token and do not expose the file as a public resource.'
+                      )}
             </div>
 
             <div className='flex justify-end gap-2'>
@@ -183,6 +218,7 @@ export const ShareDialog = ({ isOpen, file, onClose, onSuccess }: ShareDialogPro
               <Button
                 onClick={handleShare}
                 isLoading={shareMutation.isPending}
+                disabled={!publicLinksAllowed}
                 startIcon={<Icons name='IconLink' />}
               >
                 {t('resource.share.generate', 'Generate Link')}

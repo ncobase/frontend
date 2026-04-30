@@ -10,14 +10,19 @@ import {
   getUsage,
   getAdminStats,
   batchUpload,
+  batchProcess,
   batchDelete,
   batchCleanup,
+  listBatchJobs,
+  optimizeStorage,
+  getStorageHealth,
   getVersions,
   shareFile,
-  updateAccess
+  updateAccess,
+  createThumbnail
 } from './apis';
 import { QueryFormParams } from './config/query';
-import { ResourceFile } from './resource';
+import { ResourceFile, ResourceProcessingOptions } from './resource';
 
 export const resourceKeys = {
   list: (params?: QueryFormParams) => ['resourceService', 'files', params],
@@ -25,7 +30,9 @@ export const resourceKeys = {
   versions: (id?: string) => ['resourceService', 'versions', { id }],
   quota: () => ['resourceService', 'quota'],
   usage: () => ['resourceService', 'usage'],
-  stats: () => ['resourceService', 'stats']
+  stats: () => ['resourceService', 'stats'],
+  health: () => ['resourceService', 'health'],
+  jobs: (params?: Record<string, any>) => ['resourceService', 'jobs', params]
 };
 
 export const useListResources = (params: QueryFormParams) =>
@@ -66,6 +73,19 @@ export const useGetAdminStats = () =>
   useQuery({
     queryKey: resourceKeys.stats(),
     queryFn: () => getAdminStats()
+  });
+
+export const useGetStorageHealth = () =>
+  useQuery({
+    queryKey: resourceKeys.health(),
+    queryFn: () => getStorageHealth()
+  });
+
+export const useListBatchJobs = (params: Record<string, any> = {}) =>
+  useQuery({
+    queryKey: resourceKeys.jobs(params),
+    queryFn: () => listBatchJobs(params),
+    staleTime: 30 * 1000
   });
 
 export const useUploadResource = () => {
@@ -146,6 +166,29 @@ export const useUpdateAccess = () => {
   });
 };
 
+export const useCreateThumbnail = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, options }: { id: string; options: ResourceProcessingOptions }) =>
+      createThumbnail(id, options),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.get(variables.id) });
+    }
+  });
+};
+
+export const useBatchProcess = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ids, options }: { ids: string[]; options?: ResourceProcessingOptions }) =>
+      batchProcess(ids, options),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
+    }
+  });
+};
+
 export const useBatchDelete = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -161,7 +204,18 @@ export const useBatchDelete = () => {
 export const useBatchCleanup = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { type: string; dry_run?: boolean }) => batchCleanup(payload),
+    mutationFn: (payload: { type: string; dry_run?: boolean; max_items?: number }) =>
+      batchCleanup(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['resourceService'] });
+    }
+  });
+};
+
+export const useOptimizeStorage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => optimizeStorage(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resourceService'] });
     }

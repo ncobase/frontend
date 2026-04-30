@@ -28,6 +28,7 @@ export interface CommonProps<T extends object> {
   expandComponent?: TableViewProps['expandComponent'];
   maxTreeLevel?: TableViewProps['maxTreeLevel'];
   isAllExpanded?: TableViewProps['isAllExpanded'];
+  batchOperations?: TableViewProps['batchOperations'];
   data?: T[];
   columns?: TableViewProps['header'];
   queryFields?: {
@@ -85,6 +86,7 @@ export const CurdView = <T extends object>({
   expandComponent,
   maxTreeLevel,
   isAllExpanded: propIsAllExpanded,
+  batchOperations,
   onConfirm,
   record,
   createComponent,
@@ -124,6 +126,7 @@ export const CurdView = <T extends object>({
       expandComponent: memoizedExpandComponent,
       maxTreeLevel,
       isAllExpanded,
+      batchOperations,
       paginationTexts: PaginationTexts(t),
       emptyDataLabel: t('empty.no_data')
     }),
@@ -141,6 +144,7 @@ export const CurdView = <T extends object>({
       memoizedExpandComponent,
       maxTreeLevel,
       isAllExpanded,
+      batchOperations,
       t
     ]
   );

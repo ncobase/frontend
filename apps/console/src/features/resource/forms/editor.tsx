@@ -1,18 +1,23 @@
 import { Form } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
+import { ResourceRuntimePolicy } from '../resource';
+
 import { FieldConfigProps } from '@/components/form';
 
 export const ResourceEditorForm = ({
   onSubmit,
   control,
-  errors
+  errors,
+  policy
 }: {
   onSubmit: () => void;
   control: any;
   errors: any;
+  policy?: ResourceRuntimePolicy;
 }) => {
   const { t } = useTranslation();
+  const publicLinksAllowed = policy?.storage.allow_public_links !== false;
 
   const fields: FieldConfigProps[] = [
     {
@@ -40,11 +45,13 @@ export const ResourceEditorForm = ({
       type: 'select',
       prependIcon: 'IconLock',
       description: t('resource.descriptions.access_level', 'Controls who can view this file'),
-      options: [
-        { label: t('resource.access.public', 'Public'), value: 'public' },
-        { label: t('resource.access.private', 'Private'), value: 'private' },
-        { label: t('resource.access.shared', 'Shared'), value: 'shared' }
-      ]
+      options: publicLinksAllowed
+        ? [
+            { label: t('resource.access.private', 'Private'), value: 'private' },
+            { label: t('resource.access.shared', 'Shared'), value: 'shared' },
+            { label: t('resource.access.public', 'Public'), value: 'public' }
+          ]
+        : [{ label: t('resource.access.private', 'Private'), value: 'private' }]
     },
     {
       title: t('resource.fields.is_public', 'Public Access'),
@@ -52,7 +59,10 @@ export const ResourceEditorForm = ({
       defaultValue: false,
       type: 'switch',
       prependIcon: 'IconWorld',
-      description: t('resource.descriptions.is_public', 'Allow access without authentication')
+      disabled: !publicLinksAllowed,
+      description: publicLinksAllowed
+        ? t('resource.descriptions.is_public', 'Allow access without authentication')
+        : t('resource.descriptions.public_links_disabled', 'Public links are disabled by policy')
     },
     {
       title: t('resource.fields.tags', 'Tags'),

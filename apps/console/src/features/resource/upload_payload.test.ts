@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildResourceUploadFormData, normalizeResourceTags } from './upload_payload';
+import {
+  buildResourceUploadFormData,
+  fileInputAcceptValue,
+  isResourceFileTypeAllowed,
+  normalizeAllowedResourceTypes,
+  normalizeResourceTags,
+  RESOURCE_MAX_UPLOAD_BYTES,
+  summarizeAllowedResourceTypes
+} from './upload_payload';
 
 const createFile = (name: string, content = 'content') =>
   new File([content], name, { type: 'text/plain', lastModified: 1 });
@@ -12,6 +20,32 @@ describe('resource upload payload', () => {
       'archive',
       'finance'
     ]);
+  });
+
+  it('uses the backend default max upload size', () => {
+    expect(RESOURCE_MAX_UPLOAD_BYTES).toBe(5368709120);
+  });
+
+  it('normalizes allowed type lists and file input accept values', () => {
+    expect(normalizeAllowedResourceTypes([])).toEqual(['*']);
+    expect(normalizeAllowedResourceTypes([' IMAGE/* ', '.PDF', 'image/*'])).toEqual([
+      'image/*',
+      '.pdf'
+    ]);
+    expect(fileInputAcceptValue(['*'])).toBeUndefined();
+    expect(fileInputAcceptValue(['image/*', '.pdf'])).toBe('image/*,.pdf');
+    expect(summarizeAllowedResourceTypes(['*'])).toBe('All file types');
+  });
+
+  it('matches exact MIME, wildcard MIME, and extension upload allow rules', () => {
+    const image = new File(['image'], 'avatar.PNG', { type: 'image/png' });
+    const pdf = new File(['pdf'], 'document.pdf', { type: 'application/pdf' });
+    const archive = new File(['zip'], 'archive.zip', { type: 'application/zip' });
+
+    expect(isResourceFileTypeAllowed(image, ['image/*'])).toBe(true);
+    expect(isResourceFileTypeAllowed(pdf, ['application/pdf'])).toBe(true);
+    expect(isResourceFileTypeAllowed(pdf, ['.pdf'])).toBe(true);
+    expect(isResourceFileTypeAllowed(archive, ['image/*', '.pdf'])).toBe(false);
   });
 
   it('uses the single file field and appends upload metadata', () => {

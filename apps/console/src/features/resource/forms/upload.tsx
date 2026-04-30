@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   Button,
@@ -14,17 +14,29 @@ import { useTranslation } from 'react-i18next';
 
 import {
   ResourceAccessLevel,
+  ResourceRuntimePolicy,
   ResourceUploadOptions,
   ResourceUploadSubmission,
   ResourceUsage
 } from '../resource';
-import { formatBytes, normalizeResourceTags, RESOURCE_MAX_UPLOAD_BYTES } from '../upload_payload';
+import { DEFAULT_RESOURCE_RUNTIME_POLICY } from '../resource_policy';
+import {
+  fileInputAcceptValue,
+  formatBytes,
+  isResourceFileTypeAllowed,
+  normalizeAllowedResourceTypes,
+  normalizeResourceTags,
+  RESOURCE_MAX_UPLOAD_BYTES,
+  summarizeAllowedResourceTypes
+} from '../upload_payload';
 
 interface UploadFormProps {
   onUpload: (_submission: ResourceUploadSubmission) => void;
   onCancel?: () => void;
   uploading?: boolean;
   usage?: ResourceUsage | null;
+  policy?: ResourceRuntimePolicy;
+  policyLoading?: boolean;
 }
 
 const fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}`;
@@ -36,7 +48,14 @@ const cleanPathPrefix = (value: string) =>
     .replace(/^\/+|\/+$/g, '')
     .replace(/\/{2,}/g, '/');
 
-export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormProps) => {
+export const UploadForm = ({
+  onUpload,
+  onCancel,
+  uploading,
+  usage,
+  policy,
+  policyLoading
+}: UploadFormProps) => {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -45,13 +64,85 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
   const [pathPrefix, setPathPrefix] = useState('');
   const [tags, setTags] = useState('');
   const [createThumbnail, setCreateThumbnail] = useState(true);
+  const [resizeImage, setResizeImage] = useState(false);
+  const [compressImage, setCompressImage] = useState(false);
   const [thumbnailSize, setThumbnailSize] = useState(300);
+  const [compressionQuality, setCompressionQuality] = useState(85);
+
+  const runtimePolicy = policy || DEFAULT_RESOURCE_RUNTIME_POLICY;
+  const maxUploadBytes = Math.max(
+    1,
+    Number(runtimePolicy.upload.max_upload_size) || RESOURCE_MAX_UPLOAD_BYTES
+  );
+  const allowedTypes = useMemo(
+    () => normalizeAllowedResourceTypes(runtimePolicy.upload.allowed_types),
+    [runtimePolicy.upload.allowed_types]
+  );
+  const acceptValue = useMemo(() => fileInputAcceptValue(allowedTypes), [allowedTypes]);
+  const allowedTypesLabel = useMemo(
+    () => summarizeAllowedResourceTypes(allowedTypes),
+    [allowedTypes]
+  );
+  const publicLinksAllowed = runtimePolicy.storage.allow_public_links !== false;
+  const quotaEnabled = runtimePolicy.quota.enable_quotas !== false;
+  const quotaEnforced = quotaEnabled && runtimePolicy.quota.enable_enforcement !== false;
+  const quotaWarningThreshold = Math.max(
+    0,
+    Math.min(1, Number(runtimePolicy.quota.warning_threshold) || 0.8)
+  );
+  const thumbnailsEnabled = runtimePolicy.image.enable_thumbnails !== false;
+  const resizingEnabled = runtimePolicy.image.enable_resizing !== false;
+  const maxImageEdge = Math.max(
+    64,
+    Math.min(
+      Number(runtimePolicy.image.max_image_width) || 2048,
+      Number(runtimePolicy.image.max_image_height) || 2048
+    )
+  );
+  const defaultThumbnailSize = Math.max(
+    64,
+    Math.min(
+      Number(runtimePolicy.image.default_thumbnail_width) || 300,
+      Number(runtimePolicy.image.default_thumbnail_height) || 300,
+      maxImageEdge
+    )
+  );
 
   const totalSize = useMemo(() => files.reduce((total, file) => total + file.size, 0), [files]);
   const availableBytes =
     usage && usage.quota > 0 ? Math.max(usage.quota - usage.usage, 0) : undefined;
   const quotaExceeded =
-    usage?.quota_exceeded || (availableBytes !== undefined && totalSize > availableBytes);
+    quotaEnforced &&
+    (usage?.quota_exceeded || (availableBytes !== undefined && totalSize > availableBytes));
+  const quotaOverSoftLimit =
+    quotaEnabled && !quotaEnforced && availableBytes !== undefined && totalSize > availableBytes;
+
+  useEffect(() => {
+    if (!publicLinksAllowed && accessLevel !== 'private') {
+      setAccessLevel('private');
+    }
+  }, [accessLevel, publicLinksAllowed]);
+
+  useEffect(() => {
+    if (!thumbnailsEnabled) {
+      setCreateThumbnail(false);
+    }
+    if (!resizingEnabled) {
+      setResizeImage(false);
+    }
+    setThumbnailSize(current =>
+      Math.max(64, Math.min(Number(current) || defaultThumbnailSize, maxImageEdge))
+    );
+    setCompressionQuality(current =>
+      Math.max(1, Math.min(100, Number(current) || runtimePolicy.image.compression_quality || 85))
+    );
+  }, [
+    defaultThumbnailSize,
+    maxImageEdge,
+    resizingEnabled,
+    runtimePolicy.image.compression_quality,
+    thumbnailsEnabled
+  ]);
 
   const rejectedFiles = useMemo(
     () =>
@@ -63,16 +154,22 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
               reason: t('resource.upload.invalid_empty', 'Empty file cannot be uploaded')
             };
           }
-          if (file.size > RESOURCE_MAX_UPLOAD_BYTES) {
+          if (file.size > maxUploadBytes) {
             return {
               file,
               reason: t('resource.upload.invalid_large', 'File exceeds the upload limit')
             };
           }
+          if (!isResourceFileTypeAllowed(file, allowedTypes)) {
+            return {
+              file,
+              reason: t('resource.upload.invalid_type', 'File type is not allowed')
+            };
+          }
           return null;
         })
         .filter(Boolean) as Array<{ file: File; reason: string }>,
-    [files, t]
+    [allowedTypes, files, maxUploadBytes, t]
   );
 
   const canSubmit = files.length > 0 && rejectedFiles.length === 0 && !quotaExceeded && !uploading;
@@ -121,27 +218,43 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
 
   const clearFiles = useCallback(() => setFiles([]), []);
 
-  const handleAccessLevelChange = useCallback((value: ResourceAccessLevel) => {
-    setAccessLevel(value);
-  }, []);
+  const handleAccessLevelChange = useCallback(
+    (value: ResourceAccessLevel) => {
+      if (!publicLinksAllowed && value !== 'private') return;
+      setAccessLevel(value);
+    },
+    [publicLinksAllowed]
+  );
 
-  const handlePublicSwitch = useCallback((checked: boolean) => {
-    setAccessLevel(checked ? 'public' : 'private');
-  }, []);
+  const handlePublicSwitch = useCallback(
+    (checked: boolean) => {
+      if (!publicLinksAllowed) return;
+      setAccessLevel(checked ? 'public' : 'private');
+    },
+    [publicLinksAllowed]
+  );
 
   const handleSubmit = useCallback(() => {
     if (!canSubmit) return;
 
+    const normalizedAccessLevel = publicLinksAllowed ? accessLevel : 'private';
+    const shouldCreateThumbnail = thumbnailsEnabled && createThumbnail;
+    const shouldResizeImage = resizingEnabled && resizeImage;
+    const hasImageProcessing = shouldCreateThumbnail || shouldResizeImage || compressImage;
+
     const options: ResourceUploadOptions = {
-      access_level: accessLevel,
-      is_public: accessLevel === 'public',
+      access_level: normalizedAccessLevel,
+      is_public: normalizedAccessLevel === 'public',
       path_prefix: cleanPathPrefix(pathPrefix),
       tags: normalizeResourceTags(tags),
-      processing_options: createThumbnail
+      processing_options: hasImageProcessing
         ? {
-            create_thumbnail: true,
+            create_thumbnail: shouldCreateThumbnail,
+            resize_image: shouldResizeImage,
             max_width: thumbnailSize,
-            max_height: thumbnailSize
+            max_height: thumbnailSize,
+            compress_image: compressImage,
+            compression_quality: compressImage ? compressionQuality : undefined
           }
         : {
             create_thumbnail: false
@@ -149,7 +262,22 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
     };
 
     onUpload({ files, options });
-  }, [accessLevel, canSubmit, createThumbnail, files, onUpload, pathPrefix, tags, thumbnailSize]);
+  }, [
+    accessLevel,
+    canSubmit,
+    compressImage,
+    compressionQuality,
+    createThumbnail,
+    files,
+    onUpload,
+    pathPrefix,
+    publicLinksAllowed,
+    resizeImage,
+    resizingEnabled,
+    tags,
+    thumbnailSize,
+    thumbnailsEnabled
+  ]);
 
   return (
     <div className='space-y-5'>
@@ -171,8 +299,7 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
           {t('resource.upload.drag_drop', 'Drag and drop files here')}
         </p>
         <p className='text-xs text-slate-400 mb-4'>
-          {t('resource.upload.limit', 'Single file limit')}:{' '}
-          {formatBytes(RESOURCE_MAX_UPLOAD_BYTES)}
+          {t('resource.upload.limit', 'Single file limit')}: {formatBytes(maxUploadBytes)}
         </p>
         <Button
           variant='outline-primary'
@@ -186,6 +313,7 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
           ref={inputRef}
           type='file'
           multiple
+          accept={acceptValue}
           className='hidden'
           onChange={e => {
             if (e.target.files?.length) {
@@ -195,6 +323,40 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
           }}
           disabled={uploading}
         />
+      </div>
+
+      <div className='grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 md:grid-cols-3'>
+        <div>
+          <span className='font-medium text-slate-700'>
+            {t('resource.policy.max_upload', 'Upload limit')}
+          </span>
+          <p>{formatBytes(maxUploadBytes)}</p>
+        </div>
+        <div>
+          <span className='font-medium text-slate-700'>
+            {t('resource.policy.allowed_types', 'Allowed types')}
+          </span>
+          <p className='truncate' title={allowedTypesLabel}>
+            {allowedTypesLabel}
+          </p>
+        </div>
+        <div>
+          <span className='font-medium text-slate-700'>
+            {t('resource.policy.storage', 'Storage policy')}
+          </span>
+          <p>
+            {runtimePolicy.upload.default_storage}
+            {policyLoading ? ` · ${t('common.loading', 'Loading...')}` : ''}
+          </p>
+        </div>
+        {!!runtimePolicy.errors?.length && (
+          <div className='md:col-span-3 text-orange-600'>
+            {t(
+              'resource.policy.using_defaults',
+              'Some policy values are invalid; defaults applied'
+            )}
+          </div>
+        )}
       </div>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -208,10 +370,19 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
             </SelectTrigger>
             <SelectContent className='bg-white border-slate-200'>
               <SelectItem value='private'>{t('resource.access.private', 'Private')}</SelectItem>
-              <SelectItem value='shared'>{t('resource.access.shared', 'Shared')}</SelectItem>
-              <SelectItem value='public'>{t('resource.access.public', 'Public')}</SelectItem>
+              <SelectItem value='shared' disabled={!publicLinksAllowed}>
+                {t('resource.access.shared', 'Shared')}
+              </SelectItem>
+              <SelectItem value='public' disabled={!publicLinksAllowed}>
+                {t('resource.access.public', 'Public')}
+              </SelectItem>
             </SelectContent>
           </Select>
+          {!publicLinksAllowed && (
+            <p className='text-xs text-orange-600'>
+              {t('resource.policy.public_links_disabled', 'Public and shared links are disabled')}
+            </p>
+          )}
         </div>
 
         <div className='space-y-2'>
@@ -252,7 +423,11 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
                   : t('resource.upload.public_disabled', 'Restricted to authorized access')}
               </p>
             </div>
-            <Switch checked={accessLevel === 'public'} onCheckedChange={handlePublicSwitch} />
+            <Switch
+              checked={accessLevel === 'public'}
+              onCheckedChange={handlePublicSwitch}
+              disabled={!publicLinksAllowed || uploading}
+            />
           </div>
 
           <div className='flex items-center justify-between gap-3'>
@@ -264,16 +439,72 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
                 {t('resource.upload.thumbnail_size', 'Max edge')}: {thumbnailSize}px
               </p>
             </div>
-            <Switch checked={createThumbnail} onCheckedChange={setCreateThumbnail} />
+            <Switch
+              checked={createThumbnail && thumbnailsEnabled}
+              onCheckedChange={setCreateThumbnail}
+              disabled={!thumbnailsEnabled || uploading}
+            />
           </div>
-          {createThumbnail && (
+          {createThumbnail && thumbnailsEnabled && (
             <input
               type='number'
               min={64}
-              max={2048}
+              max={maxImageEdge}
               step={16}
               value={thumbnailSize}
-              onChange={e => setThumbnailSize(Number(e.target.value) || 300)}
+              onChange={e =>
+                setThumbnailSize(
+                  Math.max(64, Math.min(maxImageEdge, Number(e.target.value) || 300))
+                )
+              }
+              className='w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
+              disabled={uploading}
+            />
+          )}
+
+          <div className='flex items-center justify-between gap-3'>
+            <div>
+              <p className='text-sm font-medium text-slate-700'>
+                {t('resource.upload.resize_image', 'Resize images')}
+              </p>
+              <p className='text-xs text-slate-400'>
+                {resizingEnabled
+                  ? `${t('resource.upload.max_edge', 'Max edge')}: ${maxImageEdge}px`
+                  : t('resource.upload.resize_disabled', 'Disabled by policy')}
+              </p>
+            </div>
+            <Switch
+              checked={resizeImage && resizingEnabled}
+              onCheckedChange={setResizeImage}
+              disabled={!resizingEnabled || uploading}
+            />
+          </div>
+
+          <div className='flex items-center justify-between gap-3'>
+            <div>
+              <p className='text-sm font-medium text-slate-700'>
+                {t('resource.upload.compress_image', 'Compress images')}
+              </p>
+              <p className='text-xs text-slate-400'>
+                {t('resource.upload.quality', 'Quality')}: {compressionQuality}
+              </p>
+            </div>
+            <Switch
+              checked={compressImage}
+              onCheckedChange={setCompressImage}
+              disabled={uploading}
+            />
+          </div>
+          {compressImage && (
+            <input
+              type='number'
+              min={1}
+              max={100}
+              step={1}
+              value={compressionQuality}
+              onChange={e =>
+                setCompressionQuality(Math.max(1, Math.min(100, Number(e.target.value) || 85)))
+              }
               className='w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
               disabled={uploading}
             />
@@ -341,7 +572,7 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
         )}
       </div>
 
-      {usage && (
+      {usage && quotaEnabled && (
         <div className='rounded-lg border border-slate-200 px-4 py-3'>
           <div className='mb-2 flex items-center justify-between text-xs text-slate-500'>
             <span>{t('resource.quota.storage', 'Storage')}</span>
@@ -355,7 +586,7 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
               className={`h-2 rounded-full ${
                 quotaExceeded
                   ? 'bg-red-500'
-                  : usage.usage_percent >= 80
+                  : usage.usage_percent >= quotaWarningThreshold * 100
                     ? 'bg-orange-500'
                     : 'bg-blue-500'
               }`}
@@ -363,10 +594,23 @@ export const UploadForm = ({ onUpload, onCancel, uploading, usage }: UploadFormP
             />
           </div>
           {availableBytes !== undefined && (
-            <p className={`mt-2 text-xs ${quotaExceeded ? 'text-red-500' : 'text-slate-400'}`}>
+            <p
+              className={`mt-2 text-xs ${
+                quotaExceeded
+                  ? 'text-red-500'
+                  : quotaOverSoftLimit
+                    ? 'text-orange-600'
+                    : 'text-slate-400'
+              }`}
+            >
               {quotaExceeded
                 ? t('resource.upload.quota_exceeded', 'Selected files exceed available storage')
-                : `${t('resource.upload.available', 'Available')}: ${formatBytes(availableBytes)}`}
+                : quotaOverSoftLimit
+                  ? t(
+                      'resource.upload.quota_soft_limit',
+                      'Selected files exceed the available quota, but enforcement is disabled'
+                    )
+                  : `${t('resource.upload.available', 'Available')}: ${formatBytes(availableBytes)}`}
             </p>
           )}
         </div>
