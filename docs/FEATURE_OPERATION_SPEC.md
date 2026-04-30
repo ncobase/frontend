@@ -137,8 +137,11 @@ marked beta, or implemented backend-first before production exposure.
 - Current upload UX: upload modal has a local file queue, zero-byte/oversize rejection reasons,
   quota visibility and pre-check, private/shared/public access selection, public flag, path prefix,
   tags, image thumbnail options, single-file `file` upload, and multi-file `files` batch upload.
-- Required next UX: per-file progress, retry failed batch items, share scope, and reference warnings
-  before deleting files used by CMS media.
+- Current sharing/delete UX: table actions expose share link generation with public/shared scope and
+  expiration, and delete confirmation queries CMS media by `resource_id` to block deletion while
+  visible references exist.
+- Required next UX: per-file progress, retry failed batch items, bulk reference review, and direct
+  navigation from resource references to CMS media records.
 
 ## Spaces
 

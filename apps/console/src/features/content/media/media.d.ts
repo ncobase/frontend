@@ -3,6 +3,18 @@ export interface Media {
   title?: string;
   type?: 'image' | 'video' | 'audio' | 'file';
   url?: string;
+  resource_id?: string;
+  resource?: {
+    id: string;
+    name: string;
+    path: string;
+    type: string;
+    size?: number;
+    storage?: string;
+    download_url?: string;
+    thumbnail_url?: string;
+    is_expired?: boolean;
+  };
   path?: string;
   mime_type?: string;
   size?: number;

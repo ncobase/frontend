@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
+import { ShareDialog } from '../components/share_dialog';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection } from '../config/topbar';
@@ -24,6 +25,7 @@ import { buildResourceUploadFormData } from '../upload_payload';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { useListMedia } from '@/features/content/media/service';
 
 export const ResourceListPage = () => {
   const { t } = useTranslation();
@@ -37,6 +39,10 @@ export const ResourceListPage = () => {
   const [viewType, setViewType] = useState<string | undefined>(mode);
   const [selectedRecord, setSelectedRecord] = useState<ResourceFile | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; file: ResourceFile | null }>({
+    open: false,
+    file: null
+  });
+  const [shareDialog, setShareDialog] = useState<{ open: boolean; file: ResourceFile | null }>({
     open: false,
     file: null
   });
@@ -60,7 +66,12 @@ export const ResourceListPage = () => {
   const uploadMutation = useUploadResource();
   const batchUploadMutation = useBatchUploadResources();
   const { data: usage } = useGetUsage(uploadModal);
+  const { data: mediaReferences, isLoading: referencesLoading } = useListMedia(
+    { resource_id: deleteDialog.file?.id, limit: 5 },
+    deleteDialog.open && !!deleteDialog.file?.id
+  );
   const uploading = uploadMutation.isPending || batchUploadMutation.isPending;
+  const referenceCount = mediaReferences?.total || mediaReferences?.items?.length || 0;
 
   const onQuery = handleQuerySubmit(async queryData => {
     const cleanedData = Object.entries(queryData).reduce((acc: any, [key, value]) => {
@@ -131,8 +142,21 @@ export const ResourceListPage = () => {
     setDeleteDialog({ open: true, file: record });
   }, []);
 
+  const handleShare = useCallback((record: ResourceFile) => {
+    setShareDialog({ open: true, file: record });
+  }, []);
+
   const confirmDelete = useCallback(() => {
     if (!deleteDialog.file?.id) return;
+    if (referenceCount > 0) {
+      toast.warning(t('resource.messages.delete_blocked', 'File is referenced'), {
+        description: t(
+          'resource.messages.delete_blocked_description',
+          'Remove CMS media references before deleting this file.'
+        )
+      });
+      return;
+    }
     deleteMutation.mutate(deleteDialog.file.id, {
       onSuccess: () => {
         setDeleteDialog({ open: false, file: null });
@@ -143,7 +167,7 @@ export const ResourceListPage = () => {
         onError(error);
       }
     });
-  }, [deleteDialog.file, deleteMutation, onSuccess, onError, t]);
+  }, [deleteDialog.file, deleteMutation, onSuccess, onError, referenceCount, t, toast]);
 
   const handleUpload = useCallback(() => {
     setUploadModal(true);
@@ -218,7 +242,7 @@ export const ResourceListPage = () => {
         title={t('resource.title', 'Resource Manager')}
         topbarLeft={topbarLeftSection({ handleUpload })}
         topbarRight={[]}
-        columns={tableColumns({ handleView, handleDelete })}
+        columns={tableColumns({ handleView, handleShare, handleDelete })}
         data={data?.items || []}
         queryFields={queryFields({ queryControl })}
         onQuery={onQuery}
@@ -251,16 +275,49 @@ export const ResourceListPage = () => {
 
       <AlertDialog
         title={t('resource.dialogs.delete_title', 'Delete File')}
-        description={t(
-          'resource.dialogs.delete_description',
-          'Are you sure you want to delete this file? This action cannot be undone.'
-        )}
         isOpen={deleteDialog.open}
         onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
         cancelText={t('actions.cancel', 'Cancel')}
         confirmText={t('actions.delete', 'Delete')}
         onCancel={() => setDeleteDialog({ open: false, file: null })}
         onConfirm={confirmDelete}
+      >
+        <div className='space-y-4'>
+          <p className='text-sm text-slate-600'>
+            {t(
+              'resource.dialogs.delete_description',
+              'Are you sure you want to delete this file? This action cannot be undone.'
+            )}
+          </p>
+
+          {referencesLoading ? (
+            <div className='rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500'>
+              {t('resource.references.loading', 'Checking references...')}
+            </div>
+          ) : referenceCount > 0 ? (
+            <div className='rounded-lg border border-orange-200 bg-orange-50 px-4 py-3'>
+              <p className='text-sm font-medium text-orange-700'>
+                {t('resource.references.found', '{{count}} CMS media item references this file', {
+                  count: referenceCount
+                })}
+              </p>
+              <div className='mt-2 space-y-1'>
+                {(mediaReferences?.items || []).slice(0, 5).map((media: any) => (
+                  <p key={media.id} className='truncate text-xs text-orange-700'>
+                    {media.title || media.id}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </AlertDialog>
+
+      <ShareDialog
+        isOpen={shareDialog.open}
+        file={shareDialog.file}
+        onClose={() => setShareDialog({ open: false, file: null })}
+        onSuccess={() => refetch()}
       />
     </>
   );

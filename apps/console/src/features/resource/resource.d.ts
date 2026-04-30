@@ -99,10 +99,8 @@ export interface FileVersion {
 }
 
 export interface ShareLink {
-  id: string;
-  file_id: string;
   url: string;
   access_level: string;
-  expires_at?: number;
-  created_at: number;
+  expires_in?: string;
+  expires_at?: number | string;
 }

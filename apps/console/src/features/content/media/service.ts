@@ -26,10 +26,11 @@ export const useQueryMedia = (mediaId: string) =>
   });
 
 // List media
-export const useListMedia = (queryParams: any) => {
+export const useListMedia = (queryParams: any, enabled = true) => {
   return useQuery({
     queryKey: mediaKeys.list(queryParams),
     queryFn: () => getMediaList(queryParams),
+    enabled,
     staleTime: 5 * 60 * 1000
   });
 };

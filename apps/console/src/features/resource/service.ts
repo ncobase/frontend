@@ -121,8 +121,14 @@ export const useDeleteResource = () => {
 export const useShareFile = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...payload }: { id: string; access_level: string; expires_at?: number }) =>
-      shareFile(id, payload),
+    mutationFn: ({
+      id,
+      ...payload
+    }: {
+      id: string;
+      access_level: string;
+      expiration_hours?: number;
+    }) => shareFile(id, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
     }

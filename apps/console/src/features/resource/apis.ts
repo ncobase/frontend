@@ -9,6 +9,7 @@ import {
   FileVersion,
   ShareLink
 } from './resource';
+import { normalizeResourceTags } from './upload_payload';
 
 import { ACCESS_TOKEN_KEY } from '@/features/account/context';
 import { tokenService } from '@/features/account/token_service';
@@ -70,7 +71,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Share
   shareFile: (
     slug: string,
-    payload: { access_level: string; expires_at?: number }
+    payload: { access_level: string; expiration_hours?: number }
   ): Promise<ShareLink> => {
     return request.post(`${endpoint}/${slug}/share`, payload);
   },
@@ -127,6 +128,28 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 });
 
 export const resourceApi = createApi<ResourceFile>('/res', {
+  update: (payload, ctx) => {
+    const data = new FormData();
+    const append = (key: string, value: unknown) => {
+      if (value === undefined || value === null || value === '') return;
+      data.append(key, String(value));
+    };
+
+    append('name', payload.name);
+    append('original_name', payload.original_name);
+    append('access_level', payload.access_level);
+    if (typeof payload.is_public === 'boolean') {
+      data.append('is_public', payload.is_public ? 'true' : 'false');
+    }
+    append('expires_at', payload.expires_at);
+
+    const tags = normalizeResourceTags(payload.tags as string[] | string);
+    if (tags.length > 0) {
+      data.append('tags', tags.join(','));
+    }
+
+    return ctx.request.put(`${ctx.endpoint}/${payload.id}`, data);
+  },
   list: (params, ctx) => {
     const finalParams = withOwnerId(params);
     const queryString = finalParams ? buildQueryString(finalParams) : '';
