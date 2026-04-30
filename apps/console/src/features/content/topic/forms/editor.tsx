@@ -198,7 +198,7 @@ export const EditorTopicForm = ({
         {
           title: t('topic.fields.released', 'Release Date'),
           name: 'released',
-          type: 'date',
+          type: 'datetime-local',
           prependIcon: 'IconCalendarMonth',
           defaultValue: '',
           description: t('topic.released_hint', 'When this topic should be released')

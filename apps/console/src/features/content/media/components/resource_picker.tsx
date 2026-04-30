@@ -50,6 +50,7 @@ export const ResourceMediaPicker: React.FC<ResourceMediaPickerProps> = ({
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedResourceMap, setSelectedResourceMap] = useState<Record<string, ResourceFile>>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,11 +64,12 @@ export const ResourceMediaPicker: React.FC<ResourceMediaPickerProps> = ({
   );
   const { data, isLoading, isError } = useListResources(resourceQuery);
   const resources = data?.items || [];
-  const selectedResources = resources.filter(resource => selectedIds.has(resource.id));
+  const selectedResources = Object.values(selectedResourceMap);
 
   useEffect(() => {
     if (!isOpen) return;
     setSelectedIds(new Set());
+    setSelectedResourceMap({});
     setError(null);
   }, [isOpen]);
 
@@ -78,6 +80,15 @@ export const ResourceMediaPicker: React.FC<ResourceMediaPickerProps> = ({
         next.delete(resource.id);
       } else {
         next.add(resource.id);
+      }
+      return next;
+    });
+    setSelectedResourceMap(prev => {
+      const next = multiSelect ? { ...prev } : {};
+      if (next[resource.id]) {
+        delete next[resource.id];
+      } else {
+        next[resource.id] = resource;
       }
       return next;
     });
@@ -171,7 +182,7 @@ export const ResourceMediaPicker: React.FC<ResourceMediaPickerProps> = ({
       )}
       onCancel={onClose}
       confirmText={t('media.resource_picker.confirm', 'Use Selected')}
-      confirmDisabled={selectedResources.length === 0 || isLoading}
+      confirmDisabled={selectedResources.length === 0 || isLoading || isError || submitting}
       loading={submitting}
       onConfirm={handleConfirm}
       size='xl'
@@ -234,7 +245,10 @@ export const ResourceMediaPicker: React.FC<ResourceMediaPickerProps> = ({
             variant='outline'
             size='xs'
             disabled={selectedResources.length === 0 || submitting}
-            onClick={() => setSelectedIds(new Set())}
+            onClick={() => {
+              setSelectedIds(new Set());
+              setSelectedResourceMap({});
+            }}
           >
             {t('actions.clear', 'Clear')}
           </Button>

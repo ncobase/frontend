@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Card, Button, Icons, useToastMessage } from '@ncobase/react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router';
 
 import { canDownloadMedia, downloadMediaFile } from '../media_download';
@@ -19,6 +20,7 @@ import { useListTopicMediaByMedia } from '@/features/content/topic/service';
 export const MediaViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const toast = useToastMessage();
   const { data: media, isLoading, error } = useQueryMedia(id!);
   const {
@@ -81,8 +83,8 @@ export const MediaViewPage = () => {
     try {
       await downloadMediaFile(media);
     } catch (downloadError: any) {
-      toast.error('Failed to download media', {
-        description: downloadError?.message || 'Download failed'
+      toast.error(t('media.download_failed', 'Failed to download media'), {
+        description: downloadError?.message || t('messages.download_failed', 'Download failed')
       });
     } finally {
       setDownloading(false);
@@ -94,6 +96,8 @@ export const MediaViewPage = () => {
   const mimeType = getMediaMimeType(media);
   const size = getMediaSize(media);
   const downloadable = canDownloadMedia(media);
+  const mediaType = media.type || 'file';
+  const createdDate = media.created_at ? new Date(media.created_at).toLocaleDateString() : '';
 
   return (
     <Page
@@ -103,7 +107,7 @@ export const MediaViewPage = () => {
           left={[
             <Button variant='text' size='sm' onClick={() => navigate('/content/media')}>
               <Icons name='IconArrowLeft' size={16} className='mr-2' />
-              Back
+              {t('actions.back', 'Back')}
             </Button>
           ]}
           right={[
@@ -113,7 +117,7 @@ export const MediaViewPage = () => {
               onClick={() => navigate(`/content/media/${media.id}/edit`)}
             >
               <Icons name='IconEdit' size={16} className='mr-2' />
-              Edit
+              {t('actions.edit', 'Edit')}
             </Button>,
             <Button
               variant='outline'
@@ -123,7 +127,7 @@ export const MediaViewPage = () => {
               onClick={handleDownload}
             >
               <Icons name='IconDownload' size={16} className='mr-2' />
-              Download
+              {t('actions.download', 'Download')}
             </Button>
           ]}
         />
@@ -133,9 +137,13 @@ export const MediaViewPage = () => {
       <div className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-900 mb-2'>{media.title}</h1>
         <div className='flex items-center space-x-4 text-gray-500'>
-          {getTypeBadge(media.type)}
-          <span>·</span>
-          <span className='text-sm'>{new Date(media.created_at).toLocaleDateString()}</span>
+          {getTypeBadge(mediaType)}
+          {createdDate && (
+            <>
+              <span>·</span>
+              <span className='text-sm'>{createdDate}</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -144,21 +152,21 @@ export const MediaViewPage = () => {
         <div className='lg:col-span-2'>
           <Card className='overflow-hidden'>
             <div className='bg-gray-50 p-8 flex items-center justify-center min-h-[400px]'>
-              {media.type === 'image' && previewUrl ? (
+              {mediaType === 'image' && previewUrl ? (
                 <img
                   src={previewUrl}
                   alt={media.alt || media.title}
                   className='max-w-full max-h-96 object-contain rounded-lg shadow-sm'
                 />
-              ) : media.type === 'video' && playbackUrl ? (
+              ) : mediaType === 'video' && playbackUrl ? (
                 <video
                   src={playbackUrl}
                   controls
                   className='max-w-full max-h-96 rounded-lg shadow-sm'
                 >
-                  Your browser does not support the video tag.
+                  {t('media.preview.video_not_supported', 'Your browser does not support video.')}
                 </video>
-              ) : media.type === 'audio' && playbackUrl ? (
+              ) : mediaType === 'audio' && playbackUrl ? (
                 <div className='w-full max-w-md'>
                   <div className='text-center mb-4'>
                     <Icons name='IconMusic' size={64} className='mx-auto text-gray-400 mb-2' />
@@ -166,21 +174,23 @@ export const MediaViewPage = () => {
                   </div>
                   <audio controls className='w-full'>
                     <source src={playbackUrl} type={mimeType} />
-                    Your browser does not support the audio element.
+                    {t('media.preview.audio_not_supported', 'Your browser does not support audio.')}
                   </audio>
                 </div>
               ) : (
                 <div className='text-center'>
                   <Icons
-                    name={getTypeIcon(media.type)}
+                    name={getTypeIcon(mediaType)}
                     size={64}
                     className='mx-auto text-gray-400 mb-4'
                   />
-                  <p className='text-gray-600 mb-4'>Preview not available for this file type</p>
+                  <p className='text-gray-600 mb-4'>
+                    {t('media.preview.not_available', 'Preview not available for this file type')}
+                  </p>
                   {downloadable && (
                     <Button variant='outline' size='sm' onClick={handleDownload}>
                       <Icons name='IconExternalLink' size={16} className='mr-2' />
-                      Download File
+                      {t('media.actions.download_file', 'Download File')}
                     </Button>
                   )}
                 </div>
@@ -192,25 +202,33 @@ export const MediaViewPage = () => {
         {/* Media Information */}
         <div className='space-y-6'>
           <Card className='p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>Information</h3>
+            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+              {t('media.sections.information', 'Information')}
+            </h3>
             <div className='space-y-4'>
               {size ? (
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>File Size</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.file_size', 'File Size')}
+                  </label>
                   <p className='mt-1 text-sm text-gray-900'>{(size / 1024).toFixed(1)} KB</p>
                 </div>
               ) : null}
 
               {mimeType && (
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>MIME Type</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.mime_type', 'MIME Type')}
+                  </label>
                   <p className='mt-1 text-sm text-gray-900'>{mimeType}</p>
                 </div>
               )}
 
               {media.width && media.height && (
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>Dimensions</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.dimensions', 'Dimensions')}
+                  </label>
                   <p className='mt-1 text-sm text-gray-900'>
                     {media.width} × {media.height} px
                   </p>
@@ -219,7 +237,9 @@ export const MediaViewPage = () => {
 
               {media.duration && (
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>Duration</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.duration', 'Duration')}
+                  </label>
                   <p className='mt-1 text-sm text-gray-900'>
                     {Math.floor(media.duration / 60)}:
                     {Math.floor(media.duration % 60)
@@ -231,44 +251,59 @@ export const MediaViewPage = () => {
 
               {media.description && (
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>Description</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.description', 'Description')}
+                  </label>
                   <p className='mt-1 text-sm text-gray-900'>{media.description}</p>
                 </div>
               )}
 
               {media.alt && (
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>Alt Text</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.alt_text', 'Alt Text')}
+                  </label>
                   <p className='mt-1 text-sm text-gray-900'>{media.alt}</p>
                 </div>
               )}
 
               <div>
-                <label className='text-sm font-medium text-gray-500'>Resource ID</label>
+                <label className='text-sm font-medium text-gray-500'>
+                  {t('media.fields.resource_id', 'Resource ID')}
+                </label>
                 <p className='mt-1 break-all text-sm text-gray-900'>{media.resource_id || '-'}</p>
               </div>
             </div>
           </Card>
 
           <Card className='p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>Resource Link</h3>
+            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+              {t('media.sections.resource_link', 'Resource Link')}
+            </h3>
             {media.resource_id ? (
               <div className='space-y-4'>
                 <div>
-                  <label className='text-sm font-medium text-gray-500'>File</label>
+                  <label className='text-sm font-medium text-gray-500'>
+                    {t('media.fields.file', 'File')}
+                  </label>
                   <p className='mt-1 break-all text-sm text-gray-900'>
                     {media.resource?.name || media.path || media.resource_id}
                   </p>
                 </div>
                 {media.resource?.path && (
                   <div>
-                    <label className='text-sm font-medium text-gray-500'>Path</label>
+                    <label className='text-sm font-medium text-gray-500'>
+                      {t('media.fields.path', 'Path')}
+                    </label>
                     <p className='mt-1 break-all text-sm text-gray-900'>{media.resource.path}</p>
                   </div>
                 )}
                 {media.resource?.is_expired && (
                   <div className='rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-700'>
-                    The linked resource URL is expired. Open the resource detail to refresh access.
+                    {t(
+                      'media.resource.expired',
+                      'The linked resource URL is expired. Open the resource detail to refresh access.'
+                    )}
                   </div>
                 )}
                 <div className='flex flex-wrap gap-2'>
@@ -278,7 +313,7 @@ export const MediaViewPage = () => {
                     onClick={() => navigate(`/res/view/${media.resource_id}`)}
                   >
                     <Icons name='IconExternalLink' size={14} className='mr-1' />
-                    View Resource
+                    {t('media.actions.view_resource', 'View Resource')}
                   </Button>
                   <Button
                     variant='outline'
@@ -287,52 +322,66 @@ export const MediaViewPage = () => {
                     isLoading={downloading}
                   >
                     <Icons name='IconDownload' size={14} className='mr-1' />
-                    Download
+                    {t('actions.download', 'Download')}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className='rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500'>
-                This media record is not linked to a managed resource file.
+                {t(
+                  'media.resource.not_linked',
+                  'This media record is not linked to a managed resource file.'
+                )}
               </div>
             )}
           </Card>
 
           <Card className='p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>Topic Usage</h3>
+            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+              {t('media.sections.topic_usage', 'Topic Usage')}
+            </h3>
             {topicReferencesLoading ? (
               <div className='flex items-center gap-2 text-sm text-gray-500'>
                 <Icons name='IconLoader2' className='animate-spin' size={16} />
-                Loading topic references...
+                {t('media.topic_references.loading', 'Loading topic references...')}
               </div>
             ) : topicReferencesError ? (
               <div className='rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-sm text-orange-700'>
-                Failed to load topic references.
+                {t('media.topic_references.load_failed', 'Failed to load topic references.')}
               </div>
             ) : topicReferences.length > 0 ? (
               <div className='space-y-2'>
-                {topicReferences.map(reference => (
-                  <button
-                    key={reference.id || `${reference.topic_id}-${reference.media_id}`}
-                    type='button'
-                    onClick={() => navigate(`/content/topics/${reference.topic_id}`)}
-                    className='flex w-full items-center justify-between gap-3 rounded-md border border-slate-200 px-3 py-2 text-left text-sm transition-colors hover:bg-slate-50'
-                  >
-                    <span className='min-w-0'>
-                      <span className='block truncate font-medium text-slate-900'>
-                        {reference.topic_id}
+                {topicReferences.map(reference => {
+                  const topicId = reference.topic_id;
+                  return (
+                    <button
+                      key={reference.id || `${reference.topic_id}-${reference.media_id}`}
+                      type='button'
+                      disabled={!topicId}
+                      onClick={() => topicId && navigate(`/content/topics/${topicId}`)}
+                      className='flex w-full items-center justify-between gap-3 rounded-md border border-slate-200 px-3 py-2 text-left text-sm transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60'
+                    >
+                      <span className='min-w-0'>
+                        <span className='block truncate font-medium text-slate-900'>
+                          {topicId || '-'}
+                        </span>
+                        <span className='text-xs text-slate-500'>
+                          {reference.type || 'gallery'} ·{' '}
+                          {t('media.topic_references.order', 'order')} {reference.order ?? 0}
+                        </span>
                       </span>
-                      <span className='text-xs text-slate-500'>
-                        {reference.type || 'gallery'} · order {reference.order ?? 0}
-                      </span>
-                    </span>
-                    <Icons name='IconExternalLink' size={14} className='shrink-0 text-slate-400' />
-                  </button>
-                ))}
+                      <Icons
+                        name='IconExternalLink'
+                        size={14}
+                        className='shrink-0 text-slate-400'
+                      />
+                    </button>
+                  );
+                })}
               </div>
             ) : (
               <div className='rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500'>
-                No topic is using this media.
+                {t('media.topic_references.empty', 'No topic is using this media.')}
               </div>
             )}
           </Card>
@@ -340,7 +389,9 @@ export const MediaViewPage = () => {
           {/* Metadata */}
           {media.metadata && Object.keys(media.metadata).length > 0 && (
             <Card className='p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>Metadata</h3>
+              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+                {t('media.sections.metadata', 'Metadata')}
+              </h3>
               <div className='space-y-2'>
                 {Object.entries(media.metadata).map(([key, value]) => (
                   <div key={key} className='flex justify-between'>
