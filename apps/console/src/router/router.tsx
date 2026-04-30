@@ -15,6 +15,7 @@ import { ForgetPassword } from '@/features/account/pages/auth/forget_password';
 import { Login } from '@/features/account/pages/auth/login';
 import { Logout } from '@/features/account/pages/logout';
 import { Register } from '@/features/account/pages/register';
+import { filterRoutesByFeatureExposure } from '@/lib/features/exposure';
 // Lazy loaded routes
 const AccountRoutes = lazy(() => import('@/features/account/routes'));
 const BuilderRoutes = lazy(() => import('@/features/builder/routes'));
@@ -127,7 +128,7 @@ const routes = [
   {
     path: '/builder/*',
     element: (
-      <Guard permissions={['read:builder', 'write:builder']}>
+      <Guard permission='manage:builder'>
         <BuilderRoutes />
       </Guard>
     )
@@ -135,7 +136,7 @@ const routes = [
   {
     path: '/example/*',
     element: (
-      <Guard permissions={['read:example', 'write:example']} any>
+      <Guard>
         <ExampleRoutes />
       </Guard>
     )
@@ -143,7 +144,7 @@ const routes = [
   {
     path: '/res/*',
     element: (
-      <Guard>
+      <Guard permission='read:resources'>
         <ResourceRoutes />
       </Guard>
     )
@@ -158,6 +159,8 @@ const routes = [
   }
 ];
 
+const exposedRoutes = filterRoutesByFeatureExposure(routes);
+
 export const Router = () => {
   return (
     <BrowserRouter>
@@ -165,7 +168,7 @@ export const Router = () => {
         <ErrorBoundary>
           <Suspense fallback={<Spinner />}>
             <AnimatedSwitch>
-              {renderRoutes(routes, false)}
+              {renderRoutes(exposedRoutes, false)}
               <Route path='*' element={<ErrorPage code={404} />} />
             </AnimatedSwitch>
           </Suspense>

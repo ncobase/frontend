@@ -14,6 +14,7 @@ import { Preferences } from '@/components/preferences';
 import { Search } from '@/components/search/search';
 import { useMenuPermissions } from '@/features/account/permissions';
 import { useQueryNavigationMenus } from '@/features/system/menu/service';
+import { filterMenuTreeByFeatureExposure } from '@/lib/features/exposure';
 
 interface HeaderComponentProps {
   onMobileMenuToggle?: () => void;
@@ -38,10 +39,10 @@ const HeaderComponent = ({
     if (menuTreeData && typeof menuTreeData === 'object' && !isMenusSet) {
       try {
         const filteredGroups = {
-          headers: filterMenuTree(menuTreeData.headers || []),
-          sidebars: filterMenuTree(menuTreeData.sidebars || []),
-          accounts: filterMenuTree(menuTreeData.accounts || []),
-          spaces: filterMenuTree(menuTreeData.spaces || [])
+          headers: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.headers || [])),
+          sidebars: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.sidebars || [])),
+          accounts: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.accounts || [])),
+          spaces: filterMenuTreeByFeatureExposure(filterMenuTree(menuTreeData.spaces || []))
         };
 
         setNavigationMenus(filteredGroups);
