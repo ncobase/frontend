@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { BulkActions } from '../../components/BulkActions';
 import { ContentSearch } from '../../components/ContentSearch';
 import { useContentOperations } from '../../hooks/useContentOperations';
+import { ResourceMediaPicker } from '../components/resource_picker';
 import { MediaUpload } from '../components/upload';
 import type { Media } from '../media';
 import { canDownloadMedia, downloadMediaFile } from '../media_download';
@@ -30,6 +31,7 @@ export const MediaListPage = () => {
   });
   const [selectedItems, setSelectedItems] = useState<Media[]>([]);
   const [showUpload, setShowUpload] = useState(false);
+  const [showResourcePicker, setShowResourcePicker] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
@@ -349,6 +351,10 @@ export const MediaListPage = () => {
             <Button size='sm' onClick={() => setShowUpload(true)}>
               <Icons name='IconUpload' size={16} className='mr-1' />
               {t('content.media.upload')}
+            </Button>,
+            <Button variant='outline' size='sm' onClick={() => setShowResourcePicker(true)}>
+              <Icons name='IconFolderPlus' size={16} className='mr-1' />
+              {t('content.media.from_resources', 'From Resources')}
             </Button>
           ]}
         />
@@ -433,6 +439,16 @@ export const MediaListPage = () => {
       <MediaUpload
         isOpen={showUpload}
         onClose={() => setShowUpload(false)}
+        onSuccess={() => {
+          refetch();
+        }}
+      />
+
+      <ResourceMediaPicker
+        isOpen={showResourcePicker}
+        onClose={() => setShowResourcePicker(false)}
+        multiSelect
+        source='media'
         onSuccess={() => {
           refetch();
         }}

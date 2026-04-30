@@ -124,6 +124,10 @@ which cross-feature effects they must handle.
     `space_id`.
   - The uploaded resource response is converted into a `/cms/media` create payload with
     `resource_id`, URL/path, mime type, size, owner, space, and source metadata.
+  - `ResourceMediaPicker` can select existing `/res` files, checks `/cms/media?resource_id=...` to
+    reuse an existing CMS media record, and creates `/cms/media` only when no record exists yet.
+  - Media list exposes resource reuse as a first-class action; `TopicMediaManager` exposes the same
+    picker beside upload and gallery selection for featured/gallery/attachment media.
   - Media list, gallery, view, and edit screens use resource-backed preview/download URLs when
     present.
 - Current topic-media behavior:
@@ -144,9 +148,9 @@ which cross-feature effects they must handle.
 - Cross-effects: media references resource files through `resource_id`; resource deletion queries CMS
   media references and still needs a combined impact view that also aggregates topic usage for the
   referenced media.
-- Required next UX: shared picker for existing `/res` file selection, per-file progress, retry failed
-  uploads, protected preview states for private files, and richer batch reference warnings that show
-  the exact CMS media/topic impact before bulk delete.
+- Required next UX: per-file progress, retry failed uploads, protected preview states for private
+  files, and richer batch reference warnings that show the exact CMS media/topic impact before bulk
+  delete.
 
 ### Channels and Distributions
 

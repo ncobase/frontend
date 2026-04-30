@@ -19,13 +19,15 @@ import { buildResourceUploadFormData } from '@/features/resource/upload_payload'
 import { useSpaceContext } from '@/features/space/context';
 
 export {
+  buildMediaRecordFromExistingResource,
   buildMediaRecordFromResource,
   getMediaDownloadUrl,
   getMediaMimeType,
   getMediaPreviewUrl,
   getMediaResourceUrl,
   getMediaSize,
-  getMediaTypeFromFile
+  getMediaTypeFromFile,
+  getMediaTypeFromResource
 } from './media_resource_helpers';
 export type { ContentMediaSource } from './media_resource_helpers';
 

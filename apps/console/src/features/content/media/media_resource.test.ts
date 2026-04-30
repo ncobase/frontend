@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { canDownloadMedia, getMediaDownloadFileName } from './media_download';
 import {
+  buildMediaRecordFromExistingResource,
   buildMediaRecordFromResource,
   getMediaDownloadUrl,
   getMediaMimeType,
   getMediaPreviewUrl,
   getMediaSize,
-  getMediaTypeFromFile
+  getMediaTypeFromFile,
+  getMediaTypeFromResource
 } from './media_resource_helpers';
 
 import type { ResourceFile } from '@/features/resource/resource';
@@ -56,6 +58,44 @@ describe('content media resource helpers', () => {
       source: 'topic',
       resource_name: 'cover.png',
       thumbnail_url: '/api/res/thumb/res_1'
+    });
+  });
+
+  it('builds CMS media payloads from existing resources without requiring reupload', () => {
+    const resource: ResourceFile = {
+      id: 'res_1',
+      name: 'clip.mov',
+      original_name: 'Launch Clip.mov',
+      path: 'content/media/clip.mov',
+      type: 'video/quicktime',
+      size: 4096,
+      storage: 'local',
+      download_url: '/api/res/res_1/download'
+    };
+
+    expect(getMediaTypeFromResource(resource)).toBe('video');
+
+    const payload = buildMediaRecordFromExistingResource(resource, {
+      ownerId: 'user_1',
+      spaceId: 'space_1',
+      source: 'media'
+    });
+
+    expect(payload).toMatchObject({
+      title: 'Launch Clip.mov',
+      type: 'video',
+      resource_id: 'res_1',
+      url: '/api/res/res_1/download',
+      path: 'content/media/clip.mov',
+      mime_type: 'video/quicktime',
+      size: 4096,
+      space_id: 'space_1',
+      owner_id: 'user_1'
+    });
+    expect(payload.metadata).toMatchObject({
+      linked_from_resource: true,
+      source: 'media',
+      resource_name: 'clip.mov'
     });
   });
 

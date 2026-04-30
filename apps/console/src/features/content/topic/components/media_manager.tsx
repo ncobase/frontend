@@ -4,6 +4,7 @@ import { Button, Icons, Modal, useToastMessage } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { MediaGallery } from '../../media/components/gallery';
+import { ResourceMediaPicker } from '../../media/components/resource_picker';
 import { MediaUpload } from '../../media/components/upload';
 import type { Media } from '../../media/media';
 import { getMediaPreviewUrl } from '../../media/media_resource';
@@ -81,6 +82,7 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
   const { t } = useTranslation();
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [showMediaUpload, setShowMediaUpload] = useState(false);
+  const [showResourcePicker, setShowResourcePicker] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const { data: persistedMedia = [], isLoading, isError } = useQueryTopicMedia(topicId || '');
   const syncTopicMediaMutation = useSyncTopicMedia();
@@ -174,6 +176,11 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
     items.filter(Boolean).forEach(item => handleMediaSelect(item, currentType));
   };
 
+  const handleResourceMediaSuccess = (media: Media | Media[]) => {
+    const items = Array.isArray(media) ? media : [media];
+    items.filter(Boolean).forEach(item => handleMediaSelect(item, currentType));
+  };
+
   const selectedMedia = buildTopicMediaPayload(mediaByType)
     .map(item => mediaFromItem(item))
     .filter(Boolean) as Media[];
@@ -193,7 +200,7 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
             </p>
           </div>
           {canAddMore && (
-            <div className='flex gap-2'>
+            <div className='flex flex-wrap gap-2'>
               <Button
                 variant='outline'
                 size='sm'
@@ -217,6 +224,18 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
               >
                 <Icons name='IconPhoto' size={16} className='mr-1' />
                 {t('topic.media.gallery', 'Gallery')}
+              </Button>
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={disabled || syncTopicMediaMutation.isPending}
+                onClick={() => {
+                  setCurrentType(type);
+                  setShowResourcePicker(true);
+                }}
+              >
+                <Icons name='IconFolderPlus' size={16} className='mr-1' />
+                {t('topic.media.resources', 'Resources')}
               </Button>
             </div>
           )}
@@ -370,6 +389,14 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
         isOpen={showMediaUpload}
         onClose={() => setShowMediaUpload(false)}
         onSuccess={handleUploadSuccess}
+      />
+
+      <ResourceMediaPicker
+        isOpen={showResourcePicker}
+        onClose={() => setShowResourcePicker(false)}
+        onSuccess={handleResourceMediaSuccess}
+        multiSelect={currentType !== 'featured'}
+        source='topic'
       />
     </>
   );
