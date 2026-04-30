@@ -111,7 +111,7 @@ const routes = [
   {
     path: '/ncore/*',
     element: (
-      <Guard admin>
+      <Guard admin permission='manage:ncore'>
         <NCoreRoutes />
       </Guard>
     )

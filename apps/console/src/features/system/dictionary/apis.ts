@@ -5,17 +5,17 @@ import { createApi, ApiContext } from '@/lib/api/factory';
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Get enum options for a dictionary
   getEnumOptions: async (slug: string) => {
-    return request.get(`${endpoint}/${slug}/options`);
+    return request.get(`${endpoint}/options/${slug}`);
   },
 
   // Validate enum value
   validateEnumValue: async (slug: string, value: string) => {
-    return request.post(`${endpoint}/${slug}/validate`, { value });
+    return request.get(`${endpoint}/validate/${slug}?value=${encodeURIComponent(value)}`);
   },
 
   // Batch get dictionaries by slugs
   batchGetBySlug: async (slugs: string[]) => {
-    return request.post(`${endpoint}/batch`, { slugs });
+    return request.post(`${endpoint}/batch`, slugs);
   },
 
   // Get dictionary usage information
@@ -30,6 +30,9 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 });
 
 export const dictionaryApi = createApi<Dictionary>('/sys/dictionaries', {
+  paths: {
+    update: '/sys/dictionaries'
+  },
   extensions: extensionMethods
 });
 

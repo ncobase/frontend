@@ -18,6 +18,13 @@ export interface ExtensionListResponse {
   };
 }
 
+export interface NCoreAvailability {
+  available: boolean;
+  reason?: 'disabled' | 'forbidden' | 'error';
+  status?: number;
+  message?: string;
+}
+
 // Metrics types
 export interface ExtensionMetrics {
   name: string;

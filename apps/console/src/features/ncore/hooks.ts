@@ -23,6 +23,7 @@ import {
   getCircuitBreakersStatus,
   getSystemInfo,
   getSystemConfig,
+  getAvailability,
   loadPlugin,
   unloadPlugin,
   reloadPlugin,
@@ -46,6 +47,7 @@ import type {
 // Query keys
 export const extensionKeys = {
   all: ['extensions'] as const,
+  availability: () => [...extensionKeys.all, 'availability'] as const,
   lists: () => [...extensionKeys.all, 'list'] as const,
   status: () => [...extensionKeys.all, 'status'] as const,
   metadata: () => [...extensionKeys.all, 'metadata'] as const,
@@ -68,6 +70,15 @@ export const extensionKeys = {
   circuitBreakers: () => [...extensionKeys.health(), 'circuit-breakers'] as const,
   system: () => [...extensionKeys.all, 'system'] as const
 };
+
+export function useNCoreAvailability() {
+  return useQuery({
+    queryKey: extensionKeys.availability(),
+    queryFn: getAvailability,
+    staleTime: 30 * 1000,
+    retry: false
+  });
+}
 
 // Extensions
 export function useExtensions() {

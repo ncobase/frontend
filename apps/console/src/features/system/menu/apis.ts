@@ -43,6 +43,9 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 });
 
 export const menuApi = createApi<Menu>('/sys/menus', {
+  paths: {
+    update: '/sys/menus'
+  },
   extensions: extensionMethods
 });
 

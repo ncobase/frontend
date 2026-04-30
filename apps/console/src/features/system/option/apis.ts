@@ -15,7 +15,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Batch get options by names
   batchGetByNames: async (names: string[]) => {
-    return request.post(`${endpoint}/batch`, { names });
+    return request.post(`${endpoint}/batch`, names);
   },
 
   // Delete options by prefix
@@ -28,7 +28,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Export options as JSON
   exportOptions: async (params?: any): Promise<Option[]> => {
     const response = await request.get(`${endpoint}`, { params: { ...params, limit: 10000 } });
-    return response.data.items || [];
+    return response?.items || response?.data?.items || [];
   },
 
   // Validate option value based on type
@@ -61,6 +61,9 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 });
 
 export const optionApi = createApi<Option>('/sys/options', {
+  paths: {
+    update: '/sys/options'
+  },
   extensions: extensionMethods
 });
 

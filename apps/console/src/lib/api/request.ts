@@ -8,6 +8,12 @@ import { BearerKey, XMdSpaceKey } from '@/lib/constants';
 import { eventEmitter } from '@/lib/events';
 import { isPublicRoute } from '@/router/helpers/utils';
 
+type RequestOptions = FetchOptions & {
+  timestamp?: boolean;
+  dedupe?: boolean;
+  skipRedirect?: boolean;
+};
+
 // Circuit breaker for failed endpoints
 class CircuitBreaker {
   private static failures = new Map<
@@ -105,6 +111,130 @@ export class Request {
     };
   }
 
+  private mergeHeaders(headers?: FetchOptions['headers']) {
+    const merged: Record<string, string | undefined> = { ...this.getHeaders() };
+
+    if (!headers) return merged;
+
+    if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+      headers.forEach((value, key) => {
+        merged[key] = value;
+      });
+      return merged;
+    }
+
+    if (Array.isArray(headers)) {
+      headers.forEach(([key, value]) => {
+        merged[key] = value;
+      });
+      return merged;
+    }
+
+    return {
+      ...merged,
+      ...(headers as Record<string, string | undefined>)
+    };
+  }
+
+  private removeJsonContentType(headers: Record<string, string | undefined>) {
+    Object.keys(headers).forEach(key => {
+      if (key.toLowerCase() !== 'content-type') return;
+      const value = headers[key];
+      if (!value || value.toLowerCase().includes('application/json')) {
+        delete headers[key];
+      }
+    });
+  }
+
+  private isFormDataBody(data: ExplicitAny): data is FormData {
+    return typeof FormData !== 'undefined' && data instanceof FormData;
+  }
+
+  private isUrlSearchParamsBody(data: ExplicitAny): data is URLSearchParams {
+    return typeof URLSearchParams !== 'undefined' && data instanceof URLSearchParams;
+  }
+
+  private isBlobBody(data: ExplicitAny): data is Blob {
+    return typeof Blob !== 'undefined' && data instanceof Blob;
+  }
+
+  private isArrayBufferBody(data: ExplicitAny): data is ArrayBuffer {
+    return typeof ArrayBuffer !== 'undefined' && data instanceof ArrayBuffer;
+  }
+
+  private isBinaryViewBody(data: ExplicitAny): data is ArrayBufferView {
+    return typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView(data);
+  }
+
+  private prepareBody(data: ExplicitAny, headers: Record<string, string | undefined>) {
+    if (
+      this.isFormDataBody(data) ||
+      this.isUrlSearchParamsBody(data) ||
+      this.isBlobBody(data) ||
+      this.isArrayBufferBody(data) ||
+      this.isBinaryViewBody(data)
+    ) {
+      this.removeJsonContentType(headers);
+      return data;
+    }
+
+    return JSON.stringify(data);
+  }
+
+  private stableStringify(value: ExplicitAny): string {
+    if (value === undefined) return '';
+    if (value === null || typeof value !== 'object') return String(value);
+
+    if (this.isFormDataBody(value)) {
+      return Array.from(value.entries())
+        .map(([key, entry]) => {
+          const isFile = typeof File !== 'undefined' && entry instanceof File;
+          return `${key}:${isFile ? entry.name : String(entry)}`;
+        })
+        .sort()
+        .join('&');
+    }
+
+    if (this.isUrlSearchParamsBody(value)) return value.toString();
+    if (this.isBlobBody(value)) return `blob:${value.type}:${value.size}`;
+    if (this.isArrayBufferBody(value)) return `array-buffer:${value.byteLength}`;
+    if (this.isBinaryViewBody(value)) return `array-buffer-view:${value.byteLength}`;
+
+    if (Array.isArray(value)) {
+      return `[${value.map(item => this.stableStringify(item)).join(',')}]`;
+    }
+
+    return `{${Object.keys(value)
+      .sort()
+      .map(key => `${key}:${this.stableStringify(value[key])}`)
+      .join(',')}}`;
+  }
+
+  private shouldDeduplicate(method: string, options?: RequestOptions): boolean {
+    if (options?.dedupe !== undefined) return options.dedupe;
+    return ['GET', 'HEAD'].includes(method.toUpperCase());
+  }
+
+  private getRequestKey(
+    method: string,
+    url: string,
+    data?: ExplicitAny,
+    options?: RequestOptions
+  ): string {
+    const parts = [method.toUpperCase(), url];
+    const params = (options as ExplicitAny)?.params || (options as ExplicitAny)?.query;
+
+    if (params) {
+      parts.push(`params:${this.stableStringify(params)}`);
+    }
+
+    if (!['GET', 'HEAD'].includes(method.toUpperCase()) && data !== undefined) {
+      parts.push(`body:${this.stableStringify(data)}`);
+    }
+
+    return parts.join(':');
+  }
+
   private getEndpointKey(url: string): string {
     return url.split('?')[0];
   }
@@ -118,7 +248,7 @@ export class Request {
     );
   }
 
-  private handleError(error: any, method: string, url: string): never {
+  private handleError(error: any, method: string, url: string, skipRedirect = false): never {
     const endpoint = this.getEndpointKey(url);
     let status: number | undefined;
     let message = 'Request failed';
@@ -163,7 +293,7 @@ export class Request {
     this.emitEvents(status, message, endpoint, data);
 
     // Handle redirects (skip auth endpoints)
-    if (!this.isAuthEndpoint(url)) {
+    if (!skipRedirect && !this.isAuthEndpoint(url)) {
       this.handleRedirects(status, message);
     }
 
@@ -257,8 +387,15 @@ export class Request {
     method: string,
     url: string,
     data?: ExplicitAny,
-    options?: FetchOptions & { timestamp?: boolean }
+    options?: RequestOptions
   ): Promise<ExplicitAny> {
+    const {
+      timestamp,
+      dedupe: _dedupe,
+      skipRedirect,
+      headers: optionHeaders,
+      ...optionOverrides
+    } = options || {};
     const endpoint = this.getEndpointKey(url);
 
     // Circuit breaker check
@@ -279,19 +416,31 @@ export class Request {
     }
 
     // Prepare request
-    const headers = this.getHeaders();
+    const headers = this.mergeHeaders(optionHeaders);
     let finalUrl = url;
 
-    if (options?.timestamp !== false) {
+    if (timestamp !== false) {
       finalUrl += (url.includes('?') ? '&' : '?') + `_t=${Date.now()}`;
+    }
+
+    const bodySource =
+      data !== undefined
+        ? data
+        : (optionOverrides as ExplicitAny).body !== undefined
+          ? (optionOverrides as ExplicitAny).body
+          : undefined;
+    const hasBody = bodySource !== undefined;
+
+    if (hasBody) {
+      delete (optionOverrides as ExplicitAny).body;
     }
 
     const fetchOptions: FetchOptions = {
       ...Request.baseConfig,
+      ...optionOverrides,
       method,
       headers,
-      ...(data && { body: JSON.stringify(data) }),
-      ...options
+      ...(hasBody && { body: this.prepareBody(bodySource, headers) })
     };
 
     try {
@@ -299,7 +448,7 @@ export class Request {
       CircuitBreaker.clearFailures(endpoint);
       return response;
     } catch (error) {
-      this.handleError(error, method, finalUrl);
+      this.handleError(error, method, finalUrl, skipRedirect);
     }
   }
 
@@ -307,9 +456,13 @@ export class Request {
     method: string,
     url: string,
     data?: ExplicitAny,
-    options?: FetchOptions & { timestamp?: boolean }
+    options?: RequestOptions
   ): Promise<ExplicitAny> {
-    const requestKey = `${method}:${this.getEndpointKey(url)}`;
+    if (!this.shouldDeduplicate(method, options)) {
+      return this.executeRequest(method, url, data, options);
+    }
+
+    const requestKey = this.getRequestKey(method, url, data, options);
 
     // Deduplicate concurrent requests
     if (this.pendingRequests.has(requestKey)) {
@@ -325,23 +478,23 @@ export class Request {
   }
 
   // HTTP methods
-  public get(url: string, options?: FetchOptions & { timestamp?: boolean }) {
+  public get(url: string, options?: RequestOptions) {
     return this.request('GET', url, undefined, options);
   }
 
-  public post(url: string, data?: ExplicitAny, options?: FetchOptions & { timestamp?: boolean }) {
+  public post(url: string, data?: ExplicitAny, options?: RequestOptions) {
     return this.request('POST', url, data, options);
   }
 
-  public put(url: string, data?: ExplicitAny, options?: FetchOptions & { timestamp?: boolean }) {
+  public put(url: string, data?: ExplicitAny, options?: RequestOptions) {
     return this.request('PUT', url, data, options);
   }
 
-  public patch(url: string, data?: ExplicitAny, options?: FetchOptions & { timestamp?: boolean }) {
+  public patch(url: string, data?: ExplicitAny, options?: RequestOptions) {
     return this.request('PATCH', url, data, options);
   }
 
-  public delete(url: string, options?: FetchOptions & { timestamp?: boolean }) {
+  public delete(url: string, options?: RequestOptions) {
     return this.request('DELETE', url, undefined, options);
   }
 

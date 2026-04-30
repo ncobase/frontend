@@ -8,13 +8,54 @@ import type {
   ExtensionActionResponse,
   HistoricalMetricsResponse,
   LatestMetricsResponse,
-  StorageStats
+  StorageStats,
+  NCoreAvailability
 } from './ncore';
 
 import { createApi } from '@/lib/api/factory';
 
 export const extensionApi = createApi<any, any, any, any>('/ncore', {
   extensions: ({ endpoint, request }) => ({
+    // Capability probe
+    getAvailability: async (): Promise<NCoreAvailability> => {
+      try {
+        await request.get(`${endpoint}/health`, {
+          timestamp: false,
+          dedupe: false,
+          skipRedirect: true
+        });
+        return { available: true };
+      } catch (error) {
+        const status = (error as any)?.status;
+        const message = (error as any)?.message;
+
+        if (status === 404) {
+          return {
+            available: false,
+            reason: 'disabled',
+            status,
+            message: 'NCore management routes are not enabled on this backend.'
+          };
+        }
+
+        if (status === 401 || status === 403) {
+          return {
+            available: false,
+            reason: 'forbidden',
+            status,
+            message: 'Current account is not allowed to access NCore management routes.'
+          };
+        }
+
+        return {
+          available: false,
+          reason: 'error',
+          status,
+          message: message || 'NCore management capability probe failed.'
+        };
+      }
+    },
+
     // Extension management
     getExtensions: async (): Promise<ExtensionListResponse> => {
       return request.get(`${endpoint}/extensions`);
@@ -132,6 +173,7 @@ export const extensionApi = createApi<any, any, any, any>('/ncore', {
 });
 
 export const {
+  getAvailability,
   getExtensions,
   getExtensionStatus,
   getExtensionMetadata,

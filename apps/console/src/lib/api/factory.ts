@@ -13,6 +13,16 @@ export interface ApiContext {
   request: typeof request;
 }
 
+type ApiPathResolver<Arg> = string | ((arg: Arg, ctx: ApiContext) => string);
+
+export interface ApiPaths<T> {
+  create?: ApiPathResolver<Omit<T, 'id'>>;
+  get?: ApiPathResolver<string>;
+  update?: ApiPathResolver<T>;
+  delete?: ApiPathResolver<string>;
+  list?: ApiPathResolver<ExplicitAny | undefined>;
+}
+
 /**
  * Standard CRUD operations interface
  */
@@ -59,6 +69,11 @@ export interface ApiOptions<
   DeleteResult = T,
   ListResult = PaginationResult<T>
 > {
+  /**
+   * Override default CRUD paths while keeping the default request body and response handling.
+   */
+  paths?: ApiPaths<T>;
+
   /**
    * Override the default create method implementation
    */
@@ -114,32 +129,54 @@ export function createApi<
     request
   };
 
+  const resolvePath = <Arg>(
+    resolver: ApiPathResolver<Arg> | undefined,
+    fallback: string,
+    arg: Arg
+  ) => {
+    if (!resolver) return fallback;
+    return typeof resolver === 'function' ? resolver(arg, apiContext) : resolver;
+  };
+
   // Define default implementations
   const defaultImplementations = {
     // Create operation with proper type for payload (no ID required)
     create: async (payload: Omit<T, 'id'>): Promise<CreateResult> => {
-      return request.post(endpoint, { ...payload });
+      const path = resolvePath(options.paths?.create, endpoint, payload);
+      return request.post(path, { ...payload });
     },
 
     // Get operation
     get: async (id: string): Promise<T> => {
-      return request.get(`${endpoint}/${id}`);
+      const path = resolvePath(options.paths?.get, `${endpoint}/${id}`, id);
+      return request.get(path);
     },
 
     // Update operation
     update: async (payload: T): Promise<UpdateResult> => {
-      return request.put(`${endpoint}/${payload['id']}`, { ...payload });
+      const path = resolvePath(
+        options.paths?.update,
+        `${endpoint}/${(payload as ExplicitAny).id}`,
+        payload
+      );
+      return request.put(path, { ...payload });
     },
 
     // Delete operation
     delete: async (id: string): Promise<DeleteResult> => {
-      return request.delete(`${endpoint}/${id}`);
+      const path = resolvePath(options.paths?.delete, `${endpoint}/${id}`, id);
+      return request.delete(path);
     },
 
     // List operation with optional params
     list: async (params?: ExplicitAny): Promise<ListResult> => {
       const queryString = params ? buildQueryString(params) : '';
-      return request.get(`${endpoint}${queryString ? `?${queryString}` : ''}`);
+      const path = resolvePath(
+        options.paths?.list,
+        `${endpoint}${queryString ? `?${queryString}` : ''}`,
+        params
+      );
+      return request.get(path);
     }
   };
 
