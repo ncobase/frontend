@@ -97,19 +97,40 @@ which cross-feature effects they must handle.
 ### Topics and Taxonomies
 
 - Entry: `/content/topics`, `/content/taxonomies`.
-- Actions: list/filter, create, edit, view, delete, create topic within taxonomy context.
-- API: `/cms/topics`, `/cms/taxonomies`.
+- Actions: list/filter, create, edit, view, delete, create topic within taxonomy context, upload
+  thumbnail media.
+- API: `/cms/topics`, `/cms/taxonomies`, `/res`, `/cms/media`, `/cms/topic-media`.
 - Cross-effects: topic create/update may require taxonomy validation, media association, distribution
   invalidation, and content overview refresh.
-- Required UX: settle id/slug display and route usage; show taxonomy validation errors inline.
+- Current media behavior: thumbnail uploader uses `useTopicMediaUpload`, which uploads through `/res`
+  and creates a CMS media record before writing the media URL back to the form.
+- Required UX: settle id/slug display and route usage; show taxonomy validation errors inline; wire
+  `TopicMediaManager` into create/edit so featured/gallery/attachment media can be selected, uploaded,
+  removed, reordered, and saved with the topic.
 
 ### Media and Resource Picker
 
 - Entry: `/content/media`, topic editor media fields.
 - API: `/cms/media` and `/res` file APIs.
-- Cross-effects: media should reference resource files through `resource_id`; resource deletion should
-  show media/topic references.
-- Required UX: shared picker for upload/select, preview, access level, and reference warning.
+- Current upload behavior:
+  - `MediaUpload` and content upload hooks build resource `FormData` with the single-file `file`
+    field, access level, public flag, path prefix, tags, processing options, `owner_id`, and
+    `space_id`.
+  - The uploaded resource response is converted into a `/cms/media` create payload with
+    `resource_id`, URL/path, mime type, size, owner, space, and source metadata.
+  - Media list, gallery, view, and edit screens use resource-backed preview/download URLs when
+    present.
+- Current topic-media behavior:
+  - `TopicMediaManager` queries `/cms/topic-media/by-topic/:topicId`.
+  - Saving reconciles desired featured/gallery/attachment items against persisted relations and calls
+    create, update, or delete on `/cms/topic-media`.
+  - Unsaved topic flows can pass local media selections through `onSave`; persisted topic flows write
+    immediately through the topic-media sync mutation.
+- Cross-effects: media references resource files through `resource_id`; resource deletion queries CMS
+  media references and must also surface topic references once reverse lookup exists.
+- Required next UX: shared picker for existing `/res` file selection, direct resource/media reference
+  navigation, per-file progress, retry failed uploads, protected preview states for private files, and
+  reference warnings for bulk delete.
 
 ### Channels and Distributions
 
