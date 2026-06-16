@@ -17,6 +17,7 @@ import {
   optimizeStorage,
   getStorageHealth,
   getVersions,
+  createVersion,
   shareFile,
   updateAccess,
   createThumbnail
@@ -55,6 +56,20 @@ export const useGetVersions = (id: string) =>
     queryFn: () => getVersions(id),
     enabled: !!id
   });
+
+export const useCreateVersion = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: FormData }) => createVersion(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: resourceKeys.versions(variables.id) });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.get(variables.id) });
+      queryClient.invalidateQueries({ queryKey: ['resourceService', 'files'] });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.quota() });
+      queryClient.invalidateQueries({ queryKey: resourceKeys.usage() });
+    }
+  });
+};
 
 export const useGetQuota = () =>
   useQuery({

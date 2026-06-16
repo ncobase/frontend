@@ -177,9 +177,9 @@ which cross-feature effects they must handle.
 - Cross-effects: media references resource files through `resource_id`; resource deletion must keep
   CMS media and topic-media relations intact by refusing to delete referenced files until the
   dependent records are removed or changed.
-- Required next UX: per-file progress, retry failed uploads, protected preview states for private
-  files, and browser integration coverage for resource delete impact loading, blocking, navigation,
-  and successful clear-state deletion.
+- Required next UX: per-file transfer progress and browser integration coverage for media upload
+  retry, protected preview states, resource delete impact loading, blocking, navigation, and
+  successful clear-state deletion.
 
 ### Channels and Distributions
 
@@ -227,15 +227,21 @@ Current frontend closure from the feature/UI pass:
   tags, image thumbnail options, single-file `file` upload, and multi-file `files` batch upload.
   Batch upload partial failures and request failures stay in the modal, mark queue rows as uploaded,
   failed, or retry-needed, show server errors, and let the user keep or retry only failed items.
+- Current preview/version UX: private image/video/audio previews load through the protected
+  `/res/:id/download` route, show loading/error/retry states, provide a download fallback, and clean
+  up local object URLs. Version history calls `GET /res/:slug/versions`, uploads new versions through
+  `POST /res/:slug/versions` with the single-file `file` multipart field, applies upload policy
+  checks for size/type/quota before submitting, and supports version download plus historical
+  version resource navigation.
 - Current sharing/delete/reference UX: table actions expose share link generation with public/shared
   scope and expiration; delete confirmation checks CMS media and topic usage before single or batch
   deletion, shows per-file impact details, links to referenced media and topics, blocks deletion on
   references or reference-check failures, and only enables delete after a complete clear-state review;
-  resource detail shows CMS media references and can open a filtered `/content/media?resource_id=...`
-  list.
-- Required next UX: per-file transfer progress, retry failed batch delete items, protected
-  private-file preview states, and browser integration tests for delete impact review and upload
-  failure recovery.
+  partial or failed batch deletes keep the dialog open with deleted/failed/unknown item details and
+  allow retrying only unresolved items; resource detail shows CMS media references and can open a
+  filtered `/content/media?resource_id=...` list.
+- Required next UX: per-file transfer progress, browser integration tests for delete impact review
+  and upload/delete failure recovery, and version restore/delete UI after backend endpoints exist.
 
 ## Spaces
 

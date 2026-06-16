@@ -18,6 +18,8 @@ export const FilePreview = ({ isOpen, file, onClose }: FilePreviewProps) => {
   const toast = useToastMessage();
   const [protectedUrl, setProtectedUrl] = useState<string>('');
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState('');
+  const [previewRetry, setPreviewRetry] = useState(0);
   const [downloadLoading, setDownloadLoading] = useState(false);
 
   const previewable = useMemo(
@@ -30,22 +32,29 @@ export const FilePreview = ({ isOpen, file, onClose }: FilePreviewProps) => {
     if (!isOpen || !file || file.download_url || !previewable) {
       setProtectedUrl('');
       setPreviewLoading(false);
+      setPreviewError('');
       return;
     }
 
     let active = true;
     let objectUrl = '';
     setPreviewLoading(true);
+    setPreviewError('');
 
     download(file.id)
       .then(blob => {
         objectUrl = URL.createObjectURL(blob);
         if (active) {
           setProtectedUrl(objectUrl);
+        } else {
+          URL.revokeObjectURL(objectUrl);
         }
       })
-      .catch(() => {
+      .catch((error: any) => {
         if (active) {
+          setPreviewError(
+            error?.message || t('resource.preview.load_failed', 'Failed to load preview')
+          );
           toast.error(t('messages.error'), {
             description: t('resource.preview.load_failed', 'Failed to load preview')
           });
@@ -63,7 +72,7 @@ export const FilePreview = ({ isOpen, file, onClose }: FilePreviewProps) => {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [file, isOpen, previewable, t, toast]);
+  }, [file, isOpen, previewable, previewRetry, t, toast]);
 
   const handleProtectedDownload = useCallback(async () => {
     if (!file) return;
@@ -85,8 +94,33 @@ export const FilePreview = ({ isOpen, file, onClose }: FilePreviewProps) => {
   const renderPreview = () => {
     if (previewLoading) {
       return (
-        <div className='flex items-center justify-center h-64 bg-slate-50 text-sm text-slate-400'>
-          {t('common.loading', 'Loading...')}
+        <div className='flex h-64 items-center justify-center gap-2 rounded-md bg-slate-50 text-sm text-slate-400'>
+          <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+          {t('resource.preview.loading', 'Loading protected preview...')}
+        </div>
+      );
+    }
+
+    if (previewError) {
+      return (
+        <div className='flex h-64 flex-col items-center justify-center rounded-md border border-orange-200 bg-orange-50 px-6 text-center'>
+          <Icons name='IconAlertTriangle' className='mb-3 h-10 w-10 text-orange-500' />
+          <p className='text-sm font-medium text-orange-700'>
+            {t('resource.preview.protected_failed', 'Protected preview could not be loaded')}
+          </p>
+          <p className='mt-1 max-w-lg text-xs text-orange-600'>{previewError}</p>
+          <div className='mt-4 flex flex-wrap justify-center gap-2'>
+            <Button
+              size='sm'
+              variant='outline-slate'
+              onClick={() => setPreviewRetry(value => value + 1)}
+            >
+              {t('actions.retry', 'Retry')}
+            </Button>
+            <Button size='sm' onClick={handleProtectedDownload} isLoading={downloadLoading}>
+              {t('resource.actions.download', 'Download')}
+            </Button>
+          </div>
         </div>
       );
     }
@@ -121,7 +155,11 @@ export const FilePreview = ({ isOpen, file, onClose }: FilePreviewProps) => {
               <source src={previewUrl} type={file.type} />
             </audio>
           </div>
-        ) : null;
+        ) : (
+          <div className='flex items-center justify-center h-64 bg-slate-50'>
+            <Icons name='IconMusic' className='w-16 h-16 text-slate-300' />
+          </div>
+        );
       default:
         return (
           <div className='flex flex-col items-center justify-center h-64 bg-slate-50'>

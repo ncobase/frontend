@@ -10,7 +10,7 @@ import { VersionHistory } from '../components/version_history';
 import { downloadResourceFile } from '../file_actions';
 import { ResourceViewer } from '../forms/viewer';
 import { useResourceRuntimePolicy } from '../resource_policy';
-import { useCreateThumbnail, useGetResource } from '../service';
+import { useCreateThumbnail, useGetResource, useGetUsage } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
 import type { Media } from '@/features/content/media/media';
@@ -28,6 +28,7 @@ export const ResourceViewPage = () => {
     isError: referencesError
   } = useListMedia({ resource_id: file?.id, limit: 20 }, !!file?.id);
   const { data: policy, isLoading: policyLoading } = useResourceRuntimePolicy();
+  const { data: usage } = useGetUsage(!!file?.id);
   const thumbnailMutation = useCreateThumbnail();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -153,7 +154,13 @@ export const ResourceViewPage = () => {
         </div>
         <div className='space-y-4'>
           <div className='bg-white border rounded-lg p-4'>
-            <VersionHistory fileId={file.id} />
+            <VersionHistory
+              file={file}
+              policy={policy}
+              policyLoading={policyLoading}
+              usage={usage}
+              onVersionCreated={() => refetch()}
+            />
           </div>
           <div className='bg-white border rounded-lg p-4'>
             <div className='mb-3 flex items-center justify-between gap-3'>

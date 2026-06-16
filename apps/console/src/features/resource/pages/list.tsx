@@ -11,6 +11,12 @@ import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection } from '../config/topbar';
 import {
+  buildBatchDeleteFeedback,
+  buildDeleteErrorFeedback,
+  getRetryableDeleteFiles,
+  type ResourceDeleteFeedback
+} from '../delete_feedback';
+import {
   fetchResourceDeleteImpact,
   ResourceDeleteImpact,
   summarizeResourceDeleteImpacts
@@ -94,6 +100,9 @@ export const ResourceListPage = () => {
   const [deleteImpact, setDeleteImpact] = useState<DeleteImpactState>(emptyDeleteImpactState);
   const [batchDeleteImpact, setBatchDeleteImpact] =
     useState<DeleteImpactState>(emptyDeleteImpactState);
+  const [batchDeleteFeedback, setBatchDeleteFeedback] = useState<ResourceDeleteFeedback | null>(
+    null
+  );
   const [shareDialog, setShareDialog] = useState<{ open: boolean; file: ResourceFile | null }>({
     open: false,
     file: null
@@ -392,14 +401,21 @@ export const ResourceListPage = () => {
       return;
     }
 
+    setBatchDeleteFeedback(null);
     batchDeleteMutation.mutate(
       files.map(file => file.id),
       {
         onSuccess: (result: ResourceBatchDeleteResult) => {
           const success = result?.success_count ?? result?.deleted_ids?.length ?? files.length;
           const failed = result?.failure_count ?? 0;
-          setBatchDeleteDialog({ open: false, files: [] });
           if (failed > 0) {
+            const feedback = buildBatchDeleteFeedback(files, result);
+            const retryableFiles = getRetryableDeleteFiles(feedback);
+            setBatchDeleteFeedback(feedback);
+            setBatchDeleteDialog({
+              open: true,
+              files: retryableFiles.length > 0 ? retryableFiles : files
+            });
             toast.warning(t('messages.warning', 'Warning'), {
               description: t(
                 'resource.messages.batch_delete_partial',
@@ -408,6 +424,8 @@ export const ResourceListPage = () => {
               )
             });
           } else {
+            setBatchDeleteFeedback(null);
+            setBatchDeleteDialog({ open: false, files: [] });
             toast.success(t('messages.success'), {
               description: t('resource.messages.batch_delete_success', '{{count}} files deleted', {
                 count: success
@@ -417,7 +435,8 @@ export const ResourceListPage = () => {
           refetch();
         },
         onError: error => {
-          setBatchDeleteDialog({ open: false, files: [] });
+          setBatchDeleteFeedback(buildDeleteErrorFeedback(files, error));
+          setBatchDeleteDialog({ open: true, files });
           onError(error);
         }
       }
@@ -581,7 +600,10 @@ export const ResourceListPage = () => {
       {
         label: t('resource.batch.delete', 'Delete'),
         icon: 'IconTrash',
-        action: (rows: ResourceFile[]) => setBatchDeleteDialog({ open: true, files: rows }),
+        action: (rows: ResourceFile[]) => {
+          setBatchDeleteFeedback(null);
+          setBatchDeleteDialog({ open: true, files: rows });
+        },
         isDisabled: () => batchDeleteMutation.isPending
       }
     ],
@@ -694,13 +716,25 @@ export const ResourceListPage = () => {
       <AlertDialog
         title={t('resource.dialogs.batch_delete_title', 'Delete Selected Files')}
         isOpen={batchDeleteDialog.open}
-        onChange={() => setBatchDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={() =>
+          setBatchDeleteDialog(prev => {
+            const open = !prev.open;
+            if (!open) {
+              setBatchDeleteFeedback(null);
+              return { open, files: [] };
+            }
+            return { ...prev, open };
+          })
+        }
         className='max-w-4xl'
         footer={
           <>
             <Button
               variant='outline-slate'
-              onClick={() => setBatchDeleteDialog({ open: false, files: [] })}
+              onClick={() => {
+                setBatchDeleteFeedback(null);
+                setBatchDeleteDialog({ open: false, files: [] });
+              }}
               disabled={batchDeleteMutation.isPending}
             >
               {t('actions.cancel', 'Cancel')}
@@ -736,6 +770,85 @@ export const ResourceListPage = () => {
             onOpenMedia={openMediaReference}
             onOpenTopic={openTopicReference}
           />
+          {batchDeleteFeedback && (
+            <div
+              className={`rounded-md border px-4 py-3 ${
+                batchDeleteFeedback.status === 'partial'
+                  ? 'border-orange-200 bg-orange-50'
+                  : 'border-red-200 bg-red-50'
+              }`}
+            >
+              <div className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
+                <div className='min-w-0'>
+                  <p
+                    className={`text-sm font-medium ${
+                      batchDeleteFeedback.status === 'partial' ? 'text-orange-700' : 'text-red-700'
+                    }`}
+                  >
+                    {batchDeleteFeedback.status === 'partial'
+                      ? t('resource.delete.result_partial', 'Some files could not be deleted')
+                      : t('resource.delete.result_failed', 'Delete failed')}
+                  </p>
+                  <p className='mt-1 text-xs text-slate-600'>
+                    {t(
+                      'resource.delete.result_summary',
+                      '{{success}} deleted, {{failed}} failed out of {{total}} files.',
+                      {
+                        success: batchDeleteFeedback.successCount,
+                        failed: batchDeleteFeedback.failureCount,
+                        total: batchDeleteFeedback.total
+                      }
+                    )}
+                    {batchDeleteFeedback.operationId ? ` ${batchDeleteFeedback.operationId}` : ''}
+                  </p>
+                </div>
+                {getRetryableDeleteFiles(batchDeleteFeedback).length > 0 && (
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      setBatchDeleteFeedback(null);
+                      confirmBatchDelete();
+                    }}
+                    disabled={
+                      batchDeleteMutation.isPending ||
+                      batchDeleteImpact.loading ||
+                      !batchDeleteImpact.checked ||
+                      !batchDeleteImpactSummary.canDelete
+                    }
+                  >
+                    {t('resource.delete.retry_failed', 'Retry failed')}
+                  </Button>
+                )}
+              </div>
+              {batchDeleteFeedback.errors.length > 0 && (
+                <div className='mt-3 space-y-1'>
+                  {batchDeleteFeedback.errors.slice(0, 3).map((error, index) => (
+                    <p key={`${error}-${index}`} className='text-xs text-red-600'>
+                      {error}
+                    </p>
+                  ))}
+                </div>
+              )}
+              <div className='mt-3 max-h-40 space-y-1 overflow-auto'>
+                {batchDeleteFeedback.items
+                  .filter(item => item.status !== 'deleted')
+                  .map(item => (
+                    <div
+                      key={item.key}
+                      className='rounded border border-white/70 bg-white px-3 py-2 text-xs'
+                    >
+                      <p className='font-medium text-slate-700'>
+                        {item.file.original_name || item.file.name || item.file.id}
+                      </p>
+                      <p className={item.status === 'unknown' ? 'text-orange-600' : 'text-red-600'}>
+                        {item.message ||
+                          t('resource.delete.item_failed', 'The file could not be deleted.')}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </AlertDialog>
 

@@ -12,7 +12,6 @@ import {
   OptimizeResult,
   ResourceQuota,
   ResourceUsage,
-  FileVersion,
   ShareLink,
   ResourceProcessingOptions
 } from './resource';
@@ -67,11 +66,11 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   // Versions
-  getVersions: (slug: string): Promise<FileVersion[]> => {
+  getVersions: (slug: string): Promise<ResourceFile[]> => {
     return request.get(`${endpoint}/${slug}/versions`);
   },
 
-  createVersion: (slug: string, data: FormData): Promise<FileVersion> => {
+  createVersion: (slug: string, data: FormData): Promise<ResourceFile> => {
     return request.post(`${endpoint}/${slug}/versions`, data);
   },
 

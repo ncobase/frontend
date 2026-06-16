@@ -207,16 +207,6 @@ export interface OptimizeResult {
   duration: number;
 }
 
-export interface FileVersion {
-  id: string;
-  file_id: string;
-  version: number;
-  size: number;
-  hash: string;
-  created_at: number;
-  created_by: string;
-}
-
 export interface ShareLink {
   url: string;
   access_level: string;
