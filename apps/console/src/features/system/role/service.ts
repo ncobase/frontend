@@ -17,6 +17,8 @@ import {
 } from './apis';
 import { QueryFormParams } from './config/query';
 
+import { propagateRbacChange } from '@/features/account/session_propagation';
+
 interface RoleKeys {
   create: ['roleService', 'create'];
   get: (_options?: { role?: string }) => ['roleService', 'role', { role?: string }];
@@ -71,8 +73,9 @@ export const useCreateRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createRole,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
+      await propagateRbacChange(queryClient, { reason: 'role-created' });
     }
   });
 };
@@ -81,11 +84,12 @@ export const useUpdateRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateRole,
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       if (variables.id) {
         queryClient.invalidateQueries({ queryKey: ['role', variables.id] });
       }
+      await propagateRbacChange(queryClient, { reason: 'role-updated' });
     }
   });
 };
@@ -94,9 +98,10 @@ export const useDeleteRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteRole,
-    onSuccess: (_, deletedId) => {
+    onSuccess: async (_, deletedId) => {
       queryClient.removeQueries({ queryKey: ['role', deletedId] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
+      await propagateRbacChange(queryClient, { reason: 'role-deleted' });
     }
   });
 };
@@ -114,8 +119,9 @@ export const useAssignPermissions = () => {
   return useMutation({
     mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
       assignPermissions(roleId, permissionIds),
-    onSuccess: (_, { roleId }) => {
+    onSuccess: async (_, { roleId }) => {
       queryClient.invalidateQueries({ queryKey: ['rolePermissions', roleId] });
+      await propagateRbacChange(queryClient, { reason: 'role-permissions-assigned' });
     }
   });
 };
@@ -125,8 +131,9 @@ export const useRemovePermissions = () => {
   return useMutation({
     mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
       removePermissions(roleId, permissionIds),
-    onSuccess: (_, { roleId }) => {
+    onSuccess: async (_, { roleId }) => {
       queryClient.invalidateQueries({ queryKey: ['rolePermissions', roleId] });
+      await propagateRbacChange(queryClient, { reason: 'role-permissions-removed' });
     }
   });
 };
@@ -144,8 +151,12 @@ export const useAssignUsers = () => {
   return useMutation({
     mutationFn: ({ roleId, userIds }: { roleId: string; userIds: string[] }) =>
       assignUsers(roleId, userIds),
-    onSuccess: (_, { roleId }) => {
+    onSuccess: async (_, { roleId, userIds }) => {
       queryClient.invalidateQueries({ queryKey: ['roleUsers', roleId] });
+      await propagateRbacChange(queryClient, {
+        reason: 'role-users-assigned',
+        affectedUserIds: userIds
+      });
     }
   });
 };
@@ -155,8 +166,12 @@ export const useRemoveUsers = () => {
   return useMutation({
     mutationFn: ({ roleId, userIds }: { roleId: string; userIds: string[] }) =>
       removeUsers(roleId, userIds),
-    onSuccess: (_, { roleId }) => {
+    onSuccess: async (_, { roleId, userIds }) => {
       queryClient.invalidateQueries({ queryKey: ['roleUsers', roleId] });
+      await propagateRbacChange(queryClient, {
+        reason: 'role-users-removed',
+        affectedUserIds: userIds
+      });
     }
   });
 };

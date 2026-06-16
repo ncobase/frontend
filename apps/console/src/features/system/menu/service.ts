@@ -19,6 +19,8 @@ import {
 import { QueryFormParams } from './config/query';
 import { Menu, NavigationMenus } from './menu';
 
+import { propagateRbacChange } from '@/features/account/session_propagation';
+
 interface MenuKeys {
   create: ['menuService', 'create'];
   get: (_options?: { menu?: string }) => ['menuService', 'menu', { menu?: string }];
@@ -127,10 +129,11 @@ export const useCreateMenu = () => {
 
   return useMutation({
     mutationFn: (payload: Pick<Menu, keyof Menu>) => createMenu(payload),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['menuService', 'menus'] });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'tree'] });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'navigation'] });
+      await propagateRbacChange(queryClient, { reason: 'menu-created' });
     },
     onError: error => {
       console.error('Failed to create menu:', error);
@@ -144,7 +147,7 @@ export const useUpdateMenu = () => {
 
   return useMutation({
     mutationFn: (payload: Pick<Menu, keyof Menu>) => updateMenu(payload),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['menuService', 'menus'] });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'tree'] });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'navigation'] });
@@ -153,6 +156,7 @@ export const useUpdateMenu = () => {
           queryKey: menuKeys.get({ menu: variables.id })
         });
       }
+      await propagateRbacChange(queryClient, { reason: 'menu-updated' });
     },
     onError: error => {
       console.error('Failed to update menu:', error);
@@ -167,8 +171,9 @@ export const useMoveMenu = () => {
   return useMutation({
     mutationFn: ({ id, parentId, order }: { id: string; parentId: string | null; order: number }) =>
       moveMenu(id, parentId, order),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['menuService'] });
+      await propagateRbacChange(queryClient, { reason: 'menu-moved' });
     }
   });
 };
@@ -178,8 +183,9 @@ export const useReorderMenus = () => {
 
   return useMutation({
     mutationFn: (menuIds: string[]) => reorderMenus(menuIds),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['menuService'] });
+      await propagateRbacChange(queryClient, { reason: 'menus-reordered' });
     }
   });
 };
@@ -198,8 +204,9 @@ export const useToggleMenuStatus = () => {
     }) => {
       return toggleMenuStatus(id, action);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['menuService'] });
+      await propagateRbacChange(queryClient, { reason: 'menu-status-toggled' });
     }
   });
 };
@@ -210,13 +217,14 @@ export const useDeleteMenu = () => {
 
   return useMutation({
     mutationFn: (id: string) => deleteMenu(id),
-    onSuccess: (_, deletedId) => {
+    onSuccess: async (_, deletedId) => {
       queryClient.removeQueries({
         queryKey: menuKeys.get({ menu: deletedId })
       });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'menus'] });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'tree'] });
       queryClient.invalidateQueries({ queryKey: ['menuService', 'navigation'] });
+      await propagateRbacChange(queryClient, { reason: 'menu-deleted' });
     },
     onError: error => {
       console.error('Failed to delete menu:', error);

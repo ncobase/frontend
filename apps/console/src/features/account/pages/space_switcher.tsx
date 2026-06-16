@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { useAuthContext } from '@/features/account/context';
-import { refreshAccessToken } from '@/features/account/token_service';
+import { refreshSessionForCurrentSpace } from '@/features/account/session_propagation';
 import type { Space } from '@/features/space/space';
 import { useRedirectFromUrl } from '@/router/router.hooks';
 
@@ -78,15 +78,7 @@ export const SpaceSwitcher = ({
       try {
         switchSpace(id);
 
-        const tokens = await refreshAccessToken();
-        updateTokens(tokens.access_token, tokens.refresh_token);
-
-        await queryClient.invalidateQueries();
-        await queryClient.refetchQueries({ queryKey: ['accountService'], type: 'active' });
-        await queryClient.refetchQueries({
-          queryKey: ['menuService', 'navigation'],
-          type: 'active'
-        });
+        await refreshSessionForCurrentSpace(queryClient, updateTokens);
 
         redirect();
         onVisible?.(false);

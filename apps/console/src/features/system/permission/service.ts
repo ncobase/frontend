@@ -16,6 +16,8 @@ import {
   bulkDeletePermissions
 } from './apis';
 
+import { propagateRbacChange } from '@/features/account/session_propagation';
+
 // Permission CRUD hooks
 export const useQueryPermission = (permissionId: string) =>
   useQuery({
@@ -36,8 +38,9 @@ export const useCreatePermission = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPermission,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['permissions'] });
+      await propagateRbacChange(queryClient, { reason: 'permission-created' });
     }
   });
 };
@@ -46,11 +49,12 @@ export const useUpdatePermission = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updatePermission,
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['permissions'] });
       if (variables.id) {
         queryClient.invalidateQueries({ queryKey: ['permission', variables.id] });
       }
+      await propagateRbacChange(queryClient, { reason: 'permission-updated' });
     }
   });
 };
@@ -59,9 +63,10 @@ export const useDeletePermission = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deletePermission,
-    onSuccess: (_, deletedId) => {
+    onSuccess: async (_, deletedId) => {
       queryClient.removeQueries({ queryKey: ['permission', deletedId] });
       queryClient.invalidateQueries({ queryKey: ['permissions'] });
+      await propagateRbacChange(queryClient, { reason: 'permission-deleted' });
     }
   });
 };
@@ -72,9 +77,10 @@ export const useAssignPermissionsToRole = () => {
   return useMutation({
     mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
       assignPermissionsToRole(roleId, permissionIds),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['rolePermissions'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
+      await propagateRbacChange(queryClient, { reason: 'permission-assigned-to-role' });
     }
   });
 };
@@ -84,9 +90,10 @@ export const useRemovePermissionsFromRole = () => {
   return useMutation({
     mutationFn: ({ roleId, permissionIds }: { roleId: string; permissionIds: string[] }) =>
       removePermissionsFromRole(roleId, permissionIds),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['rolePermissions'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
+      await propagateRbacChange(queryClient, { reason: 'permission-removed-from-role' });
     }
   });
 };
@@ -125,8 +132,9 @@ export const useBulkUpdatePermissions = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: bulkUpdatePermissions,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['permissions'] });
+      await propagateRbacChange(queryClient, { reason: 'permissions-bulk-updated' });
     }
   });
 };
@@ -135,8 +143,9 @@ export const useBulkDeletePermissions = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: bulkDeletePermissions,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['permissions'] });
+      await propagateRbacChange(queryClient, { reason: 'permissions-bulk-deleted' });
     }
   });
 };

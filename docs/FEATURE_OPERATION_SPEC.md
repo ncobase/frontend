@@ -34,10 +34,14 @@ which cross-feature effects they must handle.
 
 - Entry: automatic before protected non-auth requests.
 - API: `POST /refresh-token`.
-- Success effects: replace access/refresh tokens and clear permission token cache.
+- Success effects: replace access/refresh tokens, clear permission token cache, and reset request
+  circuit/dedupe state.
 - Failure states: clear session, redirect to `/login?redirect=...`.
-- Space switch: active space changes refresh the access token, reset domain cache, and refetch
-  account/navigation context.
+- Space switch: active space changes call the shared `refreshSessionForCurrentSpace` flow. It sends
+  the selected `x-md-sid` to `/refresh-token`, stores the returned tokens, resets permission/request
+  runtime state, cancels/removes stale inactive space-scoped queries, invalidates active
+  space-scoped queries, and actively refetches `/account` plus navigation menus. Cache refetch
+  failures are logged and do not roll back a successful token refresh.
 
 ### Logout
 
@@ -75,6 +79,10 @@ which cross-feature effects they must handle.
   activities.
 - API: `/sys/roles`, `/sys/permissions`, `/sys/policies`, `/sys/activities`.
 - Cross-effects: role/permission changes affect menus, token permissions, and current route access.
+- Cache effects: role, permission, Casbin, menu, and space-role mutations call shared RBAC
+  propagation. The current browser resets permission/request runtime state, invalidates identity and
+  navigation queries, invalidates affected user/space records when ids are known, and emits
+  `rbac-change` for local listeners.
 - Current assignment behavior:
   - Permission list row selection feeds bulk state so assignment actions only appear with selected
     permissions.
@@ -82,15 +90,16 @@ which cross-feature effects they must handle.
     until roles are selected, and resets state on close.
   - Role list permission assignment opens a modal, loads current role permissions, computes added and
     removed ids, and calls assign/remove hooks before closing.
-- Required UX: show affected users/menus before destructive changes; prompt users to refresh token or
-  re-login after RBAC changes.
+- Required UX: show affected users/menus before destructive changes. Affected users in other
+  browsers or devices still need token refresh, re-login, or a future live permission refresh event.
 
 ### Menus
 
 - Entry: `/system/menus`.
 - Actions: CRUD, move, reorder, enable/disable, show/hide, navigation preview.
 - API: `/sys/menus`, `/sys/menus/tree`, `/sys/menus/navigation`, `/sys/menus/authorized/:userId`.
-- Cache effects: invalidate `menuService` list/tree/navigation queries.
+- Cache effects: invalidate `menuService` list/tree/navigation queries and run shared RBAC
+  propagation so current account/navigation permission state is refreshed.
 - Current move behavior: the table action opens a modal with parent and order fields, rejects moving a
   menu under itself or a descendant, sends `parent_id` including explicit `null`, and refetches menu
   data after success.
@@ -229,6 +238,10 @@ Current frontend closure from the feature/UI pass:
   member role mutations, settings writes, quota writes, billing writes, and bulk actions.
 - Cross-effects: changing active space affects token permissions, navigation, resource ownership,
   content visibility, payment/billing, and cached queries.
+- Current switch behavior: the `SpaceProvider` is mounted around the console router, so
+  `useSpaceContext()` consumers receive the active space. Manual switcher and provider-driven
+  updates refresh the selected-space token, permission runtime, account data, navigation, and
+  space-scoped React Query caches through the same shared helper.
 - Current import/export behavior: import accepts JSON arrays or objects with `items`, creates spaces
   through `useCreateSpace`, reports deterministic parse/validation errors, and export writes current
   rows to JSON or CSV.
@@ -238,7 +251,8 @@ Current frontend closure from the feature/UI pass:
   edit, space-user create, and space-user edit subroutes require `manage:spaces`. List and member
   pages hide write buttons, destructive dropdown items, row selection, and bulk actions when only
   read access is present.
-- Required UX: after switching space, clear or refetch account, navigation, and domain queries.
+- Required UX: add browser/e2e coverage for selected-space token refresh, read-only route retention,
+  navigation refresh, and stale domain cache cleanup.
 
 ## Payment
 

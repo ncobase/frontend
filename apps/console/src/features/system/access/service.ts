@@ -29,6 +29,8 @@ import {
   getActivityTypes
 } from './apis';
 
+import { propagateRbacChange } from '@/features/account/session_propagation';
+
 // Query parameter types
 export interface CasbinQueryParams {
   p_type?: string;
@@ -103,8 +105,9 @@ export const useCreateCasbinPolicy = () => {
 
   return useMutation({
     mutationFn: (payload: CasbinRuleBody) => createCasbinRule(payload),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['casbinService', 'policies'] });
+      await propagateRbacChange(queryClient, { reason: 'casbin-policy-created' });
     },
     onError: error => {
       console.error('Failed to create Casbin policy:', error);
@@ -118,13 +121,14 @@ export const useUpdateCasbinPolicy = () => {
 
   return useMutation({
     mutationFn: (payload: CasbinRule) => updateCasbinRule(payload),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['casbinService', 'policies'] });
       if (variables.id) {
         queryClient.invalidateQueries({
           queryKey: casbinKeys.get(variables.id)
         });
       }
+      await propagateRbacChange(queryClient, { reason: 'casbin-policy-updated' });
     },
     onError: error => {
       console.error('Failed to update Casbin policy:', error);
@@ -138,11 +142,12 @@ export const useDeleteCasbinPolicy = () => {
 
   return useMutation({
     mutationFn: (id: string) => deleteCasbinRule(id),
-    onSuccess: (_, deletedId) => {
+    onSuccess: async (_, deletedId) => {
       queryClient.removeQueries({
         queryKey: casbinKeys.get(deletedId)
       });
       queryClient.invalidateQueries({ queryKey: ['casbinService', 'policies'] });
+      await propagateRbacChange(queryClient, { reason: 'casbin-policy-deleted' });
     },
     onError: error => {
       console.error('Failed to delete Casbin policy:', error);
@@ -156,8 +161,9 @@ export const useBulkCreateCasbinPolicies = () => {
 
   return useMutation({
     mutationFn: (policies: CasbinRuleBody[]) => bulkCreateCasbinRules(policies),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['casbinService', 'policies'] });
+      await propagateRbacChange(queryClient, { reason: 'casbin-policies-bulk-created' });
     },
     onError: error => {
       console.error('Failed to bulk create Casbin policies:', error);
@@ -181,8 +187,9 @@ export const useImportCasbinPolicies = () => {
 
   return useMutation({
     mutationFn: (data: any) => importPolicies(data),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['casbinService', 'policies'] });
+      await propagateRbacChange(queryClient, { reason: 'casbin-policies-imported' });
     },
     onError: error => {
       console.error('Failed to import Casbin policies:', error);

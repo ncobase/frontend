@@ -11,6 +11,7 @@ import { AppDevHint } from '@/components/app_dev_hint';
 import { LoadingIndicator } from '@/components/loading/indicator';
 import { ThemeProvider } from '@/components/theme';
 import { AuthProvider } from '@/features/account/context';
+import { SpaceProvider } from '@/features/space/context';
 import { Router } from '@/router';
 
 const queryClient = new QueryClient({
@@ -33,9 +34,11 @@ const mount = () => {
         <ThemeProvider>
           <ToastProvider>
             <AuthProvider>
-              <Router />
-              <AppDevHint />
-              <LoadingIndicator />
+              <SpaceProvider>
+                <Router />
+                <AppDevHint />
+                <LoadingIndicator />
+              </SpaceProvider>
               <ToastContainer position='bottom-right' />
             </AuthProvider>
           </ToastProvider>

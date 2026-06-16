@@ -65,6 +65,8 @@ import {
   SpaceSettingBody
 } from './space';
 
+import { propagateRbacChange } from '@/features/account/session_propagation';
+
 export interface SpaceQueryParams extends QueryFormParams {
   user?: string;
   name?: string;
@@ -639,9 +641,14 @@ export const useAddUserToSpaceRole = () => {
   return useMutation({
     mutationFn: ({ spaceId, ...payload }: { spaceId: string } & AddUserToSpaceRoleRequest) =>
       addUserToSpaceRole(spaceId, payload),
-    onSuccess: (_, { spaceId, user_id }) => {
+    onSuccess: async (_, { spaceId, user_id }) => {
       queryClient.invalidateQueries({ queryKey: spaceKeys.spaceUsers(spaceId) });
       queryClient.invalidateQueries({ queryKey: spaceKeys.userSpaceRoles(spaceId, user_id) });
+      await propagateRbacChange(queryClient, {
+        reason: 'space-user-role-added',
+        affectedUserIds: user_id ? [user_id] : [],
+        affectedSpaceIds: [spaceId]
+      });
     },
     onError: error => {
       console.error('Failed to add user to space role:', error);
@@ -655,9 +662,14 @@ export const useUpdateUserSpaceRole = () => {
   return useMutation({
     mutationFn: ({ spaceId, userId, ...payload }: { spaceId: string; userId: string } & any) =>
       updateUserSpaceRole(spaceId, userId, payload),
-    onSuccess: (_, { spaceId, userId }) => {
+    onSuccess: async (_, { spaceId, userId }) => {
       queryClient.invalidateQueries({ queryKey: spaceKeys.spaceUsers(spaceId) });
       queryClient.invalidateQueries({ queryKey: spaceKeys.userSpaceRoles(spaceId, userId) });
+      await propagateRbacChange(queryClient, {
+        reason: 'space-user-role-updated',
+        affectedUserIds: userId ? [userId] : [],
+        affectedSpaceIds: [spaceId]
+      });
     },
     onError: error => {
       console.error('Failed to update user space role:', error);
@@ -678,9 +690,14 @@ export const useRemoveUserFromSpaceRole = () => {
       userId: string;
       roleId: string;
     }) => removeUserFromSpaceRole(spaceId, userId, roleId),
-    onSuccess: (_, { spaceId, userId }) => {
+    onSuccess: async (_, { spaceId, userId }) => {
       queryClient.invalidateQueries({ queryKey: spaceKeys.spaceUsers(spaceId) });
       queryClient.invalidateQueries({ queryKey: spaceKeys.userSpaceRoles(spaceId, userId) });
+      await propagateRbacChange(queryClient, {
+        reason: 'space-user-role-removed',
+        affectedUserIds: userId ? [userId] : [],
+        affectedSpaceIds: [spaceId]
+      });
     },
     onError: error => {
       console.error('Failed to remove user from space role:', error);
@@ -694,9 +711,17 @@ export const useBulkUpdateUserSpaceRoles = () => {
   return useMutation({
     mutationFn: ({ spaceId, ...payload }: { spaceId: string } & BulkUpdateUserSpaceRolesRequest) =>
       bulkUpdateUserSpaceRoles(spaceId, payload),
-    onSuccess: (_, { spaceId }) => {
+    onSuccess: async (_, { spaceId, updates }) => {
       queryClient.invalidateQueries({ queryKey: spaceKeys.spaceUsers(spaceId) });
       queryClient.invalidateQueries({ queryKey: ['spaceService', 'userSpaceRoles'] });
+      const affectedUserIds = Array.from(
+        new Set((updates || []).map(update => update.user_id).filter(Boolean))
+      );
+      await propagateRbacChange(queryClient, {
+        reason: 'space-user-roles-bulk-updated',
+        affectedUserIds,
+        affectedSpaceIds: [spaceId]
+      });
     },
     onError: error => {
       console.error('Failed to bulk update user space roles:', error);
@@ -775,8 +800,12 @@ export const useAddMenuToSpace = () => {
   return useMutation({
     mutationFn: ({ spaceId, ...payload }: { spaceId: string } & AddMenuToSpaceRequest) =>
       addMenuToSpace(spaceId, payload),
-    onSuccess: (_, { spaceId }) => {
+    onSuccess: async (_, { spaceId }) => {
       queryClient.invalidateQueries({ queryKey: spaceKeys.spaceMenus(spaceId) });
+      await propagateRbacChange(queryClient, {
+        reason: 'space-menu-added',
+        affectedSpaceIds: [spaceId]
+      });
     },
     onError: error => {
       console.error('Failed to add menu to space:', error);
@@ -790,8 +819,12 @@ export const useRemoveMenuFromSpace = () => {
   return useMutation({
     mutationFn: ({ spaceId, menuId }: { spaceId: string; menuId: string }) =>
       removeMenuFromSpace(spaceId, menuId),
-    onSuccess: (_, { spaceId }) => {
+    onSuccess: async (_, { spaceId }) => {
       queryClient.invalidateQueries({ queryKey: spaceKeys.spaceMenus(spaceId) });
+      await propagateRbacChange(queryClient, {
+        reason: 'space-menu-removed',
+        affectedSpaceIds: [spaceId]
+      });
     },
     onError: error => {
       console.error('Failed to remove menu from space:', error);

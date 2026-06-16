@@ -11,6 +11,7 @@ import { isBrowser, locals } from '@ncobase/utils';
 import { jwtDecode } from 'jwt-decode';
 
 import { accountApi } from './apis';
+import { Permission } from './permissions/service';
 import type { TokenPayload } from './token_service';
 
 export const ACCESS_TOKEN_KEY = 'app.access.token';
@@ -93,6 +94,7 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       try {
         const userData = await accountApi.getCurrentUser();
         setUser(userData);
+        Permission.setAccountData(userData);
 
         // Set space from user data if not set
         if (!spaceId && userData?.spaces?.[0]) {
@@ -136,6 +138,13 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       if (isBrowser) {
         locals.remove(TENANT_KEY);
       }
+    }
+
+    if (newAccessToken) {
+      Permission.refreshState();
+    } else {
+      Permission.clearAccountData();
+      Permission.refreshState();
     }
   }, []);
 
@@ -185,6 +194,7 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const clearSession = useCallback(() => {
     updateTokens();
     setUser(null);
+    Permission.clearAccountData();
   }, [updateTokens]);
 
   const contextValue = useMemo<AuthContextValue>(
