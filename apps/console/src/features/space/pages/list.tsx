@@ -30,11 +30,14 @@ import { Space } from '../space';
 import { BulkActions } from '@/components/bulk_actions';
 import { Page, Topbar } from '@/components/layout';
 import { ContentSearch } from '@/components/search/content';
+import { usePermissions } from '@/features/account/permissions';
 
 export const SpaceListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const toast = useToastMessage();
+  const { hasPermission } = usePermissions();
+  const canManageSpaces = hasPermission('manage:spaces');
 
   const [searchParams, setSearchParams] = useState({
     search: '',
@@ -291,48 +294,52 @@ export const SpaceListPage = () => {
           <Icons name='IconEye' className='mr-2' size={16} />
           {t('space.actions.view_details')}
         </DropdownItem>
-        <DropdownItem onClick={() => navigate(`/spaces/${space.id}/edit`)}>
-          <Icons name='IconPencil' className='mr-2' size={16} />
-          {t('space.actions.edit')}
-        </DropdownItem>
         <DropdownItem onClick={() => handleUsers(space)}>
           <Icons name='IconUsers' className='mr-2' size={16} />
           {t('space.actions.users')}
         </DropdownItem>
-        <DropdownItem onClick={() => handleSettings(space)}>
-          <Icons name='IconSettings' className='mr-2' size={16} />
-          {t('space.actions.settings')}
-        </DropdownItem>
-        <DropdownItem onClick={() => handleQuotas(space)}>
-          <Icons name='IconGauge' className='mr-2' size={16} />
-          {t('space.actions.quotas')}
-        </DropdownItem>
-        <DropdownItem onClick={() => handleBilling(space)}>
-          <Icons name='IconCreditCard' className='mr-2' size={16} />
-          {t('space.actions.billing')}
-        </DropdownItem>
-        <DropdownItem onClick={() => handleToggleStatus(space)}>
-          <Icons
-            name={space.disabled ? 'IconCircleCheck' : 'IconCirclePause'}
-            className='mr-2'
-            size={16}
-          />
-          {space.disabled ? t('space.actions.enable') : t('space.actions.disable')}
-        </DropdownItem>
-        <DropdownItem
-          onClick={() => navigate(`/spaces/${space.id}/clone`)}
-          className='border-t mt-1 pt-1'
-        >
-          <Icons name='IconCopy' className='mr-2' size={16} />
-          {t('space.actions.clone')}
-        </DropdownItem>
-        <DropdownItem
-          onClick={() => handleDelete(space)}
-          className='text-red-600 focus:text-red-600'
-        >
-          <Icons name='IconTrash' className='mr-2' size={16} />
-          {t('space.actions.delete')}
-        </DropdownItem>
+        {canManageSpaces && (
+          <>
+            <DropdownItem onClick={() => navigate(`/spaces/${space.id}/edit`)}>
+              <Icons name='IconPencil' className='mr-2' size={16} />
+              {t('space.actions.edit')}
+            </DropdownItem>
+            <DropdownItem onClick={() => handleSettings(space)}>
+              <Icons name='IconSettings' className='mr-2' size={16} />
+              {t('space.actions.settings')}
+            </DropdownItem>
+            <DropdownItem onClick={() => handleQuotas(space)}>
+              <Icons name='IconGauge' className='mr-2' size={16} />
+              {t('space.actions.quotas')}
+            </DropdownItem>
+            <DropdownItem onClick={() => handleBilling(space)}>
+              <Icons name='IconCreditCard' className='mr-2' size={16} />
+              {t('space.actions.billing')}
+            </DropdownItem>
+            <DropdownItem onClick={() => handleToggleStatus(space)}>
+              <Icons
+                name={space.disabled ? 'IconCircleCheck' : 'IconCirclePause'}
+                className='mr-2'
+                size={16}
+              />
+              {space.disabled ? t('space.actions.enable') : t('space.actions.disable')}
+            </DropdownItem>
+            <DropdownItem
+              onClick={() => navigate(`/spaces/${space.id}/clone`)}
+              className='border-t mt-1 pt-1'
+            >
+              <Icons name='IconCopy' className='mr-2' size={16} />
+              {t('space.actions.clone')}
+            </DropdownItem>
+            <DropdownItem
+              onClick={() => handleDelete(space)}
+              className='text-red-600 focus:text-red-600'
+            >
+              <Icons name='IconTrash' className='mr-2' size={16} />
+              {t('space.actions.delete')}
+            </DropdownItem>
+          </>
+        )}
       </DropdownContent>
     </Dropdown>
   );
@@ -467,24 +474,30 @@ export const SpaceListPage = () => {
                   <Icons name='IconRefresh' className='mr-2' size={16} />
                   {t('space.actions.refresh')}
                 </DropdownItem>
-                <DropdownItem onClick={handleImport}>
-                  <Icons name='IconUpload' className='mr-2' size={16} />
-                  {t('space.actions.import')}
-                </DropdownItem>
+                {canManageSpaces && (
+                  <DropdownItem onClick={handleImport}>
+                    <Icons name='IconUpload' className='mr-2' size={16} />
+                    {t('space.actions.import')}
+                  </DropdownItem>
+                )}
                 <DropdownItem onClick={handleExport}>
                   <Icons name='IconDownload' className='mr-2' size={16} />
                   {t('space.actions.export')}
                 </DropdownItem>
               </DropdownContent>
             </Dropdown>,
-            <Button
-              size='sm'
-              onClick={() => navigate('/spaces/create')}
-              className='flex items-center gap-2'
-            >
-              <Icons name='IconPlus' size={16} />
-              {t('space.actions.create')}
-            </Button>
+            ...(canManageSpaces
+              ? [
+                  <Button
+                    size='sm'
+                    onClick={() => navigate('/spaces/create')}
+                    className='flex items-center gap-2'
+                  >
+                    <Icons name='IconPlus' size={16} />
+                    {t('space.actions.create')}
+                  </Button>
+                ]
+              : [])
           ]}
         />
       }
@@ -503,7 +516,7 @@ export const SpaceListPage = () => {
         {spaces.length > 0 ? (
           <TableView
             header={columns}
-            selected
+            selected={canManageSpaces}
             data={spaces}
             onSelectRow={row => handleToggleSelect(row)}
             onSelectAllRows={rows => setSelectedItems(rows)}
@@ -518,26 +531,35 @@ export const SpaceListPage = () => {
               {t('space.empty.title', 'No spaces found')}
             </h3>
             <p className='text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto'>
-              {t('space.empty.description', 'Get started by creating your first space.')}
+              {canManageSpaces
+                ? t('space.empty.description', 'Get started by creating your first space.')
+                : t(
+                    'space.empty.readonly_description',
+                    'No spaces are available for your account.'
+                  )}
             </p>
-            <Button
-              size='sm'
-              onClick={() => navigate('/spaces/create')}
-              className='inline-flex items-center gap-2'
-            >
-              <Icons name='IconPlus' size={16} />
-              {t('space.actions.create')}
-            </Button>
+            {canManageSpaces && (
+              <Button
+                size='sm'
+                onClick={() => navigate('/spaces/create')}
+                className='inline-flex items-center gap-2'
+              >
+                <Icons name='IconPlus' size={16} />
+                {t('space.actions.create')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedItems}
-        onClearSelection={() => setSelectedItems([])}
-        onBulkDelete={handleBulkDelete}
-      />
+      {canManageSpaces && (
+        <BulkActions
+          selectedItems={selectedItems}
+          onClearSelection={() => setSelectedItems([])}
+          onBulkDelete={handleBulkDelete}
+        />
+      )}
 
       {/* Modals */}
       <SpaceSettings

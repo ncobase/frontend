@@ -5,9 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { PaymentOrder } from '../payment';
 
 const formatAmount = (amount: number, currency: string) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(
-    amount / 100
-  );
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(amount);
 
 const FieldItem = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className='space-y-1'>
@@ -21,16 +19,19 @@ export const OrderViewer = ({ record }: { record: PaymentOrder }) => {
   if (!record) return null;
 
   const statusVariant: Record<string, 'success' | 'warning' | 'danger' | 'secondary'> = {
+    completed: 'success',
     paid: 'success',
     pending: 'warning',
     failed: 'danger',
-    refunded: 'secondary'
+    refunded: 'secondary',
+    cancelled: 'secondary'
   };
+  const orderNumber = record.order_number || record.order_no || record.id;
 
   return (
     <div className='space-y-6 p-4'>
       <div className='flex items-center gap-3'>
-        <span className='text-lg font-semibold text-slate-900'>{record.order_no}</span>
+        <span className='text-lg font-semibold text-slate-900'>{orderNumber}</span>
         <Badge variant={statusVariant[record.status] || 'secondary'}>
           {t(`payment.status.${record.status}`, record.status)}
         </Badge>
@@ -40,7 +41,7 @@ export const OrderViewer = ({ record }: { record: PaymentOrder }) => {
         <div className='grid grid-cols-2 gap-4'>
           <FieldItem
             label={t('payment.order.fields.order_no', 'Order No')}
-            value={<span className='font-mono text-xs'>{record.order_no}</span>}
+            value={<span className='font-mono text-xs'>{orderNumber}</span>}
           />
           <FieldItem
             label={t('payment.order.fields.amount', 'Amount')}
@@ -56,11 +57,11 @@ export const OrderViewer = ({ record }: { record: PaymentOrder }) => {
           />
           <FieldItem
             label={t('payment.order.fields.channel', 'Channel')}
-            value={record.channel_type}
+            value={record.channel_type || record.channel_id}
           />
           <FieldItem
             label={t('payment.order.fields.product', 'Product')}
-            value={record.product_name}
+            value={record.product_name || record.product_id}
           />
           <FieldItem
             label={t('payment.order.fields.user_id', 'User')}

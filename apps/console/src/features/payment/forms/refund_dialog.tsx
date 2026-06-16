@@ -18,6 +18,8 @@ export const RefundDialog = ({ isOpen, order, onClose, onConfirm }: RefundDialog
 
   if (!order) return null;
 
+  const orderNumber = order.order_number || order.order_no || order.id;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -28,14 +30,14 @@ export const RefundDialog = ({ isOpen, order, onClose, onConfirm }: RefundDialog
       <div className='space-y-4 p-4'>
         <div>
           <p className='text-sm text-slate-500'>
-            {t('payment.refund.order_no', 'Order')}: {order.order_no}
+            {t('payment.refund.order_no', 'Order')}: {orderNumber}
           </p>
           <p className='text-sm text-slate-500'>
             {t('payment.refund.amount', 'Amount')}:{' '}
             {new Intl.NumberFormat('en-US', {
               style: 'currency',
               currency: order.currency || 'USD'
-            }).format(order.amount / 100)}
+            }).format(order.amount)}
           </p>
         </div>
         <div>

@@ -26,12 +26,15 @@ import { BulkActions } from '@/components/bulk_actions';
 import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
 import { ContentSearch } from '@/components/search/content';
+import { usePermissions } from '@/features/account/permissions';
 
 export const SpaceUserListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { spaceId } = useParams<{ spaceId: string }>();
   const toast = useToastMessage();
+  const { hasPermission } = usePermissions();
+  const canManageSpaces = hasPermission('manage:spaces');
 
   // Ensure spaceId exists
   if (!spaceId) {
@@ -222,21 +225,25 @@ export const SpaceUserListPage = () => {
           <Icons name='IconEye' className='mr-2' size={16} />
           {t('space.users.actions.view')}
         </DropdownItem>
-        <DropdownItem onClick={() => navigate(`/spaces/${spaceId}/users/edit/${user.user_id}`)}>
-          <Icons name='IconPencil' className='mr-2' size={16} />
-          {t('space.users.actions.edit')}
-        </DropdownItem>
-        <DropdownItem onClick={() => handleRoleManagement(user)}>
-          <Icons name='IconUserCheck' className='mr-2' size={16} />
-          {t('space.users.actions.manage_roles')}
-        </DropdownItem>
-        <DropdownItem
-          onClick={() => handleDelete(user)}
-          className='text-red-600 focus:text-red-600 border-t mt-1 pt-1'
-        >
-          <Icons name='IconTrash' className='mr-2' size={16} />
-          {t('space.users.actions.remove')}
-        </DropdownItem>
+        {canManageSpaces && (
+          <>
+            <DropdownItem onClick={() => navigate(`/spaces/${spaceId}/users/edit/${user.user_id}`)}>
+              <Icons name='IconPencil' className='mr-2' size={16} />
+              {t('space.users.actions.edit')}
+            </DropdownItem>
+            <DropdownItem onClick={() => handleRoleManagement(user)}>
+              <Icons name='IconUserCheck' className='mr-2' size={16} />
+              {t('space.users.actions.manage_roles')}
+            </DropdownItem>
+            <DropdownItem
+              onClick={() => handleDelete(user)}
+              className='text-red-600 focus:text-red-600 border-t mt-1 pt-1'
+            >
+              <Icons name='IconTrash' className='mr-2' size={16} />
+              {t('space.users.actions.remove')}
+            </DropdownItem>
+          </>
+        )}
       </DropdownContent>
     </Dropdown>
   );
@@ -371,16 +378,20 @@ export const SpaceUserListPage = () => {
               {t('actions.back_to_spaces')}
             </Button>
           ]}
-          right={[
-            <Button
-              size='sm'
-              onClick={() => navigate(`/spaces/${spaceId}/users/create`)}
-              className='flex items-center gap-2'
-            >
-              <Icons name='IconPlus' size={16} />
-              {t('space.users.add_user')}
-            </Button>
-          ]}
+          right={
+            canManageSpaces
+              ? [
+                  <Button
+                    size='sm'
+                    onClick={() => navigate(`/spaces/${spaceId}/users/create`)}
+                    className='flex items-center gap-2'
+                  >
+                    <Icons name='IconPlus' size={16} />
+                    {t('space.users.add_user')}
+                  </Button>
+                ]
+              : []
+          }
         />
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-6'
@@ -428,7 +439,7 @@ export const SpaceUserListPage = () => {
         {users.length > 0 ? (
           <TableView
             header={columns}
-            selected
+            selected={canManageSpaces}
             data={users}
             onSelectRow={row => handleToggleSelect(row)}
             onSelectAllRows={rows => setSelectedUsers(rows)}
@@ -443,54 +454,67 @@ export const SpaceUserListPage = () => {
               {t('space.users.empty.title', 'No users found')}
             </h3>
             <p className='text-sm text-gray-500 mb-6 max-w-sm mx-auto'>
-              {t(
-                'space.users.empty.description',
-                'Add users to this space to start collaborating.'
-              )}
+              {canManageSpaces
+                ? t(
+                    'space.users.empty.description',
+                    'Add users to this space to start collaborating.'
+                  )
+                : t(
+                    'space.users.empty.readonly_description',
+                    'No users are assigned to this space.'
+                  )}
             </p>
-            <Button
-              size='sm'
-              onClick={() => navigate(`/spaces/${spaceId}/users/create`)}
-              className='inline-flex items-center gap-2'
-            >
-              <Icons name='IconPlus' size={16} />
-              {t('space.users.add_first_user')}
-            </Button>
+            {canManageSpaces && (
+              <Button
+                size='sm'
+                onClick={() => navigate(`/spaces/${spaceId}/users/create`)}
+                className='inline-flex items-center gap-2'
+              >
+                <Icons name='IconPlus' size={16} />
+                {t('space.users.add_first_user')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedUsers}
-        onClearSelection={() => setSelectedUsers([])}
-        onBulkDelete={ids => handleBulkDelete(ids)}
-      />
+      {canManageSpaces && (
+        <BulkActions
+          selectedItems={selectedUsers}
+          onClearSelection={() => setSelectedUsers([])}
+          onBulkDelete={ids => handleBulkDelete(ids)}
+        />
+      )}
 
       {/* Bulk Actions Component (Space-specific) */}
-      <SpaceUserBulkActions
-        spaceId={spaceId}
-        selectedUsers={selectedUsers}
-        onSelectionChange={setSelectedUsers}
-        onSuccess={() => {
-          toast.success(t('messages.success'), {
-            description: t('space.users.messages.bulk_success')
-          });
-          refetch();
-        }}
-      />
+      {canManageSpaces && (
+        <SpaceUserBulkActions
+          spaceId={spaceId}
+          selectedUsers={selectedUsers}
+          onSelectionChange={setSelectedUsers}
+          onSuccess={() => {
+            toast.success(t('messages.success'), {
+              description: t('space.users.messages.bulk_success')
+            });
+            refetch();
+          }}
+        />
+      )}
 
       {/* Role Management Modal */}
-      <SpaceUserRoleManagement
-        isOpen={roleManagementModal.open}
-        onClose={() => setRoleManagementModal({ open: false, user: null })}
-        spaceId={spaceId}
-        user={roleManagementModal.user}
-        onSuccess={() => {
-          setRoleManagementModal({ open: false, user: null });
-          refetch();
-        }}
-      />
+      {canManageSpaces && (
+        <SpaceUserRoleManagement
+          isOpen={roleManagementModal.open}
+          onClose={() => setRoleManagementModal({ open: false, user: null })}
+          spaceId={spaceId}
+          user={roleManagementModal.user}
+          onSuccess={() => {
+            setRoleManagementModal({ open: false, user: null });
+            refetch();
+          }}
+        />
+      )}
 
       {/* Delete confirmation dialog */}
       <AlertDialog

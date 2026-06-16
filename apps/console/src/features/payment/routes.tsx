@@ -1,10 +1,12 @@
 import { Navigate } from 'react-router';
 
 import { lazyNamed, renderRoutes } from '@/router';
+import { Guard } from '@/router/helpers/guard';
 
 const ChannelCreatePage = lazyNamed(() => import('./pages/channel/create'), 'ChannelCreatePage');
 const ChannelEditPage = lazyNamed(() => import('./pages/channel/edit'), 'ChannelEditPage');
 const ChannelListPage = lazyNamed(() => import('./pages/channel/list'), 'ChannelListPage');
+const PaymentLogListPage = lazyNamed(() => import('./pages/log/list'), 'PaymentLogListPage');
 const OrderListPage = lazyNamed(() => import('./pages/order/list'), 'OrderListPage');
 const OrderViewPage = lazyNamed(() => import('./pages/order/view'), 'OrderViewPage');
 const PaymentOverviewPage = lazyNamed(() => import('./pages/overview'), 'PaymentOverviewPage');
@@ -28,20 +30,66 @@ export const PaymentRoutes = () => {
     { path: '/orders/view/:slug', element: <OrderViewPage /> },
     { path: '/orders/:mode', element: <OrderListPage /> },
     { path: '/orders/:mode/:slug', element: <OrderListPage /> },
-    { path: '/products', element: <ProductListPage /> },
-    { path: '/products/create', element: <ProductCreatePage /> },
-    { path: '/products/edit/:slug', element: <ProductEditPage /> },
-    { path: '/products/:mode', element: <ProductListPage /> },
-    { path: '/products/:mode/:slug', element: <ProductListPage /> },
-    { path: '/subscriptions', element: <SubscriptionListPage /> },
-    { path: '/subscriptions/view/:slug', element: <SubscriptionViewPage /> },
-    { path: '/subscriptions/:mode', element: <SubscriptionListPage /> },
-    { path: '/subscriptions/:mode/:slug', element: <SubscriptionListPage /> },
-    { path: '/channels', element: <ChannelListPage /> },
-    { path: '/channels/create', element: <ChannelCreatePage /> },
-    { path: '/channels/edit/:slug', element: <ChannelEditPage /> },
-    { path: '/channels/:mode', element: <ChannelListPage /> },
-    { path: '/channels/:mode/:slug', element: <ChannelListPage /> }
+    {
+      path: '/products',
+      element: <Guard permission='manage:payments' children={<ProductListPage />} />
+    },
+    {
+      path: '/products/create',
+      element: <Guard permission='manage:payments' children={<ProductCreatePage />} />
+    },
+    {
+      path: '/products/edit/:slug',
+      element: <Guard permission='manage:payments' children={<ProductEditPage />} />
+    },
+    {
+      path: '/products/:mode',
+      element: <Guard permission='manage:payments' children={<ProductListPage />} />
+    },
+    {
+      path: '/products/:mode/:slug',
+      element: <Guard permission='manage:payments' children={<ProductListPage />} />
+    },
+    {
+      path: '/subscriptions',
+      element: <Guard permission='manage:payments' children={<SubscriptionListPage />} />
+    },
+    {
+      path: '/subscriptions/view/:slug',
+      element: <Guard permission='manage:payments' children={<SubscriptionViewPage />} />
+    },
+    {
+      path: '/subscriptions/:mode',
+      element: <Guard permission='manage:payments' children={<SubscriptionListPage />} />
+    },
+    {
+      path: '/subscriptions/:mode/:slug',
+      element: <Guard permission='manage:payments' children={<SubscriptionListPage />} />
+    },
+    {
+      path: '/channels',
+      element: <Guard permission='manage:payments' children={<ChannelListPage />} />
+    },
+    {
+      path: '/channels/create',
+      element: <Guard permission='manage:payments' children={<ChannelCreatePage />} />
+    },
+    {
+      path: '/channels/edit/:slug',
+      element: <Guard permission='manage:payments' children={<ChannelEditPage />} />
+    },
+    {
+      path: '/channels/:mode',
+      element: <Guard permission='manage:payments' children={<ChannelListPage />} />
+    },
+    {
+      path: '/channels/:mode/:slug',
+      element: <Guard permission='manage:payments' children={<ChannelListPage />} />
+    },
+    {
+      path: '/logs',
+      element: <Guard permission='admin:payments' children={<PaymentLogListPage />} />
+    }
   ];
   return renderRoutes(routes);
 };

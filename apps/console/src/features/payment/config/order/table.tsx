@@ -6,11 +6,12 @@ import { PaymentOrder } from '../../payment';
 
 const formatAmount = (amount: number, currency: string) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(
-    amount / 100
+    amount
   );
 };
 
 const statusVariant: Record<string, 'success' | 'warning' | 'danger' | 'secondary'> = {
+  completed: 'success',
   paid: 'success',
   pending: 'warning',
   failed: 'danger',
@@ -20,17 +21,19 @@ const statusVariant: Record<string, 'success' | 'warning' | 'danger' | 'secondar
 
 export const tableColumns = ({
   handleView,
-  handleRefund
+  handleRefund,
+  canRefund
 }: {
   handleView: (_record: PaymentOrder, _mode: string) => void;
   handleRefund: (_record: PaymentOrder) => void;
+  canRefund: boolean;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
 
   return [
     {
       title: t('payment.order.fields.order_no', 'Order No'),
-      dataIndex: 'order_no',
+      dataIndex: 'order_number',
       parser: (value: string, record: PaymentOrder) => (
         <Button
           variant='link'
@@ -40,7 +43,7 @@ export const tableColumns = ({
             handleView(record, 'view');
           }}
         >
-          <span className='font-mono'>{value}</span>
+          <span className='font-mono'>{value || record.order_no || record.id}</span>
         </Button>
       ),
       icon: 'IconReceipt'
@@ -66,7 +69,9 @@ export const tableColumns = ({
     {
       title: t('payment.order.fields.channel', 'Channel'),
       dataIndex: 'channel_type',
-      parser: (value: string) => <span className='text-slate-600'>{value || '-'}</span>,
+      parser: (value: string, record: PaymentOrder) => (
+        <span className='text-slate-600'>{value || record.channel_id || '-'}</span>
+      ),
       icon: 'IconCreditCard'
     },
     {
@@ -91,11 +96,15 @@ export const tableColumns = ({
           icon: 'IconEye',
           onClick: (record: PaymentOrder) => handleView(record, 'view')
         },
-        {
-          title: t('payment.actions.refund', 'Refund'),
-          icon: 'IconReceiptRefund',
-          onClick: (record: PaymentOrder) => handleRefund(record)
-        }
+        ...(canRefund
+          ? [
+              {
+                title: t('payment.actions.refund', 'Refund'),
+                icon: 'IconReceiptRefund',
+                onClick: (record: PaymentOrder) => handleRefund(record)
+              }
+            ]
+          : [])
       ]
     }
   ];

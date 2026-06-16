@@ -1,4 +1,5 @@
 import { lazyNamed, renderRoutes } from '@/router';
+import { Guard } from '@/router/helpers/guard';
 
 const CreateSpacePage = lazyNamed(() => import('./pages/create'), 'CreateSpacePage');
 const SpaceEditPage = lazyNamed(() => import('./pages/edit'), 'SpaceEditPage');
@@ -13,15 +14,27 @@ export const SpaceRoutes = () => {
   const routes = [
     // Main space routes
     { path: '/', element: <SpaceListPage /> },
-    { path: '/create', element: <CreateSpacePage /> },
+    {
+      path: '/create',
+      element: <Guard permission='manage:spaces' children={<CreateSpacePage />} />
+    },
     { path: '/:slug', element: <SpaceViewPage /> },
-    { path: '/:slug/edit', element: <SpaceEditPage /> },
+    {
+      path: '/:slug/edit',
+      element: <Guard permission='manage:spaces' children={<SpaceEditPage />} />
+    },
 
     // User management routes
     { path: '/:spaceId/users', element: <SpaceUserListPage /> },
-    { path: '/:spaceId/users/create', element: <CreateSpaceUserPage /> },
+    {
+      path: '/:spaceId/users/create',
+      element: <Guard permission='manage:spaces' children={<CreateSpaceUserPage />} />
+    },
     { path: '/:spaceId/users/view/:userId', element: <SpaceUserViewPage /> },
-    { path: '/:spaceId/users/edit/:userId', element: <SpaceUserEditPage /> }
+    {
+      path: '/:spaceId/users/edit/:userId',
+      element: <Guard permission='manage:spaces' children={<SpaceUserEditPage />} />
+    }
   ];
 
   return renderRoutes(routes);

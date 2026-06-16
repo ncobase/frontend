@@ -25,6 +25,7 @@ export interface NotificationItem {
   read?: boolean;
   type?: 'info' | 'success' | 'warning' | 'error';
   onClick?: () => void;
+  metadata?: Record<string, any>;
 }
 
 export interface NotificationsProps {
@@ -65,6 +66,11 @@ export interface NotificationsProps {
   badgeCount?: number;
 
   /**
+   * Unread count override, useful when the list is paginated
+   */
+  unreadCount?: number;
+
+  /**
    * Custom class name for the trigger button
    */
   triggerClassName?: string;
@@ -83,6 +89,26 @@ export interface NotificationsProps {
    * Custom empty state message
    */
   emptyMessage?: string;
+
+  /**
+   * Shows a loading state in the dropdown
+   */
+  isLoading?: boolean;
+
+  /**
+   * Shows an error state in the dropdown
+   */
+  errorMessage?: string;
+
+  /**
+   * Called when the retry button in the error state is clicked
+   */
+  onRetry?: () => void;
+
+  /**
+   * Disables the footer action while mark-all is running
+   */
+  isMarkingAllAsRead?: boolean;
 }
 
 /**
@@ -96,16 +122,22 @@ export const Notifications = ({
   pushEnabled = true,
   customTrigger,
   badgeCount,
+  unreadCount: unreadCountOverride,
   triggerClassName = 'relative text-slate-400/85 dark:text-slate-500/70 [&>svg]:stroke-slate-400/70 dark:[&>svg]:stroke-slate-500/70',
   triggerIcon = 'IconBell',
   contentClassName = '',
-  emptyMessage
+  emptyMessage,
+  isLoading = false,
+  errorMessage,
+  onRetry,
+  isMarkingAllAsRead = false
 }: NotificationsProps) => {
   const { t } = useTranslation();
 
-  const unreadCount = useMemo(() => {
+  const itemUnreadCount = useMemo(() => {
     return items.filter(item => !item.read).length;
   }, [items]);
+  const unreadCount = unreadCountOverride ?? itemUnreadCount;
 
   const displayCount = badgeCount !== undefined ? badgeCount : unreadCount;
 
@@ -114,6 +146,15 @@ export const Notifications = ({
       notification.onClick();
     }
   }, []);
+
+  const handleNotificationKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>, notification: NotificationItem) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      handleNotificationClick(notification);
+    },
+    [handleNotificationClick]
+  );
 
   const _getTypeIcon = (type: NotificationItem['type'] = 'info') => {
     const icons = {
@@ -174,7 +215,25 @@ export const Notifications = ({
           )}
         </CardHeader>
         <CardContent className='p-0 px-4 grid gap-3 max-h-[15rem] my-3 overflow-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700'>
-          {items.length === 0 ? (
+          {isLoading ? (
+            <div className='flex items-center justify-center gap-2 py-5 text-sm text-slate-500 dark:text-slate-400'>
+              <Icons name='IconLoader2' className='w-4 h-4 animate-spin' />
+              {t('states.loading', 'Loading...')}
+            </div>
+          ) : errorMessage ? (
+            <div className='grid gap-3 py-4 text-center text-sm text-slate-500 dark:text-slate-400'>
+              <div className='inline-flex items-center justify-center gap-2'>
+                <Icons name='IconAlertCircle' className='w-4 h-4 text-red-500' />
+                <span>{errorMessage}</span>
+              </div>
+              {onRetry && (
+                <Button size='sm' variant='outline' className='mx-auto' onClick={onRetry}>
+                  <Icons name='IconRefresh' className='mr-2' />
+                  {t('actions.retry', 'Retry')}
+                </Button>
+              )}
+            </div>
+          ) : items.length === 0 ? (
             <div className='text-center py-4 text-slate-400 dark:text-slate-500'>
               {emptyMessage || t('notification.no_notifications')}
             </div>
@@ -184,8 +243,10 @@ export const Notifications = ({
                 key={notification.id}
                 className='grid grid-cols-[22px_1fr] items-start gap-3 last:mb-0 last:pb-0 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-colors duration-200'
                 onClick={() => handleNotificationClick(notification)}
+                onKeyDown={event => handleNotificationKeyDown(event, notification)}
                 role='button'
                 tabIndex={0}
+                aria-label={notification.title}
               >
                 <Badge
                   size='sm'
@@ -222,9 +283,9 @@ export const Notifications = ({
             </div>
           )}
         </CardContent>
-        {onMarkAllAsRead && items.length > 0 && unreadCount > 0 && (
+        {onMarkAllAsRead && !isLoading && !errorMessage && items.length > 0 && unreadCount > 0 && (
           <CardFooter className='mt-4'>
-            <Button className='w-full' onClick={onMarkAllAsRead}>
+            <Button className='w-full' onClick={onMarkAllAsRead} disabled={isMarkingAllAsRead}>
               <Icons name='IconCheck' className='mr-2' /> {t('actions.mark_all_as_read')}
             </Button>
           </CardFooter>

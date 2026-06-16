@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { PaymentStats } from '../payment';
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / 100);
+const formatCurrency = (amount: number, currency = 'USD') =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
 
 interface PaymentStatsCardsProps {
   stats: PaymentStats | null | undefined;
@@ -17,7 +17,7 @@ export const PaymentStatsCards = ({ stats }: PaymentStatsCardsProps) => {
     {
       icon: 'IconCurrencyDollar',
       label: t('payment.stats.total_revenue', 'Total Revenue'),
-      value: formatCurrency(stats?.total_revenue || 0),
+      value: formatCurrency(stats?.total_revenue || 0, stats?.currency),
       color: 'bg-green-500'
     },
     {

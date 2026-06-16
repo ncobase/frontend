@@ -12,11 +12,14 @@ import { useQuerySpace } from '../service';
 
 import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const SpaceViewPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
+  const canManageSpaces = hasPermission('manage:spaces');
   const { data: space, isLoading, error } = useQuerySpace(slug!);
 
   // Modal states
@@ -104,24 +107,28 @@ export const SpaceViewPage = () => {
               {t('actions.back')}
             </Button>
           ]}
-          right={[
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => setSettingsModal({ open: true, activeTab: 'general' })}
-            >
-              <Icons name='IconSettings' size={16} className='mr-2' />
-              {t('actions.settings')}
-            </Button>,
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => navigate(`/spaces/${space.id}/edit`)}
-            >
-              <Icons name='IconEdit' size={16} className='mr-2' />
-              {t('actions.edit')}
-            </Button>
-          ]}
+          right={
+            canManageSpaces
+              ? [
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setSettingsModal({ open: true, activeTab: 'general' })}
+                  >
+                    <Icons name='IconSettings' size={16} className='mr-2' />
+                    {t('actions.settings')}
+                  </Button>,
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    onClick={() => navigate(`/spaces/${space.id}/edit`)}
+                  >
+                    <Icons name='IconEdit' size={16} className='mr-2' />
+                    {t('actions.edit')}
+                  </Button>
+                ]
+              : []
+          }
         />
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-8'
@@ -190,7 +197,7 @@ export const SpaceViewPage = () => {
               </h3>
             </div>
             <div className='p-6'>
-              <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+              <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
                 <Button
                   variant='outline'
                   className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
@@ -200,32 +207,36 @@ export const SpaceViewPage = () => {
                   <span className='text-sm font-medium'>{t('space.actions.users')}</span>
                 </Button>
 
-                <Button
-                  variant='outline'
-                  className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
-                  onClick={() => setQuotasModal(true)}
-                >
-                  <Icons name='IconGauge' size={24} className='text-green-500' />
-                  <span className='text-sm font-medium'>{t('space.actions.quotas')}</span>
-                </Button>
+                {canManageSpaces && (
+                  <>
+                    <Button
+                      variant='outline'
+                      className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
+                      onClick={() => setQuotasModal(true)}
+                    >
+                      <Icons name='IconGauge' size={24} className='text-green-500' />
+                      <span className='text-sm font-medium'>{t('space.actions.quotas')}</span>
+                    </Button>
 
-                <Button
-                  variant='outline'
-                  className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
-                  onClick={() => setBillingModal(true)}
-                >
-                  <Icons name='IconCreditCard' size={24} className='text-purple-500' />
-                  <span className='text-sm font-medium'>{t('space.actions.billing')}</span>
-                </Button>
+                    <Button
+                      variant='outline'
+                      className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
+                      onClick={() => setBillingModal(true)}
+                    >
+                      <Icons name='IconCreditCard' size={24} className='text-purple-500' />
+                      <span className='text-sm font-medium'>{t('space.actions.billing')}</span>
+                    </Button>
 
-                <Button
-                  variant='outline'
-                  className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
-                  onClick={() => setSettingsModal({ open: true, activeTab: 'general' })}
-                >
-                  <Icons name='IconSettings' size={24} className='text-orange-500' />
-                  <span className='text-sm font-medium'>{t('space.actions.settings')}</span>
-                </Button>
+                    <Button
+                      variant='outline'
+                      className='h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-shadow'
+                      onClick={() => setSettingsModal({ open: true, activeTab: 'general' })}
+                    >
+                      <Icons name='IconSettings' size={24} className='text-orange-500' />
+                      <span className='text-sm font-medium'>{t('space.actions.settings')}</span>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </Card>

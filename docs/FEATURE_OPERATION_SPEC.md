@@ -221,9 +221,12 @@ Current frontend closure from the feature/UI pass:
 ## Spaces
 
 - Entry: `/spaces`.
-- Actions: space CRUD, member list, add user to space role, update/remove role, settings, quotas,
-  billing.
+- Actions: list/detail, member list, settings/quotas/billing views, export, space CRUD, add user to
+  space role, update/remove role, setting writes, quota writes, billing writes.
 - API: `/sys/spaces` and nested space subroutes.
+- Permissions: `read:spaces` can enter `/spaces`, list/detail spaces, inspect members, and use
+  read-only resource views; `manage:spaces` is required for create/edit/delete/import/status changes,
+  member role mutations, settings writes, quota writes, billing writes, and bulk actions.
 - Cross-effects: changing active space affects token permissions, navigation, resource ownership,
   content visibility, payment/billing, and cached queries.
 - Current import/export behavior: import accepts JSON arrays or objects with `items`, creates spaces
@@ -231,18 +234,54 @@ Current frontend closure from the feature/UI pass:
   rows to JSON or CSV.
 - Current edit behavior: space edit and space-user edit show unsaved reminders and use `AlertDialog`
   before discard from cancel, reminder, or back navigation.
+- Current permission behavior: `/spaces/*` accepts either `read:spaces` or `manage:spaces`; create,
+  edit, space-user create, and space-user edit subroutes require `manage:spaces`. List and member
+  pages hide write buttons, destructive dropdown items, row selection, and bulk actions when only
+  read access is present.
 - Required UX: after switching space, clear or refetch account, navigation, and domain queries.
 
 ## Payment
 
 - Entry: `/pay`.
-- Actions: manage channels/products, view orders/subscriptions/logs, generate payment URL, verify,
-  refund, cancel subscription.
+- Actions: view overview/orders, manage channels/products/subscriptions, generate payment URL, verify,
+  refund, cancel subscription, inspect logs.
 - API: `/pay/channels`, `/pay/products`, `/pay/orders`, `/pay/subscriptions`, `/pay/logs`,
   `/pay/providers`, `/pay/webhooks/:channel`.
+- Pagination: payment backend list queries accept `page_size`; console table helpers may emit
+  `limit`, and `features/payment/apis.ts` normalizes it before sending requests.
+- Permissions:
+  - `/pay` entry accepts `read:payments`, `manage:payments`, `refund:payments`, or `admin:payments`.
+  - Order overview/list/detail use `read:payments` or a higher payment permission.
+  - Products, subscriptions, channels, payment URL generation, verify, and subscription cancel require
+    `manage:payments`.
+  - Refund action requires `refund:payments` and is hidden otherwise.
+  - Logs require `admin:payments`.
+  - Webhook callbacks remain public at the route layer and must be provider-signed.
+- Current log behavior: `/pay/logs` is a real admin page backed by `/pay/logs`; the table shows
+  type, order, status transition, error presence, user, IP, and created time, but does not expose raw
+  request/response payloads in the list.
 - Required UX: order timeline, provider config masking, test connection, refund confirmation, webhook
-  log and retry state.
-- Gaps: backend route-level permissions and provider implementation depth need review.
+  log detail, retry state, and backend-masked payload detail.
+- Gaps: provider implementation depth, webhook signature/idempotency, payload masking, and order/
+  subscription state persistence need review.
+
+## Realtime and Notifications
+
+- Entry: header notification center, future realtime pages, and event-driven refreshes across
+  resource, payment, workflow, and NCore.
+- API: `/rt/notifications`, `/rt/ws`, `/rt/channels`, `/rt/events`, `/events`, `/search`,
+  `/stats/realtime`.
+- Required permissions: `read:realtime` or higher for notification/event reads and personal
+  mark-read actions; `manage:realtime` or `admin:realtime` for channel management, event
+  publish/retry/status processing, and system notification create/update/delete.
+- Current state: header notification center uses `/rt/notifications?user_id=...`, shows loading,
+  empty, error, retry, unread count, and mark-all-read states, and invalidates realtime notification
+  queries after mark-read mutations.
+- Backend ownership: normal users can only list/get/mark their own notifications; cross-user
+  notification access requires realtime management/admin permission.
+- Required UX: add notification detail/archive/delete management, then add WebSocket subscription for
+  batch upload, payment webhook, workflow task, and plugin operation updates; events should
+  invalidate exact query keys.
 
 ## NCore Operations
 
@@ -264,3 +303,10 @@ Current frontend closure from the feature/UI pass:
 - Example permission: authenticated only when enabled.
 - Required next work: Builder generated output must include backend schema/migration/API/permission
   checklist before it becomes a product feature.
+
+## Independent Frontend Surfaces
+
+- `website` is an independent public site project, not a console feature. Console tasks must not edit
+  website files unless the task explicitly targets website.
+- Shared visual primitives or Tailwind tokens should move through `axis`; website-only composition
+  should stay in `website`.

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 export type OrderQueryParams = {
   search?: string;
+  order_number?: string;
   status?: string;
   channel_type?: string;
 } & PaginationParams;
@@ -48,9 +49,10 @@ export const queryFields = ({
               allowClear
               options={[
                 { label: t('payment.status.pending', 'Pending'), value: 'pending' },
-                { label: t('payment.status.paid', 'Paid'), value: 'paid' },
+                { label: t('payment.status.completed', 'Completed'), value: 'completed' },
                 { label: t('payment.status.failed', 'Failed'), value: 'failed' },
-                { label: t('payment.status.refunded', 'Refunded'), value: 'refunded' }
+                { label: t('payment.status.refunded', 'Refunded'), value: 'refunded' },
+                { label: t('payment.status.cancelled', 'Cancelled'), value: 'cancelled' }
               ]}
               className='[&>button]:py-1.5'
               {...field}

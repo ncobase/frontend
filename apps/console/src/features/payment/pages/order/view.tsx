@@ -30,13 +30,15 @@ export const OrderViewPage = () => {
     );
   }
 
+  const orderNumber = order.order_number || order.order_no || order.id;
+
   return (
     <Page
       sidebar
-      title={`${t('payment.order.view_title', 'Order')} ${order.order_no}`}
+      title={`${t('payment.order.view_title', 'Order')} ${orderNumber}`}
       topbar={
         <Topbar
-          title={`${t('payment.order.view_title', 'Order')} ${order.order_no}`}
+          title={`${t('payment.order.view_title', 'Order')} ${orderNumber}`}
           left={[
             <Button key='back' variant='outline-slate' size='sm' onClick={() => navigate(-1)}>
               <Icons name='IconArrowLeft' className='w-4 h-4 mr-1' />

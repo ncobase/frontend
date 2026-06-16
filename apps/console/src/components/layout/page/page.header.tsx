@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 import { Button, Icons, useToastMessage, ShellHeader } from '@ncobase/react';
 import { cn } from '@ncobase/utils';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
 import { useNavigationMenus } from '../layout.hooks';
 import { AccountDropdown, MainNavigation, SpaceDropdown } from '../navigation';
@@ -10,8 +11,17 @@ import { AccountDropdown, MainNavigation, SpaceDropdown } from '../navigation';
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Logo } from '@/components/logo';
 import { Notifications, NotificationItem } from '@/components/notifications/notification';
+import {
+  mapRealtimeNotificationToItem,
+  RealtimeNotification,
+  useMarkAllRealtimeNotificationsAsRead,
+  useMarkRealtimeNotificationAsRead,
+  useNotificationService,
+  useRealtimeNotifications
+} from '@/components/notifications/notification.service';
 import { Preferences } from '@/components/preferences';
 import { Search } from '@/components/search/search';
+import { useAuthContext } from '@/features/account/context';
 import { useMenuPermissions } from '@/features/account/permissions';
 import { useQueryNavigationMenus } from '@/features/system/menu/service';
 import { filterMenuTreeByFeatureExposure } from '@/lib/features/exposure';
@@ -30,9 +40,38 @@ const HeaderComponent = ({
   const [navigationMenus, setNavigationMenus] = useNavigationMenus();
   const { data: menuTreeData, isLoading, error } = useQueryNavigationMenus();
   const toast = useToastMessage();
-  const [pushEnabled, setPushEnabled] = useState(true);
+  const navigate = useNavigate();
+  const { user: authUser, isAuthenticated } = useAuthContext();
+  const { settings, updateSettings } = useNotificationService();
+  const markAsReadMutation = useMarkRealtimeNotificationAsRead();
+  const markAllAsReadMutation = useMarkAllRealtimeNotificationsAsRead();
 
   const { filterMenuTree, canAccessMenu } = useMenuPermissions();
+
+  const currentUserId = useMemo(() => {
+    return (
+      authUser?.user?.id || authUser?.user_id || authUser?.id || authUser?.profile?.user_id || ''
+    );
+  }, [authUser]);
+
+  const notificationsEnabled = isAuthenticated && !!currentUserId;
+  const notificationParams = useMemo(
+    () => ({ user_id: currentUserId, limit: 10 }),
+    [currentUserId]
+  );
+  const unreadNotificationParams = useMemo(
+    () => ({ user_id: currentUserId, status: 0, limit: 1 }),
+    [currentUserId]
+  );
+  const {
+    data: notificationData,
+    isLoading: notificationsLoading,
+    error: notificationsError,
+    refetch: refetchNotifications
+  } = useRealtimeNotifications(notificationParams, { enabled: notificationsEnabled });
+  const { data: unreadNotificationData } = useRealtimeNotifications(unreadNotificationParams, {
+    enabled: notificationsEnabled
+  });
 
   useEffect(() => {
     if (!menuTreeData || typeof menuTreeData !== 'object') return;
@@ -66,49 +105,102 @@ const HeaderComponent = ({
     );
   }, [navigationMenus.headers, canAccessMenu]);
 
-  const notifications = useMemo<NotificationItem[]>(
-    () => [
-      {
-        id: '1',
-        title: 'You have a task to handle.',
-        description: t('datetime.now'),
-        type: 'info',
-        read: false
-      },
-      {
-        id: '2',
-        title: 'You have a new message!',
-        description: t('datetime.minutes_ago_with_value', { minutes: 5 }),
-        type: 'success',
-        read: false
-      },
-      {
-        id: '3',
-        title: 'Your subscription is about to expire!',
-        description: t('datetime.days_ago_with_value', { days: 2 }),
-        type: 'warning',
-        read: false
+  const handleNotificationClick = useCallback(
+    async (notification: RealtimeNotification) => {
+      if (notification.status !== 1) {
+        try {
+          await markAsReadMutation.mutateAsync(notification.id);
+        } catch (markError) {
+          console.error('Failed to mark notification as read:', markError);
+          toast.error(t('notification.mark_as_read_failed', 'Failed to mark notification as read'));
+          return;
+        }
       }
-    ],
-    [t]
+
+      const link = notification.links?.find(item => {
+        const value = item?.path || item?.url || item?.href;
+        return typeof value === 'string' && value.length > 0;
+      });
+      const href = link?.path || link?.url || link?.href;
+      if (typeof href !== 'string' || href.length === 0) return;
+
+      if (/^https?:\/\//i.test(href)) {
+        window.open(href, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      navigate(href.startsWith('/') ? href : `/${href}`);
+    },
+    [markAsReadMutation, navigate, t, toast]
   );
 
-  const handleMarkAllAsRead = useCallback(() => {
-    toast.success(t('notification.marked_all_as_read'), {
-      description: t('notification.marked_all_as_read_description')
-    });
-  }, [t, toast]);
+  const notifications = useMemo<NotificationItem[]>(
+    () =>
+      (notificationData?.items || []).map(notification =>
+        mapRealtimeNotificationToItem(notification, handleNotificationClick)
+      ),
+    [notificationData?.items, handleNotificationClick]
+  );
+
+  const unreadCount =
+    unreadNotificationData?.total ?? notifications.filter(item => !item.read).length;
+
+  const handleMarkAllAsRead = useCallback(async () => {
+    try {
+      await markAllAsReadMutation.mutateAsync();
+      toast.success(t('notification.marked_all_as_read'), {
+        description: t('notification.marked_all_as_read_description')
+      });
+    } catch (markError) {
+      console.error('Failed to mark all notifications as read:', markError);
+      toast.error(
+        t('notification.mark_all_as_read_failed', 'Failed to mark all notifications as read')
+      );
+    }
+  }, [markAllAsReadMutation, t, toast]);
 
   const handleTogglePushSettings = useCallback(
     (enabled: boolean) => {
-      setPushEnabled(enabled);
+      updateSettings({ pushEnabled: enabled, desktopEnabled: enabled });
       if (enabled) {
         toast.info(t('notification.push_notifications_enabled'));
       } else {
         toast.info(t('notification.push_notifications_disabled'));
       }
     },
-    [t, toast]
+    [t, toast, updateSettings]
+  );
+
+  const notificationPanelProps = useMemo(
+    () => ({
+      items: notifications,
+      unreadCount,
+      badgeCount: unreadCount,
+      onMarkAllAsRead: handleMarkAllAsRead,
+      onTogglePushSettings: handleTogglePushSettings,
+      pushEnabled: settings.pushEnabled,
+      isLoading: notificationsEnabled && notificationsLoading,
+      errorMessage: notificationsError
+        ? t('notification.load_error', 'Failed to load notifications')
+        : undefined,
+      onRetry: () => refetchNotifications(),
+      isMarkingAllAsRead: markAllAsReadMutation.isPending,
+      emptyMessage: notificationsEnabled
+        ? t('notification.no_notifications')
+        : t('notification.unavailable', 'Notifications are unavailable')
+    }),
+    [
+      handleMarkAllAsRead,
+      handleTogglePushSettings,
+      markAllAsReadMutation.isPending,
+      notifications,
+      notificationsEnabled,
+      notificationsError,
+      notificationsLoading,
+      refetchNotifications,
+      settings.pushEnabled,
+      t,
+      unreadCount
+    ]
   );
 
   const headerClassName = cn(
@@ -148,12 +240,7 @@ const HeaderComponent = ({
             <Search />
             <LanguageSwitcher />
             <Preferences />
-            <Notifications
-              items={notifications}
-              onMarkAllAsRead={handleMarkAllAsRead}
-              onTogglePushSettings={handleTogglePushSettings}
-              pushEnabled={pushEnabled}
-            />
+            <Notifications {...notificationPanelProps} />
             <SpaceDropdown />
           </div>
 
@@ -196,12 +283,7 @@ const HeaderComponent = ({
 
         <div className='hidden sm:flex md:hidden items-center gap-x-2'>
           <LanguageSwitcher />
-          <Notifications
-            items={notifications}
-            onMarkAllAsRead={handleMarkAllAsRead}
-            onTogglePushSettings={handleTogglePushSettings}
-            pushEnabled={pushEnabled}
-          />
+          <Notifications {...notificationPanelProps} />
           <SpaceDropdown />
         </div>
 
@@ -209,12 +291,7 @@ const HeaderComponent = ({
           <Search />
           <LanguageSwitcher />
           <Preferences />
-          <Notifications
-            items={notifications}
-            onMarkAllAsRead={handleMarkAllAsRead}
-            onTogglePushSettings={handleTogglePushSettings}
-            pushEnabled={pushEnabled}
-          />
+          <Notifications {...notificationPanelProps} />
           <SpaceDropdown />
         </div>
 

@@ -1,5 +1,8 @@
-import {
+import { buildQueryString } from '@ncobase/utils';
+
+import type {
   PaymentChannel,
+  PaymentLogListResponse,
   PaymentOrder,
   PaymentProduct,
   PaymentSubscription,
@@ -9,8 +12,52 @@ import {
 import { ApiContext, createApi } from '@/lib/api/factory';
 import { request } from '@/lib/api/request';
 
+const normalizePaymentListParams = (params?: Record<string, any>) => {
+  if (!params) return undefined;
+
+  const normalized = { ...params };
+  if (normalized.page_size === undefined && normalized.limit !== undefined) {
+    normalized.page_size = normalized.limit;
+  }
+  delete normalized.limit;
+
+  Object.keys(normalized).forEach(key => {
+    const value = normalized[key];
+    if (value === undefined || value === null || value === '') {
+      delete normalized[key];
+    }
+  });
+
+  return normalized;
+};
+
+const getPaymentList = <T>(endpoint: string, params?: Record<string, any>): Promise<T> => {
+  const normalizedParams = normalizePaymentListParams(params);
+  const query = normalizedParams ? buildQueryString(normalizedParams) : '';
+  return request.get(`${endpoint}${query ? `?${query}` : ''}`);
+};
+
+const listPaymentResource = (
+  params: Record<string, any> | undefined,
+  ctx: ApiContext
+): Promise<any> => getPaymentList(ctx.endpoint, params);
+
+const listPaymentOrders = (
+  params: Record<string, any> | undefined,
+  ctx: ApiContext
+): Promise<any> => {
+  const normalized = { ...(params || {}) };
+  if (normalized.order_number === undefined && normalized.search) {
+    normalized.order_number = normalized.search;
+  }
+  delete normalized.search;
+  return getPaymentList(ctx.endpoint, normalized);
+};
+
 // Channels API
-export const channelApi = createApi<PaymentChannel>('/pay/channels');
+export const channelApi = createApi<PaymentChannel>('/pay/channels', {
+  list: listPaymentResource
+});
 export const {
   create: createChannel,
   get: getChannel,
@@ -33,12 +80,15 @@ const orderExtensions = ({ request: req, endpoint }: ApiContext) => ({
 });
 
 export const orderApi = createApi<PaymentOrder>('/pay/orders', {
+  list: listPaymentOrders,
   extensions: orderExtensions
 });
 export const { get: getOrder, list: listOrders, verifyOrder, refundOrder } = orderApi;
 
 // Products API
-export const productApi = createApi<PaymentProduct>('/pay/products');
+export const productApi = createApi<PaymentProduct>('/pay/products', {
+  list: listPaymentResource
+});
 export const {
   create: createProduct,
   get: getProduct,
@@ -55,6 +105,7 @@ const subscriptionExtensions = ({ request: req, endpoint }: ApiContext) => ({
 });
 
 export const subscriptionApi = createApi<PaymentSubscription>('/pay/subscriptions', {
+  list: listPaymentResource,
   extensions: subscriptionExtensions
 });
 export const {
@@ -66,7 +117,5 @@ export const {
 // Stats & Logs
 export const getPaymentStats = (): Promise<PaymentStats> => request.get('/pay/stats');
 
-export const getPaymentLogs = (params?: Record<string, any>): Promise<any> => {
-  const query = params ? new URLSearchParams(params).toString() : '';
-  return request.get(`/pay/logs${query ? `?${query}` : ''}`);
-};
+export const getPaymentLogs = (params?: Record<string, any>): Promise<PaymentLogListResponse> =>
+  getPaymentList('/pay/logs', params);

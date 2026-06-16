@@ -120,7 +120,7 @@ const routes = [
   {
     path: '/spaces/*',
     element: (
-      <Guard super>
+      <Guard permissions={['read:spaces', 'manage:spaces']} any>
         <SpaceRoutes />
       </Guard>
     )
@@ -152,7 +152,10 @@ const routes = [
   {
     path: '/pay/*',
     element: (
-      <Guard admin>
+      <Guard
+        permissions={['read:payments', 'manage:payments', 'refund:payments', 'admin:payments']}
+        any
+      >
         <PaymentRoutes />
       </Guard>
     )

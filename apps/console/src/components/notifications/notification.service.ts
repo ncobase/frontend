@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { formatDateTime, formatRelativeTime } from '@ncobase/utils';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { NotificationItem } from './notification';
 
 import { useLocalStorage } from '@/hooks/use_local_storage';
+import { request } from '@/lib/api/request';
 
 // Storage keys
 export const NOTIFICATIONS_STORAGE_KEY = 'app.notifications';
@@ -21,6 +25,146 @@ const defaultSettings: NotificationSettings = {
   emailEnabled: true,
   desktopEnabled: true,
   soundEnabled: true
+};
+
+export interface RealtimeNotification {
+  id: string;
+  title: string;
+  content: string;
+  type?: string;
+  user_id: string;
+  status: number;
+  channel_id?: string;
+  links?: Record<string, any>[];
+  created_at?: number;
+  updated_at?: number;
+}
+
+export interface RealtimeNotificationListParams {
+  user_id?: string;
+  status?: number;
+  channel_id?: string;
+  cursor?: string;
+  limit?: number;
+  direction?: 'forward' | 'backward';
+}
+
+export interface RealtimeNotificationListResult {
+  items: RealtimeNotification[];
+  total: number;
+  cursor?: string;
+  next_cursor?: string;
+  prev_cursor?: string;
+  has_next?: boolean;
+  has_prev?: boolean;
+}
+
+export const realtimeNotificationKeys = {
+  all: ['realtimeNotificationService'] as const,
+  list: (params?: RealtimeNotificationListParams) =>
+    ['realtimeNotificationService', 'list', params || {}] as const
+};
+
+const buildNotificationQuery = (params?: RealtimeNotificationListParams) => {
+  if (!params) return '';
+
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    query.set(key, String(value));
+  });
+  return query.toString();
+};
+
+const toNotificationDate = (value?: number) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+};
+
+const toNotificationType = (type?: string): NotificationItem['type'] => {
+  switch ((type || '').toLowerCase()) {
+    case 'success':
+    case 'completed':
+      return 'success';
+    case 'warning':
+    case 'warn':
+      return 'warning';
+    case 'error':
+    case 'failed':
+      return 'error';
+    default:
+      return 'info';
+  }
+};
+
+export const mapRealtimeNotificationToItem = (
+  notification: RealtimeNotification,
+  onClick?: (_notification: RealtimeNotification) => void
+): NotificationItem => {
+  const createdAt = toNotificationDate(notification.created_at);
+
+  return {
+    id: notification.id,
+    title: notification.title,
+    description: notification.content,
+    timestamp: createdAt ? formatRelativeTime(createdAt) : undefined,
+    type: toNotificationType(notification.type),
+    read: notification.status === 1,
+    onClick: () => onClick?.(notification),
+    metadata: {
+      absoluteTime: createdAt ? formatDateTime(createdAt, 'dateTime') : undefined,
+      channelId: notification.channel_id,
+      links: notification.links || []
+    }
+  };
+};
+
+export const listRealtimeNotifications = async (
+  params?: RealtimeNotificationListParams
+): Promise<RealtimeNotificationListResult> => {
+  const query = buildNotificationQuery(params);
+  return request.get(`/rt/notifications${query ? `?${query}` : ''}`);
+};
+
+export const markRealtimeNotificationAsRead = async (id: string): Promise<void> => {
+  return request.put(`/rt/notifications/${id}/read`);
+};
+
+export const markAllRealtimeNotificationsAsRead = async (): Promise<void> => {
+  return request.put('/rt/notifications/read-all');
+};
+
+export const useRealtimeNotifications = (
+  params?: RealtimeNotificationListParams,
+  options?: { enabled?: boolean; refetchInterval?: number | false }
+) =>
+  useQuery({
+    queryKey: realtimeNotificationKeys.list(params),
+    queryFn: () => listRealtimeNotifications(params),
+    enabled: options?.enabled ?? true,
+    staleTime: 30 * 1000,
+    refetchInterval: options?.refetchInterval ?? 60 * 1000
+  });
+
+export const useMarkRealtimeNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markRealtimeNotificationAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: realtimeNotificationKeys.all });
+    }
+  });
+};
+
+export const useMarkAllRealtimeNotificationsAsRead = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: markAllRealtimeNotificationsAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: realtimeNotificationKeys.all });
+    }
+  });
 };
 
 /**

@@ -78,14 +78,23 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
   or high-risk operations.
 - Errors should distinguish validation, permission, not found, conflict, network, and backend
   unavailable cases.
+- Header notifications and other global status surfaces must use real backend data when the backend
+  contract exists. They must expose loading, empty, error, retry, unread, disabled, and keyboard
+  activation states instead of permanent mock items.
 
 ## Permissions and Ownership
 
 - Frontend guards only control user experience; backend must enforce all permissions.
 - Route guards should use the same permission strings as backend middleware and menu seed data.
+- Permission downgrades must be visible and consistent: read-only users can still inspect list/detail
+  data, but create/edit/delete/refund/cancel/bulk actions and mutation subroutes must be hidden or
+  render a 403 state.
 - Ownership-sensitive screens must display whether the object is user-owned, space-owned, public, or
   shared.
 - Space switch must be treated as an authorization boundary change.
+- Payment provider config, payment logs, webhook payloads, resource publicization, proxy rules, and
+  NCore runtime operations are high-risk surfaces. They need explicit permissions, masked sensitive
+  values, confirmation or review steps, and audit visibility before production use.
 
 ## I18n, Accessibility, and Responsiveness
 

@@ -15,6 +15,7 @@ import { useRefundOrder } from '../../service';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const OrderListPage = () => {
   const { t } = useTranslation();
@@ -22,6 +23,8 @@ export const OrderListPage = () => {
   const { mode } = useParams<{ mode: string }>();
   const { vmode } = useLayoutContext();
   const toast = useToastMessage();
+  const { hasPermission } = usePermissions();
+  const canRefundPayments = hasPermission('refund:payments') || hasPermission('admin:payments');
 
   const { data, fetchData, loading, refetch } = useOrderList();
   const [viewType, setViewType] = useState<string | undefined>(mode);
@@ -58,9 +61,21 @@ export const OrderListPage = () => {
     [navigate, vmode]
   );
 
-  const handleRefund = useCallback((record: PaymentOrder) => {
-    setRefundDialog({ open: true, order: record });
-  }, []);
+  const handleRefund = useCallback(
+    (record: PaymentOrder) => {
+      if (!canRefundPayments) {
+        toast.error(t('messages.forbidden', 'Forbidden'), {
+          description: t(
+            'payment.messages.refund_forbidden',
+            'You do not have permission to refund payments.'
+          )
+        });
+        return;
+      }
+      setRefundDialog({ open: true, order: record });
+    },
+    [canRefundPayments, t, toast]
+  );
 
   const confirmRefund = useCallback(
     (orderId: string, amount?: number, reason?: string) => {
@@ -92,7 +107,7 @@ export const OrderListPage = () => {
         title={t('payment.order.title', 'Orders')}
         topbarLeft={[]}
         topbarRight={[]}
-        columns={tableColumns({ handleView, handleRefund })}
+        columns={tableColumns({ handleView, handleRefund, canRefund: canRefundPayments })}
         data={data?.items || []}
         queryFields={queryFields({ queryControl })}
         onQuery={onQuery}
