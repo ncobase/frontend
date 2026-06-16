@@ -170,12 +170,16 @@ which cross-feature effects they must handle.
     protected `/res/:id/download` API instead of relying only on direct URLs.
   - Resource detail queries `/cms/media?resource_id=...` and links back to each CMS media record.
   - Media list accepts `?resource_id=...` so resource references can open a filtered CMS media view.
-- Cross-effects: media references resource files through `resource_id`; resource deletion queries CMS
-  media references and still needs a combined impact view that also aggregates topic usage for the
-  referenced media.
+  - Resource single and batch delete confirmations run a delete-impact review before enabling the
+    destructive action. The review queries all CMS media references for each `resource_id`, follows
+    topic usage through `/cms/topic-media?media_id=...`, links to the referenced media and topic
+    records, and blocks deletion when references or incomplete reference checks exist.
+- Cross-effects: media references resource files through `resource_id`; resource deletion must keep
+  CMS media and topic-media relations intact by refusing to delete referenced files until the
+  dependent records are removed or changed.
 - Required next UX: per-file progress, retry failed uploads, protected preview states for private
-  files, and richer batch reference warnings that show the exact CMS media/topic impact before bulk
-  delete.
+  files, and browser integration coverage for resource delete impact loading, blocking, navigation,
+  and successful clear-state deletion.
 
 ### Channels and Distributions
 
@@ -222,10 +226,13 @@ Current frontend closure from the feature/UI pass:
   quota visibility and pre-check, private/shared/public access selection, public flag, path prefix,
   tags, image thumbnail options, single-file `file` upload, and multi-file `files` batch upload.
 - Current sharing/delete/reference UX: table actions expose share link generation with public/shared
-  scope and expiration; delete confirmation queries CMS media by `resource_id` to block deletion
-  while visible references exist and links to those media records; resource detail shows CMS media
-  references and can open a filtered `/content/media?resource_id=...` list.
-- Required next UX: per-file progress, retry failed batch items, and richer bulk reference review.
+  scope and expiration; delete confirmation checks CMS media and topic usage before single or batch
+  deletion, shows per-file impact details, links to referenced media and topics, blocks deletion on
+  references or reference-check failures, and only enables delete after a complete clear-state review;
+  resource detail shows CMS media references and can open a filtered `/content/media?resource_id=...`
+  list.
+- Required next UX: per-file progress, retry failed batch upload/delete items, protected private-file
+  preview states, and browser integration tests for delete impact review and upload failure recovery.
 
 ## Spaces
 

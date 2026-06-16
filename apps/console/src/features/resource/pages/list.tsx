@@ -1,14 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { AlertDialog, Modal, useToastMessage } from '@ncobase/react';
+import { AlertDialog, Button, Modal, useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
+import { DeleteImpactPanel } from '../components/delete_impact_panel';
 import { ShareDialog } from '../components/share_dialog';
 import { QueryFormParams, queryFields } from '../config/query';
 import { tableColumns } from '../config/table';
 import { topbarLeftSection } from '../config/topbar';
+import {
+  fetchResourceDeleteImpact,
+  ResourceDeleteImpact,
+  summarizeResourceDeleteImpacts
+} from '../delete_impact';
 import { downloadResourceFile } from '../file_actions';
 import { ResourceEditorForm } from '../forms/editor';
 import { UploadForm } from '../forms/upload';
@@ -34,8 +40,29 @@ import { buildResourceUploadFormData, normalizeResourceTags } from '../upload_pa
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
-import { getMediaList } from '@/features/content/media/apis';
-import { useListMedia } from '@/features/content/media/service';
+
+interface DeleteImpactState {
+  loading: boolean;
+  checked: boolean;
+  impacts: ResourceDeleteImpact[];
+}
+
+const emptyDeleteImpactState = (): DeleteImpactState => ({
+  loading: false,
+  checked: false,
+  impacts: []
+});
+
+const failedDeleteImpact = (file: ResourceFile, error: unknown): ResourceDeleteImpact => ({
+  file,
+  mediaReferences: [],
+  topicReferences: [],
+  mediaReferenceTotal: 0,
+  topicReferenceTotal: 0,
+  mediaReferencesComplete: false,
+  topicReferencesComplete: false,
+  errors: [error instanceof Error ? error.message : 'Reference check failed']
+});
 
 export const ResourceListPage = () => {
   const { t } = useTranslation();
@@ -59,7 +86,9 @@ export const ResourceListPage = () => {
     open: false,
     files: []
   });
-  const [batchDeleteChecking, setBatchDeleteChecking] = useState(false);
+  const [deleteImpact, setDeleteImpact] = useState<DeleteImpactState>(emptyDeleteImpactState);
+  const [batchDeleteImpact, setBatchDeleteImpact] =
+    useState<DeleteImpactState>(emptyDeleteImpactState);
   const [shareDialog, setShareDialog] = useState<{ open: boolean; file: ResourceFile | null }>({
     open: false,
     file: null
@@ -87,12 +116,15 @@ export const ResourceListPage = () => {
   const batchProcessMutation = useBatchProcess();
   const { data: policy, isLoading: policyLoading } = useResourceRuntimePolicy();
   const { data: usage } = useGetUsage(uploadModal);
-  const { data: mediaReferences, isLoading: referencesLoading } = useListMedia(
-    { resource_id: deleteDialog.file?.id, limit: 5 },
-    deleteDialog.open && !!deleteDialog.file?.id
-  );
   const uploading = uploadMutation.isPending || batchUploadMutation.isPending;
-  const referenceCount = mediaReferences?.total || mediaReferences?.items?.length || 0;
+  const deleteImpactSummary = useMemo(
+    () => summarizeResourceDeleteImpacts(deleteImpact.impacts),
+    [deleteImpact.impacts]
+  );
+  const batchDeleteImpactSummary = useMemo(
+    () => summarizeResourceDeleteImpacts(batchDeleteImpact.impacts),
+    [batchDeleteImpact.impacts]
+  );
 
   useEffect(() => {
     if (viewType !== 'edit' || !selectedRecord) return;
@@ -104,6 +136,64 @@ export const ResourceListPage = () => {
       tags: selectedRecord.tags?.join(', ') || ''
     });
   }, [formReset, selectedRecord, viewType]);
+
+  useEffect(() => {
+    if (!deleteDialog.open || !deleteDialog.file?.id) {
+      setDeleteImpact(emptyDeleteImpactState());
+      return;
+    }
+
+    let active = true;
+    const file = deleteDialog.file;
+    setDeleteImpact({ loading: true, checked: false, impacts: [] });
+
+    fetchResourceDeleteImpact([file])
+      .then(impacts => {
+        if (!active) return;
+        setDeleteImpact({ loading: false, checked: true, impacts });
+      })
+      .catch(error => {
+        if (!active) return;
+        setDeleteImpact({
+          loading: false,
+          checked: true,
+          impacts: [failedDeleteImpact(file, error)]
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [deleteDialog.file, deleteDialog.open]);
+
+  useEffect(() => {
+    if (!batchDeleteDialog.open || batchDeleteDialog.files.length === 0) {
+      setBatchDeleteImpact(emptyDeleteImpactState());
+      return;
+    }
+
+    let active = true;
+    const files = batchDeleteDialog.files;
+    setBatchDeleteImpact({ loading: true, checked: false, impacts: [] });
+
+    fetchResourceDeleteImpact(files)
+      .then(impacts => {
+        if (!active) return;
+        setBatchDeleteImpact({ loading: false, checked: true, impacts });
+      })
+      .catch(error => {
+        if (!active) return;
+        setBatchDeleteImpact({
+          loading: false,
+          checked: true,
+          impacts: files.map(file => failedDeleteImpact(file, error))
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [batchDeleteDialog.files, batchDeleteDialog.open]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     const cleanedData = Object.entries(queryData).reduce((acc: any, [key, value]) => {
@@ -205,31 +295,48 @@ export const ResourceListPage = () => {
     [t, toast]
   );
 
-  const checkCmsReferences = useCallback(async (files: ResourceFile[]) => {
-    const results = await Promise.all(
-      files.map(async file => {
-        const references = await getMediaList({ resource_id: file.id, limit: 1 });
-        return {
-          file,
-          count: references?.total || references?.items?.length || 0
-        };
-      })
-    );
+  const openMediaReference = useCallback(
+    (mediaId: string) => {
+      setDeleteDialog({ open: false, file: null });
+      setBatchDeleteDialog({ open: false, files: [] });
+      navigate(`/content/media/${mediaId}`);
+    },
+    [navigate]
+  );
 
-    return results.filter(result => result.count > 0);
-  }, []);
+  const openTopicReference = useCallback(
+    (topicId: string) => {
+      setDeleteDialog({ open: false, file: null });
+      setBatchDeleteDialog({ open: false, files: [] });
+      navigate(`/content/topics/${topicId}`);
+    },
+    [navigate]
+  );
 
   const confirmDelete = useCallback(() => {
     if (!deleteDialog.file?.id) return;
-    if (referenceCount > 0) {
+
+    if (!deleteImpact.checked || deleteImpact.loading) {
+      toast.warning(t('resource.references.loading', 'Checking references...'));
+      return;
+    }
+
+    if (!deleteImpactSummary.canDelete) {
       toast.warning(t('resource.messages.delete_blocked', 'File is referenced'), {
-        description: t(
-          'resource.messages.delete_blocked_description',
-          'Remove CMS media references before deleting this file.'
-        )
+        description:
+          deleteImpactSummary.errorCount > 0
+            ? t(
+                'resource.messages.delete_check_failed',
+                'Reference checks must complete before deleting this file.'
+              )
+            : t(
+                'resource.messages.delete_blocked_description',
+                'Remove CMS media references before deleting this file.'
+              )
       });
       return;
     }
+
     deleteMutation.mutate(deleteDialog.file.id, {
       onSuccess: () => {
         setDeleteDialog({ open: false, file: null });
@@ -240,70 +347,83 @@ export const ResourceListPage = () => {
         onError(error);
       }
     });
-  }, [deleteDialog.file, deleteMutation, onSuccess, onError, referenceCount, t, toast]);
+  }, [
+    deleteDialog.file,
+    deleteImpact.checked,
+    deleteImpact.loading,
+    deleteImpactSummary.canDelete,
+    deleteImpactSummary.errorCount,
+    deleteMutation,
+    onSuccess,
+    onError,
+    t,
+    toast
+  ]);
 
-  const confirmBatchDelete = useCallback(async () => {
+  const confirmBatchDelete = useCallback(() => {
     const files = batchDeleteDialog.files;
     if (files.length === 0) return;
 
-    setBatchDeleteChecking(true);
-    try {
-      const referenced = await checkCmsReferences(files);
-      if (referenced.length > 0) {
-        toast.warning(t('resource.messages.delete_blocked', 'File is referenced'), {
-          description: t(
-            'resource.messages.batch_delete_blocked_description',
-            '{{count}} selected files are referenced by CMS media.',
-            { count: referenced.length }
-          )
-        });
-        return;
-      }
-
-      batchDeleteMutation.mutate(
-        files.map(file => file.id),
-        {
-          onSuccess: (result: ResourceBatchDeleteResult) => {
-            const success = result?.success_count ?? result?.deleted_ids?.length ?? files.length;
-            const failed = result?.failure_count ?? 0;
-            setBatchDeleteDialog({ open: false, files: [] });
-            if (failed > 0) {
-              toast.warning(t('messages.warning', 'Warning'), {
-                description: t(
-                  'resource.messages.batch_delete_partial',
-                  '{{success}} files deleted, {{failed}} failed.',
-                  { success, failed }
-                )
-              });
-            } else {
-              toast.success(t('messages.success'), {
-                description: t(
-                  'resource.messages.batch_delete_success',
-                  '{{count}} files deleted',
-                  { count: success }
-                )
-              });
-            }
-            refetch();
-          },
-          onError: error => {
-            setBatchDeleteDialog({ open: false, files: [] });
-            onError(error);
-          }
-        }
-      );
-    } catch (error: any) {
-      toast.error(t('messages.error'), {
-        description:
-          error?.message || t('resource.references.check_failed', 'Reference check failed')
-      });
-    } finally {
-      setBatchDeleteChecking(false);
+    if (!batchDeleteImpact.checked || batchDeleteImpact.loading) {
+      toast.warning(t('resource.references.loading', 'Checking references...'));
+      return;
     }
+
+    if (!batchDeleteImpactSummary.canDelete) {
+      toast.warning(t('resource.messages.delete_blocked', 'File is referenced'), {
+        description:
+          batchDeleteImpactSummary.errorCount > 0
+            ? t(
+                'resource.messages.batch_delete_check_failed',
+                'Reference checks must complete before deleting selected files.'
+              )
+            : t(
+                'resource.messages.batch_delete_blocked_description',
+                '{{count}} selected files are referenced by CMS media or topics.',
+                { count: batchDeleteImpactSummary.referencedFileCount }
+              )
+      });
+      return;
+    }
+
+    batchDeleteMutation.mutate(
+      files.map(file => file.id),
+      {
+        onSuccess: (result: ResourceBatchDeleteResult) => {
+          const success = result?.success_count ?? result?.deleted_ids?.length ?? files.length;
+          const failed = result?.failure_count ?? 0;
+          setBatchDeleteDialog({ open: false, files: [] });
+          if (failed > 0) {
+            toast.warning(t('messages.warning', 'Warning'), {
+              description: t(
+                'resource.messages.batch_delete_partial',
+                '{{success}} files deleted, {{failed}} failed.',
+                { success, failed }
+              )
+            });
+          } else {
+            toast.success(t('messages.success'), {
+              description: t('resource.messages.batch_delete_success', '{{count}} files deleted', {
+                count: success
+              })
+            });
+          }
+          refetch();
+        },
+        onError: error => {
+          setBatchDeleteDialog({ open: false, files: [] });
+          onError(error);
+        }
+      }
+    );
   }, [
     batchDeleteDialog.files,
+    batchDeleteImpact.checked,
+    batchDeleteImpact.loading,
+    batchDeleteImpactSummary.canDelete,
+    batchDeleteImpactSummary.errorCount,
+    batchDeleteImpactSummary.referencedFileCount,
     batchDeleteMutation,
-    checkCmsReferences,
     onError,
     refetch,
     t,
@@ -444,11 +564,10 @@ export const ResourceListPage = () => {
         label: t('resource.batch.delete', 'Delete'),
         icon: 'IconTrash',
         action: (rows: ResourceFile[]) => setBatchDeleteDialog({ open: true, files: rows }),
-        isDisabled: () => batchDeleteMutation.isPending || batchDeleteChecking
+        isDisabled: () => batchDeleteMutation.isPending
       }
     ],
     [
-      batchDeleteChecking,
       batchDeleteMutation.isPending,
       batchProcessMutation.isPending,
       handleBatchProcess,
@@ -509,10 +628,32 @@ export const ResourceListPage = () => {
         title={t('resource.dialogs.delete_title', 'Delete File')}
         isOpen={deleteDialog.open}
         onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
-        cancelText={t('actions.cancel', 'Cancel')}
-        confirmText={t('actions.delete', 'Delete')}
-        onCancel={() => setDeleteDialog({ open: false, file: null })}
-        onConfirm={confirmDelete}
+        className='max-w-3xl'
+        footer={
+          <>
+            <Button
+              variant='outline-slate'
+              onClick={() => setDeleteDialog({ open: false, file: null })}
+              disabled={deleteMutation.isPending}
+            >
+              {t('actions.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant='danger'
+              onClick={confirmDelete}
+              disabled={
+                deleteMutation.isPending ||
+                deleteImpact.loading ||
+                !deleteImpact.checked ||
+                !deleteImpactSummary.canDelete
+              }
+            >
+              {deleteImpact.loading
+                ? t('resource.references.checking', 'Checking...')
+                : t('actions.delete', 'Delete')}
+            </Button>
+          </>
+        }
       >
         <div className='space-y-4'>
           <p className='text-sm text-slate-600'>
@@ -521,35 +662,12 @@ export const ResourceListPage = () => {
               'Are you sure you want to delete this file? This action cannot be undone.'
             )}
           </p>
-
-          {referencesLoading ? (
-            <div className='rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500'>
-              {t('resource.references.loading', 'Checking references...')}
-            </div>
-          ) : referenceCount > 0 ? (
-            <div className='rounded-lg border border-orange-200 bg-orange-50 px-4 py-3'>
-              <p className='text-sm font-medium text-orange-700'>
-                {t('resource.references.found', '{{count}} CMS media item references this file', {
-                  count: referenceCount
-                })}
-              </p>
-              <div className='mt-2 space-y-1'>
-                {(mediaReferences?.items || []).slice(0, 5).map((media: any) => (
-                  <button
-                    key={media.id}
-                    type='button'
-                    onClick={() => {
-                      setDeleteDialog({ open: false, file: null });
-                      navigate(`/content/media/${media.id}`);
-                    }}
-                    className='block w-full truncate text-left text-xs text-orange-700 underline-offset-2 hover:underline'
-                  >
-                    {media.title || media.id}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
+          <DeleteImpactPanel
+            impacts={deleteImpact.impacts}
+            loading={deleteImpact.loading}
+            onOpenMedia={openMediaReference}
+            onOpenTopic={openTopicReference}
+          />
         </div>
       </AlertDialog>
 
@@ -557,33 +675,47 @@ export const ResourceListPage = () => {
         title={t('resource.dialogs.batch_delete_title', 'Delete Selected Files')}
         isOpen={batchDeleteDialog.open}
         onChange={() => setBatchDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
-        cancelText={t('actions.cancel', 'Cancel')}
-        confirmText={t('actions.delete', 'Delete')}
-        onCancel={() => setBatchDeleteDialog({ open: false, files: [] })}
-        onConfirm={confirmBatchDelete}
+        className='max-w-4xl'
+        footer={
+          <>
+            <Button
+              variant='outline-slate'
+              onClick={() => setBatchDeleteDialog({ open: false, files: [] })}
+              disabled={batchDeleteMutation.isPending}
+            >
+              {t('actions.cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant='danger'
+              onClick={confirmBatchDelete}
+              disabled={
+                batchDeleteMutation.isPending ||
+                batchDeleteImpact.loading ||
+                !batchDeleteImpact.checked ||
+                !batchDeleteImpactSummary.canDelete
+              }
+            >
+              {batchDeleteImpact.loading
+                ? t('resource.references.checking', 'Checking...')
+                : t('actions.delete', 'Delete')}
+            </Button>
+          </>
+        }
       >
         <div className='space-y-4'>
           <p className='text-sm text-slate-600'>
             {t(
               'resource.dialogs.batch_delete_description',
-              'Delete {{count}} selected files? CMS media references will be checked before deletion.',
+              'Delete {{count}} selected files? CMS media and topic references will be checked before deletion.',
               { count: batchDeleteDialog.files.length }
             )}
           </p>
-          <div className='max-h-44 overflow-auto rounded-lg border border-slate-200 divide-y divide-slate-100'>
-            {batchDeleteDialog.files.map(file => (
-              <div key={file.id} className='px-3 py-2 text-sm text-slate-600'>
-                <span className='block truncate'>{file.original_name || file.name}</span>
-              </div>
-            ))}
-          </div>
-          {(batchDeleteChecking || batchDeleteMutation.isPending) && (
-            <div className='rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500'>
-              {batchDeleteChecking
-                ? t('resource.references.loading', 'Checking references...')
-                : t('common.loading', 'Loading...')}
-            </div>
-          )}
+          <DeleteImpactPanel
+            impacts={batchDeleteImpact.impacts}
+            loading={batchDeleteImpact.loading}
+            onOpenMedia={openMediaReference}
+            onOpenTopic={openTopicReference}
+          />
         </div>
       </AlertDialog>
 
