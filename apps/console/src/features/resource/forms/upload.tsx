@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
+  Badge,
   Button,
   Icons,
   Select,
@@ -20,6 +21,7 @@ import {
   ResourceUsage
 } from '../resource';
 import { DEFAULT_RESOURCE_RUNTIME_POLICY } from '../resource_policy';
+import { getUploadFileKey, type ResourceUploadFeedback } from '../upload_feedback';
 import {
   fileInputAcceptValue,
   formatBytes,
@@ -37,9 +39,11 @@ interface UploadFormProps {
   usage?: ResourceUsage | null;
   policy?: ResourceRuntimePolicy;
   policyLoading?: boolean;
+  feedback?: ResourceUploadFeedback | null;
+  onClearFeedback?: () => void;
 }
 
-const fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}`;
+const fileKey = getUploadFileKey;
 
 const cleanPathPrefix = (value: string) =>
   value
@@ -54,7 +58,9 @@ export const UploadForm = ({
   uploading,
   usage,
   policy,
-  policyLoading
+  policyLoading,
+  feedback,
+  onClearFeedback
 }: UploadFormProps) => {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -116,6 +122,18 @@ export const UploadForm = ({
     (usage?.quota_exceeded || (availableBytes !== undefined && totalSize > availableBytes));
   const quotaOverSoftLimit =
     quotaEnabled && !quotaEnforced && availableBytes !== undefined && totalSize > availableBytes;
+  const feedbackByKey = useMemo(
+    () => new Map((feedback?.items || []).map(item => [item.key, item])),
+    [feedback?.items]
+  );
+  const retryableFiles = useMemo(
+    () =>
+      files.filter(file => {
+        const item = feedbackByKey.get(fileKey(file));
+        return item?.status === 'failed' || item?.status === 'unknown';
+      }),
+    [feedbackByKey, files]
+  );
 
   useEffect(() => {
     if (!publicLinksAllowed && accessLevel !== 'private') {
@@ -174,21 +192,25 @@ export const UploadForm = ({
 
   const canSubmit = files.length > 0 && rejectedFiles.length === 0 && !quotaExceeded && !uploading;
 
-  const addFiles = useCallback((fileList: FileList | File[]) => {
-    const incoming = Array.from(fileList);
-    setFiles(current => {
-      const seen = new Set(current.map(fileKey));
-      const next = [...current];
-      incoming.forEach(file => {
-        const key = fileKey(file);
-        if (!seen.has(key)) {
-          seen.add(key);
-          next.push(file);
-        }
+  const addFiles = useCallback(
+    (fileList: FileList | File[]) => {
+      onClearFeedback?.();
+      const incoming = Array.from(fileList);
+      setFiles(current => {
+        const seen = new Set(current.map(fileKey));
+        const next = [...current];
+        incoming.forEach(file => {
+          const key = fileKey(file);
+          if (!seen.has(key)) {
+            seen.add(key);
+            next.push(file);
+          }
+        });
+        return next;
       });
-      return next;
-    });
-  }, []);
+    },
+    [onClearFeedback]
+  );
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -212,11 +234,18 @@ export const UploadForm = ({
     [addFiles]
   );
 
-  const removeFile = useCallback((target: File) => {
-    setFiles(current => current.filter(file => fileKey(file) !== fileKey(target)));
-  }, []);
+  const removeFile = useCallback(
+    (target: File) => {
+      onClearFeedback?.();
+      setFiles(current => current.filter(file => fileKey(file) !== fileKey(target)));
+    },
+    [onClearFeedback]
+  );
 
-  const clearFiles = useCallback(() => setFiles([]), []);
+  const clearFiles = useCallback(() => {
+    onClearFeedback?.();
+    setFiles([]);
+  }, [onClearFeedback]);
 
   const handleAccessLevelChange = useCallback(
     (value: ResourceAccessLevel) => {
@@ -234,9 +263,7 @@ export const UploadForm = ({
     [publicLinksAllowed]
   );
 
-  const handleSubmit = useCallback(() => {
-    if (!canSubmit) return;
-
+  const buildOptions = useCallback(() => {
     const normalizedAccessLevel = publicLinksAllowed ? accessLevel : 'private';
     const shouldCreateThumbnail = thumbnailsEnabled && createThumbnail;
     const shouldResizeImage = resizingEnabled && resizeImage;
@@ -261,15 +288,12 @@ export const UploadForm = ({
           }
     };
 
-    onUpload({ files, options });
+    return options;
   }, [
     accessLevel,
-    canSubmit,
     compressImage,
     compressionQuality,
     createThumbnail,
-    files,
-    onUpload,
     pathPrefix,
     publicLinksAllowed,
     resizeImage,
@@ -278,6 +302,50 @@ export const UploadForm = ({
     thumbnailSize,
     thumbnailsEnabled
   ]);
+
+  const submitFiles = useCallback(
+    (targetFiles: File[]) => {
+      if (targetFiles.length === 0 || uploading) return;
+      const invalidTarget = targetFiles.some(target =>
+        rejectedFiles.some(rejection => fileKey(rejection.file) === fileKey(target))
+      );
+      const targetSize = targetFiles.reduce((sum, file) => sum + file.size, 0);
+      const targetQuotaExceeded =
+        quotaEnforced &&
+        (usage?.quota_exceeded || (availableBytes !== undefined && targetSize > availableBytes));
+      if (invalidTarget || targetQuotaExceeded) return;
+
+      onClearFeedback?.();
+      onUpload({ files: targetFiles, options: buildOptions() });
+    },
+    [
+      availableBytes,
+      buildOptions,
+      onClearFeedback,
+      onUpload,
+      quotaEnforced,
+      rejectedFiles,
+      uploading,
+      usage?.quota_exceeded
+    ]
+  );
+
+  const handleSubmit = useCallback(() => {
+    if (!canSubmit) return;
+    submitFiles(files);
+  }, [canSubmit, files, submitFiles]);
+
+  const keepRetryableFiles = useCallback(() => {
+    if (retryableFiles.length === 0) return;
+    onClearFeedback?.();
+    setFiles(retryableFiles);
+  }, [onClearFeedback, retryableFiles]);
+
+  const retryFailedFiles = useCallback(() => {
+    if (retryableFiles.length === 0) return;
+    setFiles(retryableFiles);
+    submitFiles(retryableFiles);
+  }, [retryableFiles, submitFiles]);
 
   return (
     <div className='space-y-5'>
@@ -544,18 +612,62 @@ export const UploadForm = ({
           <div className='max-h-56 overflow-auto divide-y divide-slate-100'>
             {files.map(file => {
               const rejection = rejectedFiles.find(item => fileKey(item.file) === fileKey(file));
+              const uploadItem = feedbackByKey.get(fileKey(file));
+              const statusTone = rejection
+                ? 'danger'
+                : uploadItem?.status === 'success'
+                  ? 'success'
+                  : uploadItem?.status === 'failed'
+                    ? 'danger'
+                    : uploadItem?.status === 'unknown'
+                      ? 'warning'
+                      : undefined;
+              const statusLabel = rejection
+                ? t('resource.upload.rejected', 'Rejected')
+                : uploadItem?.status === 'success'
+                  ? t('resource.upload.uploaded', 'Uploaded')
+                  : uploadItem?.status === 'failed'
+                    ? t('resource.upload.failed', 'Failed')
+                    : uploadItem?.status === 'unknown'
+                      ? t('resource.upload.needs_retry', 'Needs retry')
+                      : '';
+              const rowIcon =
+                rejection || uploadItem?.status === 'failed' || uploadItem?.status === 'unknown'
+                  ? 'IconAlertTriangle'
+                  : uploadItem?.status === 'success'
+                    ? 'IconCheck'
+                    : 'IconFile';
+              const rowIconClass =
+                rejection || uploadItem?.status === 'failed'
+                  ? 'text-red-500'
+                  : uploadItem?.status === 'unknown'
+                    ? 'text-orange-500'
+                    : uploadItem?.status === 'success'
+                      ? 'text-emerald-500'
+                      : 'text-slate-400';
+
               return (
                 <div key={fileKey(file)} className='flex items-center gap-3 px-4 py-3'>
-                  <Icons
-                    name={rejection ? 'IconAlertTriangle' : 'IconFile'}
-                    className={rejection ? 'text-red-500' : 'text-slate-400'}
-                  />
+                  <Icons name={rowIcon} className={rowIconClass} />
                   <div className='min-w-0 flex-1'>
                     <p className='truncate text-sm font-medium text-slate-700'>{file.name}</p>
-                    <p className={`text-xs ${rejection ? 'text-red-500' : 'text-slate-400'}`}>
-                      {rejection?.reason || formatBytes(file.size)}
+                    <p
+                      className={`text-xs ${
+                        rejection || uploadItem?.status === 'failed'
+                          ? 'text-red-500'
+                          : uploadItem?.status === 'unknown'
+                            ? 'text-orange-600'
+                            : 'text-slate-400'
+                      }`}
+                    >
+                      {rejection?.reason || uploadItem?.message || formatBytes(file.size)}
                     </p>
                   </div>
+                  {statusTone && (
+                    <Badge variant={statusTone} size='xs'>
+                      {statusLabel}
+                    </Badge>
+                  )}
                   <Button
                     size='icon'
                     variant='ghost'
@@ -571,6 +683,75 @@ export const UploadForm = ({
           </div>
         )}
       </div>
+
+      {feedback && (
+        <div
+          className={`rounded-lg border px-4 py-3 ${
+            feedback.status === 'success'
+              ? 'border-emerald-200 bg-emerald-50'
+              : feedback.status === 'partial'
+                ? 'border-orange-200 bg-orange-50'
+                : 'border-red-200 bg-red-50'
+          }`}
+        >
+          <div className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
+            <div className='min-w-0'>
+              <p
+                className={`text-sm font-medium ${
+                  feedback.status === 'success'
+                    ? 'text-emerald-700'
+                    : feedback.status === 'partial'
+                      ? 'text-orange-700'
+                      : 'text-red-700'
+                }`}
+              >
+                {feedback.status === 'success'
+                  ? t('resource.upload.result_success', 'All files uploaded')
+                  : feedback.status === 'partial'
+                    ? t('resource.upload.result_partial', 'Some files need attention')
+                    : t('resource.upload.result_failed', 'Upload failed')}
+              </p>
+              <p className='mt-1 text-xs text-slate-600'>
+                {t(
+                  'resource.upload.result_summary',
+                  '{{success}} uploaded, {{failed}} failed out of {{total}} files.',
+                  {
+                    success: feedback.successCount,
+                    failed: feedback.failureCount,
+                    total: feedback.total
+                  }
+                )}
+                {feedback.operationId ? ` ${feedback.operationId}` : ''}
+              </p>
+              {feedback.errors.length > 0 && (
+                <div className='mt-2 space-y-1'>
+                  {feedback.errors.slice(0, 3).map((error, index) => (
+                    <p key={`${error}-${index}`} className='text-xs text-red-600'>
+                      {error}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {retryableFiles.length > 0 && (
+              <div className='flex shrink-0 flex-wrap gap-2'>
+                <Button
+                  size='sm'
+                  variant='outline-slate'
+                  onClick={keepRetryableFiles}
+                  disabled={uploading}
+                >
+                  {t('resource.upload.keep_failed', 'Keep failed only')}
+                </Button>
+                <Button size='sm' onClick={retryFailedFiles} disabled={uploading}>
+                  {t('resource.upload.retry_failed', 'Retry failed')}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {usage && quotaEnabled && (
         <div className='rounded-lg border border-slate-200 px-4 py-3'>

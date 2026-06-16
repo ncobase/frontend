@@ -36,6 +36,11 @@ import {
   useUpdateResource,
   useUploadResource
 } from '../service';
+import {
+  buildBatchUploadFeedback,
+  buildUploadErrorFeedback,
+  type ResourceUploadFeedback
+} from '../upload_feedback';
 import { buildResourceUploadFormData, normalizeResourceTags } from '../upload_payload';
 
 import { CurdView } from '@/components/curd';
@@ -94,6 +99,7 @@ export const ResourceListPage = () => {
     file: null
   });
   const [uploadModal, setUploadModal] = useState(false);
+  const [uploadFeedback, setUploadFeedback] = useState<ResourceUploadFeedback | null>(null);
 
   const {
     handleSubmit: handleQuerySubmit,
@@ -474,24 +480,30 @@ export const ResourceListPage = () => {
   );
 
   const handleUpload = useCallback(() => {
+    setUploadFeedback(null);
     setUploadModal(true);
   }, []);
 
   const handleFileUpload = useCallback(
     ({ files, options }: ResourceUploadSubmission) => {
       if (files.length === 0) return;
+      setUploadFeedback(null);
 
       if (files.length === 1) {
         const formData = buildResourceUploadFormData(files, options, 'file');
         uploadMutation.mutate(formData, {
           onSuccess: () => {
+            setUploadFeedback(null);
             setUploadModal(false);
             toast.success(t('messages.success'), {
               description: t('resource.messages.upload_success', 'File uploaded')
             });
             refetch();
           },
-          onError
+          onError: error => {
+            setUploadFeedback(buildUploadErrorFeedback(files, error));
+            onError(error);
+          }
         });
         return;
       }
@@ -503,8 +515,8 @@ export const ResourceListPage = () => {
           const success = result.success_count ?? result.files?.length ?? 0;
           const failed = result.failure_count ?? total - success;
 
-          setUploadModal(false);
           if (failed > 0) {
+            setUploadFeedback(buildBatchUploadFeedback(files, result));
             toast.warning(t('messages.warning', 'Warning'), {
               description: t(
                 'resource.messages.upload_partial',
@@ -513,6 +525,8 @@ export const ResourceListPage = () => {
               )
             });
           } else {
+            setUploadFeedback(null);
+            setUploadModal(false);
             toast.success(t('messages.success'), {
               description: t(
                 'resource.messages.upload_many_success',
@@ -523,7 +537,10 @@ export const ResourceListPage = () => {
           }
           refetch();
         },
-        onError
+        onError: error => {
+          setUploadFeedback(buildUploadErrorFeedback(files, error));
+          onError(error);
+        }
       });
     },
     [batchUploadMutation, onError, refetch, t, toast, uploadMutation]
@@ -531,6 +548,7 @@ export const ResourceListPage = () => {
 
   const handleCloseUpload = useCallback(() => {
     if (uploading) return;
+    setUploadFeedback(null);
     setUploadModal(false);
   }, [uploading]);
 
@@ -621,6 +639,8 @@ export const ResourceListPage = () => {
           usage={usage}
           policy={policy}
           policyLoading={policyLoading}
+          feedback={uploadFeedback}
+          onClearFeedback={() => setUploadFeedback(null)}
         />
       </Modal>
 

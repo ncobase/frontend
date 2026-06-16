@@ -225,14 +225,17 @@ Current frontend closure from the feature/UI pass:
 - Current upload UX: upload modal has a local file queue, zero-byte/oversize rejection reasons,
   quota visibility and pre-check, private/shared/public access selection, public flag, path prefix,
   tags, image thumbnail options, single-file `file` upload, and multi-file `files` batch upload.
+  Batch upload partial failures and request failures stay in the modal, mark queue rows as uploaded,
+  failed, or retry-needed, show server errors, and let the user keep or retry only failed items.
 - Current sharing/delete/reference UX: table actions expose share link generation with public/shared
   scope and expiration; delete confirmation checks CMS media and topic usage before single or batch
   deletion, shows per-file impact details, links to referenced media and topics, blocks deletion on
   references or reference-check failures, and only enables delete after a complete clear-state review;
   resource detail shows CMS media references and can open a filtered `/content/media?resource_id=...`
   list.
-- Required next UX: per-file progress, retry failed batch upload/delete items, protected private-file
-  preview states, and browser integration tests for delete impact review and upload failure recovery.
+- Required next UX: per-file transfer progress, retry failed batch delete items, protected
+  private-file preview states, and browser integration tests for delete impact review and upload
+  failure recovery.
 
 ## Spaces
 
