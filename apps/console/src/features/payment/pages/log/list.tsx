@@ -56,13 +56,20 @@ export const PaymentLogListPage = () => {
     [navigate]
   );
 
+  const handleViewLog = useCallback(
+    (log: { id?: string }) => {
+      if (log.id) navigate(`/pay/logs/view/${log.id}`);
+    },
+    [navigate]
+  );
+
   return (
     <CurdView
       viewMode={vmode}
       title={t('payment.log.title', 'Payment Logs')}
       topbarLeft={[]}
       topbarRight={[]}
-      columns={tableColumns({ handleViewOrder })}
+      columns={tableColumns({ handleViewOrder, handleViewLog })}
       data={data?.items || []}
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}

@@ -7,6 +7,7 @@ const ChannelCreatePage = lazyNamed(() => import('./pages/channel/create'), 'Cha
 const ChannelEditPage = lazyNamed(() => import('./pages/channel/edit'), 'ChannelEditPage');
 const ChannelListPage = lazyNamed(() => import('./pages/channel/list'), 'ChannelListPage');
 const PaymentLogListPage = lazyNamed(() => import('./pages/log/list'), 'PaymentLogListPage');
+const PaymentLogViewPage = lazyNamed(() => import('./pages/log/view'), 'PaymentLogViewPage');
 const OrderListPage = lazyNamed(() => import('./pages/order/list'), 'OrderListPage');
 const OrderViewPage = lazyNamed(() => import('./pages/order/view'), 'OrderViewPage');
 const PaymentOverviewPage = lazyNamed(() => import('./pages/overview'), 'PaymentOverviewPage');
@@ -89,6 +90,10 @@ export const PaymentRoutes = () => {
     {
       path: '/logs',
       element: <Guard permission='admin:payments' children={<PaymentLogListPage />} />
+    },
+    {
+      path: '/logs/view/:slug',
+      element: <Guard permission='admin:payments' children={<PaymentLogViewPage />} />
     }
   ];
   return renderRoutes(routes);

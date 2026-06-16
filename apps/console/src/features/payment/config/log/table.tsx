@@ -15,9 +15,11 @@ const typeVariant: Record<string, 'success' | 'warning' | 'danger' | 'secondary'
 };
 
 export const tableColumns = ({
-  handleViewOrder
+  handleViewOrder,
+  handleViewLog
 }: {
   handleViewOrder: (_orderId: string) => void;
+  handleViewLog: (_log: PaymentLog) => void;
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
 
@@ -103,6 +105,17 @@ export const tableColumns = ({
           '-'
         ),
       icon: 'IconCalendarPlus'
+    },
+    {
+      title: t('common.actions', 'Actions'),
+      dataIndex: 'operation-column',
+      actions: [
+        {
+          title: t('actions.view', 'View'),
+          icon: 'IconEye',
+          onClick: (record: PaymentLog) => handleViewLog(record)
+        }
+      ]
     }
   ];
 };

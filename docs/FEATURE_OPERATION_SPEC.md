@@ -258,11 +258,12 @@ Current frontend closure from the feature/UI pass:
   - Logs require `admin:payments`.
   - Webhook callbacks remain public at the route layer and must be provider-signed.
 - Current log behavior: `/pay/logs` is a real admin page backed by `/pay/logs`; the table shows
-  type, order, status transition, error presence, user, IP, and created time, but does not expose raw
-  request/response payloads in the list.
+  type, order, status transition, error presence, user, IP, and created time. `/pay/logs/view/:id`
+  opens the admin-only detail page with request data, response data, metadata, error, user agent, and
+  order navigation. Backend serialization masks sensitive payload fields before exposure.
 - Required UX: order timeline, provider config masking, test connection, refund confirmation, webhook
-  log detail, retry state, and backend-masked payload detail.
-- Gaps: provider implementation depth, webhook signature/idempotency, payload masking, and order/
+  retry state, log export, and provider raw payload review policy.
+- Gaps: provider implementation depth, webhook signature/idempotency/retry, export, and order/
   subscription state persistence need review.
 
 ## Realtime and Notifications

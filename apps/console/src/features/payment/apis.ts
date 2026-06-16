@@ -2,6 +2,7 @@ import { buildQueryString } from '@ncobase/utils';
 
 import type {
   PaymentChannel,
+  PaymentLog,
   PaymentLogListResponse,
   PaymentOrder,
   PaymentProduct,
@@ -116,6 +117,8 @@ export const {
 
 // Stats & Logs
 export const getPaymentStats = (): Promise<PaymentStats> => request.get('/pay/stats');
+
+export const getPaymentLog = (id: string): Promise<PaymentLog> => request.get(`/pay/logs/${id}`);
 
 export const getPaymentLogs = (params?: Record<string, any>): Promise<PaymentLogListResponse> =>
   getPaymentList('/pay/logs', params);

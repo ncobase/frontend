@@ -18,6 +18,7 @@ import {
   updateChannel,
   deleteChannel,
   getPaymentStats,
+  getPaymentLog,
   getPaymentLogs
 } from './apis';
 import { PaymentChannel, PaymentProduct } from './payment';
@@ -32,6 +33,7 @@ export const paymentKeys = {
   channels: (params?: any) => ['paymentService', 'channels', params],
   channel: (id?: string) => ['paymentService', 'channel', { id }],
   stats: () => ['paymentService', 'stats'],
+  log: (id?: string) => ['paymentService', 'log', { id }],
   logs: (params?: any) => ['paymentService', 'logs', params]
 };
 
@@ -199,4 +201,11 @@ export const usePaymentLogs = (params: any) =>
     queryKey: paymentKeys.logs(params),
     queryFn: () => getPaymentLogs(params),
     staleTime: 60 * 1000
+  });
+
+export const useGetPaymentLog = (id: string) =>
+  useQuery({
+    queryKey: paymentKeys.log(id),
+    queryFn: () => getPaymentLog(id),
+    enabled: !!id
   });
