@@ -25,6 +25,26 @@ interface AnalyticsProps {
 }
 
 export const Analytics: React.FC<AnalyticsProps> = ({ data }) => {
+  const getDateKey = (value?: string) => {
+    const date = value ? new Date(value) : null;
+    if (!date || Number.isNaN(date.getTime())) return '';
+    return date.toISOString().slice(0, 10);
+  };
+
+  const activityDays = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - index));
+    const key = date.toISOString().slice(0, 10);
+    return {
+      key,
+      day: date.toLocaleDateString(undefined, { weekday: 'short' }),
+      topics: 0,
+      media: 0
+    };
+  });
+
+  const activityByDate = new Map(activityDays.map(day => [day.key, day]));
+
   // Process analytics data
   const topicStatusData = [
     {
@@ -51,12 +71,19 @@ export const Analytics: React.FC<AnalyticsProps> = ({ data }) => {
     { name: 'Files', value: data.media?.filter(m => m.type === 'file').length || 0 }
   ];
 
-  // Generate activity data (mock for demo)
-  const activityData = Array.from({ length: 7 }, (_, i) => ({
-    day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i],
-    topics: Math.floor(Math.random() * 10),
-    media: Math.floor(Math.random() * 15)
-  }));
+  data.topics?.forEach(topic => {
+    const key = getDateKey(topic.created_at);
+    const day = activityByDate.get(key);
+    if (day) day.topics += 1;
+  });
+
+  data.media?.forEach(media => {
+    const key = getDateKey(media.created_at);
+    const day = activityByDate.get(key);
+    if (day) day.media += 1;
+  });
+
+  const activityData = Array.from(activityByDate.values());
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>

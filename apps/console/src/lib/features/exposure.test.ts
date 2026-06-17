@@ -20,16 +20,29 @@ describe('feature exposure', () => {
 
   it('enables development-only features outside production by default', () => {
     expect(isConsoleFeatureEnabled('builder', { MODE: 'development', PROD: false })).toBe(true);
+    expect(isConsoleFeatureEnabled('contentAdvanced', { MODE: 'development', PROD: false })).toBe(
+      true
+    );
     expect(isConsoleFeatureEnabled('example', { MODE: 'test', PROD: false })).toBe(true);
   });
 
   it('disables development-only features in production unless explicitly enabled', () => {
     expect(isConsoleFeatureEnabled('builder', { MODE: 'production', PROD: true })).toBe(false);
+    expect(isConsoleFeatureEnabled('contentAdvanced', { MODE: 'production', PROD: true })).toBe(
+      false
+    );
     expect(
       isConsoleFeatureEnabled('builder', {
         MODE: 'production',
         PROD: true,
         VITE_ENABLE_BUILDER_ROUTES: 'true'
+      })
+    ).toBe(true);
+    expect(
+      isConsoleFeatureEnabled('contentAdvanced', {
+        MODE: 'production',
+        PROD: true,
+        VITE_ENABLE_CONTENT_ADVANCED_ROUTES: 'true'
       })
     ).toBe(true);
   });
@@ -38,6 +51,7 @@ describe('feature exposure', () => {
     const routes = [
       { path: '/dash/*' },
       { path: '/builder/*' },
+      { path: '/content/seo/*' },
       { path: '/example/*' },
       { path: '/system/*' }
     ];
@@ -45,6 +59,22 @@ describe('feature exposure', () => {
     expect(filterRoutesByFeatureExposure(routes, { MODE: 'production', PROD: true })).toEqual([
       { path: '/dash/*' },
       { path: '/system/*' }
+    ]);
+  });
+
+  it('filters disabled nested content routes in production', () => {
+    const routes = [
+      { path: '/' },
+      { path: '/topics/*' },
+      { path: '/seo/*' },
+      { path: '/workflows/*' },
+      { path: '/media/*' }
+    ];
+
+    expect(filterRoutesByFeatureExposure(routes, { MODE: 'production', PROD: true })).toEqual([
+      { path: '/' },
+      { path: '/topics/*' },
+      { path: '/media/*' }
     ]);
   });
 
@@ -57,7 +87,10 @@ describe('feature exposure', () => {
     const menus: TestMenu[] = [
       { path: '/dash', children: [] },
       { path: '/builder/form', children: [{ path: '/builder/feature' }] },
-      { path: '/content', children: [{ path: '/content/topics' }, { path: '/example/card' }] }
+      {
+        path: '/content',
+        children: [{ path: '/content/topics' }, { path: '/content/seo' }, { path: '/example/card' }]
+      }
     ];
 
     expect(filterMenuTreeByFeatureExposure(menus, { MODE: 'production', PROD: true })).toEqual([

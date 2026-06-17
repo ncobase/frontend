@@ -34,6 +34,13 @@ export const RELATION_TYPES = [
       'Each record in the first table is related to multiple records in the second table.'
   },
   {
+    value: 'manyToOne',
+    label: 'Many-to-One',
+    icon: 'IconArrowNarrowRight',
+    description:
+      'Multiple records in the first table are related to one record in the second table.'
+  },
+  {
     value: 'manyToMany',
     label: 'Many-to-Many',
     icon: 'IconArrowsLeftRight',

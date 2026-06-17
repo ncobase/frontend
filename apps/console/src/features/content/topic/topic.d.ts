@@ -6,7 +6,15 @@ export interface Topic {
   title?: string;
   slug?: string;
   content?: string;
+  content_type?: string;
   thumbnail?: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
+  excerpt_auto?: boolean;
+  excerpt?: string;
+  featured_media?: string;
+  tags?: string[];
   temp?: true;
   markdown?: true;
   private?: true;
@@ -26,6 +34,7 @@ export type QueryFormParams = {
   title?: string;
   status?: string;
   taxonomy?: string;
+  content_type?: string;
   private?: boolean | string;
   markdown?: boolean | string;
 } & PaginationParams;

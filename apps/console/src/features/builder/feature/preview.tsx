@@ -206,7 +206,7 @@ export const FeaturePreview: React.FC = () => {
       <div key={relation.id} className='col-span-2'>
         <div className='font-medium text-slate-500'>{relation.name}</div>
         <div className='mt-1 flex items-center'>
-          {relation.type === 'oneToOne' ? (
+          {relation.type === 'oneToOne' || relation.type === 'manyToOne' ? (
             <div className='text-blue-600 hover:underline cursor-pointer'>
               {relation.targetEntity} #1
             </div>
@@ -338,7 +338,9 @@ export const FeaturePreview: React.FC = () => {
     const displayName = featureConfig.displayName || featureConfig.name;
 
     // Get relationships that can be shown on the form (typically oneToOne or manyToOne relationships)
-    const formRelations = entityRelations.filter(rel => rel.type === 'oneToOne');
+    const formRelations = entityRelations.filter(
+      rel => rel.type === 'oneToOne' || rel.type === 'manyToOne'
+    );
 
     return (
       <div className='rounded-md overflow-hidden'>
@@ -391,7 +393,9 @@ export const FeaturePreview: React.FC = () => {
     const displayName = featureConfig.displayName || featureConfig.name;
 
     // Get relationships that can be shown on the form (typically oneToOne or manyToOne relationships)
-    const formRelations = entityRelations.filter(rel => rel.type === 'oneToOne');
+    const formRelations = entityRelations.filter(
+      rel => rel.type === 'oneToOne' || rel.type === 'manyToOne'
+    );
 
     return (
       <div className='rounded-md overflow-hidden'>

@@ -96,7 +96,7 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
 
     if (relation.type === 'oneToOne') {
       return featureConfig.name.toLowerCase();
-    } else if (relation.type === 'oneToMany') {
+    } else if (relation.type === 'oneToMany' || relation.type === 'manyToOne') {
       return featureConfig.name.toLowerCase();
     } else if (relation.type === 'manyToMany') {
       // Pluralize many-to-many relationships
@@ -167,7 +167,7 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
                 value={relation.type}
                 onValueChange={value =>
                   updateEntityRelation(relation.id, {
-                    type: value as 'oneToOne' | 'oneToMany' | 'manyToMany'
+                    type: value as 'oneToOne' | 'oneToMany' | 'manyToOne' | 'manyToMany'
                   })
                 }
               >
@@ -294,6 +294,17 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
                         </div>
                       </div>
                     )}
+                    {relation.type === 'manyToOne' && (
+                      <div className='flex items-center'>
+                        <div className='p-2 bg-green-100 rounded'>
+                          {featureConfig.name || 'Entity'}
+                        </div>
+                        <Icons name='IconArrowNarrowRight' className='mx-2' />
+                        <div className='p-2 bg-blue-100 rounded'>
+                          {relation.targetEntity || t('feature_builder.relations.target_entity')}
+                        </div>
+                      </div>
+                    )}
                     {relation.type === 'manyToMany' && (
                       <div className='flex items-center gap-2'>
                         <div className='p-2 bg-white rounded shadow border'>
@@ -323,6 +334,15 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
                     {relation.type === 'oneToMany' && (
                       <p>
                         {t('feature_builder.relations.one_to_many_desc_template', {
+                          source: featureConfig.name,
+                          target:
+                            relation.targetEntity || t('feature_builder.relations.target_entity')
+                        })}
+                      </p>
+                    )}
+                    {relation.type === 'manyToOne' && (
+                      <p>
+                        {t('feature_builder.relations.many_to_one_desc_template', {
                           source: featureConfig.name,
                           target:
                             relation.targetEntity || t('feature_builder.relations.target_entity')
@@ -365,6 +385,13 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
                               {relation.isRequired ? '' : '?'};
                             </>
                           )}
+                          {relation.type === 'manyToOne' && (
+                            <div>
+                              {featureConfig.name}.{relation.name}:{' '}
+                              {relation.targetEntity || 'TargetEntity'}
+                              {relation.isRequired ? '' : '?'};
+                            </div>
+                          )}
                           {relation.type === 'manyToMany' && (
                             <>
                               {featureConfig.name}.{relation.name}:{' '}
@@ -395,6 +422,13 @@ export const RelationshipEditor: React.FC<RelationshipEditorProps> = ({ relation
                               {relation.fieldName || getInverseRelationName()}: {featureConfig.name}
                               ;
                             </>
+                          )}
+                          {relation.type === 'manyToOne' && (
+                            <div>
+                              {relation.targetEntity || 'TargetEntity'}.
+                              {relation.fieldName || getInverseRelationName()}: {featureConfig.name}
+                              []
+                            </div>
                           )}
                           {relation.type === 'manyToMany' && (
                             <>

@@ -7,8 +7,23 @@ export type QueryFormParams = {
   name?: string;
   type?: string;
   autoload?: boolean;
+  category?: string;
+  is_secret?: boolean;
   prefix?: string;
 } & PaginationParams;
+
+const OPTION_CATEGORY_OPTIONS = [
+  'general',
+  'security',
+  'email',
+  'ui',
+  'resource',
+  'ai',
+  'performance',
+  'integrations',
+  'backup',
+  'uncategorized'
+];
 
 export const queryFields = ({
   queryControl
@@ -74,6 +89,51 @@ export const queryFields = ({
             <SelectField
               allowClear
               placeholder='Filter by auto load'
+              option={[
+                { label: t('common.yes', 'Yes'), value: true },
+                { label: t('common.no', 'No'), value: false }
+              ]}
+              className='[&>button]:py-1.5'
+              {...field}
+            />
+          )}
+        />
+      )
+    },
+    {
+      name: 'category',
+      label: t('option.fields.category', 'Category'),
+      component: (
+        <Controller
+          name='category'
+          control={queryControl}
+          defaultValue=''
+          render={({ field }) => (
+            <SelectField
+              allowClear
+              placeholder={t('option.placeholders.category', 'Filter by category')}
+              option={OPTION_CATEGORY_OPTIONS.map(category => ({
+                label: t(`options.categories.${category}`, category),
+                value: category
+              }))}
+              className='[&>button]:py-1.5'
+              {...field}
+            />
+          )}
+        />
+      )
+    },
+    {
+      name: 'is_secret',
+      label: t('option.fields.is_secret', 'Secret'),
+      component: (
+        <Controller
+          name='is_secret'
+          control={queryControl}
+          render={({ field }) => (
+            <SelectField
+              allowClear
+              placeholder={t('option.placeholders.is_secret', 'Filter by secret flag')}
               option={[
                 { label: t('common.yes', 'Yes'), value: true },
                 { label: t('common.no', 'No'), value: false }

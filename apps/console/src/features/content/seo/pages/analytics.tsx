@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   Button,
@@ -25,38 +25,48 @@ import {
   Bar
 } from 'recharts';
 
+import { summarizeTopicSEO } from '../local_analysis';
+
 import { Page, Topbar } from '@/components/layout';
+import { useListTopics } from '@/features/content/topic/service';
+
+const SCORE_FILTER_DAYS: Record<string, number> = {
+  '30d': 30,
+  '90d': 90,
+  '180d': 180,
+  '365d': 365
+};
+
+const isWithinRange = (value: string, days: number) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
+  return date.getTime() >= threshold;
+};
+
+const getScoreColor = (score: number) => {
+  if (score >= 80) return 'text-green-600';
+  if (score >= 60) return 'text-yellow-600';
+  return 'text-red-600';
+};
 
 export const SEOAnalyticsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState('30d');
+  const [timeRange, setTimeRange] = useState('90d');
   const [contentType, setContentType] = useState('all');
+  const topicsQuery = useListTopics({ limit: 100 });
 
-  // Mock data - replace with real API calls
-  const scoreData = [
-    { date: '2024-01-01', score: 65 },
-    { date: '2024-01-08', score: 68 },
-    { date: '2024-01-15', score: 72 },
-    { date: '2024-01-22', score: 75 },
-    { date: '2024-01-29', score: 78 }
-  ];
+  const summary = useMemo(() => {
+    const days = SCORE_FILTER_DAYS[timeRange] || SCORE_FILTER_DAYS['90d'];
+    const topics = topicsQuery.data?.items || [];
+    const filteredTopics = topics.filter(topic => {
+      const matchesType = contentType === 'all' || (topic.content_type || 'topic') === contentType;
+      return matchesType && isWithinRange(topic.updated_at || topic.created_at || '', days);
+    });
 
-  const issuesData = [
-    { category: 'Title Issues', count: 15, color: '#ef4444' },
-    { category: 'Meta Description', count: 12, color: '#f97316' },
-    { category: 'Missing Keywords', count: 8, color: '#eab308' },
-    { category: 'Image Alt Text', count: 22, color: '#06b6d4' },
-    { category: 'Heading Structure', count: 6, color: '#8b5cf6' }
-  ];
-
-  const topContent = [
-    { title: 'Complete Guide to SEO', score: 95, traffic: 1250 },
-    { title: 'React Performance Tips', score: 88, traffic: 980 },
-    { title: 'Modern CSS Techniques', score: 82, traffic: 750 },
-    { title: 'JavaScript Best Practices', score: 79, traffic: 650 },
-    { title: 'Web Accessibility Guide', score: 76, traffic: 420 }
-  ];
+    return summarizeTopicSEO(filteredTopics);
+  }, [contentType, timeRange, topicsQuery.data?.items]);
 
   return (
     <Page
@@ -89,7 +99,6 @@ export const SEOAnalyticsPage = () => {
               <SelectContent>
                 <SelectItem value='all'>{t('common.all')}</SelectItem>
                 <SelectItem value='topic'>{t('content.type.topic')}</SelectItem>
-                <SelectItem value='taxonomy'>{t('content.type.taxonomy')}</SelectItem>
               </SelectContent>
             </Select>,
             <Button
@@ -104,105 +113,146 @@ export const SEOAnalyticsPage = () => {
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
-      {/* Score Trend */}
+      {topicsQuery.isError && (
+        <div className='rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-red-700'>
+          <div className='flex items-start justify-between gap-3'>
+            <div className='flex min-w-0 gap-2'>
+              <Icons name='IconAlertCircle' className='mt-0.5 h-4 w-4 shrink-0' />
+              <div>
+                <p className='text-sm font-medium'>{t('messages.error')}</p>
+                <p className='mt-1 text-xs opacity-80'>
+                  {t('seo.analytics.load_failed', 'Unable to load topic SEO metadata.')}
+                </p>
+              </div>
+            </div>
+            <Button size='xs' variant='outline' onClick={() => topicsQuery.refetch()}>
+              {t('actions.retry', 'Retry')}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Card className='p-6'>
-        <h3 className='text-lg font-semibold mb-4'>{t('seo.analytics.score_trend')}</h3>
+        <div className='mb-4'>
+          <h3 className='text-lg font-semibold'>{t('seo.analytics.score_trend')}</h3>
+          <p className='mt-1 text-xs text-slate-500'>
+            {t(
+              'seo.analytics.snapshot_note',
+              'This chart groups current topic SEO metadata scores by topic update date.'
+            )}
+          </p>
+        </div>
         <div className='h-80'>
-          <ResponsiveContainer width='100%' height='100%'>
-            <LineChart data={scoreData}>
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='date' />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Legend />
-              <Line
-                type='monotone'
-                dataKey='score'
-                stroke='#3b82f6'
-                strokeWidth={3}
-                name={t('seo.analytics.avg_score')}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {topicsQuery.isLoading ? (
+            <div className='h-full animate-pulse rounded bg-slate-100' />
+          ) : summary.score_by_date.length > 0 ? (
+            <ResponsiveContainer width='100%' height='100%'>
+              <LineChart data={summary.score_by_date}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis dataKey='date' />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type='monotone'
+                  dataKey='score'
+                  stroke='#2563eb'
+                  strokeWidth={3}
+                  name={t('seo.analytics.avg_score')}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className='flex h-full items-center justify-center text-sm text-slate-500'>
+              {t('seo.analytics.no_snapshot', 'No SEO metadata found for this range.')}
+            </div>
+          )}
         </div>
       </Card>
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        {/* Issues Breakdown */}
         <Card className='p-6'>
           <h3 className='text-lg font-semibold mb-4'>{t('seo.analytics.issues_breakdown')}</h3>
           <div className='h-64'>
-            <ResponsiveContainer width='100%' height='100%'>
-              <BarChart data={issuesData}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='category' angle={-45} textAnchor='end' height={80} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey='count' fill='#ef4444' />
-              </BarChart>
-            </ResponsiveContainer>
+            {topicsQuery.isLoading ? (
+              <div className='h-full animate-pulse rounded bg-slate-100' />
+            ) : summary.issues_breakdown.length > 0 ? (
+              <ResponsiveContainer width='100%' height='100%'>
+                <BarChart data={summary.issues_breakdown}>
+                  <CartesianGrid strokeDasharray='3 3' />
+                  <XAxis dataKey='category' />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey='count' fill='#dc2626' />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className='flex h-full items-center justify-center text-sm text-slate-500'>
+                {t('seo.analytics.no_issues', 'No metadata issues found for this range.')}
+              </div>
+            )}
           </div>
         </Card>
 
-        {/* Top Performing Content */}
         <Card className='p-6'>
           <h3 className='text-lg font-semibold mb-4'>{t('seo.analytics.top_content')}</h3>
           <div className='space-y-3'>
-            {topContent.map((item, index) => (
-              <div
-                key={index}
-                className='flex items-center justify-between p-3 bg-gray-50 rounded-lg'
-              >
-                <div className='flex-1'>
-                  <div className='font-medium text-sm'>{item.title}</div>
-                  <div className='text-xs text-gray-500'>
-                    {t('seo.analytics.traffic')}: {item.traffic}
+            {topicsQuery.isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <div key={index} className='h-12 animate-pulse rounded bg-slate-100' />
+              ))
+            ) : summary.top_content.length > 0 ? (
+              summary.top_content.map(item => (
+                <button
+                  key={item.id}
+                  type='button'
+                  className='flex w-full items-center justify-between rounded-lg bg-gray-50 p-3 text-left hover:bg-gray-100'
+                  onClick={() => navigate(`/content/topics/${item.id}`)}
+                >
+                  <div className='min-w-0 flex-1'>
+                    <div className='truncate text-sm font-medium'>{item.title}</div>
+                    <div className='text-xs text-gray-500'>
+                      {t('seo.analytics.word_count', '{{count}} words', {
+                        count: item.word_count
+                      })}
+                    </div>
                   </div>
-                </div>
-                <div className='text-right'>
-                  <div
-                    className={`font-bold ${
-                      item.score >= 80
-                        ? 'text-green-600'
-                        : item.score >= 60
-                          ? 'text-yellow-600'
-                          : 'text-red-600'
-                    }`}
-                  >
-                    {item.score}
+                  <div className='text-right'>
+                    <div className={`font-bold ${getScoreColor(item.score)}`}>{item.score}</div>
+                    <div className='text-xs text-gray-500'>{t('seo.analytics.seo_score')}</div>
                   </div>
-                  <div className='text-xs text-gray-500'>{t('seo.analytics.seo_score')}</div>
-                </div>
+                </button>
+              ))
+            ) : (
+              <div className='rounded-lg border border-dashed py-10 text-center text-sm text-slate-500'>
+                {t('seo.analytics.no_top_content', 'No scored content found.')}
               </div>
-            ))}
+            )}
           </div>
         </Card>
       </div>
 
-      {/* Detailed Metrics */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
         <Card className='p-6 text-center'>
-          <div className='text-3xl font-bold text-blue-600 mb-2'>78.5</div>
+          <div className={`mb-2 text-3xl font-bold ${getScoreColor(summary.avg_score)}`}>
+            {summary.avg_score}
+          </div>
           <div className='text-sm text-gray-600'>{t('seo.analytics.avg_score')}</div>
-          <div className='text-xs text-green-600 mt-1'>↑ 5.2%</div>
         </Card>
 
         <Card className='p-6 text-center'>
-          <div className='text-3xl font-bold text-green-600 mb-2'>156</div>
+          <div className='mb-2 text-3xl font-bold text-green-600'>{summary.analyzed_content}</div>
           <div className='text-sm text-gray-600'>{t('seo.analytics.analyzed_pages')}</div>
-          <div className='text-xs text-green-600 mt-1'>↑ 12</div>
         </Card>
 
         <Card className='p-6 text-center'>
-          <div className='text-3xl font-bold text-red-600 mb-2'>63</div>
+          <div className='mb-2 text-3xl font-bold text-red-600'>{summary.issues_found}</div>
           <div className='text-sm text-gray-600'>{t('seo.analytics.total_issues')}</div>
-          <div className='text-xs text-red-600 mt-1'>↓ 8</div>
         </Card>
 
         <Card className='p-6 text-center'>
-          <div className='text-3xl font-bold text-purple-600 mb-2'>92%</div>
+          <div className='mb-2 text-3xl font-bold text-blue-600'>{summary.optimization_rate}%</div>
           <div className='text-sm text-gray-600'>{t('seo.analytics.optimization_rate')}</div>
-          <div className='text-xs text-green-600 mt-1'>↑ 3%</div>
         </Card>
       </div>
     </Page>

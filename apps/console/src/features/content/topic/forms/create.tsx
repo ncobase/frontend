@@ -95,6 +95,20 @@ export const CreateTopicForm = ({
           }
         },
         {
+          title: t('topic.fields.content_type', 'Content Type'),
+          name: 'content_type',
+          type: 'select',
+          prependIcon: 'IconArticle',
+          defaultValue: 'article',
+          options: [
+            { label: t('topic.content_type.article', 'Article'), value: 'article' },
+            { label: t('topic.content_type.page', 'Page'), value: 'page' },
+            { label: t('topic.content_type.video', 'Video'), value: 'video' },
+            { label: t('topic.content_type.audio', 'Audio'), value: 'audio' }
+          ],
+          rules: { required: t('forms.select_required') }
+        },
+        {
           title: t('topic.fields.slug', 'Slug'),
           name: 'slug',
           type: 'text',
@@ -134,6 +148,56 @@ export const CreateTopicForm = ({
           className: 'col-span-full',
           rows: 10,
           description: t('topic.content_hint', 'Main content of the topic')
+        }
+      ]
+    },
+    {
+      id: 'seo',
+      title: t('topic.section.seo', 'SEO Metadata'),
+      subtitle: t('topic.section.seo_subtitle', 'Search and discovery metadata'),
+      icon: 'IconSearch',
+      collapsible: true,
+      fields: [
+        {
+          title: t('topic.fields.seo_title', 'SEO Title'),
+          name: 'seo_title',
+          type: 'text',
+          defaultValue: '',
+          placeholder: t('topic.placeholders.seo_title', 'Search result title'),
+          description: t('topic.seo_title_hint', 'Recommended length: 25-70 characters'),
+          rules: {
+            maxLength: { value: 70, message: t('forms.max_length', { count: 70 }) }
+          }
+        },
+        {
+          title: t('topic.fields.seo_keywords', 'SEO Keywords'),
+          name: 'seo_keywords',
+          type: 'text',
+          defaultValue: '',
+          placeholder: t('topic.placeholders.seo_keywords', 'keyword one, keyword two'),
+          description: t('topic.seo_keywords_hint', 'Comma-separated search keywords')
+        },
+        {
+          title: t('topic.fields.seo_description', 'SEO Description'),
+          name: 'seo_description',
+          type: 'textarea',
+          defaultValue: '',
+          rows: 3,
+          className: 'col-span-full',
+          placeholder: t('topic.placeholders.seo_description', 'Search result description'),
+          description: t('topic.seo_description_hint', 'Recommended length: 70-170 characters'),
+          rules: {
+            maxLength: { value: 170, message: t('forms.max_length', { count: 170 }) }
+          }
+        },
+        {
+          title: t('topic.fields.excerpt', 'Excerpt'),
+          name: 'excerpt',
+          type: 'textarea',
+          defaultValue: '',
+          rows: 3,
+          className: 'col-span-full',
+          placeholder: t('topic.placeholders.excerpt', 'Short editorial summary')
         }
       ]
     },

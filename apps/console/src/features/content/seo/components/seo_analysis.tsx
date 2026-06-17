@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { Card, Icons, Badge, Button, Progress } from '@ncobase/react';
+import { Card, Icons, Badge, Progress } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
 
 import { SEORecommendation } from '../seo';
-import { useSEOAnalysis, useRunSEOAudit } from '../service';
+import { useSEOAnalysis } from '../service';
 
 interface SEOAnalysisProps {
   contentId: string;
@@ -14,17 +14,7 @@ interface SEOAnalysisProps {
 export const SEOAnalysisComponent: React.FC<SEOAnalysisProps> = ({ contentId, contentType }) => {
   const { t } = useTranslation();
 
-  const { data: analysis, isLoading, refetch } = useSEOAnalysis(contentId, contentType);
-  const runAuditMutation = useRunSEOAudit();
-
-  const handleRunAudit = async () => {
-    try {
-      await runAuditMutation.mutateAsync({ contentId, contentType });
-      refetch();
-    } catch (error) {
-      console.error('Failed to run SEO audit:', error);
-    }
-  };
+  const { data: analysis, isLoading } = useSEOAnalysis(contentId, contentType, false);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
@@ -67,10 +57,6 @@ export const SEOAnalysisComponent: React.FC<SEOAnalysisProps> = ({ contentId, co
       {/* Header */}
       <div className='flex items-center justify-between'>
         <h3 className='text-lg font-medium'>{t('seo.analysis.title')}</h3>
-        <Button onClick={handleRunAudit} loading={runAuditMutation.isPending} size='sm'>
-          <Icons name='IconRefresh' size={16} className='mr-1' />
-          {t('seo.analysis.run_audit')}
-        </Button>
       </div>
 
       {analysis ? (
@@ -192,11 +178,12 @@ export const SEOAnalysisComponent: React.FC<SEOAnalysisProps> = ({ contentId, co
         <Card className='p-8 text-center'>
           <Icons name='IconSearchCheck' size={48} className='mx-auto text-gray-400 mb-4' />
           <h3 className='text-lg font-medium text-gray-900 mb-2'>{t('seo.analysis.no_data')}</h3>
-          <p className='text-gray-500 mb-4'>{t('seo.analysis.no_data_description')}</p>
-          <Button onClick={handleRunAudit} loading={runAuditMutation.isPending}>
-            <Icons name='IconPlay' size={16} className='mr-1' />
-            {t('seo.analysis.run_first_audit')}
-          </Button>
+          <p className='text-gray-500 mb-4'>
+            {t(
+              'seo.analysis.no_backend_description',
+              'Dedicated SEO audit history is not configured. The SEO dashboard uses current topic metadata until the backend audit module is available.'
+            )}
+          </p>
         </Card>
       )}
     </div>

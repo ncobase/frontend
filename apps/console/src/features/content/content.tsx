@@ -15,10 +15,24 @@ export const ContentPage = () => {
   const { t } = useTranslation();
 
   // Fetch data for dashboard
-  const { data: topicsData } = useListTopics({ limit: 100 });
-  const { data: mediaData } = useListMedia({ limit: 100 });
-  const { data: channelsData } = useListChannels({ limit: 100 });
-  const { data: distributionsData } = useListDistributions({ limit: 100 });
+  const topicsQuery = useListTopics({ limit: 100 });
+  const mediaQuery = useListMedia({ limit: 100 });
+  const channelsQuery = useListChannels({ limit: 100 });
+  const distributionsQuery = useListDistributions({ limit: 100 });
+  const topicsData = topicsQuery.data;
+  const mediaData = mediaQuery.data;
+  const channelsData = channelsQuery.data;
+  const distributionsData = distributionsQuery.data;
+  const isLoading =
+    topicsQuery.isLoading ||
+    mediaQuery.isLoading ||
+    channelsQuery.isLoading ||
+    distributionsQuery.isLoading;
+  const hasError =
+    topicsQuery.isError ||
+    mediaQuery.isError ||
+    channelsQuery.isError ||
+    distributionsQuery.isError;
 
   // Calculate stats
   const topicCount = topicsData?.total || 0;
@@ -30,14 +44,21 @@ export const ContentPage = () => {
 
   // Recent items
   const recentTopics =
-    topicsData?.items
+    [...(topicsData?.items || [])]
       ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5) || [];
 
   const recentDistributions =
-    distributionsData?.items
+    [...(distributionsData?.items || [])]
       ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5) || [];
+
+  const handleRetry = () => {
+    void topicsQuery.refetch();
+    void mediaQuery.refetch();
+    void channelsQuery.refetch();
+    void distributionsQuery.refetch();
+  };
 
   const getStatusBadge = (status: number, type: 'topic' | 'distribution') => {
     if (type === 'topic') {
@@ -87,13 +108,39 @@ export const ContentPage = () => {
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
+      {hasError && (
+        <div className='rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-red-700'>
+          <div className='flex items-start justify-between gap-3'>
+            <div className='flex min-w-0 gap-2'>
+              <Icons name='IconAlertCircle' className='mt-0.5 h-4 w-4 shrink-0' />
+              <div>
+                <p className='text-sm font-medium'>{t('messages.error')}</p>
+                <p className='mt-1 text-xs opacity-80'>
+                  {t(
+                    'content.dashboard.load_failed',
+                    'Unable to load the complete content overview.'
+                  )}
+                </p>
+              </div>
+            </div>
+            <Button variant='outline' size='xs' onClick={handleRetry}>
+              {t('actions.retry', 'Retry')}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         <div className='px-6 py-4'>
           <div className='flex justify-between items-center'>
             <div>
               <div className='text-gray-500 mb-1 text-sm'>{t('content.stats.total_topics')}</div>
-              <div className='text-2xl font-semibold'>{topicCount}</div>
+              {isLoading ? (
+                <div className='h-8 w-14 animate-pulse rounded bg-slate-100' />
+              ) : (
+                <div className='text-2xl font-semibold'>{topicCount}</div>
+              )}
             </div>
             <div className='w-10 h-10 rounded-lg flex items-center justify-center bg-green-100'>
               <Icons name='IconBookmark' size={20} className='text-green-600' />
@@ -104,7 +151,7 @@ export const ContentPage = () => {
               variant='unstyle'
               size='sm'
               className='text-primary-500 flex items-center gap-1 hover:text-primary-600'
-              onClick={() => navigate('/content/taxonomies')}
+              onClick={() => navigate('/content/topics')}
             >
               {t('actions.view_details')} <Icons name='IconChevronRight' size={14} />
             </Button>
@@ -115,7 +162,11 @@ export const ContentPage = () => {
           <div className='flex justify-between items-center'>
             <div>
               <div className='text-gray-500 mb-1 text-sm'>{t('content.stats.media_files')}</div>
-              <div className='text-2xl font-semibold'>{mediaCount}</div>
+              {isLoading ? (
+                <div className='h-8 w-14 animate-pulse rounded bg-slate-100' />
+              ) : (
+                <div className='text-2xl font-semibold'>{mediaCount}</div>
+              )}
             </div>
             <div className='w-10 h-10 rounded-lg flex items-center justify-center bg-purple-100'>
               <Icons name='IconPhoto' size={20} className='text-purple-600' />
@@ -137,10 +188,16 @@ export const ContentPage = () => {
           <div className='flex justify-between items-center'>
             <div>
               <div className='text-gray-500 mb-1 text-sm'>{t('content.stats.channels')}</div>
-              <div className='text-2xl font-semibold'>{channelCount}</div>
-              <div className='text-xs text-gray-400 mt-1'>
-                {activeChannelCount} {t('content.stats.active')}
-              </div>
+              {isLoading ? (
+                <div className='h-8 w-14 animate-pulse rounded bg-slate-100' />
+              ) : (
+                <>
+                  <div className='text-2xl font-semibold'>{channelCount}</div>
+                  <div className='text-xs text-gray-400 mt-1'>
+                    {activeChannelCount} {t('content.stats.active')}
+                  </div>
+                </>
+              )}
             </div>
             <div className='w-10 h-10 rounded-lg flex items-center justify-center bg-orange-100'>
               <Icons name='IconBroadcast' size={20} className='text-orange-600' />
@@ -162,7 +219,11 @@ export const ContentPage = () => {
           <div className='flex justify-between items-center'>
             <div>
               <div className='text-gray-500 mb-1 text-sm'>{t('content.stats.distributions')}</div>
-              <div className='text-2xl font-semibold'>{distributionCount}</div>
+              {isLoading ? (
+                <div className='h-8 w-14 animate-pulse rounded bg-slate-100' />
+              ) : (
+                <div className='text-2xl font-semibold'>{distributionCount}</div>
+              )}
             </div>
             <div className='w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-100'>
               <Icons name='IconSend' size={20} className='text-indigo-600' />
@@ -196,27 +257,33 @@ export const ContentPage = () => {
           </div>
 
           <div className='space-y-3'>
-            {recentTopics.map(topic => (
-              <div
-                key={topic.id}
-                className='flex items-center p-3 border border-slate-300/65 rounded-md hover:bg-gray-50 cursor-pointer transition-colors'
-                onClick={() => navigate(`/content/topics/${topic.id}`)} // Updated route
-              >
-                <div className='flex-1 min-w-0'>
-                  <div className='flex items-center justify-between mb-1'>
-                    <div className='font-medium text-gray-900 truncate'>{topic.title}</div>
-                    {getStatusBadge(topic.status, 'topic')}
-                  </div>
-                  <div className='text-sm text-gray-500 truncate'>{topic.name}</div>
-                  <div className='text-xs text-gray-400 mt-1'>
-                    {new Date(topic.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-                <Icons name='IconChevronRight' size={16} className='text-gray-400 ml-2' />
-              </div>
-            ))}
+            {topicsQuery.isLoading &&
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className='h-20 animate-pulse rounded-md bg-slate-100' />
+              ))}
 
-            {recentTopics.length === 0 && (
+            {!topicsQuery.isLoading &&
+              recentTopics.map(topic => (
+                <div
+                  key={topic.id}
+                  className='flex items-center p-3 border border-slate-300/65 rounded-md hover:bg-gray-50 cursor-pointer transition-colors'
+                  onClick={() => navigate(`/content/topics/${topic.id}`)} // Updated route
+                >
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex items-center justify-between mb-1'>
+                      <div className='font-medium text-gray-900 truncate'>{topic.title}</div>
+                      {getStatusBadge(topic.status, 'topic')}
+                    </div>
+                    <div className='text-sm text-gray-500 truncate'>{topic.name}</div>
+                    <div className='text-xs text-gray-400 mt-1'>
+                      {new Date(topic.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <Icons name='IconChevronRight' size={16} className='text-gray-400 ml-2' />
+                </div>
+              ))}
+
+            {!topicsQuery.isLoading && recentTopics.length === 0 && (
               <div className='text-center py-8 text-gray-500'>
                 <Icons name='IconFileText' size={32} className='mx-auto mb-2 opacity-50' />
                 <p className='text-sm'>{t('content.recent.no_topics')}</p>
@@ -246,34 +313,40 @@ export const ContentPage = () => {
           </div>
 
           <div className='space-y-3'>
-            {recentDistributions.map(distribution => (
-              <div
-                key={distribution.id}
-                className='flex items-center p-3 border border-slate-300/65 rounded-md hover:bg-gray-50 cursor-pointer transition-colors'
-                onClick={() => navigate(`/content/distributions/${distribution.id}`)} // Updated route
-              >
-                <div className='flex-1 min-w-0'>
-                  <div className='flex items-center justify-between mb-1'>
-                    <div className='font-medium text-gray-900 truncate'>
-                      {distribution.topic?.title || t('distribution.unknown_topic')}
-                    </div>
-                    {getStatusBadge(distribution.status, 'distribution')}
-                  </div>
-                  <div className='text-sm text-gray-500 truncate'>
-                    <Icons name='IconBroadcast' size={12} className='inline mr-1' />
-                    {distribution.channel?.name || t('distribution.unknown_channel')}
-                  </div>
-                  <div className='text-xs text-gray-400 mt-1'>
-                    {distribution.scheduled_at
-                      ? `${t('distribution.scheduled')}: ${new Date(distribution.scheduled_at).toLocaleDateString()}`
-                      : new Date(distribution.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-                <Icons name='IconChevronRight' size={16} className='text-gray-400 ml-2' />
-              </div>
-            ))}
+            {distributionsQuery.isLoading &&
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className='h-20 animate-pulse rounded-md bg-slate-100' />
+              ))}
 
-            {recentDistributions.length === 0 && (
+            {!distributionsQuery.isLoading &&
+              recentDistributions.map(distribution => (
+                <div
+                  key={distribution.id}
+                  className='flex items-center p-3 border border-slate-300/65 rounded-md hover:bg-gray-50 cursor-pointer transition-colors'
+                  onClick={() => navigate(`/content/distributions/${distribution.id}`)} // Updated route
+                >
+                  <div className='flex-1 min-w-0'>
+                    <div className='flex items-center justify-between mb-1'>
+                      <div className='font-medium text-gray-900 truncate'>
+                        {distribution.topic?.title || t('distribution.unknown_topic')}
+                      </div>
+                      {getStatusBadge(distribution.status, 'distribution')}
+                    </div>
+                    <div className='text-sm text-gray-500 truncate'>
+                      <Icons name='IconBroadcast' size={12} className='inline mr-1' />
+                      {distribution.channel?.name || t('distribution.unknown_channel')}
+                    </div>
+                    <div className='text-xs text-gray-400 mt-1'>
+                      {distribution.scheduled_at
+                        ? `${t('distribution.scheduled')}: ${new Date(distribution.scheduled_at).toLocaleDateString()}`
+                        : new Date(distribution.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <Icons name='IconChevronRight' size={16} className='text-gray-400 ml-2' />
+                </div>
+              ))}
+
+            {!distributionsQuery.isLoading && recentDistributions.length === 0 && (
               <div className='text-center py-8 text-gray-500'>
                 <Icons name='IconBroadcast' size={32} className='mx-auto mb-2 opacity-50' />
                 <p className='text-sm'>{t('content.recent.no_distributions')}</p>

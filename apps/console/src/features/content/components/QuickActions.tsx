@@ -1,36 +1,38 @@
 import React from 'react';
 
 import { Icons } from '@ncobase/react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 export const QuickActions: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const actions = [
     {
-      title: 'New Topic',
-      description: 'Create a new content topic',
+      title: t('content.quick.new_topic', 'New Topic'),
+      description: t('content.quick.new_topic_desc', 'Create a new content topic'),
       icon: 'IconFilePlus',
       color: 'bg-blue-500',
       onClick: () => navigate('/content/topics/create')
     },
     {
-      title: 'New Taxonomy',
-      description: 'Create a new category or tag',
+      title: t('content.quick.new_taxonomy', 'New Taxonomy'),
+      description: t('content.quick.new_taxonomy_desc', 'Create a new category or tag'),
       icon: 'IconFolderPlus',
       color: 'bg-green-500',
       onClick: () => navigate('/content/taxonomies/create')
     },
     {
-      title: 'Upload Media',
-      description: 'Upload images, videos, or files',
+      title: t('content.quick.upload_media', 'Upload Media'),
+      description: t('content.quick.upload_media_desc', 'Upload images, videos, or files'),
       icon: 'IconCloudUpload',
       color: 'bg-purple-500',
       onClick: () => navigate('/content/media')
     },
     {
-      title: 'New Channel',
-      description: 'Add a distribution channel',
+      title: t('content.quick.new_channel', 'New Channel'),
+      description: t('content.quick.new_channel_desc', 'Add a distribution channel'),
       icon: 'IconBroadcast',
       color: 'bg-orange-500',
       onClick: () => navigate('/content/channels/create')
@@ -39,7 +41,7 @@ export const QuickActions: React.FC = () => {
 
   return (
     <div className='px-6'>
-      <h2 className='text-lg font-semibold mb-6'>Quick Actions</h2>
+      <h2 className='text-lg font-semibold mb-6'>{t('content.quick.title', 'Quick Actions')}</h2>
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         {actions.map((action, index) => (
           <button

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   Button,
@@ -15,39 +15,44 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { summarizeTopicSEO } from '../local_analysis';
+
 import { Page, Topbar } from '@/components/layout';
+import { useListTopics } from '@/features/content/topic/service';
+
+const SCORE_FILTER_DAYS: Record<string, number> = {
+  '7d': 7,
+  '30d': 30,
+  '90d': 90
+};
+
+const isWithinRange = (value: string, days: number) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
+  return date.getTime() >= threshold;
+};
+
+const iconColorClasses = {
+  blue: { background: 'bg-blue-100', foreground: 'text-blue-600' },
+  green: { background: 'bg-green-100', foreground: 'text-green-600' },
+  red: { background: 'bg-red-100', foreground: 'text-red-600' },
+  yellow: { background: 'bg-yellow-100', foreground: 'text-yellow-600' }
+};
 
 export const SEODashboardPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState('7d');
+  const [timeRange, setTimeRange] = useState('30d');
+  const topicsQuery = useListTopics({ limit: 100 });
 
-  // Mock data - replace with real API calls
-  const seoStats = {
-    total_content: 156,
-    analyzed_content: 142,
-    issues_found: 28,
-    avg_score: 78
-  };
-
-  const recentAnalyses = [
-    {
-      id: '1',
-      title: 'How to Build a CMS',
-      content_type: 'topic',
-      score: 85,
-      issues: 2,
-      analyzed_at: '2024-01-15T10:30:00Z'
-    },
-    {
-      id: '2',
-      title: 'React Best Practices',
-      content_type: 'topic',
-      score: 72,
-      issues: 5,
-      analyzed_at: '2024-01-15T09:15:00Z'
-    }
-  ];
+  const summary = useMemo(() => {
+    const days = SCORE_FILTER_DAYS[timeRange] || SCORE_FILTER_DAYS['30d'];
+    const topics = topicsQuery.data?.items || [];
+    return summarizeTopicSEO(
+      topics.filter(topic => isWithinRange(topic.updated_at || topic.created_at || '', days))
+    );
+  }, [timeRange, topicsQuery.data?.items]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
@@ -148,6 +153,14 @@ export const SEODashboardPage = () => {
               prependIcon={<Icons name='IconChartBubble' />}
             >
               {t('seo.analytics.view')}
+            </Button>,
+            <Button
+              onClick={() => navigate('/content/seo/settings')}
+              size='sm'
+              variant='outline'
+              prependIcon={<Icons name='IconSettings' />}
+            >
+              {t('seo.dashboard.configure')}
             </Button>
           ]}
         />
@@ -155,118 +168,106 @@ export const SEODashboardPage = () => {
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
     >
       <div className='space-y-6'>
-        {/* Stats Cards */}
+        {topicsQuery.isError && (
+          <div className='rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-red-700'>
+            <div className='flex items-start justify-between gap-3'>
+              <div className='flex min-w-0 gap-2'>
+                <Icons name='IconAlertCircle' className='mt-0.5 h-4 w-4 shrink-0' />
+                <div>
+                  <p className='text-sm font-medium'>{t('messages.error')}</p>
+                  <p className='mt-1 text-xs opacity-80'>
+                    {t('seo.dashboard.load_failed', 'Unable to load topic SEO metadata.')}
+                  </p>
+                </div>
+              </div>
+              <Button size='xs' variant='outline' onClick={() => topicsQuery.refetch()}>
+                {t('actions.retry', 'Retry')}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-          <Card className='p-6'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-gray-600'>{t('seo.dashboard.total_content')}</p>
-                <p className='text-2xl font-bold text-gray-900'>{seoStats.total_content}</p>
+          {[
+            {
+              label: t('seo.dashboard.total_content'),
+              value: summary.total_content,
+              icon: 'IconFileText',
+              color: iconColorClasses.blue,
+              valueClass: 'text-gray-900'
+            },
+            {
+              label: t('seo.dashboard.analyzed_content'),
+              value: summary.analyzed_content,
+              icon: 'IconSearchCheck',
+              color: iconColorClasses.green,
+              valueClass: 'text-gray-900'
+            },
+            {
+              label: t('seo.dashboard.issues_found'),
+              value: summary.issues_found,
+              icon: 'IconAlertTriangle',
+              color: iconColorClasses.red,
+              valueClass: 'text-red-600'
+            },
+            {
+              label: t('seo.dashboard.avg_score'),
+              value: summary.avg_score,
+              icon: 'IconTarget',
+              color: iconColorClasses.yellow,
+              valueClass: getScoreColor(summary.avg_score)
+            }
+          ].map(card => (
+            <Card className='p-6' key={card.label}>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='text-sm text-gray-600'>{card.label}</p>
+                  {topicsQuery.isLoading ? (
+                    <div className='mt-2 h-7 w-16 animate-pulse rounded bg-slate-100' />
+                  ) : (
+                    <p className={`text-2xl font-bold ${card.valueClass}`}>{card.value}</p>
+                  )}
+                </div>
+                <div
+                  className={`w-12 h-12 ${card.color.background} rounded-lg flex items-center justify-center`}
+                >
+                  <Icons name={card.icon} size={24} className={card.color.foreground} />
+                </div>
               </div>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <Icons name='IconFileText' size={24} className='text-blue-600' />
-              </div>
-            </div>
-          </Card>
-
-          <Card className='p-6'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-gray-600'>{t('seo.dashboard.analyzed_content')}</p>
-                <p className='text-2xl font-bold text-gray-900'>{seoStats.analyzed_content}</p>
-              </div>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <Icons name='IconSearchCheck' size={24} className='text-green-600' />
-              </div>
-            </div>
-          </Card>
-
-          <Card className='p-6'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-gray-600'>{t('seo.dashboard.issues_found')}</p>
-                <p className='text-2xl font-bold text-red-600'>{seoStats.issues_found}</p>
-              </div>
-              <div className='w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center'>
-                <Icons name='IconAlertTriangle' size={24} className='text-red-600' />
-              </div>
-            </div>
-          </Card>
-
-          <Card className='p-6'>
-            <div className='flex items-center justify-between'>
-              <div>
-                <p className='text-sm text-gray-600'>{t('seo.dashboard.avg_score')}</p>
-                <p className={`text-2xl font-bold ${getScoreColor(seoStats.avg_score)}`}>
-                  {seoStats.avg_score}
-                </p>
-              </div>
-              <div className='w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center'>
-                <Icons name='IconTarget' size={24} className='text-yellow-600' />
-              </div>
-            </div>
-          </Card>
+            </Card>
+          ))}
         </div>
 
-        {/* Recent Analyses */}
         <Card className='p-6'>
           <div className='flex items-center justify-between mb-6'>
-            <h3 className='text-lg font-semibold'>{t('seo.dashboard.recent_analyses')}</h3>
+            <div>
+              <h3 className='text-lg font-semibold'>{t('seo.dashboard.recent_analyses')}</h3>
+              <p className='mt-1 text-xs text-slate-500'>
+                {t(
+                  'seo.dashboard.metadata_snapshot',
+                  'Calculated from current topic SEO title, description, keywords, and content fields.'
+                )}
+              </p>
+            </div>
             <Button variant='outline' size='sm' onClick={() => navigate('/content/seo/analytics')}>
               {t('seo.dashboard.view_all')}
             </Button>
           </div>
-          <TableView header={columns} data={recentAnalyses} />
+          {topicsQuery.isLoading ? (
+            <div className='space-y-3'>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className='h-10 animate-pulse rounded bg-slate-100' />
+              ))}
+            </div>
+          ) : summary.recent_analyses.length > 0 ? (
+            <TableView header={columns} data={summary.recent_analyses} />
+          ) : (
+            <div className='rounded-lg border border-dashed py-10 text-center text-slate-500'>
+              <Icons name='IconSearchCheck' size={32} className='mx-auto mb-2 opacity-60' />
+              <p className='text-sm'>{t('seo.dashboard.no_content', 'No topic metadata found.')}</p>
+            </div>
+          )}
         </Card>
-
-        {/* Quick Actions */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          <Card className='p-6 hover:shadow-lg transition-shadow cursor-pointer'>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4'>
-                <Icons name='IconRocketLaunch' size={32} className='text-blue-600' />
-              </div>
-              <h3 className='font-semibold mb-2'>{t('seo.dashboard.bulk_audit')}</h3>
-              <p className='text-sm text-gray-600 mb-4'>{t('seo.dashboard.bulk_audit_desc')}</p>
-              <Button size='sm' className='w-full'>
-                {t('seo.dashboard.start_audit')}
-              </Button>
-            </div>
-          </Card>
-
-          <Card className='p-6 hover:shadow-lg transition-shadow cursor-pointer'>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4'>
-                <Icons name='IconTrendingUp' size={32} className='text-green-600' />
-              </div>
-              <h3 className='font-semibold mb-2'>{t('seo.dashboard.performance_report')}</h3>
-              <p className='text-sm text-gray-600 mb-4'>
-                {t('seo.dashboard.performance_report_desc')}
-              </p>
-              <Button size='sm' variant='outline' className='w-full'>
-                {t('seo.dashboard.view_report')}
-              </Button>
-            </div>
-          </Card>
-
-          <Card className='p-6 hover:shadow-lg transition-shadow cursor-pointer'>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4'>
-                <Icons name='IconSettings' size={32} className='text-purple-600' />
-              </div>
-              <h3 className='font-semibold mb-2'>{t('seo.dashboard.settings')}</h3>
-              <p className='text-sm text-gray-600 mb-4'>{t('seo.dashboard.settings_desc')}</p>
-              <Button
-                size='sm'
-                variant='outline'
-                className='w-full'
-                onClick={() => navigate('/content/seo/settings')}
-              >
-                {t('seo.dashboard.configure')}
-              </Button>
-            </div>
-          </Card>
-        </div>
       </div>
     </Page>
   );

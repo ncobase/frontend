@@ -48,7 +48,7 @@ export interface EntityField {
 export interface EntityRelation {
   id: string;
   name: string;
-  type: 'oneToOne' | 'oneToMany' | 'manyToMany';
+  type: 'oneToOne' | 'oneToMany' | 'manyToOne' | 'manyToMany';
   targetEntity: string;
   fieldName: string;
   isRequired: boolean;
@@ -69,6 +69,12 @@ export interface GeneratedCode {
   routes: string;
   relationsService: string;
 }
+
+const isToOneRelation = (relation: EntityRelation) =>
+  relation.type === 'oneToOne' || relation.type === 'manyToOne';
+
+const isCollectionRelation = (relation: EntityRelation) =>
+  relation.type === 'oneToMany' || relation.type === 'manyToMany';
 
 export const getTypeScriptType = (fieldType: string): string => {
   const typeMap: Record<string, string> = {
@@ -194,7 +200,7 @@ export const ${lowerName}Api = createApi<${name}>('${endpointPath}'${hasCustomEn
     // Generate relationship endpoints if there are relationships
     if (entityRelations.length > 0) {
       entityRelations.forEach(relation => {
-        if (relation.type === 'oneToMany' || relation.type === 'manyToMany') {
+        if (isCollectionRelation(relation)) {
           code += `,
 
     // Relationship endpoints for ${relation.name}
@@ -209,7 +215,7 @@ export const ${lowerName}Api = createApi<${name}>('${endpointPath}'${hasCustomEn
     remove${name}${relation.name.charAt(0).toUpperCase() + relation.name.slice(1)}: async (id: string, ${relation.targetEntity.toLowerCase()}Id: string): Promise<${name}> => {
       return request.delete(\`\${endpoint}/\${id}/${relation.name}/\${${relation.targetEntity.toLowerCase()}Id}\`);
     }`;
-        } else if (relation.type === 'oneToOne') {
+        } else if (isToOneRelation(relation)) {
           code += `,
 
     // Relationship endpoints for ${relation.name}
@@ -258,12 +264,12 @@ export const upload${name}File = ${lowerName}Api.upload${name}File;`;
       entityRelations.forEach(relation => {
         const relationCapitalized = relation.name.charAt(0).toUpperCase() + relation.name.slice(1);
 
-        if (relation.type === 'oneToMany' || relation.type === 'manyToMany') {
+        if (isCollectionRelation(relation)) {
           code += `
 export const get${name}${relationCapitalized} = ${lowerName}Api.get${name}${relationCapitalized};
 export const add${name}${relationCapitalized} = ${lowerName}Api.add${name}${relationCapitalized};
 export const remove${name}${relationCapitalized} = ${lowerName}Api.remove${name}${relationCapitalized};`;
-        } else if (relation.type === 'oneToOne') {
+        } else if (isToOneRelation(relation)) {
           code += `
 export const get${name}${relationCapitalized} = ${lowerName}Api.get${name}${relationCapitalized};
 export const set${name}${relationCapitalized} = ${lowerName}Api.set${name}${relationCapitalized};
@@ -516,7 +522,23 @@ import { parseStatus } from '@/lib/status';
 import { useTranslation } from 'react-i18next';
 import { ${featureConfig.name} } from './${featureConfig.name.toLowerCase()}';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+type RelationColumnTarget = {
+  name: string;
+  targetEntity: string;
+  targetPath: string;
+};
+
+type TableColumnHandlers = {
+  handleView: (record: ${featureConfig.name}, type: string) => void;
+  handleDelete: (record: ${featureConfig.name}) => void;
+  handleRelationView?: (relation: RelationColumnTarget, record: any) => void;
+};
+
+export const tableColumns = ({
+  handleView,
+  handleDelete,
+  handleRelationView
+}: TableColumnHandlers): TableViewProps['header'] => {
   const { t } = useTranslation();
   return [
 ${tableFields
@@ -549,23 +571,34 @@ ${tableFields
 
   // Add relation columns if needed
   if (entityRelations.length > 0) {
-    const relationColumns = entityRelations
-      // @ts-expect-error
-      .filter(rel => rel.type === 'oneToOne' || rel.type === 'manyToOne')
-      .map(rel => {
-        return `    {
+    const relationColumns = entityRelations.filter(isToOneRelation).map(rel => {
+      const targetPath = `/${rel.targetEntity.toLowerCase()}s`;
+      return `    {
       title: t('${featureConfig.name.toLowerCase()}.fields.${rel.name}'),
       dataIndex: '${rel.name}.name',
       icon: 'IconLink',
       parser: (value: string, record: ${featureConfig.name}) => (
         record.${rel.name} ? (
-          <Button variant='link' size='md' onClick={() => console.log('Navigate to related entity', record.${rel.name})}>
+          <Button
+            variant='link'
+            size='md'
+            onClick={() =>
+              handleRelationView?.(
+                {
+                  name: '${rel.name}',
+                  targetEntity: '${rel.targetEntity}',
+                  targetPath: '${targetPath}'
+                },
+                record.${rel.name}
+              )
+            }
+          >
             {record.${rel.name}.name || record.${rel.name}.title || record.${rel.name}.id}
           </Button>
         ) : '-'
       )
     }`;
-      });
+    });
 
     if (relationColumns.length > 0) {
       code += `,
@@ -692,9 +725,9 @@ import {
   ${entityRelations
     .map(rel => {
       const relationCapitalized = rel.name.charAt(0).toUpperCase() + rel.name.slice(1);
-      if (rel.type === 'oneToOne') {
+      if (isToOneRelation(rel)) {
         return `get${featureConfig.name}${relationCapitalized}, set${featureConfig.name}${relationCapitalized}, remove${featureConfig.name}${relationCapitalized}`;
-      } else if (rel.type === 'oneToMany' || rel.type === 'manyToMany') {
+      } else if (isCollectionRelation(rel)) {
         return `get${featureConfig.name}${relationCapitalized}, add${featureConfig.name}${relationCapitalized}, remove${featureConfig.name}${relationCapitalized}`;
       }
       return '';
@@ -786,7 +819,7 @@ ${entityRelations
   .map(rel => {
     const relationCapitalized = rel.name.charAt(0).toUpperCase() + rel.name.slice(1);
 
-    if (rel.type === 'oneToOne') {
+    if (isToOneRelation(rel)) {
       return `// Hooks for ${rel.name} relationship
 export const useGet${featureConfig.name}${relationCapitalized} = (id: string) => {
   return useQuery({
@@ -820,7 +853,7 @@ export const useRemove${featureConfig.name}${relationCapitalized} = () => {
     }
   });
 };`;
-    } else if (rel.type === 'oneToMany' || rel.type === 'manyToMany') {
+    } else if (isCollectionRelation(rel)) {
       return `// Hooks for ${rel.name} relationship
 export const useGet${featureConfig.name}${relationCapitalized} = (id: string) => {
   return useQuery({
@@ -1367,6 +1400,15 @@ export const ${featureConfig.name}ListPage = () => {
     [delete${featureConfig.name}Mutation, onSuccess, t]
   );
 
+  const handleRelationView = useCallback(
+    (relation: { targetPath: string }, relatedRecord: any) => {
+      const relatedId = relatedRecord?.id || relatedRecord?.slug;
+      if (!relatedId) return;
+      navigate(\`\${relation.targetPath}/view/\${relatedId}\`);
+    },
+    [navigate]
+  );
+
   const handleConfirm = useCallback(
     handleFormSubmit((data: ${featureConfig.name}) => {
       return viewType === 'create' ? handleCreate(data) : handleUpdate(data);
@@ -1394,7 +1436,7 @@ export const ${featureConfig.name}ListPage = () => {
       title={t('${featureConfig.name.toLowerCase()}.title', '${featureConfig.displayName || featureConfig.name}')}
       topbarLeft={topbarLeftSection({ handleView })}
       topbarRight={topbarRightSection}
-      columns={tableColumns({ handleView, handleDelete })}
+      columns={tableColumns({ handleView, handleDelete, handleRelationView })}
       selected
       queryFields={queryFields({ queryControl })}
       onQuery={onQuery}

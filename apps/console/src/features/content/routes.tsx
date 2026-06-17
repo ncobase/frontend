@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 
+import { filterRoutesByFeatureExposure } from '@/lib/features/exposure';
 import { lazyNamed, renderRoutes } from '@/router';
 
 const ContentPage = lazyNamed(() => import('./content'), 'ContentPage');
@@ -33,7 +34,7 @@ export const ContentRoutes = () => {
     { path: '/approval/*', element: <TopicRoutes /> },
     { path: '/component/*', element: <TopicRoutes /> }
   ];
-  return renderRoutes(routes);
+  return renderRoutes(filterRoutesByFeatureExposure(routes));
 };
 
 export default ContentRoutes;

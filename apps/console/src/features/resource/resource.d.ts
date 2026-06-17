@@ -145,6 +145,16 @@ export interface StorageStats {
   total_users: number;
   by_category: Record<string, number>;
   by_storage: Record<string, number>;
+  daily_uploads?: Array<{
+    date: string;
+    count: number;
+    size: number;
+  }>;
+  top_users?: Array<{
+    user_id: string;
+    size: number;
+    files: number;
+  }>;
   storage_health: string;
 }
 
@@ -173,7 +183,9 @@ export interface BatchCleanupResult {
   items_found: number;
   items_cleaned: number;
   space_freed: number;
+  potential_space_freed?: number;
   dry_run: boolean;
+  candidate_items?: string[];
   cleaned_items?: string[];
   errors?: string[];
 }
@@ -200,10 +212,15 @@ export interface BatchJobListResponse {
 
 export interface OptimizeResult {
   task_id: string;
+  mode?: 'analysis' | 'executed' | string;
   deduplicated_files: number;
   space_freed: number;
   orphaned_cleaned: number;
   indexes_rebuilt: number;
+  potential_duplicate_files?: number;
+  potential_space_freed?: number;
+  orphaned_files?: number;
+  performed_actions?: string[];
   duration: number;
 }
 

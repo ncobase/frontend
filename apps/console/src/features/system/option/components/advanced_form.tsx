@@ -81,10 +81,8 @@ export const AdvancedOptionForm: React.FC<{
                     { label: t('options.types.string'), value: 'string' },
                     { label: t('options.types.number'), value: 'number' },
                     { label: t('options.types.boolean'), value: 'boolean' },
-                    { label: t('options.types.json'), value: 'json' },
-                    { label: t('options.types.url'), value: 'url' },
-                    { label: t('options.types.email'), value: 'email' },
-                    { label: t('options.types.password'), value: 'password' }
+                    { label: t('options.types.object', 'Object'), value: 'object' },
+                    { label: t('options.types.array', 'Array'), value: 'array' }
                   ]}
                   {...field}
                 />
@@ -105,7 +103,7 @@ export const AdvancedOptionForm: React.FC<{
                     />
                     <span>{t('options.fields.value')}</span>
                   </div>
-                ) : watchType === 'json' ? (
+                ) : watchType === 'object' || watchType === 'array' ? (
                   <Textarea
                     value={t('options.fields.value')}
                     placeholder={t('options.placeholders.value_json')}
@@ -116,17 +114,7 @@ export const AdvancedOptionForm: React.FC<{
                 ) : (
                   <InputField
                     value={t('options.fields.value')}
-                    type={
-                      watchIsSecret
-                        ? 'password'
-                        : watchType === 'number'
-                          ? 'number'
-                          : watchType === 'email'
-                            ? 'email'
-                            : watchType === 'url'
-                              ? 'url'
-                              : 'text'
-                    }
+                    type={watchIsSecret ? 'password' : watchType === 'number' ? 'number' : 'text'}
                     placeholder={t(`options.placeholders.value_${watchType}`)}
                     {...field}
                   />
@@ -224,9 +212,15 @@ export const AdvancedOptionForm: React.FC<{
                   { label: t('options.categories.security'), value: 'security' },
                   { label: t('options.categories.email'), value: 'email' },
                   { label: t('options.categories.ui'), value: 'ui' },
+                  { label: t('options.categories.resource', 'Resource'), value: 'resource' },
+                  { label: t('options.categories.ai', 'AI'), value: 'ai' },
                   { label: t('options.categories.performance'), value: 'performance' },
                   { label: t('options.categories.integrations'), value: 'integrations' },
-                  { label: t('options.categories.backup'), value: 'backup' }
+                  { label: t('options.categories.backup'), value: 'backup' },
+                  {
+                    label: t('options.categories.uncategorized', 'Uncategorized'),
+                    value: 'uncategorized'
+                  }
                 ]}
                 {...field}
               />

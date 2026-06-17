@@ -36,6 +36,8 @@ export const RelationshipList: React.FC = () => {
         return 'IconArrowRightBar';
       case 'oneToMany':
         return 'IconArrowsRight';
+      case 'manyToOne':
+        return 'IconArrowNarrowRight';
       case 'manyToMany':
         return 'IconArrowsLeftRight';
       default:
@@ -57,6 +59,11 @@ export const RelationshipList: React.FC = () => {
         });
       case 'oneToMany':
         return t('feature_builder.relations.one_to_many_short', {
+          source: featureConfig.name,
+          target: relation.targetEntity
+        });
+      case 'manyToOne':
+        return t('feature_builder.relations.many_to_one_short', {
           source: featureConfig.name,
           target: relation.targetEntity
         });

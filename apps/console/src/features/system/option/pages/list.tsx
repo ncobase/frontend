@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Modal, useToastMessage } from '@ncobase/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { OptionsBulkImport } from '../components/bulk_import';
 import { QueryFormParams, queryFields } from '../config/query';
@@ -26,11 +26,20 @@ export const OptionListPage = () => {
   const toast = useToastMessage();
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryFromUrl = searchParams.get('category') || undefined;
   const { vmode } = useLayoutContext();
   const { hasPermission } = usePermissions();
   const canManage = hasPermission('manage:system');
+  const initialOptionParams = useMemo<QueryFormParams>(
+    () => ({
+      limit: 20,
+      category: categoryFromUrl
+    }),
+    [categoryFromUrl]
+  );
 
-  const { data, fetchData, loading, refetch } = useOptionList();
+  const { data, fetchData, loading, refetch } = useOptionList(initialOptionParams);
 
   const [viewType, setViewType] = useState<string | undefined>(mode);
   const [selectedRecord, setSelectedRecord] = useState<Option | null>(null);
@@ -43,6 +52,10 @@ export const OptionListPage = () => {
     control: queryControl,
     reset: queryReset
   } = useForm<QueryFormParams>();
+
+  useEffect(() => {
+    queryReset({ category: categoryFromUrl });
+  }, [categoryFromUrl, queryReset]);
 
   const {
     control: formControl,
@@ -73,12 +86,18 @@ export const OptionListPage = () => {
   }, [canManage, mode, navigate, vmode]);
 
   const onQuery = handleQuerySubmit(async queryData => {
+    if (queryData.category) {
+      setSearchParams({ category: queryData.category });
+    } else if (categoryFromUrl) {
+      setSearchParams({});
+    }
     await fetchData({ ...queryData, cursor: '' });
     await refetch();
   });
 
   const onResetQuery = () => {
     queryReset();
+    setSearchParams({});
     fetchData({});
   };
 

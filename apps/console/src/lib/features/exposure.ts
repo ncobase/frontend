@@ -4,13 +4,36 @@ interface FeatureEnv {
   readonly MODE?: string;
   readonly PROD?: boolean | string;
   readonly VITE_ENABLE_BUILDER_ROUTES?: EnvValue;
+  readonly VITE_ENABLE_CONTENT_ADVANCED_ROUTES?: EnvValue;
   readonly VITE_ENABLE_EXAMPLE_ROUTES?: EnvValue;
 }
 
-export type ConsoleFeature = 'builder' | 'example';
+export type ConsoleFeature = 'builder' | 'contentAdvanced' | 'example';
 
 export const FEATURE_ROUTE_PREFIXES: Record<ConsoleFeature, string[]> = {
   builder: ['/builder'],
+  contentAdvanced: [
+    '/content/approval',
+    '/content/comments',
+    '/content/component',
+    '/content/schedule',
+    '/content/seo',
+    '/content/templates',
+    '/content/trash',
+    '/content/version',
+    '/content/workflow',
+    '/content/workflows',
+    '/approval',
+    '/comments',
+    '/component',
+    '/schedule',
+    '/seo',
+    '/templates',
+    '/trash',
+    '/version',
+    '/workflow',
+    '/workflows'
+  ],
   example: ['/example']
 };
 
@@ -36,8 +59,12 @@ export const isConsoleFeatureEnabled = (
   feature: ConsoleFeature,
   env: FeatureEnv = import.meta.env
 ): boolean => {
-  const explicitFlag =
-    feature === 'builder' ? env.VITE_ENABLE_BUILDER_ROUTES : env.VITE_ENABLE_EXAMPLE_ROUTES;
+  const featureFlags: Record<ConsoleFeature, EnvValue> = {
+    builder: env.VITE_ENABLE_BUILDER_ROUTES,
+    contentAdvanced: env.VITE_ENABLE_CONTENT_ADVANCED_ROUTES,
+    example: env.VITE_ENABLE_EXAMPLE_ROUTES
+  };
+  const explicitFlag = featureFlags[feature];
   const parsed = parseFeatureFlag(explicitFlag);
 
   if (parsed !== undefined) return parsed;

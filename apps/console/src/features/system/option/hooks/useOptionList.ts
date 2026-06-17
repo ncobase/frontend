@@ -24,6 +24,8 @@ export const useOptionList = (initialParams: QueryFormParams = { limit: 20 }) =>
         mergedParams.name !== queryParams.name ||
         mergedParams.type !== queryParams.type ||
         mergedParams.autoload !== queryParams.autoload ||
+        mergedParams.category !== queryParams.category ||
+        mergedParams.is_secret !== queryParams.is_secret ||
         mergedParams.prefix !== queryParams.prefix;
 
       if (searchParamsChanged) {
@@ -57,6 +59,13 @@ export const useOptionList = (initialParams: QueryFormParams = { limit: 20 }) =>
   useEffect(() => {
     lastParamsRef.current = queryParams;
   }, [queryParams]);
+
+  useEffect(() => {
+    if (!isEqual(initialParams, lastParamsRef.current)) {
+      setQueryParams(initialParams);
+      lastParamsRef.current = initialParams;
+    }
+  }, [initialParams]);
 
   return {
     data: memoizedData,
