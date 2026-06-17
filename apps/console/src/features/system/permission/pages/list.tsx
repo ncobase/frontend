@@ -19,12 +19,15 @@ import { PermissionViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const PermissionListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
+  const { hasPermission } = usePermissions();
+  const canManage = hasPermission('manage:permissions');
 
   const { data, fetchData, loading, refetch } = usePermissionList();
 
@@ -55,12 +58,20 @@ export const PermissionListPage = () => {
   const deletePermissionMutation = useDeletePermission();
 
   useEffect(() => {
+    if (!canManage && (mode === 'create' || mode === 'edit')) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/permissions');
+      }
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canManage, mode, navigate, vmode]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     await fetchData({ ...queryData, cursor: '' });
@@ -101,39 +112,49 @@ export const PermissionListPage = () => {
 
   const handleCreate = useCallback(
     (data: Permission) => {
+      if (!canManage) return;
       createPermissionMutation.mutate(data, { onSuccess });
     },
-    [createPermissionMutation, onSuccess]
+    [canManage, createPermissionMutation, onSuccess]
   );
 
   const handleUpdate = useCallback(
     (data: Permission) => {
+      if (!canManage) return;
       updatePermissionMutation.mutate(data, { onSuccess });
     },
-    [updatePermissionMutation, onSuccess]
+    [canManage, updatePermissionMutation, onSuccess]
   );
 
   const handleDelete = useCallback(
     (record: Permission) => {
-      if (record.id) {
+      if (canManage && record.id) {
         deletePermissionMutation.mutate(record.id, { onSuccess });
       }
     },
-    [deletePermissionMutation, onSuccess]
+    [canManage, deletePermissionMutation, onSuccess]
   );
 
-  const handleAssignRoles = useCallback((permission: Permission) => {
-    setRoleAssignmentModal({ open: true, permission });
-  }, []);
+  const handleAssignRoles = useCallback(
+    (permission: Permission) => {
+      if (!canManage) return;
+      setRoleAssignmentModal({ open: true, permission });
+    },
+    [canManage]
+  );
 
-  const handleToggleSelect = useCallback((permission: Permission) => {
-    setSelectedPermissions(prev => {
-      const isSelected = prev.some(selected => selected.id === permission.id);
-      return isSelected
-        ? prev.filter(selected => selected.id !== permission.id)
-        : [...prev, permission];
-    });
-  }, []);
+  const handleToggleSelect = useCallback(
+    (permission: Permission) => {
+      if (!canManage) return;
+      setSelectedPermissions(prev => {
+        const isSelected = prev.some(selected => selected.id === permission.id);
+        return isSelected
+          ? prev.filter(selected => selected.id !== permission.id)
+          : [...prev, permission];
+      });
+    },
+    [canManage]
+  );
 
   const handleConfirm = useCallback(
     handleFormSubmit((data: Permission) => {
@@ -146,9 +167,10 @@ export const PermissionListPage = () => {
     columns: tableColumns({
       handleView,
       handleDelete,
-      handleAssignRoles
+      handleAssignRoles,
+      canManage
     }),
-    topbarLeft: topbarLeftSection({ handleView }),
+    topbarLeft: topbarLeftSection({ handleView, canManage }),
     topbarRight: topbarRightSection,
     title: t('system.permissions.title')
   };
@@ -162,14 +184,14 @@ export const PermissionListPage = () => {
         topbarRight={tableConfig.topbarRight}
         columns={tableConfig.columns}
         data={data?.items || []}
-        selected
+        selected={canManage}
         queryFields={queryFields({ queryControl })}
         onQuery={onQuery}
         onResetQuery={onResetQuery}
         fetchData={fetchData}
         loading={loading}
         onSelectRow={handleToggleSelect}
-        onSelectAllRows={rows => setSelectedPermissions(rows)}
+        onSelectAllRows={rows => setSelectedPermissions(canManage ? rows : [])}
         createComponent={
           <CreatePermissionPage
             viewMode={vmode}
@@ -198,22 +220,26 @@ export const PermissionListPage = () => {
       />
 
       {/* Bulk Actions */}
-      <PermissionBulkActions
-        selectedPermissions={selectedPermissions}
-        onSelectionChange={setSelectedPermissions}
-        onSuccess={onSuccess}
-      />
+      {canManage && (
+        <PermissionBulkActions
+          selectedPermissions={selectedPermissions}
+          onSelectionChange={setSelectedPermissions}
+          onSuccess={onSuccess}
+        />
+      )}
 
       {/* Role Assignment Modal */}
-      <PermissionRoleAssignment
-        isOpen={roleAssignmentModal.open}
-        onClose={() => setRoleAssignmentModal({ open: false, permission: null })}
-        permission={roleAssignmentModal.permission}
-        onSuccess={() => {
-          setRoleAssignmentModal({ open: false, permission: null });
-          refetch();
-        }}
-      />
+      {canManage && (
+        <PermissionRoleAssignment
+          isOpen={roleAssignmentModal.open}
+          onClose={() => setRoleAssignmentModal({ open: false, permission: null })}
+          permission={roleAssignmentModal.permission}
+          onSuccess={() => {
+            setRoleAssignmentModal({ open: false, permission: null });
+            refetch();
+          }}
+        />
+      )}
     </>
   );
 };

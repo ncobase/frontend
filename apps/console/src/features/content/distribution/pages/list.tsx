@@ -13,10 +13,13 @@ import { Distribution } from '../distribution.d';
 import { useListDistributions, usePublishDistribution, useCancelDistribution } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const DistributionListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
+  const canManageContent = hasPermission('manage:content') || hasPermission('manage:cms');
   const [searchParams, setSearchParams] = useState({ search: '', status: '', limit: 50 });
   const [selectedItems, setSelectedItems] = useState<Distribution[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
@@ -222,7 +225,7 @@ export const DistributionListPage = () => {
             {t('actions.view')}
           </Button>
 
-          {distribution.status === DISTRIBUTION_STATUS.DRAFT && (
+          {canManageContent && distribution.status === DISTRIBUTION_STATUS.DRAFT && (
             <Button
               variant='text'
               size='xs'
@@ -234,27 +237,30 @@ export const DistributionListPage = () => {
             </Button>
           )}
 
-          {(distribution.status === DISTRIBUTION_STATUS.SCHEDULED ||
-            distribution.status === DISTRIBUTION_STATUS.DRAFT) && (
+          {canManageContent &&
+            (distribution.status === DISTRIBUTION_STATUS.SCHEDULED ||
+              distribution.status === DISTRIBUTION_STATUS.DRAFT) && (
+              <Button
+                variant='text'
+                size='xs'
+                onClick={() => openCancelDialog(distribution.id)}
+                loading={cancelMutation.isPending}
+              >
+                <Icons name='IconX' size={14} className='mr-1' />
+                {t('actions.cancel')}
+              </Button>
+            )}
+
+          {canManageContent && (
             <Button
               variant='text'
               size='xs'
-              onClick={() => openCancelDialog(distribution.id)}
-              loading={cancelMutation.isPending}
+              onClick={() => navigate(`/content/distributions/${distribution.id}/edit`)}
             >
-              <Icons name='IconX' size={14} className='mr-1' />
-              {t('actions.cancel')}
+              <Icons name='IconEdit' size={14} className='mr-1' />
+              {t('actions.edit')}
             </Button>
           )}
-
-          <Button
-            variant='text'
-            size='xs'
-            onClick={() => navigate(`/content/distributions/${distribution.id}/edit`)}
-          >
-            <Icons name='IconEdit' size={14} className='mr-1' />
-            {t('actions.edit')}
-          </Button>
         </div>
       )
     }
@@ -268,12 +274,14 @@ export const DistributionListPage = () => {
       <Card key={distribution.id} className='p-4 hover:shadow-md transition-shadow'>
         <div className='flex items-start justify-between mb-3'>
           <div className='flex items-start space-x-4'>
-            <input
-              type='checkbox'
-              checked={isSelectedItem}
-              onChange={() => handleToggleSelect(distribution)}
-              className='mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
-            />
+            {canManageContent && (
+              <input
+                type='checkbox'
+                checked={isSelectedItem}
+                onChange={() => handleToggleSelect(distribution)}
+                className='mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+              />
+            )}
             <div className='flex-1'>
               <div className='flex items-center space-x-3 mb-2'>
                 <h3 className='font-semibold text-gray-900'>
@@ -330,7 +338,7 @@ export const DistributionListPage = () => {
 
         {/* Actions */}
         <div className='flex items-center justify-end space-x-2 pt-3 border-t border-gray-100'>
-          {distribution.status === DISTRIBUTION_STATUS.DRAFT && (
+          {canManageContent && distribution.status === DISTRIBUTION_STATUS.DRAFT && (
             <Button
               variant='outline'
               size='sm'
@@ -342,18 +350,19 @@ export const DistributionListPage = () => {
             </Button>
           )}
 
-          {(distribution.status === DISTRIBUTION_STATUS.SCHEDULED ||
-            distribution.status === DISTRIBUTION_STATUS.DRAFT) && (
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => openCancelDialog(distribution.id)}
-              loading={cancelMutation.isPending}
-            >
-              <Icons name='IconX' size={16} className='mr-1' />
-              {t('actions.cancel')}
-            </Button>
-          )}
+          {canManageContent &&
+            (distribution.status === DISTRIBUTION_STATUS.SCHEDULED ||
+              distribution.status === DISTRIBUTION_STATUS.DRAFT) && (
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => openCancelDialog(distribution.id)}
+                loading={cancelMutation.isPending}
+              >
+                <Icons name='IconX' size={16} className='mr-1' />
+                {t('actions.cancel')}
+              </Button>
+            )}
 
           <Button
             variant='outline'
@@ -364,14 +373,16 @@ export const DistributionListPage = () => {
             {t('actions.view')}
           </Button>
 
-          <Button
-            variant='outline'
-            size='sm'
-            onClick={() => navigate(`/content/distributions/${distribution.id}/edit`)}
-          >
-            <Icons name='IconEdit' size={16} className='mr-1' />
-            {t('actions.edit')}
-          </Button>
+          {canManageContent && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => navigate(`/content/distributions/${distribution.id}/edit`)}
+            >
+              <Icons name='IconEdit' size={16} className='mr-1' />
+              {t('actions.edit')}
+            </Button>
+          )}
         </div>
       </Card>
     );
@@ -392,10 +403,14 @@ export const DistributionListPage = () => {
             >
               <Icons name={viewMode === 'grid' ? 'IconList' : 'IconGrid'} size={16} />
             </Button>,
-            <Button size='sm' onClick={() => navigate('/content/distributions/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.distributions.create')}
-            </Button>
+            ...(canManageContent
+              ? [
+                  <Button size='sm' onClick={() => navigate('/content/distributions/create')}>
+                    <Icons name='IconPlus' size={16} className='mr-1' />
+                    {t('content.distributions.create')}
+                  </Button>
+                ]
+              : [])
           ]}
         />
       }
@@ -419,14 +434,10 @@ export const DistributionListPage = () => {
           viewMode === 'list' ? (
             <TableView
               header={columns}
-              selected
+              selected={canManageContent}
               data={distributions}
-              onSelectRow={row => {
-                handleToggleSelect(row);
-              }}
-              onSelectAllRows={rows => {
-                setSelectedItems(rows);
-              }}
+              onSelectRow={canManageContent ? row => handleToggleSelect(row) : undefined}
+              onSelectAllRows={canManageContent ? rows => setSelectedItems(rows) : undefined}
             />
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -442,21 +453,25 @@ export const DistributionListPage = () => {
             <p className='text-sm text-gray-500 mb-4'>
               {t('content.distributions.empty.description')}
             </p>
-            <Button size='sm' onClick={() => navigate('/content/distributions/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.distributions.create')}
-            </Button>
+            {canManageContent && (
+              <Button size='sm' onClick={() => navigate('/content/distributions/create')}>
+                <Icons name='IconPlus' size={16} className='mr-1' />
+                {t('content.distributions.create')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedItems}
-        onClearSelection={() => setSelectedItems([])}
-        onBulkDelete={handleBulkDelete}
-        onBulkExport={handleExport}
-      />
+      {canManageContent && (
+        <BulkActions
+          selectedItems={selectedItems}
+          onClearSelection={() => setSelectedItems([])}
+          onBulkDelete={handleBulkDelete}
+          onBulkExport={handleExport}
+        />
+      )}
       <Modal
         isOpen={cancelDialog.open}
         onCancel={() => setCancelDialog({ open: false, distributionId: '', reason: '' })}

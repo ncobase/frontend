@@ -7,9 +7,50 @@ import { Role } from '../role';
 export const tableColumns = ({
   handleView,
   handleDelete,
-  handlePermissions
+  handlePermissions,
+  canManage
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: Role) => handleView(record, 'view')
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.edit', 'Edit'),
+            icon: 'IconPencil',
+            onClick: (record: Role) => handleView(record, 'edit')
+          },
+          {
+            title: t('actions.duplicate', 'Duplicate'),
+            icon: 'IconCopy',
+            onClick: (record: Role) => {
+              const duplicateRecord = {
+                ...record,
+                id: undefined,
+                name: `${record.name} (Copy)`,
+                slug: `${record.slug}-copy`
+              };
+              handleView(duplicateRecord, 'create');
+            }
+          },
+          {
+            title: t('actions.permissions', 'Permissions'),
+            icon: 'IconLock',
+            onClick: (record: Role) => handlePermissions(record)
+          },
+          {
+            title: t('actions.delete', 'Delete'),
+            icon: 'IconTrash',
+            onClick: (record: Role) => handleDelete(record)
+          }
+        ]
+      : [])
+  ];
+
   return [
     {
       title: t('role.fields.name', 'Name'),
@@ -74,42 +115,7 @@ export const tableColumns = ({
     {
       title: t('common.actions', 'Actions'),
       dataIndex: 'operation-column',
-      actions: [
-        {
-          title: t('actions.view', 'View'),
-          icon: 'IconEye',
-          onClick: (record: Role) => handleView(record, 'view')
-        },
-        {
-          title: t('actions.edit', 'Edit'),
-          icon: 'IconPencil',
-          onClick: (record: Role) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.duplicate', 'Duplicate'),
-          icon: 'IconCopy',
-          onClick: (record: Role) => {
-            // Create a copy without ID for duplication
-            const duplicateRecord = {
-              ...record,
-              id: undefined,
-              name: `${record.name} (Copy)`,
-              slug: `${record.slug}-copy`
-            };
-            handleView(duplicateRecord, 'create');
-          }
-        },
-        {
-          title: t('actions.permissions', 'Permissions'),
-          icon: 'IconLock',
-          onClick: (record: Role) => handlePermissions(record)
-        },
-        {
-          title: t('actions.delete', 'Delete'),
-          icon: 'IconTrash',
-          onClick: (record: Role) => handleDelete(record)
-        }
-      ]
+      actions
     }
   ];
 };

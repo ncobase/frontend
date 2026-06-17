@@ -9,9 +9,64 @@ export const tableColumns = ({
   handleView,
   handleDelete,
   handleToggleStatus,
-  handleMove
+  handleMove,
+  canManage
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: MenuTree) => handleView(record, 'view')
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.edit', 'Edit'),
+            icon: 'IconPencil',
+            onClick: (record: MenuTree) => handleView(record, 'edit')
+          },
+          {
+            title: record =>
+              record.disabled ? t('actions.enable', 'Enable') : t('actions.disable', 'Disable'),
+            icon: record => (record.disabled ? 'IconCircleCheck' : 'IconCircleMinus'),
+            onClick: (record: MenuTree) =>
+              handleToggleStatus?.(record, record.disabled ? 'enable' : 'disable')
+          },
+          {
+            title: record =>
+              record.hidden ? t('actions.show', 'Show') : t('actions.hide', 'Hide'),
+            icon: record => (record.hidden ? 'IconEye' : 'IconEyeOff'),
+            onClick: (record: MenuTree) =>
+              handleToggleStatus?.(record, record.hidden ? 'show' : 'hide')
+          },
+          {
+            title: t('actions.duplicate', 'Duplicate'),
+            icon: 'IconCopy',
+            onClick: (record: MenuTree) => {
+              const duplicateRecord = {
+                ...record,
+                id: undefined,
+                name: `${record.name} (Copy)`,
+                slug: `${record.slug}-copy`
+              };
+              handleView(duplicateRecord, 'create');
+            }
+          },
+          {
+            title: t('actions.move', 'Move'),
+            icon: 'IconArrowsMove',
+            onClick: (record: MenuTree) => handleMove?.(record)
+          },
+          {
+            title: t('actions.delete', 'Delete'),
+            icon: 'IconTrash',
+            onClick: (record: MenuTree) => handleDelete(record, 'delete')
+          }
+        ]
+      : [])
+  ];
+
   return [
     {
       title: t('menu.fields.name', 'Name'),
@@ -98,54 +153,7 @@ export const tableColumns = ({
     {
       title: t('common.actions', 'Actions'),
       dataIndex: 'operation-column',
-      actions: [
-        {
-          title: t('actions.view', 'View'),
-          icon: 'IconEye',
-          onClick: (record: MenuTree) => handleView(record, 'view')
-        },
-        {
-          title: t('actions.edit', 'Edit'),
-          icon: 'IconPencil',
-          onClick: (record: MenuTree) => handleView(record, 'edit')
-        },
-        {
-          title: record =>
-            record.disabled ? t('actions.enable', 'Enable') : t('actions.disable', 'Disable'),
-          icon: record => (record.disabled ? 'IconCircleCheck' : 'IconCircleMinus'),
-          onClick: (record: MenuTree) =>
-            handleToggleStatus?.(record, record.disabled ? 'enable' : 'disable')
-        },
-        {
-          title: record => (record.hidden ? t('actions.show', 'Show') : t('actions.hide', 'Hide')),
-          icon: record => (record.hidden ? 'IconEye' : 'IconEyeOff'),
-          onClick: (record: MenuTree) =>
-            handleToggleStatus?.(record, record.hidden ? 'show' : 'hide')
-        },
-        {
-          title: t('actions.duplicate', 'Duplicate'),
-          icon: 'IconCopy',
-          onClick: (record: MenuTree) => {
-            const duplicateRecord = {
-              ...record,
-              id: undefined,
-              name: `${record.name} (Copy)`,
-              slug: `${record.slug}-copy`
-            };
-            handleView(duplicateRecord, 'create');
-          }
-        },
-        {
-          title: t('actions.move', 'Move'),
-          icon: 'IconArrowsMove',
-          onClick: (record: MenuTree) => handleMove?.(record)
-        },
-        {
-          title: t('actions.delete', 'Delete'),
-          icon: 'IconTrash',
-          onClick: (record: MenuTree) => handleDelete(record, 'delete')
-        }
-      ]
+      actions
     }
   ];
 };

@@ -61,15 +61,23 @@ which cross-feature effects they must handle.
 
 ## System Management
 
-### Users
+### Users and Employees
 
-- Entry: `/system/users`.
+- Entry: `/system/users`, `/system/users/employees`.
 - Actions: list/search, create user with profile, edit meshes, reset/update password, enable/disable,
-  assign roles, manage employee and API key data.
+  assign roles, manage employee records, and manage API key data.
 - API: `/sys/users`, `/sys/users/:username/*`, `/sys/employees`.
 - Cache effects: invalidate user list, single user meshes, roles for user, employees when changed.
 - Required permissions: `read:users`, `create:users`, `update:users`, `delete:users`,
-  employee-specific permissions.
+  `manage:users`, `manage:roles` for role assignment, `read/create/update/manage:employees` or
+  `manage:hr` for the employee page, and own-profile API key permissions for current-user key
+  create/delete.
+- Current permission behavior: create/edit/delete/duplicate, role assignment, employee writes, and
+  API key actions are hidden when the matching permission is absent. Direct user `/create` and
+  `/edit` URLs route read-only users back to the list. `/system/users/employees` is independently
+  reachable for HR/employee permissions, and the employee page disables write actions by the
+  matching create/update/delete permission. API key creation is only shown when the selected row is
+  the current user because the backend create endpoint creates a key for the authenticated user.
 - Gaps: not every API wrapper has a visible, tested UI action.
 
 ### Roles, Permissions, and Policies
@@ -92,12 +100,17 @@ which cross-feature effects they must handle.
     removed ids, and calls assign/remove hooks before closing.
 - Required UX: show affected users/menus before destructive changes. Affected users in other
   browsers or devices still need token refresh, re-login, or a future live permission refresh event.
+- Read-only behavior: permission readers can list, view, and export permission rows; write actions,
+  bulk enable/disable/delete, assignment modals, and direct create/edit URLs require
+  `manage:permissions`.
 
 ### Menus
 
 - Entry: `/system/menus`.
 - Actions: CRUD, move, reorder, enable/disable, show/hide, navigation preview.
 - API: `/sys/menus`, `/sys/menus/tree`, `/sys/menus/navigation`, `/sys/menus/authorized/:userId`.
+- Required permissions: `/sys/menus/navigation` is authenticated; raw list/tree/authorized/get plus
+  all writes require `manage:menu`.
 - Cache effects: invalidate `menuService` list/tree/navigation queries and run shared RBAC
   propagation so current account/navigation permission state is refreshed.
 - Current move behavior: the table action opens a modal with parent and order fields, rejects moving a
@@ -111,10 +124,16 @@ which cross-feature effects they must handle.
 - Entry: `/system/dictionaries`, `/system/options`.
 - Actions: CRUD, validate dictionary option value, batch load, delete by prefix, export options.
 - API: `/sys/dictionaries`, `/sys/options`.
+- Required permissions: dictionary reads use `read:dictionaries`, `manage:dictionary`, or
+  `manage:system`; dictionary writes use `manage:dictionary`; option runtime settings and writes use
+  `manage:system`.
 - Cross-effects: forms using dictionaries/options need refetch or stale indicators after changes.
 - Current validation behavior: dictionary table validation opens a modal, parses JSON when required,
   validates enum/object/number/boolean/scalar expectations, and shows normalized JSON preview or
   deterministic validation errors.
+- Current permission behavior: dictionary readers keep view/export/validate actions while
+  create/edit/duplicate/import/delete require management permission. Option readers keep list/detail
+  access while create/edit/duplicate/import/delete and runtime settings require `manage:system`.
 - Required UX: usage/impact query before delete or prefix delete.
 
 ## Content
@@ -220,7 +239,8 @@ Current frontend closure from the feature/UI pass:
 - Actions: upload, batch upload/delete, list/search, preview, download, create version, share,
   change access level, view quota/usage, admin cleanup.
 - API: `/res`, `/res/search`, `/res/:slug/*`, `/res/batch/*`, `/res/admin/*`.
-- Required permissions: `read:resources`, `manage:resources`, admin for admin routes.
+- Required permissions: `read:resources`, `manage:resources`, and `admin:resources`; resource admin
+  routes accept `manage:resources` or `admin:resources`.
 - Cross-effects: resource files can back CMS media; delete/access changes must consider references.
 - Current upload UX: upload modal has a local file queue, zero-byte/oversize rejection reasons,
   quota visibility and pre-check, private/shared/public access selection, public flag, path prefix,

@@ -1,34 +1,24 @@
-import { useState } from 'react';
+import { EmployeeManagement } from '../components/employee_management';
 
-import { EmployeeDirectory, EmployeeForm } from '../components';
+import { Page } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const EmployeesPage = () => {
-  const [showEmployeeForm, setShowEmployeeForm] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState(null);
+  const { hasPermission } = usePermissions();
+  const canCreate =
+    hasPermission('create:employees') ||
+    hasPermission('manage:employees') ||
+    hasPermission('manage:hr');
+  const canUpdate =
+    hasPermission('update:employees') ||
+    hasPermission('manage:employees') ||
+    hasPermission('manage:hr');
+  const canDelete = hasPermission('manage:employees') || hasPermission('manage:hr');
 
   return (
-    <>
-      <EmployeeDirectory
-        onCreateEmployee={() => {
-          setEditingEmployee(null);
-          setShowEmployeeForm(true);
-        }}
-        onEditEmployee={employee => {
-          setEditingEmployee(employee);
-          setShowEmployeeForm(true);
-        }}
-      />
-
-      <EmployeeForm
-        isOpen={showEmployeeForm}
-        onClose={() => setShowEmployeeForm(false)}
-        employee={editingEmployee}
-        onSuccess={() => {
-          setShowEmployeeForm(false);
-          // Refresh employee list
-        }}
-      />
-    </>
+    <Page className='px-4 sm:px-6 lg:px-8 py-8'>
+      <EmployeeManagement canCreate={canCreate} canUpdate={canUpdate} canDelete={canDelete} />
+    </Page>
   );
 };
 

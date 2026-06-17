@@ -12,10 +12,16 @@ import { useListTaxonomies } from '../service';
 import { Taxonomy } from '../taxonomy';
 
 import { Page, Topbar } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const TaxonomyListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
+  const canManageContent =
+    hasPermission('manage:content') ||
+    hasPermission('manage:cms') ||
+    hasPermission('manage:taxonomies');
   const [searchParams, setSearchParams] = useState({ search: '', type: '', limit: 50 });
   const [selectedItems, setSelectedItems] = useState<Taxonomy[]>([]);
 
@@ -138,17 +144,19 @@ export const TaxonomyListPage = () => {
             <Icons name='IconEye' size={14} className='mr-1' />
             {t('actions.view')}
           </Button>
-          <Button
-            variant='text'
-            size='xs'
-            onClick={e => {
-              e.stopPropagation();
-              navigate(`/content/taxonomies/${taxonomy.slug}/edit`);
-            }}
-          >
-            <Icons name='IconEdit' size={14} className='mr-1' />
-            {t('actions.edit')}
-          </Button>
+          {canManageContent && (
+            <Button
+              variant='text'
+              size='xs'
+              onClick={e => {
+                e.stopPropagation();
+                navigate(`/content/taxonomies/${taxonomy.slug}/edit`);
+              }}
+            >
+              <Icons name='IconEdit' size={14} className='mr-1' />
+              {t('actions.edit')}
+            </Button>
+          )}
         </div>
       )
     }
@@ -170,12 +178,16 @@ export const TaxonomyListPage = () => {
       topbar={
         <Topbar
           title={t('content.taxonomies.title')}
-          right={[
-            <Button size='sm' onClick={() => navigate('/content/taxonomies/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.taxonomies.create')}
-            </Button>
-          ]}
+          right={
+            canManageContent
+              ? [
+                  <Button size='sm' onClick={() => navigate('/content/taxonomies/create')}>
+                    <Icons name='IconPlus' size={16} className='mr-1' />
+                    {t('content.taxonomies.create')}
+                  </Button>
+                ]
+              : []
+          }
         />
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
@@ -197,10 +209,10 @@ export const TaxonomyListPage = () => {
         ) : taxonomies.length > 0 ? (
           <TableView
             header={columns}
-            selected
+            selected={canManageContent}
             data={taxonomies}
-            onSelectRow={row => handleToggleSelect(row)}
-            onSelectAllRows={rows => setSelectedItems(rows)}
+            onSelectRow={canManageContent ? row => handleToggleSelect(row) : undefined}
+            onSelectAllRows={canManageContent ? rows => setSelectedItems(rows) : undefined}
           />
         ) : (
           <div className='text-center py-8'>
@@ -211,20 +223,24 @@ export const TaxonomyListPage = () => {
             <p className='text-sm text-gray-500 mb-4'>
               {t('content.taxonomies.empty.description')}
             </p>
-            <Button size='sm' onClick={() => navigate('/content/taxonomies/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.taxonomies.create')}
-            </Button>
+            {canManageContent && (
+              <Button size='sm' onClick={() => navigate('/content/taxonomies/create')}>
+                <Icons name='IconPlus' size={16} className='mr-1' />
+                {t('content.taxonomies.create')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedItems}
-        onClearSelection={() => setSelectedItems([])}
-        onBulkDelete={handleBulkDelete}
-      />
+      {canManageContent && (
+        <BulkActions
+          selectedItems={selectedItems}
+          onClearSelection={() => setSelectedItems([])}
+          onBulkDelete={handleBulkDelete}
+        />
+      )}
     </Page>
   );
 };

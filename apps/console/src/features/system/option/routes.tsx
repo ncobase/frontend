@@ -1,4 +1,4 @@
-import { lazyNamed, renderRoutes } from '@/router';
+import { Guard, lazyNamed, renderRoutes } from '@/router';
 
 const OptionListPage = lazyNamed(() => import('./pages/list'), 'OptionListPage');
 const RuntimeSettingsPage = lazyNamed(() => import('./pages/runtime'), 'RuntimeSettingsPage');
@@ -7,7 +7,7 @@ export const OptionRoutes = () => {
   const routes = [
     {
       path: '/runtime-settings',
-      element: <RuntimeSettingsPage />,
+      element: <Guard permission='manage:system' children={<RuntimeSettingsPage />} />,
       meta: {
         title: 'Runtime Settings',
         description: 'Manage runtime system options'

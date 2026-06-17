@@ -18,12 +18,15 @@ import { RoleViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const RoleListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
+  const { hasPermission } = usePermissions();
+  const canManage = hasPermission('manage:roles');
 
   const { data, fetchData, loading, refetch } = useRoleList();
 
@@ -53,12 +56,20 @@ export const RoleListPage = () => {
   const deleteRoleMutation = useDeleteRole();
 
   useEffect(() => {
+    if (!canManage && (mode === 'create' || mode === 'edit')) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/roles');
+      }
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canManage, mode, navigate, vmode]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     await fetchData({ ...queryData, cursor: '' });
@@ -130,8 +141,8 @@ export const RoleListPage = () => {
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete, handlePermissions }),
-    topbarLeft: topbarLeftSection({ handleView }),
+    columns: tableColumns({ handleView, handleDelete, handlePermissions, canManage }),
+    topbarLeft: topbarLeftSection({ handleView, canManage }),
     topbarRight: topbarRightSection,
     title: t('system.roles.title')
   };

@@ -19,12 +19,15 @@ import { DictionaryViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const DictionaryListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
+  const { hasPermission } = usePermissions();
+  const canManage = hasPermission('manage:dictionary') || hasPermission('manage:system');
 
   const { data, fetchData, loading, refetch } = useDictionaryList();
 
@@ -63,12 +66,20 @@ export const DictionaryListPage = () => {
   const deleteDictionaryMutation = useDeleteDictionary();
 
   useEffect(() => {
+    if (!canManage && (mode === 'create' || mode === 'edit')) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/dictionaries');
+      }
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canManage, mode, navigate, vmode]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     await fetchData({ ...queryData, cursor: '' });
@@ -107,25 +118,27 @@ export const DictionaryListPage = () => {
 
   const handleCreate = useCallback(
     (data: Dictionary) => {
+      if (!canManage) return;
       createDictionaryMutation.mutate(data, { onSuccess });
     },
-    [createDictionaryMutation, onSuccess]
+    [canManage, createDictionaryMutation, onSuccess]
   );
 
   const handleUpdate = useCallback(
     (data: Dictionary) => {
+      if (!canManage) return;
       updateDictionaryMutation.mutate(data, { onSuccess });
     },
-    [updateDictionaryMutation, onSuccess]
+    [canManage, updateDictionaryMutation, onSuccess]
   );
 
   const handleDelete = useCallback(
     (record: Dictionary) => {
-      if (record.id) {
+      if (canManage && record.id) {
         deleteDictionaryMutation.mutate(record.id, { onSuccess });
       }
     },
-    [deleteDictionaryMutation, onSuccess]
+    [canManage, deleteDictionaryMutation, onSuccess]
   );
 
   const handleValidate = useCallback(
@@ -212,8 +225,8 @@ export const DictionaryListPage = () => {
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete, handleValidate }),
-    topbarLeft: topbarLeftSection({ handleView, setShowImportExport }),
+    columns: tableColumns({ handleView, handleDelete, handleValidate, canManage }),
+    topbarLeft: topbarLeftSection({ handleView, setShowImportExport, canManage }),
     topbarRight: topbarRightSection,
     title: t('system.dictionaries.title')
   };
@@ -227,7 +240,7 @@ export const DictionaryListPage = () => {
         topbarRight={tableConfig.topbarRight}
         columns={tableConfig.columns}
         data={data?.items || []}
-        selected
+        selected={canManage}
         queryFields={queryFields({ queryControl })}
         onQuery={onQuery}
         onResetQuery={onResetQuery}
@@ -259,14 +272,16 @@ export const DictionaryListPage = () => {
         onConfirm={handleConfirm}
         onCancel={handleClose}
       />
-      <Modal
-        isOpen={showImportExport}
-        onCancel={() => setShowImportExport(false)}
-        title={t('dictionary.import_export.title')}
-        className='max-w-4xl'
-      >
-        <DictionaryImportExport />
-      </Modal>
+      {canManage && (
+        <Modal
+          isOpen={showImportExport}
+          onCancel={() => setShowImportExport(false)}
+          title={t('dictionary.import_export.title')}
+          className='max-w-4xl'
+        >
+          <DictionaryImportExport />
+        </Modal>
+      )}
       <Modal
         isOpen={validationResult.open}
         onCancel={() =>

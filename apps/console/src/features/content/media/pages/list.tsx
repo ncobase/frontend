@@ -16,11 +16,14 @@ import { getMediaMimeType, getMediaPreviewUrl, getMediaSize } from '../media_res
 import { useListMedia } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const MediaListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const toast = useToastMessage();
+  const { hasPermission } = usePermissions();
+  const canManageContent = hasPermission('manage:content') || hasPermission('manage:cms');
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const resourceIdFilter = urlSearchParams.get('resource_id') || '';
   const [searchParams, setSearchParams] = useState<Record<string, any>>({
@@ -245,14 +248,16 @@ export const MediaListPage = () => {
             <Icons name='IconEye' size={14} className='mr-1' />
             {t('actions.view')}
           </Button>
-          <Button
-            variant='text'
-            size='xs'
-            onClick={() => navigate(`/content/media/${media.id}/edit`)}
-          >
-            <Icons name='IconEdit' size={14} className='mr-1' />
-            {t('actions.edit')}
-          </Button>
+          {canManageContent && (
+            <Button
+              variant='text'
+              size='xs'
+              onClick={() => navigate(`/content/media/${media.id}/edit`)}
+            >
+              <Icons name='IconEdit' size={14} className='mr-1' />
+              {t('actions.edit')}
+            </Button>
+          )}
           {canDownloadMedia(media) && (
             <Button
               variant='text'
@@ -300,14 +305,16 @@ export const MediaListPage = () => {
         </div>
 
         {/* Selection checkbox */}
-        <div className='absolute top-2 left-2 z-10'>
-          <input
-            type='checkbox'
-            checked={isSelectedItem}
-            onChange={() => handleToggleSelect(media)}
-            className='w-4 h-4 text-blue-600 border-white rounded focus:ring-blue-500'
-          />
-        </div>
+        {canManageContent && (
+          <div className='absolute top-2 left-2 z-10'>
+            <input
+              type='checkbox'
+              checked={isSelectedItem}
+              onChange={() => handleToggleSelect(media)}
+              className='w-4 h-4 text-blue-600 border-white rounded focus:ring-blue-500'
+            />
+          </div>
+        )}
 
         {/* Type badge */}
         <div className='absolute top-2 right-2 z-10'>{getTypeBadge(media.type)}</div>
@@ -322,13 +329,15 @@ export const MediaListPage = () => {
             >
               <Icons name='IconEye' size={16} />
             </Button>
-            <Button
-              variant='ghost'
-              onClick={() => navigate(`/content/media/${media.id}/edit`)}
-              className='bg-white text-gray-700 hover:bg-gray-100'
-            >
-              <Icons name='IconEdit' size={16} />
-            </Button>
+            {canManageContent && (
+              <Button
+                variant='ghost'
+                onClick={() => navigate(`/content/media/${media.id}/edit`)}
+                className='bg-white text-gray-700 hover:bg-gray-100'
+              >
+                <Icons name='IconEdit' size={16} />
+              </Button>
+            )}
             {canDownloadMedia(media) && (
               <Button
                 variant='ghost'
@@ -370,14 +379,18 @@ export const MediaListPage = () => {
             >
               <Icons name={viewMode === 'grid' ? 'IconList' : 'IconGridPattern'} />
             </Button>,
-            <Button size='sm' onClick={() => setShowUpload(true)}>
-              <Icons name='IconUpload' size={16} className='mr-1' />
-              {t('content.media.upload')}
-            </Button>,
-            <Button variant='outline' size='sm' onClick={() => setShowResourcePicker(true)}>
-              <Icons name='IconFolderPlus' size={16} className='mr-1' />
-              {t('content.media.from_resources', 'From Resources')}
-            </Button>
+            ...(canManageContent
+              ? [
+                  <Button size='sm' onClick={() => setShowUpload(true)}>
+                    <Icons name='IconUpload' size={16} className='mr-1' />
+                    {t('content.media.upload')}
+                  </Button>,
+                  <Button variant='outline' size='sm' onClick={() => setShowResourcePicker(true)}>
+                    <Icons name='IconFolderPlus' size={16} className='mr-1' />
+                    {t('content.media.from_resources', 'From Resources')}
+                  </Button>
+                ]
+              : [])
           ]}
         />
       }
@@ -416,14 +429,10 @@ export const MediaListPage = () => {
           viewMode === 'list' ? (
             <TableView
               header={columns}
-              selected
+              selected={canManageContent}
               data={mediaItems}
-              onSelectRow={row => {
-                handleToggleSelect(row);
-              }}
-              onSelectAllRows={rows => {
-                setSelectedItems(rows);
-              }}
+              onSelectRow={canManageContent ? row => handleToggleSelect(row) : undefined}
+              onSelectAllRows={canManageContent ? rows => setSelectedItems(rows) : undefined}
             />
           ) : (
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4'>
@@ -439,40 +448,48 @@ export const MediaListPage = () => {
             <p className='text-sm text-gray-500 mb-6 max-w-md text-center'>
               {t('content.media.empty.description')}
             </p>
-            <Button size='lg' onClick={() => setShowUpload(true)}>
-              <Icons name='IconUpload' size={20} className='mr-2' />
-              {t('content.media.upload')}
-            </Button>
+            {canManageContent && (
+              <Button size='lg' onClick={() => setShowUpload(true)}>
+                <Icons name='IconUpload' size={20} className='mr-2' />
+                {t('content.media.upload')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedItems}
-        onClearSelection={() => setSelectedItems([])}
-        onBulkDelete={handleBulkDelete}
-        onBulkExport={handleExport}
-      />
+      {canManageContent && (
+        <BulkActions
+          selectedItems={selectedItems}
+          onClearSelection={() => setSelectedItems([])}
+          onBulkDelete={handleBulkDelete}
+          onBulkExport={handleExport}
+        />
+      )}
 
       {/* Upload Modal */}
-      <MediaUpload
-        isOpen={showUpload}
-        onClose={() => setShowUpload(false)}
-        onSuccess={() => {
-          refetch();
-        }}
-      />
+      {canManageContent && (
+        <MediaUpload
+          isOpen={showUpload}
+          onClose={() => setShowUpload(false)}
+          onSuccess={() => {
+            refetch();
+          }}
+        />
+      )}
 
-      <ResourceMediaPicker
-        isOpen={showResourcePicker}
-        onClose={() => setShowResourcePicker(false)}
-        multiSelect
-        source='media'
-        onSuccess={() => {
-          refetch();
-        }}
-      />
+      {canManageContent && (
+        <ResourceMediaPicker
+          isOpen={showResourcePicker}
+          onClose={() => setShowResourcePicker(false)}
+          multiSelect
+          source='media'
+          onSuccess={() => {
+            refetch();
+          }}
+        />
+      )}
     </Page>
   );
 };

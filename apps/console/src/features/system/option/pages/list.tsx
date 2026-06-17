@@ -19,6 +19,7 @@ import { OptionViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const OptionListPage = () => {
   const { t } = useTranslation();
@@ -26,6 +27,8 @@ export const OptionListPage = () => {
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; id: string }>();
   const { vmode } = useLayoutContext();
+  const { hasPermission } = usePermissions();
+  const canManage = hasPermission('manage:system');
 
   const { data, fetchData, loading, refetch } = useOptionList();
 
@@ -54,12 +57,20 @@ export const OptionListPage = () => {
   const deleteOptionMutation = useDeleteOption();
 
   useEffect(() => {
+    if (!canManage && (mode === 'create' || mode === 'edit')) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/options');
+      }
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canManage, mode, navigate, vmode]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     await fetchData({ ...queryData, cursor: '' });
@@ -102,16 +113,19 @@ export const OptionListPage = () => {
   }, [handleClose, refetch, toast, t]);
 
   const handleCreate = useCallback(() => {
+    if (!canManage) return;
     setSelectedRecord(null);
     handleView(null, 'create');
-  }, [handleView]);
+  }, [canManage, handleView]);
 
   const handleRuntimeSettings = useCallback(() => {
+    if (!canManage) return;
     navigate('/system/options/runtime-settings');
-  }, [navigate]);
+  }, [canManage, navigate]);
 
   const handleDuplicate = useCallback(
     (record: Option) => {
+      if (!canManage) return;
       const duplicateRecord = {
         ...record,
         id: undefined,
@@ -122,16 +136,20 @@ export const OptionListPage = () => {
       setSelectedRecord(duplicateRecord);
       handleView(duplicateRecord, 'create');
     },
-    [handleView]
+    [canManage, handleView]
   );
 
-  const handleDeleteClick = useCallback((record: Option) => {
-    setDeleteTarget(record);
-    setShowDeleteConfirm(true);
-  }, []);
+  const handleDeleteClick = useCallback(
+    (record: Option) => {
+      if (!canManage) return;
+      setDeleteTarget(record);
+      setShowDeleteConfirm(true);
+    },
+    [canManage]
+  );
 
   const handleDeleteConfirm = useCallback(() => {
-    if (deleteTarget?.id) {
+    if (canManage && deleteTarget?.id) {
       deleteOptionMutation.mutate(deleteTarget.id, {
         onSuccess: () => {
           setShowDeleteConfirm(false);
@@ -148,10 +166,11 @@ export const OptionListPage = () => {
         }
       });
     }
-  }, [deleteTarget, deleteOptionMutation, refetch, toast, t]);
+  }, [canManage, deleteTarget, deleteOptionMutation, refetch, toast, t]);
 
   const handleFormCreate = useCallback(
     (data: Option) => {
+      if (!canManage) return;
       createOptionMutation.mutate(data, {
         onSuccess,
         onError: error => {
@@ -161,11 +180,12 @@ export const OptionListPage = () => {
         }
       });
     },
-    [createOptionMutation, onSuccess, toast, t]
+    [canManage, createOptionMutation, onSuccess, toast, t]
   );
 
   const handleFormUpdate = useCallback(
     (data: Option) => {
+      if (!canManage) return;
       updateOptionMutation.mutate(
         { ...data, id: data.id! },
         {
@@ -178,7 +198,7 @@ export const OptionListPage = () => {
         }
       );
     },
-    [updateOptionMutation, onSuccess, toast, t]
+    [canManage, updateOptionMutation, onSuccess, toast, t]
   );
 
   const handleConfirm = useCallback(
@@ -192,12 +212,14 @@ export const OptionListPage = () => {
     columns: tableColumns({
       handleView,
       handleDelete: handleDeleteClick,
-      handleDuplicate
+      handleDuplicate,
+      canManage
     }),
     topbarLeft: topbarLeftSection({
       setShowBulkImport,
       handleCreate,
-      handleRuntimeSettings
+      handleRuntimeSettings,
+      canManage
     }),
     topbarRight: topbarRightSection,
     title: t('system.option.title', 'System Options')
@@ -212,7 +234,7 @@ export const OptionListPage = () => {
         topbarRight={tableConfig.topbarRight}
         columns={tableConfig.columns}
         data={data?.items || []}
-        selected
+        selected={canManage}
         queryFields={queryFields({ queryControl })}
         onQuery={onQuery}
         onResetQuery={onResetQuery}
@@ -246,57 +268,61 @@ export const OptionListPage = () => {
       />
 
       {/* Bulk Import Modal */}
-      <Modal
-        isOpen={showBulkImport}
-        onCancel={() => setShowBulkImport(false)}
-        title={t('options.bulk_import.title', 'Bulk Import Options')}
-        className='max-w-4xl'
-      >
-        <OptionsBulkImport
-          onSuccess={() => {
-            setShowBulkImport(false);
-            refetch();
-          }}
-        />
-      </Modal>
+      {canManage && (
+        <Modal
+          isOpen={showBulkImport}
+          onCancel={() => setShowBulkImport(false)}
+          title={t('options.bulk_import.title', 'Bulk Import Options')}
+          className='max-w-4xl'
+        >
+          <OptionsBulkImport
+            onSuccess={() => {
+              setShowBulkImport(false);
+              refetch();
+            }}
+          />
+        </Modal>
+      )}
 
       {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={showDeleteConfirm}
-        onCancel={() => {
-          setShowDeleteConfirm(false);
-          setDeleteTarget(null);
-        }}
-        title='Delete Option'
-        confirmText='Delete'
-        confirmVariant='destructive'
-        onConfirm={handleDeleteConfirm}
-        loading={deleteOptionMutation.isPending}
-      >
-        <div className='space-y-4'>
-          <p>Are you sure you want to delete this option?</p>
-          {deleteTarget && (
-            <div className='bg-gray-50 p-4 rounded-lg'>
-              <div className='space-y-2'>
-                <div>
-                  <strong>Name:</strong> <code className='text-sm'>{deleteTarget.name}</code>
-                </div>
-                <div>
-                  <strong>Type:</strong> <code className='text-sm'>{deleteTarget.type}</code>
-                </div>
-                <div>
-                  <strong>Value:</strong>{' '}
-                  <code className='text-sm break-all'>{deleteTarget.value}</code>
+      {canManage && (
+        <Modal
+          isOpen={showDeleteConfirm}
+          onCancel={() => {
+            setShowDeleteConfirm(false);
+            setDeleteTarget(null);
+          }}
+          title='Delete Option'
+          confirmText='Delete'
+          confirmVariant='destructive'
+          onConfirm={handleDeleteConfirm}
+          loading={deleteOptionMutation.isPending}
+        >
+          <div className='space-y-4'>
+            <p>Are you sure you want to delete this option?</p>
+            {deleteTarget && (
+              <div className='bg-gray-50 p-4 rounded-lg'>
+                <div className='space-y-2'>
+                  <div>
+                    <strong>Name:</strong> <code className='text-sm'>{deleteTarget.name}</code>
+                  </div>
+                  <div>
+                    <strong>Type:</strong> <code className='text-sm'>{deleteTarget.type}</code>
+                  </div>
+                  <div>
+                    <strong>Value:</strong>{' '}
+                    <code className='text-sm break-all'>{deleteTarget.value}</code>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <p className='text-red-600 text-sm'>
-            <strong>Warning:</strong> This action cannot be undone. The option will be permanently
-            removed from the system.
-          </p>
-        </div>
-      </Modal>
+            )}
+            <p className='text-red-600 text-sm'>
+              <strong>Warning:</strong> This action cannot be undone. The option will be permanently
+              removed from the system.
+            </p>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

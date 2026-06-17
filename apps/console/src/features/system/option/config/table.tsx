@@ -7,9 +7,36 @@ import { Option } from '../option';
 export const tableColumns = ({
   handleView,
   handleDelete,
-  handleDuplicate
+  handleDuplicate,
+  canManage
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: Option) => handleView(record, 'view')
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.edit', 'Edit'),
+            icon: 'IconPencil',
+            onClick: (record: Option) => handleView(record, 'edit')
+          },
+          {
+            title: t('actions.duplicate', 'Duplicate'),
+            icon: 'IconCopy',
+            onClick: (record: Option) => handleDuplicate(record)
+          },
+          {
+            title: t('actions.delete', 'Delete'),
+            icon: 'IconTrash',
+            onClick: (record: Option) => handleDelete(record)
+          }
+        ]
+      : [])
+  ];
 
   return [
     {
@@ -69,28 +96,7 @@ export const tableColumns = ({
     {
       title: t('common.actions', 'Actions'),
       dataIndex: 'operation-column',
-      actions: [
-        {
-          title: t('actions.view', 'View'),
-          icon: 'IconEye',
-          onClick: (record: Option) => handleView(record, 'view')
-        },
-        {
-          title: t('actions.edit', 'Edit'),
-          icon: 'IconPencil',
-          onClick: (record: Option) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.duplicate', 'Duplicate'),
-          icon: 'IconCopy',
-          onClick: (record: Option) => handleDuplicate(record)
-        },
-        {
-          title: t('actions.delete', 'Delete'),
-          icon: 'IconTrash',
-          onClick: (record: Option) => handleDelete(record)
-        }
-      ]
+      actions
     }
   ];
 };

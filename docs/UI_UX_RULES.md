@@ -93,6 +93,11 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Permission downgrades must be visible and consistent: read-only users can still inspect list/detail
   data, but create/edit/delete/refund/cancel/bulk actions and mutation subroutes must be hidden or
   render a 403 state.
+- System management pages must split read and manage affordances at the row, toolbar, bulk action,
+  modal, and direct URL levels. Examples: permission readers can view/export but not bulk mutate;
+  dictionary readers can validate/export but not import or delete; option readers cannot enter
+  runtime settings; user API key creation is only shown for the current user's own keys unless a
+  backend target-user creation contract exists.
 - Ownership-sensitive screens must display whether the object is user-owned, space-owned, public, or
   shared.
 - Space switch must be treated as an authorization boundary change.

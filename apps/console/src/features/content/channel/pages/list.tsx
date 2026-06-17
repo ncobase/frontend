@@ -12,10 +12,13 @@ import { Channel } from '../channel';
 import { useListChannels } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const ChannelListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
+  const canManageContent = hasPermission('manage:content') || hasPermission('manage:cms');
   const [searchParams, setSearchParams] = useState({ search: '', type: '', limit: 50 });
   const [selectedItems, setSelectedItems] = useState<Channel[]>([]);
 
@@ -112,14 +115,16 @@ export const ChannelListPage = () => {
             <Icons name='IconEye' size={14} className='mr-1' />
             {t('actions.view')}
           </Button>
-          <Button
-            variant='text'
-            size='xs'
-            onClick={() => navigate(`/content/channels/${channel.id}/edit`)} // Updated route
-          >
-            <Icons name='IconEdit' size={14} className='mr-1' />
-            {t('actions.edit')}
-          </Button>
+          {canManageContent && (
+            <Button
+              variant='text'
+              size='xs'
+              onClick={() => navigate(`/content/channels/${channel.id}/edit`)}
+            >
+              <Icons name='IconEdit' size={14} className='mr-1' />
+              {t('actions.edit')}
+            </Button>
+          )}
         </div>
       )
     }
@@ -141,12 +146,16 @@ export const ChannelListPage = () => {
       topbar={
         <Topbar
           title={t('content.channels.description')}
-          right={[
-            <Button size='sm' onClick={() => navigate('/content/channels/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.channels.create')}
-            </Button>
-          ]}
+          right={
+            canManageContent
+              ? [
+                  <Button size='sm' onClick={() => navigate('/content/channels/create')}>
+                    <Icons name='IconPlus' size={16} className='mr-1' />
+                    {t('content.channels.create')}
+                  </Button>
+                ]
+              : []
+          }
         />
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
@@ -168,10 +177,10 @@ export const ChannelListPage = () => {
         ) : channels.length > 0 ? (
           <TableView
             header={columns}
-            selected
+            selected={canManageContent}
             data={channels}
-            onSelectRow={row => handleToggleSelect(row)}
-            onSelectAllRows={rows => setSelectedItems(rows)}
+            onSelectRow={canManageContent ? row => handleToggleSelect(row) : undefined}
+            onSelectAllRows={canManageContent ? rows => setSelectedItems(rows) : undefined}
           />
         ) : (
           <div className='text-center py-8'>
@@ -180,20 +189,24 @@ export const ChannelListPage = () => {
               {t('content.channels.empty.title')}
             </h3>
             <p className='text-sm text-gray-500 mb-4'>{t('content.channels.empty.description')}</p>
-            <Button size='sm' onClick={() => navigate('/content/channels/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.channels.create')}
-            </Button>
+            {canManageContent && (
+              <Button size='sm' onClick={() => navigate('/content/channels/create')}>
+                <Icons name='IconPlus' size={16} className='mr-1' />
+                {t('content.channels.create')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedItems}
-        onClearSelection={() => setSelectedItems([])}
-        onBulkDelete={handleBulkDelete}
-      />
+      {canManageContent && (
+        <BulkActions
+          selectedItems={selectedItems}
+          onClearSelection={() => setSelectedItems([])}
+          onBulkDelete={handleBulkDelete}
+        />
+      )}
     </Page>
   );
 };

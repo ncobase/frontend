@@ -97,7 +97,7 @@ const routes = [
   {
     path: '/content/*',
     element: (
-      <Guard>
+      <Guard permissions={['read:content', 'manage:content', 'read:cms', 'manage:cms']} any>
         <ContentRoutes />
       </Guard>
     )
@@ -105,7 +105,33 @@ const routes = [
   {
     path: '/system/*',
     element: (
-      <Guard admin>
+      <Guard
+        permissions={[
+          'read:system',
+          'manage:system',
+          'admin:system',
+          'read:organizations',
+          'manage:organizations',
+          'read:users',
+          'create:users',
+          'update:users',
+          'delete:users',
+          'manage:users',
+          'read:employees',
+          'create:employees',
+          'update:employees',
+          'manage:employees',
+          'manage:hr',
+          'read:roles',
+          'manage:roles',
+          'read:permissions',
+          'manage:permissions',
+          'manage:menu',
+          'read:dictionaries',
+          'manage:dictionary'
+        ]}
+        any
+      >
         <SystemRoutes />
       </Guard>
     )
@@ -113,7 +139,7 @@ const routes = [
   {
     path: '/ncore/*',
     element: (
-      <Guard admin permission='manage:ncore'>
+      <Guard permission='manage:ncore'>
         <NCoreRoutes />
       </Guard>
     )
@@ -145,7 +171,7 @@ const routes = [
   {
     path: '/res/*',
     element: (
-      <Guard permission='read:resources'>
+      <Guard permissions={['read:resources', 'manage:resources', 'admin:resources']} any>
         <ResourceRoutes />
       </Guard>
     )

@@ -9,9 +9,83 @@ export const tableColumns = ({
   handleDelete,
   setRoleManagementModal,
   setApiKeyModal,
-  setEmployeeModal
+  setEmployeeModal,
+  canCreate,
+  canUpdate,
+  canDelete,
+  canManageRoles,
+  canReadApiKeys,
+  canReadEmployees
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    ...(canManageRoles
+      ? [
+          {
+            title: t('actions.role', 'Roles'),
+            icon: 'IconUserCheck',
+            onClick: (record: User) => setRoleManagementModal({ open: true, user: record })
+          }
+        ]
+      : []),
+    ...(canReadApiKeys
+      ? [
+          {
+            title: t('actions.api_key', 'API Keys'),
+            icon: 'IconKey',
+            onClick: (record: User) => setApiKeyModal({ open: true, user: record })
+          }
+        ]
+      : []),
+    ...(canReadEmployees
+      ? [
+          {
+            title: t('actions.employee', 'Employee'),
+            icon: 'IconBriefcase',
+            onClick: (record: User) => setEmployeeModal({ open: true, user: record })
+          }
+        ]
+      : []),
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: User) => handleView(record, 'view')
+    },
+    ...(canUpdate
+      ? [
+          {
+            title: t('actions.edit', 'Edit'),
+            icon: 'IconPencil',
+            onClick: (record: User) => handleView(record, 'edit')
+          }
+        ]
+      : []),
+    ...(canCreate
+      ? [
+          {
+            title: t('actions.duplicate', 'Duplicate'),
+            icon: 'IconCopy',
+            onClick: (record: User) => {
+              const duplicateRecord = {
+                ...record,
+                id: undefined,
+                username: `${record.username}_copy`
+              };
+              handleView(duplicateRecord, 'create');
+            }
+          }
+        ]
+      : []),
+    ...(canDelete
+      ? [
+          {
+            title: t('actions.delete', 'Delete'),
+            icon: 'IconTrash',
+            onClick: (record: User) => handleDelete(record)
+          }
+        ]
+      : [])
+  ];
 
   return [
     {
@@ -72,50 +146,7 @@ export const tableColumns = ({
     {
       title: t('common.actions', 'Actions'),
       dataIndex: 'operation-column',
-      actions: [
-        {
-          title: t('actions.role', 'Roles'),
-          icon: 'IconUserCheck',
-          onClick: (record: User) => setRoleManagementModal({ open: true, user: record })
-        },
-        {
-          title: t('actions.api_key', 'API Keys'),
-          icon: 'IconKey',
-          onClick: (record: User) => setApiKeyModal({ open: true, user: record })
-        },
-        {
-          title: t('actions.employee', 'Employee'),
-          icon: 'IconBriefcase',
-          onClick: (record: User) => setEmployeeModal({ open: true, user: record })
-        },
-        {
-          title: t('actions.view', 'View'),
-          icon: 'IconEye',
-          onClick: (record: User) => handleView(record, 'view')
-        },
-        {
-          title: t('actions.edit', 'Edit'),
-          icon: 'IconPencil',
-          onClick: (record: User) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.duplicate', 'Duplicate'),
-          icon: 'IconCopy',
-          onClick: (record: User) => {
-            const duplicateRecord = {
-              ...record,
-              id: undefined,
-              username: `${record.username}_copy`
-            };
-            handleView(duplicateRecord, 'create');
-          }
-        },
-        {
-          title: t('actions.delete', 'Delete'),
-          icon: 'IconTrash',
-          onClick: (record: User) => handleDelete(record)
-        }
-      ]
+      actions
     }
   ];
 };

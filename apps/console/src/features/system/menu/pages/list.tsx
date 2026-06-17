@@ -23,12 +23,15 @@ import { EditorMenuPage } from './editor';
 import { MenuViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
+import { usePermissions } from '@/features/account/permissions';
 
 export const MenuListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
   const toast = useToastMessage();
+  const { hasPermission } = usePermissions();
+  const canManage = hasPermission('manage:menu');
 
   const { data, fetchData, loading, refetch } = useMenuList();
 
@@ -69,12 +72,18 @@ export const MenuListPage = () => {
   const vmode = 'flatten' as 'flatten' | 'modal';
 
   useEffect(() => {
+    if (!canManage && ['create', 'edit'].includes(mode || '')) {
+      setViewType(undefined);
+      navigate('/system/menus');
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canManage, mode, navigate]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     await fetchData({ ...queryData, cursor: '' });
@@ -114,45 +123,48 @@ export const MenuListPage = () => {
 
   const handleCreate = useCallback(
     (data: MenuTree) => {
+      if (!canManage) return;
       createMenuMutation.mutate(data, { onSuccess });
     },
-    [createMenuMutation, onSuccess]
+    [canManage, createMenuMutation, onSuccess]
   );
 
   const handleUpdate = useCallback(
     (data: MenuTree) => {
+      if (!canManage) return;
       updateMenuMutation.mutate(data, { onSuccess });
     },
-    [updateMenuMutation, onSuccess]
+    [canManage, updateMenuMutation, onSuccess]
   );
 
   const handleDelete = useCallback(
     (record: MenuTree) => {
-      if (record.id) {
+      if (canManage && record.id) {
         deleteMenuMutation.mutate(record.id, { onSuccess });
       }
     },
-    [deleteMenuMutation, onSuccess]
+    [canManage, deleteMenuMutation, onSuccess]
   );
 
   const handleToggleStatus = useCallback(
     (record: MenuTree, action: 'enable' | 'disable' | 'show' | 'hide') => {
-      if (record.id) {
+      if (canManage && record.id) {
         toggleStatusMutation.mutate({ id: record.id, action }, { onSuccess });
       }
     },
-    [toggleStatusMutation, onSuccess]
+    [canManage, toggleStatusMutation, onSuccess]
   );
 
   const handleMove = useCallback(
     (record: MenuTree) => {
+      if (!canManage) return;
       resetMoveForm({
         parent_id: record.parent_id || 'root',
         order: record.order ?? 99
       });
       setMoveDialog({ open: true, menu: record });
     },
-    [resetMoveForm]
+    [canManage, resetMoveForm]
   );
 
   const flattenedMenus = useMemo(() => {
@@ -187,7 +199,7 @@ export const MenuListPage = () => {
 
   const handleConfirmMove = useCallback(
     handleMoveSubmit(async values => {
-      if (!moveDialog.menu?.id) return;
+      if (!canManage || !moveDialog.menu?.id) return;
       try {
         await moveMenuMutation.mutateAsync({
           id: moveDialog.menu.id,
@@ -205,7 +217,7 @@ export const MenuListPage = () => {
         });
       }
     }),
-    [handleMoveSubmit, moveDialog.menu, moveMenuMutation, toast, t, refetch]
+    [canManage, handleMoveSubmit, moveDialog.menu, moveMenuMutation, toast, t, refetch]
   );
 
   const handleConfirm = useCallback(
@@ -216,8 +228,8 @@ export const MenuListPage = () => {
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete, handleToggleStatus, handleMove }),
-    topbarLeft: topbarLeftSection({ handleView }),
+    columns: tableColumns({ handleView, handleDelete, handleToggleStatus, handleMove, canManage }),
+    topbarLeft: topbarLeftSection({ handleView, canManage }),
     topbarRight: topbarRightSection,
     title: t('system.menus.title')
   };
@@ -265,45 +277,47 @@ export const MenuListPage = () => {
         onConfirm={handleConfirm}
         onCancel={handleClose}
       />
-      <Modal
-        isOpen={moveDialog.open}
-        onCancel={() => setMoveDialog({ open: false, menu: null })}
-        title={t('menu.move.title', 'Move Menu')}
-        description={t('menu.move.description', {
-          defaultValue: 'Change parent and order for "{{name}}"',
-          name: moveDialog.menu?.name || moveDialog.menu?.label || moveDialog.menu?.id
-        })}
-        confirmText={t('actions.save', 'Save')}
-        confirmDisabled={moveMenuMutation.isPending}
-        onConfirm={handleConfirmMove}
-        className='max-w-xl'
-      >
-        <Form
-          id='move-menu'
-          className='grid grid-cols-1 gap-4'
-          control={moveControl}
-          errors={moveErrors}
-          fields={[
-            {
-              title: t('menu.fields.parent', 'Parent Menu'),
-              name: 'parent_id',
-              type: 'select',
-              options: moveParentOptions
-            },
-            {
-              title: t('menu.fields.order', 'Sort Order'),
-              name: 'order',
-              type: 'number',
-              rules: {
-                min: {
-                  value: 0,
-                  message: t('menu.validation.order_min', 'Order must be a positive number')
+      {canManage && (
+        <Modal
+          isOpen={moveDialog.open}
+          onCancel={() => setMoveDialog({ open: false, menu: null })}
+          title={t('menu.move.title', 'Move Menu')}
+          description={t('menu.move.description', {
+            defaultValue: 'Change parent and order for "{{name}}"',
+            name: moveDialog.menu?.name || moveDialog.menu?.label || moveDialog.menu?.id
+          })}
+          confirmText={t('actions.save', 'Save')}
+          confirmDisabled={moveMenuMutation.isPending}
+          onConfirm={handleConfirmMove}
+          className='max-w-xl'
+        >
+          <Form
+            id='move-menu'
+            className='grid grid-cols-1 gap-4'
+            control={moveControl}
+            errors={moveErrors}
+            fields={[
+              {
+                title: t('menu.fields.parent', 'Parent Menu'),
+                name: 'parent_id',
+                type: 'select',
+                options: moveParentOptions
+              },
+              {
+                title: t('menu.fields.order', 'Sort Order'),
+                name: 'order',
+                type: 'number',
+                rules: {
+                  min: {
+                    value: 0,
+                    message: t('menu.validation.order_min', 'Order must be a positive number')
+                  }
                 }
               }
-            }
-          ]}
-        />
-      </Modal>
+            ]}
+          />
+        </Modal>
+      )}
     </>
   );
 };

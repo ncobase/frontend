@@ -14,13 +14,21 @@ import { useTranslation } from 'react-i18next';
 
 import { getUserApiKeys, generateApiKey, deleteApiKey } from '../apis';
 
-export const ApiKey: React.FC<{ userId: string }> = ({ userId }) => {
+export const ApiKey: React.FC<{
+  userId: string;
+  currentUserId?: string;
+  canCreateOwn?: boolean;
+  canDeleteAny?: boolean;
+}> = ({ userId, currentUserId, canCreateOwn = false, canDeleteAny = false }) => {
   const { t } = useTranslation();
   const [apiKeys, setApiKey] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [generatedKey, setGeneratedKey] = useState(null);
+  const isOwnUser = !!currentUserId && currentUserId === userId;
+  const canCreate = isOwnUser && canCreateOwn;
+  const canDelete = canDeleteAny || (isOwnUser && canCreateOwn);
 
   useEffect(() => {
     loadApiKey();
@@ -39,7 +47,7 @@ export const ApiKey: React.FC<{ userId: string }> = ({ userId }) => {
   };
 
   const handleCreateKey = async () => {
-    if (!newKeyName.trim()) return;
+    if (!canCreate || !newKeyName.trim()) return;
 
     try {
       const newKey = await generateApiKey({ name: newKeyName });
@@ -60,10 +68,12 @@ export const ApiKey: React.FC<{ userId: string }> = ({ userId }) => {
           <h3 className='font-medium'>{t('api_keys.title')}</h3>
           <p className='text-sm text-slate-600'>{t('api_keys.description')}</p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
-          <Icons name='IconPlus' className='mr-2' />
-          {t('api_keys.create')}
-        </Button>
+        {canCreate && (
+          <Button onClick={() => setShowCreateForm(true)}>
+            <Icons name='IconPlus' className='mr-2' />
+            {t('api_keys.create')}
+          </Button>
+        )}
       </div>
 
       {/* API Keys List */}
@@ -74,40 +84,52 @@ export const ApiKey: React.FC<{ userId: string }> = ({ userId }) => {
           <div className='text-center py-8 text-slate-500'>
             <Icons name='IconKey' className='w-12 h-12 mx-auto mb-4 text-slate-300' />
             <p>{t('api_keys.no_keys')}</p>
-            <Button
-              variant='outline-primary'
-              className='mt-4'
-              onClick={() => setShowCreateForm(true)}
-            >
-              {t('api_keys.create_first')}
-            </Button>
+            {canCreate && (
+              <Button
+                variant='outline-primary'
+                className='mt-4'
+                onClick={() => setShowCreateForm(true)}
+              >
+                {t('api_keys.create_first')}
+              </Button>
+            )}
           </div>
         ) : (
-          apiKeys.map(key => <ApiKeyItem key={key.id} apiKey={key} onDelete={loadApiKey} t={t} />)
+          apiKeys.map(key => (
+            <ApiKeyItem
+              key={key.id}
+              apiKey={key}
+              canDelete={canDelete}
+              onDelete={loadApiKey}
+              t={t}
+            />
+          ))
         )}
       </div>
 
       {/* Create Form Modal */}
-      <Modal
-        isOpen={showCreateForm}
-        onCancel={() => {
-          setShowCreateForm(false);
-          setNewKeyName('');
-        }}
-        title={t('api_keys.create_title')}
-        confirmText={t('actions.create')}
-        onConfirm={handleCreateKey}
-      >
-        <div className='space-y-4'>
-          <InputField
-            label={t('api_keys.fields.name')}
-            placeholder={t('api_keys.placeholders.name')}
-            value={newKeyName}
-            onChange={e => setNewKeyName(e.target.value)}
-            description={t('api_keys.hints.name')}
-          />
-        </div>
-      </Modal>
+      {canCreate && (
+        <Modal
+          isOpen={showCreateForm}
+          onCancel={() => {
+            setShowCreateForm(false);
+            setNewKeyName('');
+          }}
+          title={t('api_keys.create_title')}
+          confirmText={t('actions.create')}
+          onConfirm={handleCreateKey}
+        >
+          <div className='space-y-4'>
+            <InputField
+              label={t('api_keys.fields.name')}
+              placeholder={t('api_keys.placeholders.name')}
+              value={newKeyName}
+              onChange={e => setNewKeyName(e.target.value)}
+              description={t('api_keys.hints.name')}
+            />
+          </div>
+        </Modal>
+      )}
 
       {/* Generated Key Modal */}
       <Modal
@@ -146,7 +168,7 @@ export const ApiKey: React.FC<{ userId: string }> = ({ userId }) => {
   );
 };
 
-const ApiKeyItem = ({ apiKey, onDelete, t }) => {
+const ApiKeyItem = ({ apiKey, canDelete, onDelete, t }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showKey, setShowKey] = useState(false);
   const toast = useToastMessage();
@@ -216,23 +238,27 @@ const ApiKeyItem = ({ apiKey, onDelete, t }) => {
                 {t('api_keys.unused')}
               </Badge>
             )}
-            <Button variant='outline-danger' size='xs' onClick={() => setShowDeleteDialog(true)}>
-              <Icons name='IconTrash' size={14} />
-            </Button>
+            {canDelete && (
+              <Button variant='outline-danger' size='xs' onClick={() => setShowDeleteDialog(true)}>
+                <Icons name='IconTrash' size={14} />
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
-      <AlertDialog
-        title={t('api_keys.delete_confirm_title')}
-        description={t('api_keys.delete_confirm_description', { name: apiKey.name })}
-        isOpen={showDeleteDialog}
-        onChange={() => setShowDeleteDialog(!showDeleteDialog)}
-        cancelText={t('actions.cancel')}
-        confirmText={t('actions.delete')}
-        onCancel={() => setShowDeleteDialog(false)}
-        onConfirm={handleDelete}
-      />
+      {canDelete && (
+        <AlertDialog
+          title={t('api_keys.delete_confirm_title')}
+          description={t('api_keys.delete_confirm_description', { name: apiKey.name })}
+          isOpen={showDeleteDialog}
+          onChange={() => setShowDeleteDialog(!showDeleteDialog)}
+          cancelText={t('actions.cancel')}
+          confirmText={t('actions.delete')}
+          onCancel={() => setShowDeleteDialog(false)}
+          onConfirm={handleDelete}
+        />
+      )}
     </>
   );
 };

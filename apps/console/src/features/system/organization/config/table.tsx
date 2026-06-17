@@ -7,8 +7,32 @@ import { Org } from '../org';
 
 import { parseStatus } from '@/lib/status';
 
-export const tableColumns = ({ handleView, handleDelete }): TableViewProps['header'] => {
+export const tableColumns = ({ handleView, handleDelete, canManage }): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: Org) => handleView(record, 'view')
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.edit'),
+            icon: 'IconPencil',
+            onClick: (record: Org) => handleView(record, 'edit')
+          },
+          {
+            title: t('actions.delete'),
+            icon: 'IconTrash',
+            onClick: (record: Org) => {
+              handleDelete(record, 'delete');
+            }
+          }
+        ]
+      : [])
+  ];
+
   return [
     {
       title: '名称',
@@ -59,20 +83,7 @@ export const tableColumns = ({ handleView, handleDelete }): TableViewProps['head
     },
     {
       title: 'operation-column',
-      actions: [
-        {
-          title: t('actions.edit'),
-          icon: 'IconPencil',
-          onClick: (record: Org) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.delete'),
-          icon: 'IconTrash',
-          onClick: (record: Org) => {
-            handleDelete(record, 'delete');
-          }
-        }
-      ]
+      actions
     }
   ];
 };

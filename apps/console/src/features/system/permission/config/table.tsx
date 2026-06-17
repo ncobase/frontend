@@ -8,14 +8,73 @@ interface TableColumnsProps {
   handleView: (_record: Permission, _type: string) => void;
   handleDelete: (_record: Permission) => void;
   handleAssignRoles: (_record: Permission) => void;
+  canManage: boolean;
 }
 
 export const tableColumns = ({
   handleView,
   handleDelete,
-  handleAssignRoles
+  handleAssignRoles,
+  canManage
 }: TableColumnsProps): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: Permission) => handleView(record, 'view')
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.edit', 'Edit'),
+            icon: 'IconPencil',
+            onClick: (record: Permission) => handleView(record, 'edit')
+          },
+          {
+            title: t('actions.duplicate', 'Duplicate'),
+            icon: 'IconCopy',
+            onClick: (record: Permission) => {
+              const duplicateRecord = {
+                ...record,
+                id: undefined,
+                name: `${record.name} (Copy)`
+              };
+              handleView(duplicateRecord, 'create');
+            }
+          },
+          {
+            title: t('permission.actions.assign_roles', 'Assign to Roles'),
+            icon: 'IconUserCheck',
+            onClick: (record: Permission) => handleAssignRoles(record)
+          }
+        ]
+      : []),
+    {
+      title: t('actions.export', 'Export'),
+      icon: 'IconDownload',
+      onClick: (record: Permission) => {
+        const dataStr = JSON.stringify(record, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `permission-${record.id || record.name}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.delete', 'Delete'),
+            icon: 'IconTrash',
+            onClick: (record: Permission) => handleDelete(record),
+            disabled: (record: Permission) => record.default
+          }
+        ]
+      : [])
+  ];
 
   return [
     {
@@ -94,55 +153,7 @@ export const tableColumns = ({
     {
       title: t('common.actions', 'Actions'),
       dataIndex: 'operation-column',
-      actions: [
-        {
-          title: t('actions.view', 'View'),
-          icon: 'IconEye',
-          onClick: (record: Permission) => handleView(record, 'view')
-        },
-        {
-          title: t('actions.edit', 'Edit'),
-          icon: 'IconPencil',
-          onClick: (record: Permission) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.duplicate', 'Duplicate'),
-          icon: 'IconCopy',
-          onClick: (record: Permission) => {
-            const duplicateRecord = {
-              ...record,
-              id: undefined,
-              name: `${record.name} (Copy)`
-            };
-            handleView(duplicateRecord, 'create');
-          }
-        },
-        {
-          title: t('permission.actions.assign_roles', 'Assign to Roles'),
-          icon: 'IconUserCheck',
-          onClick: (record: Permission) => handleAssignRoles(record)
-        },
-        {
-          title: t('actions.export', 'Export'),
-          icon: 'IconDownload',
-          onClick: (record: Permission) => {
-            const dataStr = JSON.stringify(record, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `permission-${record.id || record.name}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-          }
-        },
-        {
-          title: t('actions.delete', 'Delete'),
-          icon: 'IconTrash',
-          onClick: (record: Permission) => handleDelete(record),
-          disabled: (record: Permission) => record.default
-        }
-      ]
+      actions
     }
   ];
 };

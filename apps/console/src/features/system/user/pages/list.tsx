@@ -21,6 +21,8 @@ import { UserViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { useAuthContext } from '@/features/account/context';
+import { usePermissions } from '@/features/account/permissions';
 import { useSpaceContext } from '@/features/space/context';
 
 export const UserListPage = () => {
@@ -29,7 +31,33 @@ export const UserListPage = () => {
   const { mode } = useParams<{ mode: string; slug: string }>();
   const { vmode } = useLayoutContext();
   const { space_id } = useSpaceContext();
+  const { user: currentUser } = useAuthContext();
+  const { hasPermission } = usePermissions();
   const toast = useToastMessage();
+  const canCreate = hasPermission('create:users') || hasPermission('manage:users');
+  const canUpdate = hasPermission('update:users') || hasPermission('manage:users');
+  const canDelete = hasPermission('delete:users') || hasPermission('manage:users');
+  const canReadUsers = hasPermission('read:users') || hasPermission('manage:users');
+  const canManageRoles = hasPermission('manage:roles');
+  const canReadApiKeys = canReadUsers;
+  const canDeleteAnyApiKeys = hasPermission('delete:users') || hasPermission('manage:users');
+  const canManageOwnApiKeys =
+    hasPermission('manage:profile') ||
+    hasPermission('create:users') ||
+    hasPermission('manage:users');
+  const canReadEmployees =
+    hasPermission('read:employees') ||
+    hasPermission('manage:employees') ||
+    hasPermission('manage:hr');
+  const canCreateEmployees =
+    hasPermission('create:employees') ||
+    hasPermission('manage:employees') ||
+    hasPermission('manage:hr');
+  const canUpdateEmployees =
+    hasPermission('update:employees') ||
+    hasPermission('manage:employees') ||
+    hasPermission('manage:hr');
+  const canDeleteEmployees = hasPermission('manage:employees') || hasPermission('manage:hr');
 
   const { data, fetchData, loading, refetch } = useUserList();
 
@@ -71,12 +99,28 @@ export const UserListPage = () => {
   const deleteUserMutation = useDeleteUser();
 
   useEffect(() => {
+    if (mode === 'create' && !canCreate) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/users');
+      }
+      return;
+    }
+
+    if (mode === 'edit' && !canUpdate) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/users');
+      }
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canCreate, canUpdate, mode, navigate, vmode]);
 
   const onQuery = handleQuerySubmit(async queryData => {
     // Remove empty values from the query
@@ -141,30 +185,36 @@ export const UserListPage = () => {
 
   const handleCreate = useCallback(
     (data: any) => {
+      if (!canCreate) return;
       createUserMutation.mutate(data, {
         onSuccess: () => onSuccess(t('user.messages.create_success')),
         onError
       });
     },
-    [createUserMutation, onSuccess, onError, t]
+    [canCreate, createUserMutation, onSuccess, onError, t]
   );
 
   const handleUpdate = useCallback(
     (data: any) => {
+      if (!canUpdate) return;
       updateUserMutation.mutate(data, {
         onSuccess: () => onSuccess(t('user.messages.update_success')),
         onError
       });
     },
-    [updateUserMutation, onSuccess, onError, t]
+    [canUpdate, updateUserMutation, onSuccess, onError, t]
   );
 
-  const handleDelete = useCallback((record: User) => {
-    setDeleteDialog({ open: true, user: record });
-  }, []);
+  const handleDelete = useCallback(
+    (record: User) => {
+      if (!canDelete) return;
+      setDeleteDialog({ open: true, user: record });
+    },
+    [canDelete]
+  );
 
   const confirmDelete = useCallback(() => {
-    if (!deleteDialog.user?.id) return;
+    if (!canDelete || !deleteDialog.user?.id) return;
 
     deleteUserMutation.mutate(deleteDialog.user.id, {
       onSuccess: () => {
@@ -176,7 +226,7 @@ export const UserListPage = () => {
         onError(error);
       }
     });
-  }, [deleteDialog.user, deleteUserMutation, onSuccess, onError, t]);
+  }, [canDelete, deleteDialog.user, deleteUserMutation, onSuccess, onError, t]);
 
   const handleConfirm = useCallback(
     handleFormSubmit((data: any) => {
@@ -191,9 +241,15 @@ export const UserListPage = () => {
       handleDelete,
       setRoleManagementModal,
       setApiKeyModal,
-      setEmployeeModal
+      setEmployeeModal,
+      canCreate,
+      canUpdate,
+      canDelete,
+      canManageRoles,
+      canReadApiKeys,
+      canReadEmployees
     }),
-    topbarLeft: topbarLeftSection({ handleView }),
+    topbarLeft: topbarLeftSection({ handleView, canCreate }),
     topbarRight: topbarRightSection,
     title: t('system.users.title')
   };
@@ -240,16 +296,18 @@ export const UserListPage = () => {
       />
 
       {/* Role Management Modal */}
-      <UserRole
-        isOpen={roleManagementModal.open}
-        onClose={() => setRoleManagementModal({ open: false, user: null })}
-        user={roleManagementModal.user}
-        currentSpaceId={space_id}
-        onSuccess={() => {
-          setRoleManagementModal({ open: false, user: null });
-          refetch();
-        }}
-      />
+      {canManageRoles && (
+        <UserRole
+          isOpen={roleManagementModal.open}
+          onClose={() => setRoleManagementModal({ open: false, user: null })}
+          user={roleManagementModal.user}
+          currentSpaceId={space_id}
+          onSuccess={() => {
+            setRoleManagementModal({ open: false, user: null });
+            refetch();
+          }}
+        />
+      )}
 
       {/* API Key Management Modal */}
       <Modal
@@ -258,7 +316,14 @@ export const UserListPage = () => {
         title={t('user.api_keys.manage_title')}
         className='max-w-4xl'
       >
-        {apiKeyModal.user && <ApiKey userId={apiKeyModal.user.id} />}
+        {apiKeyModal.user && (
+          <ApiKey
+            userId={apiKeyModal.user.id}
+            currentUserId={currentUser?.id}
+            canCreateOwn={canManageOwnApiKeys}
+            canDeleteAny={canDeleteAnyApiKeys}
+          />
+        )}
       </Modal>
 
       {/* Employee Management Modal */}
@@ -268,7 +333,13 @@ export const UserListPage = () => {
         title={t('user.employee.manage_title')}
         className='max-w-6xl'
       >
-        {employeeModal.user && <EmployeeManagement />}
+        {employeeModal.user && (
+          <EmployeeManagement
+            canCreate={canCreateEmployees}
+            canUpdate={canUpdateEmployees}
+            canDelete={canDeleteEmployees}
+          />
+        )}
       </Modal>
 
       {/* Delete confirmation dialog */}

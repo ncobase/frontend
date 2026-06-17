@@ -16,10 +16,13 @@ import { OrgViewerPage } from './viewer';
 
 import { CurdView } from '@/components/curd';
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const OrgListPage = () => {
   const { t } = useTranslation();
   const { vmode } = useLayoutContext();
+  const { hasPermission } = usePermissions();
+  const canManage = hasPermission('manage:organizations');
   const navigate = useNavigate();
   const { mode } = useParams<{ mode: string; slug: string }>();
 
@@ -41,12 +44,20 @@ export const OrgListPage = () => {
   const deleteOrgMutation = useDeleteOrg();
 
   useEffect(() => {
+    if (!canManage && (mode === 'create' || mode === 'edit')) {
+      setViewType(undefined);
+      if (vmode === 'flatten') {
+        navigate('/system/orgs');
+      }
+      return;
+    }
+
     if (mode) {
       setViewType(mode);
     } else {
       setViewType(undefined);
     }
-  }, [mode]);
+  }, [canManage, mode, navigate, vmode]);
 
   const handleView = useCallback(
     (record: Org | null, type: string) => {
@@ -105,8 +116,8 @@ export const OrgListPage = () => {
   );
 
   const tableConfig = {
-    columns: tableColumns({ handleView, handleDelete }),
-    topbarLeft: topbarLeftSection({ handleView }),
+    columns: tableColumns({ handleView, handleDelete, canManage }),
+    topbarLeft: topbarLeftSection({ handleView, canManage }),
     topbarRight: topbarRightSection,
     title: t('system.orgs.title')
   };

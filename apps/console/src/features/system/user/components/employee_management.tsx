@@ -22,7 +22,11 @@ import {
   useDeleteEmployee
 } from '../service';
 
-export const EmployeeManagement: React.FC = () => {
+export const EmployeeManagement: React.FC<{
+  canCreate?: boolean;
+  canUpdate?: boolean;
+  canDelete?: boolean;
+}> = ({ canCreate = false, canUpdate = false, canDelete = false }) => {
   const { t } = useTranslation();
   const toast = useToastMessage();
 
@@ -50,23 +54,26 @@ export const EmployeeManagement: React.FC = () => {
   } = useForm();
 
   const handleCreate = () => {
+    if (!canCreate) return;
     setEditingEmployee(null);
     reset();
     setShowForm(true);
   };
 
   const handleEdit = (employee: any) => {
+    if (!canUpdate) return;
     setEditingEmployee(employee);
     reset(employee);
     setShowForm(true);
   };
 
   const handleDelete = (employee: any) => {
+    if (!canDelete) return;
     setDeleteDialog({ open: true, employee });
   };
 
   const confirmDelete = async () => {
-    if (!deleteDialog.employee) return;
+    if (!canDelete || !deleteDialog.employee) return;
 
     try {
       await deleteEmployeeMutation.mutateAsync(deleteDialog.employee.user_id);
@@ -83,6 +90,8 @@ export const EmployeeManagement: React.FC = () => {
   };
 
   const onSubmit = async (data: any) => {
+    if ((!editingEmployee && !canCreate) || (editingEmployee && !canUpdate)) return;
+
     try {
       // Convert skills and certifications from comma-separated strings to arrays
       const payload = {
@@ -131,10 +140,12 @@ export const EmployeeManagement: React.FC = () => {
           <h2 className='text-2xl font-bold'>{t('employee.management_title')}</h2>
           <p className='text-slate-600'>{t('employee.management_description')}</p>
         </div>
-        <Button onClick={handleCreate}>
-          <Icons name='IconPlus' className='mr-2' />
-          {t('employee.add_employee')}
-        </Button>
+        {canCreate && (
+          <Button onClick={handleCreate}>
+            <Icons name='IconPlus' className='mr-2' />
+            {t('employee.add_employee')}
+          </Button>
+        )}
       </div>
 
       {/* Filters */}
@@ -240,9 +251,11 @@ export const EmployeeManagement: React.FC = () => {
                   <th className='px-4 py-3 text-left font-medium text-slate-900'>
                     {t('employee.fields.employment_type')}
                   </th>
-                  <th className='px-4 py-3 text-center font-medium text-slate-900'>
-                    {t('common.actions')}
-                  </th>
+                  {(canUpdate || canDelete) && (
+                    <th className='px-4 py-3 text-center font-medium text-slate-900'>
+                      {t('common.actions')}
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className='divide-y'>
@@ -252,6 +265,8 @@ export const EmployeeManagement: React.FC = () => {
                     employee={employee}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    canUpdate={canUpdate}
+                    canDelete={canDelete}
                     t={t}
                   />
                 ))}
@@ -270,6 +285,7 @@ export const EmployeeManagement: React.FC = () => {
         }}
         title={editingEmployee ? t('employee.edit_title') : t('employee.create_title')}
         confirmText={editingEmployee ? t('actions.update') : t('actions.create')}
+        confirmDisabled={editingEmployee ? !canUpdate : !canCreate}
         onConfirm={handleSubmit(onSubmit)}
         className='max-w-4xl'
       >
@@ -277,21 +293,23 @@ export const EmployeeManagement: React.FC = () => {
       </Modal>
 
       {/* Delete Confirmation */}
-      <AlertDialog
-        title={t('employee.delete_confirm_title')}
-        description={t('employee.delete_confirm_description')}
-        isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
-        cancelText={t('actions.cancel')}
-        confirmText={t('actions.delete')}
-        onCancel={() => setDeleteDialog({ open: false, employee: null })}
-        onConfirm={confirmDelete}
-      />
+      {canDelete && (
+        <AlertDialog
+          title={t('employee.delete_confirm_title')}
+          description={t('employee.delete_confirm_description')}
+          isOpen={deleteDialog.open}
+          onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
+          cancelText={t('actions.cancel')}
+          confirmText={t('actions.delete')}
+          onCancel={() => setDeleteDialog({ open: false, employee: null })}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 };
 
-const EmployeeRow = ({ employee, onEdit, onDelete, t }: any) => {
+const EmployeeRow = ({ employee, onEdit, onDelete, canUpdate, canDelete, t }: any) => {
   const getStatusColor = (status: string) => {
     const colors = {
       active: 'success',
@@ -318,16 +336,22 @@ const EmployeeRow = ({ employee, onEdit, onDelete, t }: any) => {
           ? t(`employee.employment_types.${employee.employment_type}`)
           : '-'}
       </td>
-      <td className='px-4 py-3'>
-        <div className='flex items-center justify-center space-x-2'>
-          <Button variant='outline-primary' size='xs' onClick={() => onEdit(employee)}>
-            <Icons name='IconPencil' size={14} />
-          </Button>
-          <Button variant='outline-danger' size='xs' onClick={() => onDelete(employee)}>
-            <Icons name='IconTrash' size={14} />
-          </Button>
-        </div>
-      </td>
+      {(canUpdate || canDelete) && (
+        <td className='px-4 py-3'>
+          <div className='flex items-center justify-center space-x-2'>
+            {canUpdate && (
+              <Button variant='outline-primary' size='xs' onClick={() => onEdit(employee)}>
+                <Icons name='IconPencil' size={14} />
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant='outline-danger' size='xs' onClick={() => onDelete(employee)}>
+                <Icons name='IconTrash' size={14} />
+              </Button>
+            )}
+          </div>
+        </td>
+      )}
     </tr>
   );
 };

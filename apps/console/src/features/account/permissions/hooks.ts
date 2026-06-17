@@ -192,12 +192,21 @@ export const useRoutePermissions = () => {
         return hasPermission('manage:system') || hasPermission('read:system');
       }
 
-      if (path.startsWith('/user/')) {
-        return hasPermission('manage:user') || hasPermission('read:user');
+      if (path.startsWith('/system/users') || path.startsWith('/user/')) {
+        return hasPermission('manage:users') || hasPermission('read:users');
+      }
+
+      if (path.startsWith('/system/orgs') || path.startsWith('/org/')) {
+        return hasPermission('manage:organizations') || hasPermission('read:organizations');
       }
 
       if (path.startsWith('/content/')) {
-        return hasPermission('manage:content') || hasPermission('read:content');
+        return (
+          hasPermission('manage:content') ||
+          hasPermission('read:content') ||
+          hasPermission('manage:cms') ||
+          hasPermission('read:cms')
+        );
       }
 
       // Default allow access if no specific permission required

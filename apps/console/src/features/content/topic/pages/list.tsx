@@ -13,10 +13,13 @@ import { useListTopics } from '../service';
 import { Topic } from '../topic';
 
 import { Page, Topbar } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const TopicListPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
+  const canManageContent = hasPermission('manage:content') || hasPermission('manage:cms');
   const [searchParams, setSearchParams] = useState({ search: '', status: '', limit: 50 });
   const [selectedItems, setSelectedItems] = useState<Topic[]>([]);
 
@@ -129,17 +132,19 @@ export const TopicListPage = () => {
             <Icons name='IconEye' size={14} className='mr-1' />
             {t('actions.view')}
           </Button>
-          <Button
-            variant='text'
-            size='xs'
-            onClick={e => {
-              e.stopPropagation();
-              navigate(`/content/topics/${topic.id}/edit`);
-            }}
-          >
-            <Icons name='IconEdit' size={14} className='mr-1' />
-            {t('actions.edit')}
-          </Button>
+          {canManageContent && (
+            <Button
+              variant='text'
+              size='xs'
+              onClick={e => {
+                e.stopPropagation();
+                navigate(`/content/topics/${topic.id}/edit`);
+              }}
+            >
+              <Icons name='IconEdit' size={14} className='mr-1' />
+              {t('actions.edit')}
+            </Button>
+          )}
         </div>
       )
     }
@@ -160,16 +165,20 @@ export const TopicListPage = () => {
       topbar={
         <Topbar
           title={t('content.topics.title')}
-          right={[
-            <Button
-              size='sm'
-              onClick={() => navigate('/content/topics/create')}
-              className='flex items-center gap-2'
-            >
-              <Icons name='IconPlus' size={16} />
-              {t('content.topics.create')}
-            </Button>
-          ]}
+          right={
+            canManageContent
+              ? [
+                  <Button
+                    size='sm'
+                    onClick={() => navigate('/content/topics/create')}
+                    className='flex items-center gap-2'
+                  >
+                    <Icons name='IconPlus' size={16} />
+                    {t('content.topics.create')}
+                  </Button>
+                ]
+              : []
+          }
         />
       }
       className='px-4 sm:px-6 lg:px-8 py-8 space-y-4'
@@ -191,10 +200,10 @@ export const TopicListPage = () => {
         ) : topics.length > 0 ? (
           <TableView
             header={columns}
-            selected
+            selected={canManageContent}
             data={topics}
-            onSelectRow={row => handleToggleSelect(row)}
-            onSelectAllRows={rows => setSelectedItems(rows)}
+            onSelectRow={canManageContent ? row => handleToggleSelect(row) : undefined}
+            onSelectAllRows={canManageContent ? rows => setSelectedItems(rows) : undefined}
             expandComponent={(item: Topic) => <TableRowOverflow item={item} />}
           />
         ) : (
@@ -204,20 +213,24 @@ export const TopicListPage = () => {
               {t('content.topics.empty.title')}
             </h3>
             <p className='text-sm text-gray-500 mb-4'>{t('content.topics.empty.description')}</p>
-            <Button size='sm' onClick={() => navigate('/content/topics/create')}>
-              <Icons name='IconPlus' size={16} className='mr-1' />
-              {t('content.topics.create')}
-            </Button>
+            {canManageContent && (
+              <Button size='sm' onClick={() => navigate('/content/topics/create')}>
+                <Icons name='IconPlus' size={16} className='mr-1' />
+                {t('content.topics.create')}
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Bulk Actions */}
-      <BulkActions
-        selectedItems={selectedItems}
-        onClearSelection={() => setSelectedItems([])}
-        onBulkDelete={handleBulkDelete}
-      />
+      {canManageContent && (
+        <BulkActions
+          selectedItems={selectedItems}
+          onClearSelection={() => setSelectedItems([])}
+          onBulkDelete={handleBulkDelete}
+        />
+      )}
     </Page>
   );
 };

@@ -11,7 +11,7 @@ export const ResourceRoutes = () => {
     {
       path: '/admin',
       element: (
-        <Guard admin>
+        <Guard permissions={['manage:resources', 'admin:resources']} any>
           <ResourceAdminPage />
         </Guard>
       )

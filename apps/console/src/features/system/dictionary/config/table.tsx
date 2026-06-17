@@ -7,9 +7,68 @@ import { Dictionary } from '../dictionary';
 export const tableColumns = ({
   handleView,
   handleDelete,
-  handleValidate
+  handleValidate,
+  canManage
 }): TableViewProps['header'] => {
   const { t } = useTranslation();
+  const actions = [
+    {
+      title: t('actions.view', 'View'),
+      icon: 'IconEye',
+      onClick: (record: Dictionary) => handleView(record, 'view')
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.edit', 'Edit'),
+            icon: 'IconPencil',
+            onClick: (record: Dictionary) => handleView(record, 'edit')
+          },
+          {
+            title: t('actions.duplicate', 'Duplicate'),
+            icon: 'IconCopy',
+            onClick: (record: Dictionary) => {
+              const duplicateRecord = {
+                ...record,
+                id: undefined,
+                name: `${record.name} (Copy)`,
+                slug: `${record.slug}-copy`
+              };
+              handleView(duplicateRecord, 'create');
+            }
+          }
+        ]
+      : []),
+    {
+      title: t('actions.export', 'Export'),
+      icon: 'IconDownload',
+      onClick: (record: Dictionary) => {
+        const dataStr = JSON.stringify(record, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `dictionary-${record.slug}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    },
+    {
+      title: t('actions.validate', 'Validate'),
+      icon: 'IconShieldCheck',
+      onClick: (record: Dictionary) => handleValidate(record)
+    },
+    ...(canManage
+      ? [
+          {
+            title: t('actions.delete', 'Delete'),
+            icon: 'IconTrash',
+            onClick: (record: Dictionary) => handleDelete(record)
+          }
+        ]
+      : [])
+  ];
+
   return [
     {
       title: t('dictionary.fields.name', 'Name'),
@@ -68,55 +127,7 @@ export const tableColumns = ({
     {
       title: t('common.actions', 'Actions'),
       dataIndex: 'operation-column',
-      actions: [
-        {
-          title: t('actions.view', 'View'),
-          icon: 'IconEye',
-          onClick: (record: Dictionary) => handleView(record, 'view')
-        },
-        {
-          title: t('actions.edit', 'Edit'),
-          icon: 'IconPencil',
-          onClick: (record: Dictionary) => handleView(record, 'edit')
-        },
-        {
-          title: t('actions.duplicate', 'Duplicate'),
-          icon: 'IconCopy',
-          onClick: (record: Dictionary) => {
-            const duplicateRecord = {
-              ...record,
-              id: undefined,
-              name: `${record.name} (Copy)`,
-              slug: `${record.slug}-copy`
-            };
-            handleView(duplicateRecord, 'create');
-          }
-        },
-        {
-          title: t('actions.export', 'Export'),
-          icon: 'IconDownload',
-          onClick: (record: Dictionary) => {
-            const dataStr = JSON.stringify(record, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `dictionary-${record.slug}.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-          }
-        },
-        {
-          title: t('actions.validate', 'Validate'),
-          icon: 'IconShieldCheck',
-          onClick: (record: Dictionary) => handleValidate(record)
-        },
-        {
-          title: t('actions.delete', 'Delete'),
-          icon: 'IconTrash',
-          onClick: (record: Dictionary) => handleDelete(record)
-        }
-      ]
+      actions
     }
   ];
 };
