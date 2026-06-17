@@ -81,6 +81,10 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Header notifications and other global status surfaces must use real backend data when the backend
   contract exists. They must expose loading, empty, error, retry, unread, disabled, and keyboard
   activation states instead of permanent mock items.
+- AI surfaces must show disabled/unconfigured provider states before accepting prompts, distinguish
+  policy/provider/permission failures, show generated output with run ids, and link to the backend
+  run record for auditability. Contextual AI assistants may generate reviewable output, but must not
+  silently mutate business records.
 
 ## Permissions and Ownership
 
@@ -92,9 +96,10 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Ownership-sensitive screens must display whether the object is user-owned, space-owned, public, or
   shared.
 - Space switch must be treated as an authorization boundary change.
-- Payment provider config, payment logs, webhook payloads, resource publicization, proxy rules, and
-  NCore runtime operations are high-risk surfaces. They need explicit permissions, masked sensitive
-  values, confirmation or review steps, and audit visibility before production use.
+- Payment provider config, payment logs, webhook payloads, resource publicization, proxy rules, AI
+  provider configuration, and NCore runtime operations are high-risk surfaces. They need explicit
+  permissions, masked sensitive values, confirmation or review steps, and audit visibility before
+  production use.
 
 ## I18n, Accessibility, and Responsiveness
 

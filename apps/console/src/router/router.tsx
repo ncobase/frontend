@@ -27,6 +27,7 @@ const NCoreRoutes = lazy(() => import('@/features/ncore/routes'));
 const SpaceRoutes = lazy(() => import('@/features/space/routes'));
 const ResourceRoutes = lazy(() => import('@/features/resource/routes'));
 const PaymentRoutes = lazy(() => import('@/features/payment/routes'));
+const AIRoutes = lazy(() => import('@/features/ai/routes'));
 
 const routes = [
   { path: '/', element: <Navigate to='/dash' replace /> },
@@ -157,6 +158,14 @@ const routes = [
         any
       >
         <PaymentRoutes />
+      </Guard>
+    )
+  },
+  {
+    path: '/ai/*',
+    element: (
+      <Guard permissions={['read:ai', 'use:ai', 'manage:ai', 'admin:ai']} any>
+        <AIRoutes />
       </Guard>
     )
   }

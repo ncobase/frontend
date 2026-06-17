@@ -26,6 +26,8 @@ import { FeaturePreview } from './preview';
 import { RelationshipEditor } from './relationship_editor';
 import { RelationshipList } from './relationship_list';
 
+import { AIActionRunner } from '@/features/ai/components/action_runner';
+
 export const FeatureBuilder = () => {
   const { t } = useTranslation();
 
@@ -409,9 +411,41 @@ export const FeatureBuilder = () => {
 
   return (
     <>
-      <div className='flex items-center justify-between mb-6'>
+      <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
         <h1 className='text-2xl font-semibold'>{t('feature_builder.title')}</h1>
-        <div className='flex items-center gap-4'>
+        <div className='flex flex-wrap items-center gap-2'>
+          <AIActionRunner
+            domain='builder'
+            actionKeys={[
+              'builder.schema',
+              'builder.form',
+              'builder.api',
+              'builder.menu',
+              'builder.tests'
+            ]}
+            title={t('ai.builder.assistant', 'AI Builder Assistant')}
+            buttonLabel={t('ai.actions.assist', 'AI assist')}
+            compact
+            content={JSON.stringify(
+              {
+                feature: featureConfig,
+                fields: entityFields,
+                relations: entityRelations
+              },
+              null,
+              2
+            )}
+            instruction={t(
+              'ai.builder.instruction',
+              'Review this feature design and generate production-ready schema, API, form, menu, or test guidance.'
+            )}
+            context={{
+              surface: 'builder.feature',
+              active_tab: activeTab,
+              active_field_id: activeFieldId,
+              active_relation_id: activeRelationId
+            }}
+          />
           <Button
             variant={activeTab === TAB_NAMES.CONFIG ? 'primary' : 'outline-slate'}
             className='py-2.5'

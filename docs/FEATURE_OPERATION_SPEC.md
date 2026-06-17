@@ -243,6 +243,36 @@ Current frontend closure from the feature/UI pass:
 - Required next UX: per-file transfer progress, browser integration tests for delete impact review
   and upload/delete failure recovery, and version restore/delete UI after backend endpoints exist.
 
+## AI Gateway
+
+- Entry: `/ai/overview`, `/ai/playground`, `/ai/actions`, `/ai/runs`, `/ai/runs/:id`,
+  `/ai/providers`, `/ai/usage`, plus contextual AI assistant buttons in topic create/edit, resource
+  detail, CMS media detail, and Builder feature design.
+- Actions:
+  - inspect runtime readiness, policy limits, provider configuration status, server-side secret
+    presence, available actions, usage, and run history;
+  - run non-stream completion from the playground through `POST /ai/complete`;
+  - run streaming completion through `POST /ai/stream` with SSE parsing and the same auth/space
+    headers as normal requests;
+  - run governed business actions through `POST /ai/actions/:action`;
+  - inspect run metadata/errors/hashes/tokens/cost without storing raw prompts by default;
+  - copy generated output and open the auditable run record.
+- API: `/ai/status`, `/ai/providers`, `/ai/models`, `/ai/actions`, `/ai/runs`, `/ai/runs/:id`,
+  `/ai/usage`, `/ai/health`, `/ai/complete`, `/ai/stream`, `/ai/embed`, `/ai/actions/:action`.
+- Required permissions: `read:ai` or higher for status, provider summaries, actions, runs, and
+  usage; `use:ai` or higher for complete, stream, embed, and action execution; `manage:ai` or
+  `admin:ai` for provider health checks.
+- Cross-effects: successful AI calls invalidate AI runs, usage, and status queries. Business
+  surfaces pass currently visible form or record context to AI actions but do not mutate topics,
+  media, resources, or Builder state automatically. Server-side options and environment variables
+  control enablement, provider selection, safety, model defaults, cost, embedding, and policy limits.
+- Failure states: disabled runtime, missing provider secrets, policy rejection, prompt size limits,
+  malformed action context JSON, permission denial, provider error, stream interruption, and run
+  lookup ownership denial.
+- Required next UX: admin option editor for AI policy/provider options, browser tests for
+  playground/actions/streaming, and explicit apply flows only after each target domain has a backend
+  mutation contract and validation behavior.
+
 ## Spaces
 
 - Entry: `/spaces`.

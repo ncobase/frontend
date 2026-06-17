@@ -11,6 +11,7 @@ import { useCreateTopic } from '../service';
 import type { TopicMedia } from '../topic_media';
 
 import { Page, Topbar } from '@/components/layout';
+import { AIActionRunner } from '@/features/ai/components/action_runner';
 
 export const CreateTopicPage = () => {
   const { t } = useTranslation();
@@ -22,8 +23,10 @@ export const CreateTopicPage = () => {
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors }
   } = useForm();
+  const draftTopic = watch();
   const createTopicMutation = useCreateTopic();
 
   const onSubmit = handleSubmit(async data => {
@@ -55,6 +58,32 @@ export const CreateTopicPage = () => {
             </Button>
           ]}
           right={[
+            <AIActionRunner
+              key='ai'
+              domain='content'
+              actionKeys={[
+                'content.title',
+                'content.summary',
+                'content.seo',
+                'content.tags',
+                'content.review',
+                'content.translation'
+              ]}
+              title={t('ai.content.topic_assistant', 'AI Topic Assistant')}
+              buttonLabel={t('ai.actions.assist', 'AI assist')}
+              compact
+              content={[draftTopic?.title, draftTopic?.content].filter(Boolean).join('\n\n')}
+              instruction={t(
+                'ai.content.topic_instruction',
+                'Generate production-ready editorial help for this topic draft.'
+              )}
+              context={{
+                surface: 'content.topic.create',
+                topic: draftTopic,
+                media_count: topicMedia.length
+              }}
+              disabled={createTopicMutation.isPending}
+            />,
             <Button variant='outline' size='sm' onClick={() => navigate('/content/topics')}>
               {t('actions.cancel')}
             </Button>,

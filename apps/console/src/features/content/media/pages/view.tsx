@@ -15,6 +15,7 @@ import { useQueryMedia } from '../service';
 
 import { ErrorPage } from '@/components/errors';
 import { Page, Topbar } from '@/components/layout';
+import { AIActionRunner } from '@/features/ai/components/action_runner';
 import { useListTopicMediaByMedia } from '@/features/content/topic/service';
 
 export const MediaViewPage = () => {
@@ -111,6 +112,34 @@ export const MediaViewPage = () => {
             </Button>
           ]}
           right={[
+            <AIActionRunner
+              key='ai'
+              domain='resource'
+              actionKeys={['resource.summary', 'resource.description', 'resource.tags']}
+              title={t('ai.media.assistant', 'AI Media Assistant')}
+              buttonLabel={t('ai.actions.assist', 'AI assist')}
+              compact
+              content={[
+                media.title,
+                media.description,
+                media.alt,
+                media.type,
+                mimeType,
+                size ? `${size} bytes` : '',
+                media.resource_id ? `resource_id: ${media.resource_id}` : ''
+              ]
+                .filter(Boolean)
+                .join('\n')}
+              instruction={t(
+                'ai.media.instruction',
+                'Generate accessible descriptions, summaries, or tags from this media metadata.'
+              )}
+              context={{
+                surface: 'content.media.view',
+                media,
+                topic_usage_count: topicReferences.length
+              }}
+            />,
             <Button
               variant='outline'
               size='sm'

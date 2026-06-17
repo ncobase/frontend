@@ -13,6 +13,7 @@ import { useResourceRuntimePolicy } from '../resource_policy';
 import { useCreateThumbnail, useGetResource, useGetUsage } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
+import { AIActionRunner } from '@/features/ai/components/action_runner';
 import type { Media } from '@/features/content/media/media';
 import { useListMedia } from '@/features/content/media/service';
 
@@ -108,6 +109,32 @@ export const ResourceViewPage = () => {
             </Button>
           ]}
           right={[
+            <AIActionRunner
+              key='ai'
+              domain='resource'
+              actionKeys={['resource.summary', 'resource.description', 'resource.tags']}
+              title={t('ai.resource.assistant', 'AI Resource Assistant')}
+              buttonLabel={t('ai.actions.assist', 'AI assist')}
+              compact
+              content={[
+                file.original_name || file.name,
+                file.type,
+                file.category,
+                file.path,
+                file.tags?.join(', ')
+              ]
+                .filter(Boolean)
+                .join('\n')}
+              instruction={t(
+                'ai.resource.instruction',
+                'Analyze this resource metadata and generate useful summary, description, or tags.'
+              )}
+              context={{
+                surface: 'resource.view',
+                resource: file,
+                cms_media_reference_total: mediaReferenceTotal
+              }}
+            />,
             <Button
               key='preview'
               variant='outline-slate'

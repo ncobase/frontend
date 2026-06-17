@@ -10,6 +10,7 @@ import { EditorTopicForm } from '../forms/editor';
 import { useQueryTopic, useUpdateTopic } from '../service';
 
 import { Page, Topbar } from '@/components/layout';
+import { AIActionRunner } from '@/features/ai/components/action_runner';
 
 export const TopicEditPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,9 +23,11 @@ export const TopicEditPage = () => {
     control,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors }
   } = useForm();
+  const draftTopic = watch();
   const updateTopicMutation = useUpdateTopic();
 
   // Reset form when topic data loads
@@ -72,6 +75,34 @@ export const TopicEditPage = () => {
             </Button>
           ]}
           right={[
+            <AIActionRunner
+              key='ai'
+              domain='content'
+              actionKeys={[
+                'content.title',
+                'content.summary',
+                'content.seo',
+                'content.tags',
+                'content.review',
+                'content.translation'
+              ]}
+              title={t('ai.content.topic_assistant', 'AI Topic Assistant')}
+              buttonLabel={t('ai.actions.assist', 'AI assist')}
+              compact
+              content={[draftTopic?.title || topic?.title, draftTopic?.content || topic?.content]
+                .filter(Boolean)
+                .join('\n\n')}
+              instruction={t(
+                'ai.content.topic_instruction',
+                'Generate production-ready editorial help for this topic draft.'
+              )}
+              context={{
+                surface: 'content.topic.edit',
+                topic_id: id,
+                topic: { ...topic, ...draftTopic }
+              }}
+              disabled={updateTopicMutation.isPending}
+            />,
             <Button variant='outline' size='sm' onClick={() => navigate(`/content/topics/${id}`)}>
               {t('actions.cancel')}
             </Button>,
