@@ -108,30 +108,36 @@ export const RoleListPage = () => {
 
   const handleCreate = useCallback(
     (data: Role) => {
+      if (!canManage) return;
       createRoleMutation.mutate(data, { onSuccess });
     },
-    [createRoleMutation, onSuccess]
+    [canManage, createRoleMutation, onSuccess]
   );
 
   const handleUpdate = useCallback(
     (data: Role) => {
+      if (!canManage) return;
       updateRoleMutation.mutate(data, { onSuccess });
     },
-    [updateRoleMutation, onSuccess]
+    [canManage, updateRoleMutation, onSuccess]
   );
 
   const handleDelete = useCallback(
     (record: Role) => {
-      if (record.id) {
+      if (canManage && record.id) {
         deleteRoleMutation.mutate(record.id, { onSuccess });
       }
     },
-    [deleteRoleMutation, onSuccess]
+    [canManage, deleteRoleMutation, onSuccess]
   );
 
-  const handlePermissions = useCallback((role: Role) => {
-    setPermissionModal({ open: true, role });
-  }, []);
+  const handlePermissions = useCallback(
+    (role: Role) => {
+      if (!canManage) return;
+      setPermissionModal({ open: true, role });
+    },
+    [canManage]
+  );
 
   const handleConfirm = useCallback(
     handleFormSubmit((data: Role) => {
@@ -156,7 +162,7 @@ export const RoleListPage = () => {
         topbarRight={tableConfig.topbarRight}
         columns={tableConfig.columns}
         data={data?.items || []}
-        selected
+        selected={canManage}
         queryFields={queryFields({ queryControl })}
         onQuery={onQuery}
         onResetQuery={onResetQuery}
@@ -188,12 +194,14 @@ export const RoleListPage = () => {
         onConfirm={handleConfirm}
         onCancel={handleClose}
       />
-      <RolePermissionAssignment
-        isOpen={permissionModal.open}
-        onClose={() => setPermissionModal({ open: false, role: null })}
-        role={permissionModal.role}
-        onSuccess={refetch}
-      />
+      {canManage && (
+        <RolePermissionAssignment
+          isOpen={permissionModal.open}
+          onClose={() => setPermissionModal({ open: false, role: null })}
+          role={permissionModal.role}
+          onSuccess={refetch}
+        />
+      )}
     </>
   );
 };

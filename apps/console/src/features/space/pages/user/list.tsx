@@ -91,17 +91,22 @@ export const SpaceUserListPage = () => {
     }));
   }, []);
 
-  const handleToggleSelect = useCallback((user: any) => {
-    setSelectedUsers(prev => {
-      const isSelected = prev.some(selected => selected.user_id === user.user_id);
-      return isSelected
-        ? prev.filter(selected => selected.user_id !== user.user_id)
-        : [...prev, user];
-    });
-  }, []);
+  const handleToggleSelect = useCallback(
+    (user: any) => {
+      if (!canManageSpaces) return;
+      setSelectedUsers(prev => {
+        const isSelected = prev.some(selected => selected.user_id === user.user_id);
+        return isSelected
+          ? prev.filter(selected => selected.user_id !== user.user_id)
+          : [...prev, user];
+      });
+    },
+    [canManageSpaces]
+  );
 
   const handleBulkDelete = useCallback(
     async (userIds: string[]) => {
+      if (!canManageSpaces) return;
       try {
         // Remove all roles for selected users from space
         const promises = userIds.map(async userId => {
@@ -128,15 +133,19 @@ export const SpaceUserListPage = () => {
         });
       }
     },
-    [users, removeUserMutation, spaceId, toast, t, refetch]
+    [canManageSpaces, users, removeUserMutation, spaceId, toast, t, refetch]
   );
 
-  const handleDelete = useCallback((user: any) => {
-    setDeleteDialog({ open: true, user });
-  }, []);
+  const handleDelete = useCallback(
+    (user: any) => {
+      if (!canManageSpaces) return;
+      setDeleteDialog({ open: true, user });
+    },
+    [canManageSpaces]
+  );
 
   const confirmDelete = useCallback(async () => {
-    if (!deleteDialog.user) return;
+    if (!canManageSpaces || !deleteDialog.user) return;
 
     try {
       const userRoles = deleteDialog.user.role_ids || [];
@@ -163,11 +172,15 @@ export const SpaceUserListPage = () => {
       });
       setDeleteDialog({ open: false, user: null });
     }
-  }, [deleteDialog.user, removeUserMutation, spaceId, toast, t, refetch]);
+  }, [canManageSpaces, deleteDialog.user, removeUserMutation, spaceId, toast, t, refetch]);
 
-  const handleRoleManagement = useCallback((user: any) => {
-    setRoleManagementModal({ open: true, user });
-  }, []);
+  const handleRoleManagement = useCallback(
+    (user: any) => {
+      if (!canManageSpaces) return;
+      setRoleManagementModal({ open: true, user });
+    },
+    [canManageSpaces]
+  );
 
   const getAccessLevelBadge = (level: string) => {
     const levelConfig = {
@@ -416,10 +429,15 @@ export const SpaceUserListPage = () => {
                 {space.name} {t('space.users.title')}
               </h1>
               <p className='text-gray-600'>
-                {t('space.users.description_with_count', {
-                  count: users.length,
-                  defaultValue: 'Manage user access and permissions for this space'
-                })}
+                {canManageSpaces
+                  ? t('space.users.description_with_count', {
+                      count: users.length,
+                      defaultValue: 'Manage user access and permissions for this space'
+                    })
+                  : t('space.users.readonly_description_with_count', {
+                      count: users.length,
+                      defaultValue: 'View user access and permissions for this space'
+                    })}
               </p>
             </div>
           </div>
@@ -442,7 +460,7 @@ export const SpaceUserListPage = () => {
             selected={canManageSpaces}
             data={users}
             onSelectRow={row => handleToggleSelect(row)}
-            onSelectAllRows={rows => setSelectedUsers(rows)}
+            onSelectAllRows={rows => setSelectedUsers(canManageSpaces ? rows : [])}
             className='[&_table]:border-0'
           />
         ) : (
@@ -517,16 +535,18 @@ export const SpaceUserListPage = () => {
       )}
 
       {/* Delete confirmation dialog */}
-      <AlertDialog
-        title={t('space.users.dialogs.remove_title')}
-        description={t('space.users.dialogs.remove_description')}
-        isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !deleteDialog.open }))}
-        cancelText={t('actions.cancel')}
-        confirmText={t('actions.remove')}
-        onCancel={() => setDeleteDialog({ open: false, user: null })}
-        onConfirm={confirmDelete}
-      />
+      {canManageSpaces && (
+        <AlertDialog
+          title={t('space.users.dialogs.remove_title')}
+          description={t('space.users.dialogs.remove_description')}
+          isOpen={deleteDialog.open}
+          onChange={() => setDeleteDialog(prev => ({ ...prev, open: !deleteDialog.open }))}
+          cancelText={t('actions.cancel')}
+          confirmText={t('actions.remove')}
+          onCancel={() => setDeleteDialog({ open: false, user: null })}
+          onConfirm={confirmDelete}
+        />
+      )}
     </Page>
   );
 };

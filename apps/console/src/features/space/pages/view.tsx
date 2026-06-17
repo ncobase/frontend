@@ -408,56 +408,62 @@ export const SpaceViewPage = () => {
       </div>
 
       {/* Modals */}
-      <SpaceSettings
-        isOpen={settingsModal.open}
-        onClose={() => setSettingsModal({ open: false, activeTab: 'general' })}
-        space={space}
-        initialTab={settingsModal.activeTab}
-        onSuccess={() => {
-          setSettingsModal({ open: false, activeTab: 'general' });
-          window.location.reload(); // Refresh to show updated data
-        }}
-        onNavigateToQuotas={() => {
-          setSettingsModal({ open: false, activeTab: 'general' });
-          setQuotasModal(true);
-        }}
-        onNavigateToBilling={() => {
-          setSettingsModal({ open: false, activeTab: 'general' });
-          setBillingModal(true);
-        }}
-        onNavigateToView={() => {}}
-        onNavigateToEdit={() => navigate(`/spaces/${space.id}/edit`)}
-      />
-
-      <Modal
-        isOpen={quotasModal}
-        onCancel={() => setQuotasModal(false)}
-        title={t('space.quotas.manage_title')}
-        className='max-w-6xl'
-      >
-        <SpaceQuotaManagement
+      {canManageSpaces && (
+        <SpaceSettings
+          isOpen={settingsModal.open}
+          onClose={() => setSettingsModal({ open: false, activeTab: 'general' })}
           space={space}
-          onNavigateToSettings={() => {
-            setQuotasModal(false);
-            setSettingsModal({ open: true, activeTab: 'quotas' });
+          initialTab={settingsModal.activeTab}
+          onSuccess={() => {
+            setSettingsModal({ open: false, activeTab: 'general' });
+            window.location.reload(); // Refresh to show updated data
           }}
+          onNavigateToQuotas={() => {
+            setSettingsModal({ open: false, activeTab: 'general' });
+            setQuotasModal(true);
+          }}
+          onNavigateToBilling={() => {
+            setSettingsModal({ open: false, activeTab: 'general' });
+            setBillingModal(true);
+          }}
+          onNavigateToView={() => {}}
+          onNavigateToEdit={() => navigate(`/spaces/${space.id}/edit`)}
         />
-      </Modal>
+      )}
 
-      <Modal
-        isOpen={billingModal}
-        onCancel={() => setBillingModal(false)}
-        title={t('space.billing.manage_title')}
-        className='max-w-6xl'
-      >
-        <SpaceBillingManagement
-          space={space}
-          onNavigateToSettings={() => {
-            setBillingModal(false);
-            setSettingsModal({ open: true, activeTab: 'billing' });
-          }}
-        />
-      </Modal>
+      {canManageSpaces && (
+        <Modal
+          isOpen={quotasModal}
+          onCancel={() => setQuotasModal(false)}
+          title={t('space.quotas.manage_title')}
+          className='max-w-6xl'
+        >
+          <SpaceQuotaManagement
+            space={space}
+            onNavigateToSettings={() => {
+              setQuotasModal(false);
+              setSettingsModal({ open: true, activeTab: 'quotas' });
+            }}
+          />
+        </Modal>
+      )}
+
+      {canManageSpaces && (
+        <Modal
+          isOpen={billingModal}
+          onCancel={() => setBillingModal(false)}
+          title={t('space.billing.manage_title')}
+          className='max-w-6xl'
+        >
+          <SpaceBillingManagement
+            space={space}
+            onNavigateToSettings={() => {
+              setBillingModal(false);
+              setSettingsModal({ open: true, activeTab: 'billing' });
+            }}
+          />
+        </Modal>
+      )}
     </Page>
   );
 };

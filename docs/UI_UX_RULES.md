@@ -9,6 +9,8 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Development-only surfaces are filtered again by feature exposure:
   - Builder: enabled outside production, or production with `VITE_ENABLE_BUILDER_ROUTES=true`.
   - Example: enabled outside production, or production with `VITE_ENABLE_EXAMPLE_ROUTES=true`.
+  - Advanced content: enabled outside production, or production with
+    `VITE_ENABLE_CONTENT_ADVANCED_ROUTES=true`.
 - Menus hidden by feature exposure must not render even if backend seed still contains them.
 - A route must not be exposed when its menu permission points to a backend route permission that does
   not exist.
@@ -90,6 +92,9 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 
 - Frontend guards only control user experience; backend must enforce all permissions.
 - Route guards should use the same permission strings as backend middleware and menu seed data.
+- Menu permission filtering must preserve a visible parent when at least one child menu remains
+  accessible; otherwise read-only child pages such as roles or permissions can become unreachable
+  from navigation even when their route and API permissions are valid.
 - Permission downgrades must be visible and consistent: read-only users can still inspect list/detail
   data, but create/edit/delete/refund/cancel/bulk actions and mutation subroutes must be hidden or
   render a 403 state.

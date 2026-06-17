@@ -89,15 +89,20 @@ export const SpaceListPage = () => {
     }));
   }, []);
 
-  const handleToggleSelect = useCallback((item: Space) => {
-    setSelectedItems(prev => {
-      const isSelected = prev.some(selected => selected.id === item.id);
-      return isSelected ? prev.filter(selected => selected.id !== item.id) : [...prev, item];
-    });
-  }, []);
+  const handleToggleSelect = useCallback(
+    (item: Space) => {
+      if (!canManageSpaces) return;
+      setSelectedItems(prev => {
+        const isSelected = prev.some(selected => selected.id === item.id);
+        return isSelected ? prev.filter(selected => selected.id !== item.id) : [...prev, item];
+      });
+    },
+    [canManageSpaces]
+  );
 
   const handleBulkDelete = useCallback(
     async (ids: string[]) => {
+      if (!canManageSpaces) return;
       try {
         await Promise.all(ids.map(id => deleteSpaceMutation.mutateAsync(id)));
         toast.success(t('messages.success'), {
@@ -111,15 +116,19 @@ export const SpaceListPage = () => {
         });
       }
     },
-    [deleteSpaceMutation, toast, t, refetch]
+    [canManageSpaces, deleteSpaceMutation, toast, t, refetch]
   );
 
-  const handleDelete = useCallback((space: Space) => {
-    setDeleteDialog({ open: true, space });
-  }, []);
+  const handleDelete = useCallback(
+    (space: Space) => {
+      if (!canManageSpaces) return;
+      setDeleteDialog({ open: true, space });
+    },
+    [canManageSpaces]
+  );
 
   const confirmDelete = useCallback(async () => {
-    if (!deleteDialog.space) return;
+    if (!canManageSpaces || !deleteDialog.space) return;
 
     try {
       await deleteSpaceMutation.mutateAsync(deleteDialog.space.id || '');
@@ -134,10 +143,11 @@ export const SpaceListPage = () => {
       });
       setDeleteDialog({ open: false, space: null });
     }
-  }, [deleteDialog.space, deleteSpaceMutation, toast, t, refetch]);
+  }, [canManageSpaces, deleteDialog.space, deleteSpaceMutation, toast, t, refetch]);
 
   const handleToggleStatus = useCallback(
     async (space: Space) => {
+      if (!canManageSpaces) return;
       try {
         await updateSpaceMutation.mutateAsync({
           ...space,
@@ -155,13 +165,17 @@ export const SpaceListPage = () => {
         });
       }
     },
-    [updateSpaceMutation, toast, t, refetch]
+    [canManageSpaces, updateSpaceMutation, toast, t, refetch]
   );
 
   // Management handlers
-  const handleSettings = useCallback((space: Space, activeTab = 'general') => {
-    setSettingsModal({ open: true, space, activeTab });
-  }, []);
+  const handleSettings = useCallback(
+    (space: Space, activeTab = 'general') => {
+      if (!canManageSpaces) return;
+      setSettingsModal({ open: true, space, activeTab });
+    },
+    [canManageSpaces]
+  );
 
   const handleUsers = useCallback(
     (space: Space) => {
@@ -170,18 +184,27 @@ export const SpaceListPage = () => {
     [navigate]
   );
 
-  const handleQuotas = useCallback((space: Space) => {
-    setQuotasModal({ open: true, space });
-  }, []);
+  const handleQuotas = useCallback(
+    (space: Space) => {
+      if (!canManageSpaces) return;
+      setQuotasModal({ open: true, space });
+    },
+    [canManageSpaces]
+  );
 
-  const handleBilling = useCallback((space: Space) => {
-    setBillingModal({ open: true, space });
-  }, []);
+  const handleBilling = useCallback(
+    (space: Space) => {
+      if (!canManageSpaces) return;
+      setBillingModal({ open: true, space });
+    },
+    [canManageSpaces]
+  );
 
   // Import/Export handlers
   const handleImport = useCallback(() => {
+    if (!canManageSpaces) return;
     setImportModal(true);
-  }, []);
+  }, [canManageSpaces]);
 
   const handleExport = useCallback(() => {
     setExportModal(true);
@@ -189,6 +212,7 @@ export const SpaceListPage = () => {
 
   const handleImportSubmit = useCallback(
     async (data: any) => {
+      if (!canManageSpaces) return;
       const items = data.items || [];
       if (!items.length) {
         toast.error(t('messages.error'), {
@@ -232,7 +256,7 @@ export const SpaceListPage = () => {
         throw error;
       }
     },
-    [createSpaceMutation, toast, t, refetch]
+    [canManageSpaces, createSpaceMutation, toast, t, refetch]
   );
 
   const handleExportSubmit = useCallback(
@@ -519,7 +543,7 @@ export const SpaceListPage = () => {
             selected={canManageSpaces}
             data={spaces}
             onSelectRow={row => handleToggleSelect(row)}
-            onSelectAllRows={rows => setSelectedItems(rows)}
+            onSelectAllRows={rows => setSelectedItems(canManageSpaces ? rows : [])}
             className='[&_table]:border-0'
           />
         ) : (
@@ -562,64 +586,72 @@ export const SpaceListPage = () => {
       )}
 
       {/* Modals */}
-      <SpaceSettings
-        isOpen={settingsModal.open}
-        onClose={() => setSettingsModal({ open: false, space: null, activeTab: 'general' })}
-        space={settingsModal.space}
-        initialTab={settingsModal.activeTab}
-        onSuccess={() => {
-          setSettingsModal({ open: false, space: null, activeTab: 'general' });
-          refetch();
-        }}
-        onNavigateToQuotas={space => {
-          setSettingsModal({ open: false, space: null, activeTab: 'general' });
-          setQuotasModal({ open: true, space });
-        }}
-        onNavigateToBilling={space => {
-          setSettingsModal({ open: false, space: null, activeTab: 'general' });
-          setBillingModal({ open: true, space });
-        }}
-        onNavigateToView={space => navigate(`/spaces/${space.id}`)}
-        onNavigateToEdit={space => navigate(`/spaces/${space.id}/edit`)}
-      />
+      {canManageSpaces && (
+        <SpaceSettings
+          isOpen={settingsModal.open}
+          onClose={() => setSettingsModal({ open: false, space: null, activeTab: 'general' })}
+          space={settingsModal.space}
+          initialTab={settingsModal.activeTab}
+          onSuccess={() => {
+            setSettingsModal({ open: false, space: null, activeTab: 'general' });
+            refetch();
+          }}
+          onNavigateToQuotas={space => {
+            setSettingsModal({ open: false, space: null, activeTab: 'general' });
+            setQuotasModal({ open: true, space });
+          }}
+          onNavigateToBilling={space => {
+            setSettingsModal({ open: false, space: null, activeTab: 'general' });
+            setBillingModal({ open: true, space });
+          }}
+          onNavigateToView={space => navigate(`/spaces/${space.id}`)}
+          onNavigateToEdit={space => navigate(`/spaces/${space.id}/edit`)}
+        />
+      )}
 
-      <Modal
-        isOpen={quotasModal.open}
-        onCancel={() => setQuotasModal({ open: false, space: null })}
-        title={t('space.quotas.manage_title')}
-        className='max-w-6xl'
-      >
-        {quotasModal.space && (
-          <SpaceQuotaManagement
-            space={quotasModal.space}
-            onNavigateToSettings={space => {
-              setQuotasModal({ open: false, space: null });
-              setSettingsModal({ open: true, space, activeTab: 'quotas' });
-            }}
-          />
-        )}
-      </Modal>
+      {canManageSpaces && (
+        <Modal
+          isOpen={quotasModal.open}
+          onCancel={() => setQuotasModal({ open: false, space: null })}
+          title={t('space.quotas.manage_title')}
+          className='max-w-6xl'
+        >
+          {quotasModal.space && (
+            <SpaceQuotaManagement
+              space={quotasModal.space}
+              onNavigateToSettings={space => {
+                setQuotasModal({ open: false, space: null });
+                setSettingsModal({ open: true, space, activeTab: 'quotas' });
+              }}
+            />
+          )}
+        </Modal>
+      )}
 
-      <Modal
-        isOpen={billingModal.open}
-        onCancel={() => setBillingModal({ open: false, space: null })}
-        title={t('space.billing.manage_title')}
-        className='max-w-6xl'
-      >
-        {billingModal.space && (
-          <SpaceBillingManagement
-            space={billingModal.space}
-            onNavigateToSettings={space => {
-              setBillingModal({ open: false, space: null });
-              setSettingsModal({ open: true, space, activeTab: 'billing' });
-            }}
-          />
-        )}
-      </Modal>
+      {canManageSpaces && (
+        <Modal
+          isOpen={billingModal.open}
+          onCancel={() => setBillingModal({ open: false, space: null })}
+          title={t('space.billing.manage_title')}
+          className='max-w-6xl'
+        >
+          {billingModal.space && (
+            <SpaceBillingManagement
+              space={billingModal.space}
+              onNavigateToSettings={space => {
+                setBillingModal({ open: false, space: null });
+                setSettingsModal({ open: true, space, activeTab: 'billing' });
+              }}
+            />
+          )}
+        </Modal>
+      )}
 
-      <Modal isOpen={importModal} title={t('space.import.title')}>
-        <SpaceImportForm onSubmit={handleImportSubmit} onCancel={() => setImportModal(false)} />
-      </Modal>
+      {canManageSpaces && (
+        <Modal isOpen={importModal} title={t('space.import.title')}>
+          <SpaceImportForm onSubmit={handleImportSubmit} onCancel={() => setImportModal(false)} />
+        </Modal>
+      )}
 
       <Modal isOpen={exportModal} title={t('space.export.title')}>
         <SpaceExportForm
@@ -631,16 +663,18 @@ export const SpaceListPage = () => {
         />
       </Modal>
 
-      <AlertDialog
-        title={t('space.dialogs.delete_title')}
-        description={t('space.dialogs.delete_description')}
-        isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !deleteDialog.open }))}
-        cancelText={t('actions.cancel')}
-        confirmText={t('actions.delete')}
-        onCancel={() => setDeleteDialog({ open: false, space: null })}
-        onConfirm={confirmDelete}
-      />
+      {canManageSpaces && (
+        <AlertDialog
+          title={t('space.dialogs.delete_title')}
+          description={t('space.dialogs.delete_description')}
+          isOpen={deleteDialog.open}
+          onChange={() => setDeleteDialog(prev => ({ ...prev, open: !deleteDialog.open }))}
+          cancelText={t('actions.cancel')}
+          confirmText={t('actions.delete')}
+          onCancel={() => setDeleteDialog({ open: false, space: null })}
+          onConfirm={confirmDelete}
+        />
+      )}
     </Page>
   );
 };

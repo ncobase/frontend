@@ -102,7 +102,10 @@ which cross-feature effects they must handle.
   browsers or devices still need token refresh, re-login, or a future live permission refresh event.
 - Read-only behavior: permission readers can list, view, and export permission rows; write actions,
   bulk enable/disable/delete, assignment modals, and direct create/edit URLs require
-  `manage:permissions`.
+  `manage:permissions`. Role readers can list, view, and inspect role permissions/users; role
+  create/edit/delete, role-user assignment, and role-permission mutation require `manage:roles`.
+  Runtime navigation for the roles and permissions pages uses `read:roles` and `read:permissions`,
+  so seed data must keep those read permissions available.
 
 ### Menus
 
@@ -141,11 +144,17 @@ which cross-feature effects they must handle.
 ### Topics and Taxonomies
 
 - Entry: `/content/topics`, `/content/taxonomies`.
-- Actions: list/filter, create, edit, view, delete, create topic within taxonomy context, upload
-  thumbnail media, and manage featured/gallery/attachment topic media.
+- Actions: list/filter, create, edit, view, delete, create topic within taxonomy context, maintain
+  content type and SEO metadata, upload thumbnail media, and manage featured/gallery/attachment
+  topic media.
 - API: `/cms/topics`, `/cms/taxonomies`, `/res`, `/cms/media`, `/cms/topic-media`.
 - Cross-effects: topic create/update may require taxonomy validation, media association, distribution
   invalidation, and content overview refresh.
+- Current metadata behavior: topic create/edit forms write `content_type`, `seo_title`,
+  `seo_description`, `seo_keywords`, and `excerpt` directly through `/cms/topics`; topic list
+  filtering supports search/status/taxonomy/content type/private/markdown/space filters. The SEO
+  dashboard reads the same topic fields to calculate a current metadata snapshot. It must not
+  display traffic, audit history, or trend data without a real backend source.
 - Current media behavior: thumbnail uploader uses `useTopicMediaUpload`, which uploads through `/res`
   and creates a CMS media record before writing the media URL back to the form.
 - Current topic form behavior:
@@ -217,6 +226,13 @@ which cross-feature effects they must handle.
 Comments, tags, SEO, workflow, templates, versions, schedules, trash, and approval pages are not a
 complete backend-backed product surface in the current `ncobase` backend. They must be hidden,
 marked beta, or implemented backend-first before production exposure.
+
+- Route exposure: advanced content routes are filtered by `VITE_ENABLE_CONTENT_ADVANCED_ROUTES`.
+  Production builds hide them unless explicitly enabled; menu filtering and direct nested route
+  filtering use the same feature exposure helper.
+- SEO exception: `/content/seo` uses implemented topic metadata to show a real current snapshot.
+  Dedicated `/cms/seo` audit/edit endpoints are not a current product contract; the audit page must
+  not auto-run missing API calls.
 
 Current frontend closure from the feature/UI pass:
 

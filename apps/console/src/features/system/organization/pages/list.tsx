@@ -87,25 +87,27 @@ export const OrgListPage = () => {
 
   const handleCreate = useCallback(
     (data: Org) => {
+      if (!canManage) return;
       createOrgMutation.mutate(data, { onSuccess });
     },
-    [createOrgMutation, onSuccess]
+    [canManage, createOrgMutation, onSuccess]
   );
 
   const handleUpdate = useCallback(
     (data: Org) => {
+      if (!canManage) return;
       updateOrgMutation.mutate(data, { onSuccess });
     },
-    [updateOrgMutation, onSuccess]
+    [canManage, updateOrgMutation, onSuccess]
   );
 
   const handleDelete = useCallback(
     (record: Org) => {
-      if (record.id) {
+      if (canManage && record.id) {
         deleteOrgMutation.mutate(record.id, { onSuccess });
       }
     },
-    [deleteOrgMutation, onSuccess]
+    [canManage, deleteOrgMutation, onSuccess]
   );
 
   const handleConfirm = useCallback(
@@ -131,7 +133,7 @@ export const OrgListPage = () => {
       columns={tableConfig.columns}
       data={data?.items || []}
       paginated={false}
-      selected
+      selected={canManage}
       fetchData={fetchData}
       loading={loading}
       maxTreeLevel={-1}

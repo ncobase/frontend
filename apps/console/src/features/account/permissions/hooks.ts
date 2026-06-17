@@ -2,6 +2,8 @@ import { useCallback, useMemo } from 'react';
 
 import { useAuthContext } from '../context';
 
+import { filterMenuTreeByAccess } from './menu_tree';
+
 export interface UsePermissionsResult {
   hasRole: (_role: string | string[]) => boolean;
   hasPermission: (_permission: string) => boolean;
@@ -149,19 +151,7 @@ export const useMenuPermissions = () => {
       }
     >(
       menus: T[]
-    ): T[] => {
-      return menus
-        .filter(menu => canAccessMenu(menu))
-        .map(menu => {
-          if (menu.children && menu.children.length > 0) {
-            return {
-              ...menu,
-              children: filterMenuTree(menu.children)
-            };
-          }
-          return menu;
-        });
-    },
+    ): T[] => filterMenuTreeByAccess(menus, canAccessMenu),
     [canAccessMenu]
   );
 

@@ -5,12 +5,16 @@ import { useParams } from 'react-router';
 import { PermissionViewerForms } from '../forms/viewer';
 
 import { useLayoutContext } from '@/components/layout';
+import { usePermissions } from '@/features/account/permissions';
 
 export const PermissionViewerPage = ({ viewMode, record: initialRecord, handleView }) => {
   const { vmode } = useLayoutContext();
+  const { t } = useTranslation();
+  const { hasPermission } = usePermissions();
   const { slug } = useParams<{ slug: string }>();
   const record = initialRecord || slug;
   const mode = viewMode || vmode || 'flatten';
+  const canManage = hasPermission('manage:permissions');
 
   if (!record) {
     return null;
@@ -20,8 +24,6 @@ export const PermissionViewerPage = ({ viewMode, record: initialRecord, handleVi
     return <PermissionViewerForms record={record} />;
   }
 
-  const { t } = useTranslation();
-
   return (
     <>
       <div className='bg-white sticky top-0 right-0 left-0 border-b border-slate-100 pb-4'>
@@ -30,14 +32,16 @@ export const PermissionViewerPage = ({ viewMode, record: initialRecord, handleVi
             <div className='text-slate-600 font-medium'>{t('actions.view')}</div>
           </div>
           <div className='flex gap-x-4'>
-            <Button
-              variant='outline-primary'
-              prependIcon={<Icons name='IconEdit' className='w-4 h-4' />}
-              onClick={() => handleView({ id: record }, '../edit')}
-              size='sm'
-            >
-              {t('actions.edit')}
-            </Button>
+            {canManage && (
+              <Button
+                variant='outline-primary'
+                prependIcon={<Icons name='IconEdit' className='w-4 h-4' />}
+                onClick={() => handleView({ id: record }, '../edit')}
+                size='sm'
+              >
+                {t('actions.edit')}
+              </Button>
+            )}
             <Button
               variant='outline-danger'
               prependIcon={<Icons name='IconPrinter' className='w-4 h-4' />}

@@ -101,7 +101,7 @@ const HeaderComponent = ({
   const headerMenus = useMemo(() => {
     if (!navigationMenus.headers) return [];
     return navigationMenus.headers.filter(
-      menu => !menu.hidden && !menu.disabled && canAccessMenu(menu)
+      menu => !menu.hidden && !menu.disabled && (canAccessMenu(menu) || !!menu.children?.length)
     );
   }, [navigationMenus.headers, canAccessMenu]);
 
