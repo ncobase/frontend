@@ -4,10 +4,11 @@ import { buildQueryString } from '@ncobase/utils';
 import { Menu, MenuTrees, NavigationMenus } from './menu';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   getMenuBySlug: async (slug: string): Promise<Menu> => {
-    return request.get(`${endpoint}/slug/${slug}`);
+    return request.get(`${endpoint}/slug/${assertRequiredApiValue(slug, 'Menu slug')}`);
   },
   getMenuTree: async (params?: ExplicitAny): Promise<MenuTrees> => {
     const queryString = params ? buildQueryString(params) : '';
@@ -19,26 +20,30 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.get(`${endpoint}/navigation${queryString ? `?${queryString}` : ''}`);
   },
   moveMenu: async (id: string, parentId: string | null, order: number): Promise<Menu> => {
-    return request.put(`${endpoint}/${id}/move`, {
+    return request.put(`${endpoint}/${assertRequiredApiValue(id, 'Menu ID')}/move`, {
       parent_id: parentId,
       order
     });
   },
   getChildMenus: async (parentId: string): Promise<Menu[]> => {
-    return request.get(`${endpoint}/children/${parentId}`);
+    return request.get(
+      `${endpoint}/children/${assertRequiredApiValue(parentId, 'Parent menu ID')}`
+    );
   },
   getUserAuthorizedMenus: async (userId: string): Promise<Menu[]> => {
-    return request.get(`${endpoint}/authorized/${userId}`);
+    return request.get(`${endpoint}/authorized/${assertRequiredApiValue(userId, 'User ID')}`);
   },
   reorderMenus: async (menuIds: string[]): Promise<void> => {
-    return request.post(`${endpoint}/reorder`, menuIds);
+    return request.post(`${endpoint}/reorder`, assertRequiredApiArray(menuIds, 'Menu IDs'));
   },
   // Updated to use unified toggle status endpoint
   toggleMenuStatus: async (
     id: string,
     action: 'enable' | 'disable' | 'show' | 'hide'
   ): Promise<Menu> => {
-    return request.put(`${endpoint}/${id}/${action}`);
+    return request.put(
+      `${endpoint}/${assertRequiredApiValue(id, 'Menu ID')}/${assertRequiredApiValue(action, 'Menu action')}`
+    );
   }
 });
 

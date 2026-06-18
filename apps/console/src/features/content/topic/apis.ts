@@ -2,6 +2,7 @@ import type { Topic } from './topic';
 import type { TopicMedia } from './topic_media';
 
 import { createApi } from '@/lib/api/factory';
+import { assertRequiredApiValue } from '@/lib/api/guards';
 
 export const topicApi = createApi<Topic>('/cms/topics');
 export const topicMediaApi = createApi<TopicMedia>('/cms/topic-media', {
@@ -16,10 +17,15 @@ export const topicMediaApi = createApi<TopicMedia>('/cms/topic-media', {
         }, {})
       ).toString();
 
-      return request.get(`${endpoint}/by-topic/${topicId}${query ? `?${query}` : ''}`);
+      return request.get(
+        `${endpoint}/by-topic/${assertRequiredApiValue(topicId, 'Topic ID')}${query ? `?${query}` : ''}`
+      );
     },
     getByTopicAndMedia: (topicId: string, mediaId: string) => {
-      const query = new URLSearchParams({ topicId, mediaId }).toString();
+      const query = new URLSearchParams({
+        topicId: assertRequiredApiValue(topicId, 'Topic ID'),
+        mediaId: assertRequiredApiValue(mediaId, 'Media ID')
+      }).toString();
       return request.get(`${endpoint}/by-topic-and-media?${query}`);
     }
   })

@@ -13,6 +13,7 @@ import type {
 } from './ncore';
 
 import { createApi } from '@/lib/api/factory';
+import { assertRequiredApiValue } from '@/lib/api/guards';
 
 export const extensionApi = createApi<any, any, any, any>('/ncore', {
   extensions: ({ endpoint, request }) => ({
@@ -70,20 +71,28 @@ export const extensionApi = createApi<any, any, any, any>('/ncore', {
     },
 
     getExtension: async (name: string): Promise<any> => {
-      return request.get(`${endpoint}/extensions/${name}`);
+      return request.get(
+        `${endpoint}/extensions/${assertRequiredApiValue(name, 'Extension name')}`
+      );
     },
 
     // Plugin management
     loadPlugin: async (name: string): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/plugins/load?name=${encodeURIComponent(name)}`);
+      return request.post(
+        `${endpoint}/plugins/load?name=${encodeURIComponent(assertRequiredApiValue(name, 'Plugin name'))}`
+      );
     },
 
     unloadPlugin: async (name: string): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/plugins/unload?name=${encodeURIComponent(name)}`);
+      return request.post(
+        `${endpoint}/plugins/unload?name=${encodeURIComponent(assertRequiredApiValue(name, 'Plugin name'))}`
+      );
     },
 
     reloadPlugin: async (name: string): Promise<ExtensionActionResponse> => {
-      return request.post(`${endpoint}/plugins/reload?name=${encodeURIComponent(name)}`);
+      return request.post(
+        `${endpoint}/plugins/reload?name=${encodeURIComponent(assertRequiredApiValue(name, 'Plugin name'))}`
+      );
     },
 
     // Metrics endpoints
@@ -104,7 +113,9 @@ export const extensionApi = createApi<any, any, any, any>('/ncore', {
     },
 
     getSpecificExtensionMetrics: async (name: string): Promise<any> => {
-      return request.get(`${endpoint}/metrics/extensions/${name}`);
+      return request.get(
+        `${endpoint}/metrics/extensions/${assertRequiredApiValue(name, 'Extension name')}`
+      );
     },
 
     getDataMetrics: async (): Promise<any> => {
@@ -133,7 +144,9 @@ export const extensionApi = createApi<any, any, any, any>('/ncore', {
     },
 
     getLatestMetrics: async (name: string, limit = 100): Promise<LatestMetricsResponse> => {
-      return request.get(`${endpoint}/metrics/latest/${name}?limit=${limit}`);
+      return request.get(
+        `${endpoint}/metrics/latest/${assertRequiredApiValue(name, 'Metric name')}?limit=${limit}`
+      );
     },
 
     getStorageStats: async (): Promise<StorageStats> => {

@@ -1,27 +1,32 @@
 import { Permission } from './permission';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   assignPermissionsToRole: async (roleId: string, permissionIds: string[]) => {
-    return request.post(`/sys/roles/${roleId}/permissions`, { permissionIds });
+    return request.post(`/sys/roles/${assertRequiredApiValue(roleId, 'Role ID')}/permissions`, {
+      permissionIds: assertRequiredApiArray(permissionIds, 'Permission IDs')
+    });
   },
 
   removePermissionsFromRole: async (roleId: string, permissionIds: string[]) => {
-    return request.delete(`/sys/roles/${roleId}/permissions`, { body: { permissionIds } });
+    return request.delete(`/sys/roles/${assertRequiredApiValue(roleId, 'Role ID')}/permissions`, {
+      body: { permissionIds: assertRequiredApiArray(permissionIds, 'Permission IDs') }
+    });
   },
 
   getRolePermissions: async (roleId: string) => {
-    return request.get(`/sys/roles/${roleId}/permissions`);
+    return request.get(`/sys/roles/${assertRequiredApiValue(roleId, 'Role ID')}/permissions`);
   },
 
   // Advanced permission queries
   getPermissionsByAction: async (action: string) => {
-    return request.get(`${endpoint}?action=${action}`);
+    return request.get(`${endpoint}?action=${assertRequiredApiValue(action, 'Action')}`);
   },
 
   getPermissionsBySubject: async (subject: string) => {
-    return request.get(`${endpoint}?subject=${subject}`);
+    return request.get(`${endpoint}?subject=${assertRequiredApiValue(subject, 'Subject')}`);
   },
 
   getDefaultPermissions: async () => {
@@ -30,16 +35,25 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Permission hierarchy
   getPermissionChildren: async (parentId: string) => {
-    return request.get(`${endpoint}?parent=${parentId}`);
+    return request.get(
+      `${endpoint}?parent=${assertRequiredApiValue(parentId, 'Parent permission ID')}`
+    );
   },
 
   // Bulk operations
   bulkUpdatePermissions: async (updates: Array<{ id: string; [key: string]: any }>) => {
-    return request.put(`${endpoint}/bulk`, { updates });
+    assertRequiredApiArray(updates, 'Permission updates').forEach((update, index) => {
+      assertRequiredApiValue(update.id, `Permission updates[${index}].id`);
+    });
+    return request.put(`${endpoint}/bulk`, {
+      updates
+    });
   },
 
   bulkDeletePermissions: async (ids: string[]) => {
-    return request.delete(`${endpoint}/bulk`, { body: { ids } });
+    return request.delete(`${endpoint}/bulk`, {
+      body: { ids: assertRequiredApiArray(ids, 'Permission IDs') }
+    });
   }
 });
 

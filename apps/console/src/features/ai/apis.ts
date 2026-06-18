@@ -22,6 +22,7 @@ import type {
 
 import { ACCESS_TOKEN_KEY, TENANT_KEY } from '@/features/account/context';
 import { checkAndRefreshToken } from '@/features/account/token_service';
+import { assertRequiredApiValue } from '@/lib/api/guards';
 import { Request, request } from '@/lib/api/request';
 import { BearerKey, XMdSpaceKey } from '@/lib/constants';
 
@@ -62,7 +63,8 @@ export const getAIActions = (): Promise<AIActionDescriptor[]> => request.get('/a
 export const getAIRuns = (params?: AIRunQuery): Promise<AIRunListResponse> =>
   getAIList('/ai/runs', params);
 
-export const getAIRun = (id: string): Promise<AIRun> => request.get(`/ai/runs/${id}`);
+export const getAIRun = (id: string): Promise<AIRun> =>
+  request.get(`/ai/runs/${assertRequiredApiValue(id, 'AI run ID')}`);
 
 export const getAIUsage = (params?: AIUsageQuery): Promise<AIUsageSummary> =>
   getAIList('/ai/usage', params);
@@ -76,7 +78,10 @@ export const embedAI = (payload: AIEmbedRequest): Promise<AIEmbedResponse> =>
   request.post('/ai/embed', payload);
 
 export const runAIAction = (action: string, payload: AIActionRequest): Promise<AIActionResponse> =>
-  request.post(`/ai/actions/${encodeURIComponent(action)}`, payload);
+  request.post(
+    `/ai/actions/${encodeURIComponent(assertRequiredApiValue(action, 'AI action'))}`,
+    payload
+  );
 
 const nativeAPIURL = (path: string) => {
   const baseURL = String(Request.baseConfig.baseURL || '/api').replace(/\/$/, '');

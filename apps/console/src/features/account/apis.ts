@@ -16,6 +16,7 @@ import {
 } from './account';
 
 import type { Space } from '@/features/space/space';
+import { assertRequiredApiValue } from '@/lib/api/guards';
 import { request } from '@/lib/api/request';
 
 export interface Spaces {
@@ -113,11 +114,15 @@ export const authApi = {
   },
 
   sendCode: async (email: string): Promise<SendCodeReply> => {
-    return request.post(`${authEndpoint}/authorize/send`, { email });
+    return request.post(`${authEndpoint}/authorize/send`, {
+      email: assertRequiredApiValue(email, 'Email')
+    });
   },
 
   verifyCode: async (code: string): Promise<LoginReply> => {
-    return request.get(`${authEndpoint}/authorize/${encodeURIComponent(code)}`);
+    return request.get(
+      `${authEndpoint}/authorize/${encodeURIComponent(assertRequiredApiValue(code, 'Authorization code'))}`
+    );
   }
 
   /**

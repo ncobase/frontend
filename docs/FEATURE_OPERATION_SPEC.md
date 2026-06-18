@@ -6,6 +6,9 @@ which cross-feature effects they must handle.
 ## Global Operation Rules
 
 - Every protected request includes `Authorization` and current `x-md-sid` when available.
+- API wrappers must validate required path identifiers and required relationship IDs before building
+  URLs or mutation payloads. Missing IDs must fail locally with a clear field label and must not send
+  `/undefined`, empty-path, or empty-bulk requests to the backend.
 - Create/update/delete mutations must show saving/deleting state, success feedback, and field or
   request errors.
 - Dangerous operations must use a confirmation dialog that names the target and describes impact.

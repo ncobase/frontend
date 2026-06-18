@@ -1,29 +1,33 @@
 import { ContentTemplate, TemplateInstance } from './template';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiValue } from '@/lib/api/guards';
 
 const templateExtensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Apply template to content
   applyTemplate: async (templateId: string, contentId: string, contentType: string, data: any) => {
-    return request.post(`${endpoint}/${templateId}/apply`, {
-      content_id: contentId,
-      content_type: contentType,
+    return request.post(`${endpoint}/${assertRequiredApiValue(templateId, 'Template ID')}/apply`, {
+      content_id: assertRequiredApiValue(contentId, 'Content ID'),
+      content_type: assertRequiredApiValue(contentType, 'Content type'),
       data
     });
   },
   // Get templates by category
   getTemplatesByCategory: async (category: string, type?: string) => {
-    let url = `${endpoint}?category=${category}`;
+    let url = `${endpoint}?category=${assertRequiredApiValue(category, 'Template category')}`;
     if (type) url += `&type=${type}`;
     return request.get(url);
   },
   // Duplicate template
   duplicateTemplate: async (templateId: string, name: string) => {
-    return request.post(`${endpoint}/${templateId}/duplicate`, { name });
+    return request.post(
+      `${endpoint}/${assertRequiredApiValue(templateId, 'Template ID')}/duplicate`,
+      { name: assertRequiredApiValue(name, 'Template name') }
+    );
   },
   // Export template
   exportTemplate: async (templateId: string) => {
-    return request.get(`${endpoint}/${templateId}/export`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(templateId, 'Template ID')}/export`);
   },
   // Import template
   importTemplate: async (templateData: any) => {

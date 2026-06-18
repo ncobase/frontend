@@ -11,6 +11,7 @@ import type {
 } from './payment';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiValue } from '@/lib/api/guards';
 import { request } from '@/lib/api/request';
 
 const normalizePaymentListParams = (params?: Record<string, any>) => {
@@ -70,13 +71,13 @@ export const {
 // Orders API
 const orderExtensions = ({ request: req, endpoint }: ApiContext) => ({
   verifyOrder: async (id: string): Promise<PaymentOrder> => {
-    return req.post(`${endpoint}/${id}/verify`);
+    return req.post(`${endpoint}/${assertRequiredApiValue(id, 'Order ID')}/verify`);
   },
   refundOrder: async (
     id: string,
     payload?: { amount?: number; reason?: string }
   ): Promise<PaymentOrder> => {
-    return req.post(`${endpoint}/${id}/refund`, payload);
+    return req.post(`${endpoint}/${assertRequiredApiValue(id, 'Order ID')}/refund`, payload);
   }
 });
 
@@ -101,7 +102,7 @@ export const {
 // Subscriptions API
 const subscriptionExtensions = ({ request: req, endpoint }: ApiContext) => ({
   cancelSubscription: async (id: string): Promise<PaymentSubscription> => {
-    return req.post(`${endpoint}/${id}/cancel`);
+    return req.post(`${endpoint}/${assertRequiredApiValue(id, 'Subscription ID')}/cancel`);
   }
 });
 
@@ -118,7 +119,8 @@ export const {
 // Stats & Logs
 export const getPaymentStats = (): Promise<PaymentStats> => request.get('/pay/stats');
 
-export const getPaymentLog = (id: string): Promise<PaymentLog> => request.get(`/pay/logs/${id}`);
+export const getPaymentLog = (id: string): Promise<PaymentLog> =>
+  request.get(`/pay/logs/${assertRequiredApiValue(id, 'Payment log ID')}`);
 
 export const getPaymentLogs = (params?: Record<string, any>): Promise<PaymentLogListResponse> =>
   getPaymentList('/pay/logs', params);

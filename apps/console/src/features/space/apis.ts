@@ -14,37 +14,40 @@ import {
 } from './space';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
-
-const assertRequiredId = (value: string | undefined, label: string) => {
-  if (!value) {
-    throw new Error(`${label} is required`);
-  }
-  return value;
-};
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Basic CRUD operations
   getSpaceBySlug: async (slug: string): Promise<Space> => {
-    return request.get(`${endpoint}/${slug}`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(slug, 'Space slug')}`);
   },
 
   // Space Settings Management
   getSpaceSettings: async (spaceId: string, params?: any) => {
     const searchParams = new URLSearchParams(params || {});
     const query = searchParams.toString();
-    return request.get(`${endpoint}/${spaceId}/settings${query ? `?${query}` : ''}`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/settings${query ? `?${query}` : ''}`
+    );
   },
 
   getPublicSettings: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/settings/public`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/settings/public`
+    );
   },
 
   setSetting: async (spaceId: string, key: string, value: string) => {
-    return request.put(`${endpoint}/${spaceId}/settings/${key}`, { value });
+    return request.put(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/settings/${assertRequiredApiValue(key, 'Setting key')}`,
+      { value }
+    );
   },
 
   getSetting: async (spaceId: string, key: string) => {
-    return request.get(`${endpoint}/${spaceId}/settings/${key}`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/settings/${assertRequiredApiValue(key, 'Setting key')}`
+    );
   },
 
   createSetting: async (payload: any) => {
@@ -52,24 +55,27 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   updateSetting: async (id: string, payload: any) => {
-    return request.put(`${endpoint}/settings/${id}`, payload);
+    return request.put(`${endpoint}/settings/${assertRequiredApiValue(id, 'Setting ID')}`, payload);
   },
 
   deleteSetting: async (id: string) => {
-    return request.delete(`${endpoint}/settings/${id}`);
+    return request.delete(`${endpoint}/settings/${assertRequiredApiValue(id, 'Setting ID')}`);
   },
 
   bulkUpdateSettings: async (spaceId: string, settings: Record<string, string>) => {
-    return request.post(`${endpoint}/settings/bulk`, { space_id: spaceId, settings });
+    return request.post(`${endpoint}/settings/bulk`, {
+      space_id: assertRequiredApiValue(spaceId, 'Space ID'),
+      settings
+    });
   },
 
   // Space Quota Management
   getSpaceQuotas: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/quotas`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/quotas`);
   },
 
   getQuotaSummary: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/quotas`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/quotas`);
   },
 
   createQuota: async (payload: SpaceQuotaBody) => {
@@ -77,32 +83,45 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   updateQuota: async (id: string, payload: SpaceQuotaBody) => {
-    return request.put(`${endpoint}/quotas/${id}`, payload);
+    return request.put(`${endpoint}/quotas/${assertRequiredApiValue(id, 'Quota ID')}`, payload);
   },
 
   deleteQuota: async (id: string) => {
-    return request.delete(`${endpoint}/quotas/${id}`);
+    return request.delete(`${endpoint}/quotas/${assertRequiredApiValue(id, 'Quota ID')}`);
   },
 
   updateUsage: async (payload: QuotaUsageRequest) => {
-    return request.post(`${endpoint}/quotas/usage`, payload);
+    const body = assertRequiredApiValue(payload, 'Quota usage payload');
+    return request.post(`${endpoint}/quotas/usage`, {
+      ...body,
+      space_id: assertRequiredApiValue(body.space_id, 'Space ID'),
+      quota_type: assertRequiredApiValue(body.quota_type, 'Quota type')
+    });
   },
 
   checkLimit: async (spaceId: string, quotaType: string) => {
-    return request.get(`${endpoint}/quotas/check?space_id=${spaceId}&quota_type=${quotaType}`);
+    return request.get(
+      `${endpoint}/quotas/check?space_id=${assertRequiredApiValue(spaceId, 'Space ID')}&quota_type=${assertRequiredApiValue(quotaType, 'Quota type')}`
+    );
   },
 
   // Space Billing Management
   getSpaceBilling: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/billing/summary`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/billing/summary`
+    );
   },
 
   getBillingSummary: async (spaceId: string): Promise<BillingSummary> => {
-    return request.get(`${endpoint}/${spaceId}/billing/summary`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/billing/summary`
+    );
   },
 
   getOverdueBilling: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/billing/overdue`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/billing/overdue`
+    );
   },
 
   createBilling: async (payload: SpaceBillingBody) => {
@@ -110,19 +129,29 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   updateBilling: async (id: string, payload: SpaceBillingBody) => {
-    return request.put(`${endpoint}/billing/${id}`, payload);
+    return request.put(`${endpoint}/billing/${assertRequiredApiValue(id, 'Billing ID')}`, payload);
   },
 
   deleteBilling: async (id: string) => {
-    return request.delete(`${endpoint}/billing/${id}`);
+    return request.delete(`${endpoint}/billing/${assertRequiredApiValue(id, 'Billing ID')}`);
   },
 
   processPayment: async (payload: PaymentRequest) => {
-    return request.post(`${endpoint}/billing/payment`, payload);
+    const body = assertRequiredApiValue(payload, 'Payment payload');
+    return request.post(`${endpoint}/billing/payment`, {
+      ...body,
+      billing_id: assertRequiredApiValue(body.billing_id, 'Billing ID'),
+      payment_method: assertRequiredApiValue(body.payment_method, 'Payment method')
+    });
   },
 
   generateInvoice: async (spaceId: string, billingId: string) => {
-    return request.post(`${endpoint}/${spaceId}/billing/invoice`, { billing_id: billingId });
+    return request.post(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/billing/invoice`,
+      {
+        billing_id: assertRequiredApiValue(billingId, 'Billing ID')
+      }
+    );
   },
 
   // User-Space-Role Management
@@ -130,53 +159,79 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     const searchParams = new URLSearchParams(params || {});
     const query = searchParams.toString();
     return request.get(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users${query ? `?${query}` : ''}`
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users${query ? `?${query}` : ''}`
     );
   },
 
   addUserToSpaceRole: async (spaceId: string, payload: AddUserToSpaceRoleRequest) => {
-    return request.post(`${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/roles`, {
-      ...payload,
-      user_id: assertRequiredId(payload.user_id, 'User ID'),
-      role_id: assertRequiredId(payload.role_id, 'Role ID')
+    const body = assertRequiredApiValue(payload, 'Space role payload');
+    return request.post(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users/roles`, {
+      ...body,
+      user_id: assertRequiredApiValue(body.user_id, 'User ID'),
+      role_id: assertRequiredApiValue(body.role_id, 'Role ID')
     });
   },
 
   getUserSpaceRoles: async (spaceId: string, userId: string) => {
     return request.get(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles`
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users/${assertRequiredApiValue(userId, 'User ID')}/roles`
     );
   },
 
   updateUserSpaceRole: async (spaceId: string, userId: string, payload: any) => {
     return request.put(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles`,
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users/${assertRequiredApiValue(userId, 'User ID')}/roles`,
       payload
     );
   },
 
   removeUserFromSpaceRole: async (spaceId: string, userId: string, roleId: string) => {
     return request.delete(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles/${assertRequiredId(roleId, 'Role ID')}`
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users/${assertRequiredApiValue(userId, 'User ID')}/roles/${assertRequiredApiValue(roleId, 'Role ID')}`
     );
   },
 
   checkUserSpaceRole: async (spaceId: string, userId: string, roleId: string) => {
     return request.get(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles/${assertRequiredId(roleId, 'Role ID')}/check`
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users/${assertRequiredApiValue(userId, 'User ID')}/roles/${assertRequiredApiValue(roleId, 'Role ID')}/check`
     );
   },
 
   getSpaceUsersByRole: async (spaceId: string, roleId: string) => {
     return request.get(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/roles/${assertRequiredId(roleId, 'Role ID')}/users`
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/roles/${assertRequiredApiValue(roleId, 'Role ID')}/users`
     );
   },
 
   bulkUpdateUserSpaceRoles: async (spaceId: string, payload: BulkUpdateUserSpaceRolesRequest) => {
+    const body = assertRequiredApiValue(payload, 'User space role payload');
+    const updates = assertRequiredApiArray(body.updates, 'User space role updates').map(
+      (update, index) => ({
+        ...update,
+        user_id: assertRequiredApiValue(
+          update.user_id,
+          `User space role updates[${index}].user_id`
+        ),
+        role_id: assertRequiredApiValue(
+          update.role_id,
+          `User space role updates[${index}].role_id`
+        ),
+        operation: assertRequiredApiValue(
+          update.operation,
+          `User space role updates[${index}].operation`
+        ),
+        old_role_id:
+          update.operation === 'update'
+            ? assertRequiredApiValue(
+                update.old_role_id,
+                `User space role updates[${index}].old_role_id`
+              )
+            : update.old_role_id
+      })
+    );
     return request.put(
-      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/roles/bulk`,
-      payload
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/users/roles/bulk`,
+      { ...body, updates }
     );
   },
 
@@ -184,79 +239,113 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   getSpaceGroups: async (spaceId: string, params?: any) => {
     const searchParams = new URLSearchParams(params || {});
     const query = searchParams.toString();
-    return request.get(`${endpoint}/${spaceId}/orgs${query ? `?${query}` : ''}`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/orgs${query ? `?${query}` : ''}`
+    );
   },
 
   addGroupToSpace: async (spaceId: string, payload: AddGroupToSpaceRequest) => {
-    return request.post(`${endpoint}/${spaceId}/orgs`, payload);
+    const body = assertRequiredApiValue(payload, 'Space group payload');
+    return request.post(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/orgs`, {
+      ...body,
+      group_id: assertRequiredApiValue(body.group_id, 'Group ID')
+    });
   },
 
   removeGroupFromSpace: async (spaceId: string, groupId: string) => {
-    return request.delete(`${endpoint}/${spaceId}/orgs/${groupId}`);
+    return request.delete(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/orgs/${assertRequiredApiValue(groupId, 'Group ID')}`
+    );
   },
 
   isGroupInSpace: async (spaceId: string, groupId: string) => {
-    return request.get(`${endpoint}/${spaceId}/orgs/${groupId}/check`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/orgs/${assertRequiredApiValue(groupId, 'Group ID')}/check`
+    );
   },
 
   getOrgSpaces: async (groupId: string) => {
-    return request.get(`${endpoint}/orgs/${groupId}/spaces`);
+    return request.get(`${endpoint}/orgs/${assertRequiredApiValue(groupId, 'Group ID')}/spaces`);
   },
 
   // Space-Menu Management
   getSpaceMenus: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/menus`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/menus`);
   },
 
   addMenuToSpace: async (spaceId: string, payload: AddMenuToSpaceRequest) => {
-    return request.post(`${endpoint}/${spaceId}/menus`, payload);
+    const body = assertRequiredApiValue(payload, 'Space menu payload');
+    return request.post(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/menus`, {
+      ...body,
+      menu_id: assertRequiredApiValue(body.menu_id, 'Menu ID')
+    });
   },
 
   removeMenuFromSpace: async (spaceId: string, menuId: string) => {
-    return request.delete(`${endpoint}/${spaceId}/menus/${menuId}`);
+    return request.delete(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/menus/${assertRequiredApiValue(menuId, 'Menu ID')}`
+    );
   },
 
   checkMenuInSpace: async (spaceId: string, menuId: string) => {
-    return request.get(`${endpoint}/${spaceId}/menus/${menuId}/check`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/menus/${assertRequiredApiValue(menuId, 'Menu ID')}/check`
+    );
   },
 
   // Space-Dictionary Management
   getSpaceDictionaries: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/dictionaries`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/dictionaries`);
   },
 
   addDictionaryToSpace: async (spaceId: string, payload: AddDictionaryToSpaceRequest) => {
-    return request.post(`${endpoint}/${spaceId}/dictionaries`, payload);
+    const body = assertRequiredApiValue(payload, 'Space dictionary payload');
+    return request.post(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/dictionaries`, {
+      ...body,
+      dictionary_id: assertRequiredApiValue(body.dictionary_id, 'Dictionary ID')
+    });
   },
 
   removeDictionaryFromSpace: async (spaceId: string, dictionaryId: string) => {
-    return request.delete(`${endpoint}/${spaceId}/dictionaries/${dictionaryId}`);
+    return request.delete(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/dictionaries/${assertRequiredApiValue(dictionaryId, 'Dictionary ID')}`
+    );
   },
 
   checkDictionaryInSpace: async (spaceId: string, dictionaryId: string) => {
-    return request.get(`${endpoint}/${spaceId}/dictionaries/${dictionaryId}/check`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/dictionaries/${assertRequiredApiValue(dictionaryId, 'Dictionary ID')}/check`
+    );
   },
 
   // Space-Option Management
   getSpaceOptions: async (spaceId: string) => {
-    return request.get(`${endpoint}/${spaceId}/options`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/options`);
   },
 
   addOptionsToSpace: async (spaceId: string, payload: AddOptionsToSpaceRequest) => {
-    return request.post(`${endpoint}/${spaceId}/options`, payload);
+    const body = assertRequiredApiValue(payload, 'Space option payload');
+    return request.post(`${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/options`, {
+      ...body,
+      option_id: assertRequiredApiValue(body.option_id, 'Option ID')
+    });
   },
 
   removeOptionsFromSpace: async (spaceId: string, optionsId: string) => {
-    return request.delete(`${endpoint}/${spaceId}/options/${optionsId}`);
+    return request.delete(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/options/${assertRequiredApiValue(optionsId, 'Option ID')}`
+    );
   },
 
   checkOptionsInSpace: async (spaceId: string, optionsId: string) => {
-    return request.get(`${endpoint}/${spaceId}/options/${optionsId}/check`);
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(spaceId, 'Space ID')}/options/${assertRequiredApiValue(optionsId, 'Option ID')}/check`
+    );
   },
 
   // User's space ownership
   getUserOwnSpace: async (username: string) => {
-    return request.get(`${endpoint}/users/${username}/space`);
+    return request.get(`${endpoint}/users/${assertRequiredApiValue(username, 'Username')}/space`);
   }
 });
 

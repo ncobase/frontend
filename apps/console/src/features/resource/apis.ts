@@ -20,6 +20,7 @@ import { normalizeResourceTags } from './upload_payload';
 import { ACCESS_TOKEN_KEY } from '@/features/account/context';
 import { tokenService } from '@/features/account/token_service';
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const resolveOwnerId = (params?: Record<string, any>) => {
   const explicitOwnerId = params?.owner_id;
@@ -56,7 +57,9 @@ const ensureOwnerIdFormData = (data: FormData, params?: Record<string, any>) => 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Download
   download: (slug: string): Promise<Blob> => {
-    return request.get(`${endpoint}/${slug}/download`, { responseType: 'blob' });
+    return request.get(`${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/download`, {
+      responseType: 'blob'
+    });
   },
 
   // Search
@@ -67,11 +70,14 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Versions
   getVersions: (slug: string): Promise<ResourceFile[]> => {
-    return request.get(`${endpoint}/${slug}/versions`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/versions`);
   },
 
   createVersion: (slug: string, data: FormData): Promise<ResourceFile> => {
-    return request.post(`${endpoint}/${slug}/versions`, data);
+    return request.post(
+      `${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/versions`,
+      data
+    );
   },
 
   // Share
@@ -79,20 +85,29 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     slug: string,
     payload: { access_level: string; expiration_hours?: number }
   ): Promise<ShareLink> => {
-    return request.post(`${endpoint}/${slug}/share`, payload);
+    return request.post(
+      `${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/share`,
+      payload
+    );
   },
 
   updateAccess: (slug: string, payload: { access_level: string }): Promise<ResourceFile> => {
-    return request.put(`${endpoint}/${slug}/access`, payload);
+    return request.put(
+      `${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/access`,
+      payload
+    );
   },
 
   // Thumbnail
   getThumbnail: (slug: string): Promise<string> => {
-    return request.get(`${endpoint}/thumb/${slug}`);
+    return request.get(`${endpoint}/thumb/${assertRequiredApiValue(slug, 'Resource slug')}`);
   },
 
   createThumbnail: (slug: string, options: ResourceProcessingOptions): Promise<ResourceFile> => {
-    return request.post(`${endpoint}/${slug}/thumbnail`, options);
+    return request.post(
+      `${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/thumbnail`,
+      options
+    );
   },
 
   // Batch
@@ -109,7 +124,11 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     params?: Record<string, any>
   ): Promise<ResourceFile[]> => {
     const finalParams = withOwnerId(params) || {};
-    return request.post(`${endpoint}/batch/process`, { ids, options, ...finalParams });
+    return request.post(`${endpoint}/batch/process`, {
+      ids: assertRequiredApiArray(ids, 'Resource IDs'),
+      options,
+      ...finalParams
+    });
   },
 
   batchDelete: (
@@ -117,11 +136,14 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     params?: Record<string, any>
   ): Promise<ResourceBatchDeleteResult> => {
     const finalParams = withOwnerId(params) || {};
-    return request.post(`${endpoint}/batch/delete`, { ids, ...finalParams });
+    return request.post(`${endpoint}/batch/delete`, {
+      ids: assertRequiredApiArray(ids, 'Resource IDs'),
+      ...finalParams
+    });
   },
 
   getBatchStatus: (jobId: string): Promise<ResourceBatchStatus> => {
-    return request.get(`${endpoint}/status/${jobId}`);
+    return request.get(`${endpoint}/status/${assertRequiredApiValue(jobId, 'Batch job ID')}`);
   },
 
   // Quota
@@ -191,7 +213,10 @@ export const resourceApi = createApi<ResourceFile>('/res', {
       data.append('tags', tags.join(','));
     }
 
-    return ctx.request.put(`${ctx.endpoint}/${payload.id}`, data);
+    return ctx.request.put(
+      `${ctx.endpoint}/${assertRequiredApiValue(payload.id, 'Resource ID')}`,
+      data
+    );
   },
   list: (params, ctx) => {
     const finalParams = withOwnerId(params);

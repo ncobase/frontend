@@ -1,17 +1,22 @@
 import { SEOData, SEOAnalysis, SEOAudit, KeywordData } from './seo';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Get SEO data for content
   getContentSEO: async (contentId: string, contentType: string): Promise<SEOData> => {
-    return request.get(`${endpoint}?content_id=${contentId}&content_type=${contentType}`);
+    const params = new URLSearchParams({
+      content_id: assertRequiredApiValue(contentId, 'Content ID'),
+      content_type: assertRequiredApiValue(contentType, 'Content type')
+    });
+    return request.get(`${endpoint}?${params.toString()}`);
   },
   // Analyze SEO for content
   analyzeSEO: async (contentId: string, contentType: string): Promise<SEOAnalysis> => {
     return request.post(`${endpoint}/analyze`, {
-      content_id: contentId,
-      content_type: contentType
+      content_id: assertRequiredApiValue(contentId, 'Content ID'),
+      content_type: assertRequiredApiValue(contentType, 'Content type')
     });
   },
   // Run SEO audit
@@ -21,37 +26,50 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     auditType: string = 'full'
   ): Promise<SEOAudit> => {
     return request.post(`${endpoint}/audit`, {
-      content_id: contentId,
-      content_type: contentType,
-      audit_type: auditType
+      content_id: assertRequiredApiValue(contentId, 'Content ID'),
+      content_type: assertRequiredApiValue(contentType, 'Content type'),
+      audit_type: assertRequiredApiValue(auditType, 'Audit type')
     });
   },
   // Get keyword suggestions
   getKeywordSuggestions: async (seed: string, language: string = 'en'): Promise<KeywordData[]> => {
-    return request.get(
-      `${endpoint}/keywords/suggestions?seed=${encodeURIComponent(seed)}&language=${language}`
-    );
+    const params = new URLSearchParams({
+      seed: assertRequiredApiValue(seed, 'Keyword seed'),
+      language: assertRequiredApiValue(language, 'Language')
+    });
+    return request.get(`${endpoint}/keywords/suggestions?${params.toString()}`);
   },
   // Analyze keyword density
   analyzeKeywordDensity: async (
     content: string,
     keywords: string[]
   ): Promise<Record<string, number>> => {
-    return request.post(`${endpoint}/keywords/density`, { content, keywords });
+    return request.post(`${endpoint}/keywords/density`, {
+      content: assertRequiredApiValue(content, 'Content'),
+      keywords: assertRequiredApiArray(keywords, 'Keywords')
+    });
   },
   // Generate meta tags
   generateMetaTags: async (content: string, keywords?: string[]): Promise<Partial<SEOData>> => {
-    return request.post(`${endpoint}/meta/generate`, { content, keywords });
+    return request.post(`${endpoint}/meta/generate`, {
+      content: assertRequiredApiValue(content, 'Content'),
+      keywords
+    });
   },
   // Check URL structure
   checkURL: async (
     url: string
   ): Promise<{ score: number; issues: string[]; suggestions: string[] }> => {
-    return request.post(`${endpoint}/url/check`, { url });
+    return request.post(`${endpoint}/url/check`, {
+      url: assertRequiredApiValue(url, 'URL')
+    });
   },
   // Generate schema markup
   generateSchema: async (contentType: string, data: any): Promise<Record<string, any>> => {
-    return request.post(`${endpoint}/schema/generate`, { content_type: contentType, data });
+    return request.post(`${endpoint}/schema/generate`, {
+      content_type: assertRequiredApiValue(contentType, 'Content type'),
+      data
+    });
   }
 });
 

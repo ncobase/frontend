@@ -49,4 +49,18 @@ describe('createApi', () => {
 
     expect(request.put).toHaveBeenCalledWith('/sys/menus', { id: 'menu-1', name: 'Settings' });
   });
+
+  it('rejects default CRUD operations before issuing requests when IDs are missing', async () => {
+    const api = createApi<TestEntity>('/items');
+
+    await expect(api.get(undefined as unknown as string)).rejects.toThrow('ID is required');
+    await expect(api.update({ name: 'Missing ID' } as TestEntity)).rejects.toThrow(
+      'ID is required'
+    );
+    await expect(api.delete('')).rejects.toThrow('ID is required');
+
+    expect(request.get).not.toHaveBeenCalled();
+    expect(request.put).not.toHaveBeenCalled();
+    expect(request.delete).not.toHaveBeenCalled();
+  });
 });

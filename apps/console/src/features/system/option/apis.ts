@@ -1,26 +1,33 @@
 import { Option } from './option.d';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Get option by name
   getByName: async (name: string) => {
-    return request.get(`${endpoint}/name/${encodeURIComponent(name)}`);
+    return request.get(
+      `${endpoint}/name/${encodeURIComponent(assertRequiredApiValue(name, 'Option name'))}`
+    );
   },
 
   // Get options by type
   getByType: async (type: string) => {
-    return request.get(`${endpoint}/type/${encodeURIComponent(type)}`);
+    return request.get(
+      `${endpoint}/type/${encodeURIComponent(assertRequiredApiValue(type, 'Option type'))}`
+    );
   },
 
   // Batch get options by names
   batchGetByNames: async (names: string[]) => {
-    return request.post(`${endpoint}/batch`, names);
+    return request.post(`${endpoint}/batch`, assertRequiredApiArray(names, 'Option names'));
   },
 
   // Delete options by prefix
   deleteByPrefix: async (prefix: string) => {
-    return request.delete(`${endpoint}/prefix?prefix=${encodeURIComponent(prefix)}`);
+    return request.delete(
+      `${endpoint}/prefix?prefix=${encodeURIComponent(assertRequiredApiValue(prefix, 'Option prefix'))}`
+    );
   },
 
   // Export options as JSON

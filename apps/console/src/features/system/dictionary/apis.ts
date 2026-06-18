@@ -1,26 +1,31 @@
 import { Dictionary, DictionaryUsage } from './dictionary.d';
 
 import { createApi, ApiContext } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Get enum options for a dictionary
   getEnumOptions: async (slug: string) => {
-    return request.get(`${endpoint}/options/${slug}`);
+    return request.get(`${endpoint}/options/${assertRequiredApiValue(slug, 'Dictionary slug')}`);
   },
 
   // Validate enum value
   validateEnumValue: async (slug: string, value: string) => {
-    return request.get(`${endpoint}/validate/${slug}?value=${encodeURIComponent(value)}`);
+    return request.get(
+      `${endpoint}/validate/${assertRequiredApiValue(slug, 'Dictionary slug')}?value=${encodeURIComponent(assertRequiredApiValue(value, 'Dictionary value'))}`
+    );
   },
 
   // Batch get dictionaries by slugs
   batchGetBySlug: async (slugs: string[]) => {
-    return request.post(`${endpoint}/batch`, slugs);
+    return request.post(`${endpoint}/batch`, assertRequiredApiArray(slugs, 'Dictionary slugs'));
   },
 
   // Get dictionary usage information
   getUsage: async (id: string): Promise<DictionaryUsage[]> => {
-    return request.get(`${endpoint}/${encodeURIComponent(id)}/usage`);
+    return request.get(
+      `${endpoint}/${encodeURIComponent(assertRequiredApiValue(id, 'Dictionary ID'))}/usage`
+    );
   },
 
   // Get all dictionaries

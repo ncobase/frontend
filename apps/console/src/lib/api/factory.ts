@@ -3,6 +3,7 @@ import { PaginationResult } from '@ncobase/react';
 import { ExplicitAny } from '@ncobase/types';
 import { buildQueryString } from '@ncobase/utils';
 
+import { assertRequiredApiValue } from '@/lib/api/guards';
 import { request } from '@/lib/api/request';
 
 /**
@@ -148,23 +149,22 @@ export function createApi<
 
     // Get operation
     get: async (id: string): Promise<T> => {
-      const path = resolvePath(options.paths?.get, `${endpoint}/${id}`, id);
+      const entityId = assertRequiredApiValue(id, 'ID');
+      const path = resolvePath(options.paths?.get, `${endpoint}/${entityId}`, entityId);
       return request.get(path);
     },
 
     // Update operation
     update: async (payload: T): Promise<UpdateResult> => {
-      const path = resolvePath(
-        options.paths?.update,
-        `${endpoint}/${(payload as ExplicitAny).id}`,
-        payload
-      );
+      const entityId = assertRequiredApiValue((payload as ExplicitAny).id, 'ID');
+      const path = resolvePath(options.paths?.update, `${endpoint}/${entityId}`, payload);
       return request.put(path, { ...payload });
     },
 
     // Delete operation
     delete: async (id: string): Promise<DeleteResult> => {
-      const path = resolvePath(options.paths?.delete, `${endpoint}/${id}`, id);
+      const entityId = assertRequiredApiValue(id, 'ID');
+      const path = resolvePath(options.paths?.delete, `${endpoint}/${entityId}`, entityId);
       return request.delete(path);
     },
 

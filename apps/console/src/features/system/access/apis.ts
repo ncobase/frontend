@@ -9,12 +9,13 @@ import {
 } from './access.d';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 // Casbin API extensions
 const casbinExtensions = ({ request, endpoint }: ApiContext) => ({
   // Get policy by rule components
   getPolicyByRule: async (ptype: string, rule: string[]) => {
-    const params = new URLSearchParams({ p_type: ptype });
+    const params = new URLSearchParams({ p_type: assertRequiredApiValue(ptype, 'Policy type') });
     rule.forEach((value, index) => {
       if (value) params.append(`v${index}`, value);
     });
@@ -23,7 +24,9 @@ const casbinExtensions = ({ request, endpoint }: ApiContext) => ({
 
   // Bulk create policies
   bulkCreate: async (policies: CasbinRuleBody[]) => {
-    return request.post(`${endpoint}/bulk`, { policies });
+    return request.post(`${endpoint}/bulk`, {
+      policies: assertRequiredApiArray(policies, 'Policies')
+    });
   },
 
   // Import policies from file
@@ -66,7 +69,9 @@ const activityExtensions = ({ request, endpoint }: ApiContext) => ({
       });
     }
     const query = searchParams.toString();
-    return request.get(`${endpoint}/users/${username}${query ? `?${query}` : ''}`);
+    return request.get(
+      `${endpoint}/users/${assertRequiredApiValue(username, 'Username')}${query ? `?${query}` : ''}`
+    );
   },
 
   // Get activity analytics
@@ -90,7 +95,7 @@ const activityExtensions = ({ request, endpoint }: ApiContext) => ({
   // Bulk delete activities
   bulkDelete: async (activityIds: string[]) => {
     return request.delete(`${endpoint}/bulk`, {
-      body: { activity_ids: activityIds }
+      body: { activity_ids: assertRequiredApiArray(activityIds, 'Activity IDs') }
     });
   },
 

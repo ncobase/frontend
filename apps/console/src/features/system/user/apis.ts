@@ -10,18 +10,12 @@ import {
 } from './user';
 
 import { ApiContext, createApi } from '@/lib/api/factory';
-
-const assertRequiredId = (value: string | undefined, label: string) => {
-  if (!value) {
-    throw new Error(`${label} is required`);
-  }
-  return value;
-};
+import { assertRequiredApiArray, assertRequiredApiValue } from '@/lib/api/guards';
 
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // User meshes and profiles
   getUserMeshes: async (id: string): Promise<UserMeshes> => {
-    return request.get(`${endpoint}/${assertRequiredId(id, 'User ID')}/meshes`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/meshes`);
   },
 
   createUserWithProfile: async (payload: CreateUserPayload): Promise<UserMeshes> => {
@@ -29,12 +23,13 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   updateUserWithProfile: async (payload: UpdateUserPayload): Promise<UserMeshes> => {
-    return request.put(`${endpoint}/${payload.user.id}/meshes`, payload);
+    const user = assertRequiredApiValue(payload.user, 'User');
+    return request.put(`${endpoint}/${assertRequiredApiValue(user.id, 'User ID')}/meshes`, payload);
   },
 
   // Password management
   changePassword: async (id: string, payload: UserPasswordPayload): Promise<void> => {
-    return request.put(`${endpoint}/${assertRequiredId(id, 'User ID')}/password`, payload);
+    return request.put(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/password`, payload);
   },
 
   resetPassword: async (payload: { username: string; email: string }): Promise<void> => {
@@ -43,30 +38,38 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Role management
   getUserRoles: async (id: string): Promise<string[]> => {
-    return request.get(`${endpoint}/${assertRequiredId(id, 'User ID')}/roles`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/roles`);
   },
 
   assignRoles: async (id: string, roleIds: string[]): Promise<void> => {
-    return request.post(`${endpoint}/${assertRequiredId(id, 'User ID')}/roles`, { roleIds });
+    return request.post(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/roles`, {
+      roleIds: assertRequiredApiArray(roleIds, 'Role IDs')
+    });
   },
 
   removeRoles: async (id: string, roleIds: string[]): Promise<void> => {
-    return request.delete(`${endpoint}/${assertRequiredId(id, 'User ID')}/roles`, {
-      body: { roleIds }
+    return request.delete(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/roles`, {
+      body: { roleIds: assertRequiredApiArray(roleIds, 'Role IDs') }
     });
   },
 
   // Status management
   enableUser: async (id: string): Promise<UserMeshes> => {
-    return request.patch(`${endpoint}/${id}/status`, { status: 0 });
+    return request.patch(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/status`, {
+      status: 0
+    });
   },
 
   disableUser: async (id: string): Promise<UserMeshes> => {
-    return request.patch(`${endpoint}/${id}/status`, { status: 2 });
+    return request.patch(`${endpoint}/${assertRequiredApiValue(id, 'User ID')}/status`, {
+      status: 2
+    });
   },
 
   updateStatus: async (username: string, status: number): Promise<User> => {
-    return request.patch(`${endpoint}/${username}/status`, { status });
+    return request.patch(`${endpoint}/${assertRequiredApiValue(username, 'Username')}/status`, {
+      status
+    });
   },
 
   // Search and filter
@@ -75,25 +78,28 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   getUserByEmail: async (email: string): Promise<User> => {
-    return request.get(`${endpoint}/by-email/${email}`);
+    return request.get(`${endpoint}/by-email/${assertRequiredApiValue(email, 'Email')}`);
   },
 
   getUserByUsername: async (username: string): Promise<User> => {
-    return request.get(`${endpoint}/by-username/${username}`);
+    return request.get(`${endpoint}/by-username/${assertRequiredApiValue(username, 'Username')}`);
   },
 
   // Profile management
   getUserProfile: async (username: string) => {
-    return request.get(`${endpoint}/${username}/profile`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(username, 'Username')}/profile`);
   },
 
   updateUserProfile: async (username: string, payload: any) => {
-    return request.put(`${endpoint}/${username}/profile`, payload);
+    return request.put(
+      `${endpoint}/${assertRequiredApiValue(username, 'Username')}/profile`,
+      payload
+    );
   },
 
   // Employee management
   getEmployee: async (userId: string): Promise<Employee> => {
-    return request.get(`/sys/employees/${userId}`);
+    return request.get(`/sys/employees/${assertRequiredApiValue(userId, 'User ID')}`);
   },
 
   createEmployee: async (payload: any): Promise<Employee> => {
@@ -101,11 +107,11 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   updateEmployee: async (userId: string, payload: any): Promise<Employee> => {
-    return request.put(`/sys/employees/${userId}`, payload);
+    return request.put(`/sys/employees/${assertRequiredApiValue(userId, 'User ID')}`, payload);
   },
 
   deleteEmployee: async (userId: string): Promise<void> => {
-    return request.delete(`/sys/employees/${userId}`);
+    return request.delete(`/sys/employees/${assertRequiredApiValue(userId, 'User ID')}`);
   },
 
   getEmployees: async (params: any): Promise<{ items: Employee[] }> => {
@@ -119,16 +125,18 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   getEmployeesByDepartment: async (department: string): Promise<Employee[]> => {
-    return request.get(`/sys/employees/department/${department}`);
+    return request.get(
+      `/sys/employees/department/${assertRequiredApiValue(department, 'Department')}`
+    );
   },
 
   getEmployeesByManager: async (managerId: string): Promise<Employee[]> => {
-    return request.get(`/sys/employees/manager/${managerId}`);
+    return request.get(`/sys/employees/manager/${assertRequiredApiValue(managerId, 'Manager ID')}`);
   },
 
   // API Key management
   getUserApiKeys: async (userId: string): Promise<ApiKey[]> => {
-    return request.get(`${endpoint}/${assertRequiredId(userId, 'User ID')}/api-keys`);
+    return request.get(`${endpoint}/${assertRequiredApiValue(userId, 'User ID')}/api-keys`);
   },
 
   getMyApiKeys: async (): Promise<ApiKey[]> => {
@@ -140,17 +148,17 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   },
 
   getApiKey: async (keyId: string): Promise<ApiKey> => {
-    return request.get(`${endpoint}/api-keys/${keyId}`);
+    return request.get(`${endpoint}/api-keys/${assertRequiredApiValue(keyId, 'API key ID')}`);
   },
 
   deleteApiKey: async (keyId: string): Promise<void> => {
-    return request.delete(`${endpoint}/api-keys/${keyId}`);
+    return request.delete(`${endpoint}/api-keys/${assertRequiredApiValue(keyId, 'API key ID')}`);
   },
 
   // Space relationships
   getUserSpaceRoles: async (userId: string, spaceId: string) => {
     return request.get(
-      `${endpoint}/${assertRequiredId(userId, 'User ID')}/spaces/${assertRequiredId(spaceId, 'Space ID')}/roles`
+      `${endpoint}/${assertRequiredApiValue(userId, 'User ID')}/spaces/${assertRequiredApiValue(spaceId, 'Space ID')}/roles`
     );
   }
 });
