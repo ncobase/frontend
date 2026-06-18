@@ -252,7 +252,7 @@ const ApiKeyItem = ({ apiKey, canDelete, onDelete, t }) => {
           title={t('api_keys.delete_confirm_title')}
           description={t('api_keys.delete_confirm_description', { name: apiKey.name })}
           isOpen={showDeleteDialog}
-          onChange={() => setShowDeleteDialog(!showDeleteDialog)}
+          onChange={setShowDeleteDialog}
           cancelText={t('actions.cancel')}
           confirmText={t('actions.delete')}
           onCancel={() => setShowDeleteDialog(false)}

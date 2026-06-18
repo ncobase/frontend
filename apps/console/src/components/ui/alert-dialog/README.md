@@ -23,7 +23,7 @@ const [isOpen, setIsOpen] = useState(false);
   title="Confirm Changes"
   description="Your changes will be saved."
   isOpen={isOpen}
-  onChange={() => setIsOpen(!isOpen)}
+  onChange={setIsOpen}
   cancelText="Discard"
   confirmText="Save"
   onCancel={() => setIsOpen(false)}

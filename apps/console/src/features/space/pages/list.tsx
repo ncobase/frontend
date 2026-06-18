@@ -668,7 +668,7 @@ export const SpaceListPage = () => {
           title={t('space.dialogs.delete_title')}
           description={t('space.dialogs.delete_description')}
           isOpen={deleteDialog.open}
-          onChange={() => setDeleteDialog(prev => ({ ...prev, open: !deleteDialog.open }))}
+          onChange={nextOpen => setDeleteDialog(prev => ({ ...prev, open: nextOpen }))}
           cancelText={t('actions.cancel')}
           confirmText={t('actions.delete')}
           onCancel={() => setDeleteDialog({ open: false, space: null })}

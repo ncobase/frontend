@@ -129,7 +129,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         />
       </div>
 
-      <Dialog isOpen={isOpen} onChange={() => setIsOpen(!isOpen)}>
+      <Dialog isOpen={isOpen} onChange={setIsOpen}>
         <DialogContent className='max-w-md w-full'>
           <DialogHeader>
             <DialogTitle>Select a Color</DialogTitle>

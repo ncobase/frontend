@@ -190,7 +190,9 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
         title={t('schedule.execute.title', 'Execute Schedule')}
         description={t('schedule.execute.confirm')}
         isOpen={!!executeDialog}
-        onChange={() => setExecuteDialog(null)}
+        onChange={nextOpen => {
+          if (!nextOpen) setExecuteDialog(null);
+        }}
         cancelText={t('actions.cancel')}
         confirmText={t('schedule.actions.execute')}
         onCancel={() => setExecuteDialog(null)}

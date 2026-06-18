@@ -1032,7 +1032,7 @@ export const Elements = ({ ...rest }) => {
                     </Button>
                     <Dialog
                       isOpen={dialogOpen}
-                      onChange={() => setDialogOpen(false)}
+                      onChange={setDialogOpen}
                       title='Sample Dialog'
                       description='This is a sample dialog with some content.'
                       onConfirm={() => {
@@ -1055,7 +1055,7 @@ export const Elements = ({ ...rest }) => {
                     </Button>
                     <AlertDialog
                       isOpen={alertDialogOpen}
-                      onChange={() => setAlertDialogOpen(false)}
+                      onChange={setAlertDialogOpen}
                       title='Are you sure?'
                       description='This action cannot be undone. This will permanently delete the item.'
                       onConfirm={() => {

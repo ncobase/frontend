@@ -223,7 +223,9 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
         title={t('version.restore.title', 'Restore Version')}
         description={t('version.restore.confirm')}
         isOpen={!!restoreTarget}
-        onChange={() => setRestoreTarget(null)}
+        onChange={nextOpen => {
+          if (!nextOpen) setRestoreTarget(null);
+        }}
         cancelText={t('actions.cancel')}
         confirmText={t('version.restore.action', 'Restore')}
         onCancel={() => setRestoreTarget(null)}

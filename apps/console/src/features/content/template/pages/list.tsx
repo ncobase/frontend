@@ -181,7 +181,9 @@ export const TemplateListPage = () => {
         title={t('template.delete.title', 'Delete Template')}
         description={t('template.delete.confirm')}
         isOpen={!!deleteDialog}
-        onChange={() => setDeleteDialog(null)}
+        onChange={nextOpen => {
+          if (!nextOpen) setDeleteDialog(null);
+        }}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.delete')}
         onCancel={() => setDeleteDialog(null)}

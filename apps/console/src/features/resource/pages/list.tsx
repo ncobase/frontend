@@ -669,7 +669,7 @@ export const ResourceListPage = () => {
       <AlertDialog
         title={t('resource.dialogs.delete_title', 'Delete File')}
         isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setDeleteDialog(prev => ({ ...prev, open: nextOpen }))}
         className='max-w-3xl'
         footer={
           <>

@@ -45,9 +45,9 @@ export interface DialogViewProps<T = any> {
    */
   isOpen?: boolean;
   /**
-   * Callback when dialog is open or close
+   * Callback when dialog is open or closed
    */
-  onChange?: (_record?: T) => void;
+  onChange?: (_open: boolean) => void;
   /**
    * Cancel button, if footer is not defined it will be displayed
    */
@@ -105,15 +105,21 @@ export const Dialog = <T,>({
   loading,
   size = 'default'
 }: DialogViewProps<T>) => {
-  const [open, setOpen] = useState(isOpen);
+  const isControlled = isOpen !== undefined;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(Boolean(isOpen));
+  const open = isControlled ? Boolean(isOpen) : uncontrolledOpen;
 
   useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen]);
+    if (isControlled) {
+      setUncontrolledOpen(Boolean(isOpen));
+    }
+  }, [isControlled, isOpen]);
 
-  const handleChange = () => {
-    setOpen(prevStatus => !prevStatus);
-    onChange?.();
+  const handleChange = (nextOpen: boolean) => {
+    if (!isControlled) {
+      setUncontrolledOpen(nextOpen);
+    }
+    onChange?.(nextOpen);
   };
 
   const sizeClasses = {

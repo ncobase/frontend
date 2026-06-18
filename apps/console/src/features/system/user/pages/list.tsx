@@ -347,7 +347,7 @@ export const UserListPage = () => {
         title={t('user.dialogs.delete_title')}
         description={t('user.dialogs.delete_description')}
         isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !deleteDialog.open }))}
+        onChange={nextOpen => setDeleteDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.delete')}
         onCancel={() => setDeleteDialog({ open: false, user: null })}

@@ -477,7 +477,7 @@ export const SpaceBillingManagement: React.FC<SpaceBillingManagementProps> = ({
         title={t('space.billing.delete_confirm_title')}
         description={t('space.billing.delete_confirm_description')}
         isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setDeleteDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.delete')}
         onCancel={() => setDeleteDialog({ open: false, billing: null })}

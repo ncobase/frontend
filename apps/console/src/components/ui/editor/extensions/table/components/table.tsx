@@ -237,7 +237,7 @@ export const TableComponent = memo(
         <NodeViewContent className='table-content' as={'table' as any} />
 
         {/* Confirmation Dialog */}
-        <Dialog isOpen={isDialogOpen} onChange={() => setIsDialogOpen}>
+        <Dialog isOpen={isDialogOpen} onChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>

@@ -217,7 +217,7 @@ export const PermissionBulkActions = ({
         title={confirmDialog.title}
         description={confirmDialog.description}
         isOpen={confirmDialog.open}
-        onChange={() => setConfirmDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setConfirmDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel')}
         confirmText={t(`actions.${confirmDialog.action}`)}
         onCancel={() => setConfirmDialog(prev => ({ ...prev, open: false }))}

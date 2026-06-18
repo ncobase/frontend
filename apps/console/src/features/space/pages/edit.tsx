@@ -211,7 +211,7 @@ export const SpaceEditPage = () => {
         title={t('space.edit.discard_title', 'Discard changes')}
         description={t('space.edit.unsaved_changes_warning')}
         isOpen={discardConfirmOpen}
-        onChange={() => setDiscardConfirmOpen(false)}
+        onChange={setDiscardConfirmOpen}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.discard')}
         onCancel={() => setDiscardConfirmOpen(false)}

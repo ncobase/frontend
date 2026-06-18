@@ -161,7 +161,7 @@ export default (({ mode }: ConfigEnv): UserConfig => {
       }
     },
     server: {
-      port: +ENV.VITE_PORT || 5173,
+      port: +ENV.VITE_PORT || 62860,
       proxy
     }
   };

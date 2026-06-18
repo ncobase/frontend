@@ -143,7 +143,7 @@ export const QuickLogout = ({
         title='Sign out'
         description={confirmMessage}
         isOpen={confirmOpen}
-        onChange={() => setConfirmOpen(false)}
+        onChange={setConfirmOpen}
         cancelText='Cancel'
         confirmText='Sign out'
         onCancel={() => setConfirmOpen(false)}

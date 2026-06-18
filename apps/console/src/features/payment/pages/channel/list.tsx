@@ -171,7 +171,7 @@ export const ChannelListPage = () => {
           'Are you sure you want to delete this payment channel?'
         )}
         isOpen={deleteDialog.open}
-        onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setDeleteDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel', 'Cancel')}
         confirmText={t('actions.delete', 'Delete')}
         onCancel={() => setDeleteDialog({ open: false, item: null })}

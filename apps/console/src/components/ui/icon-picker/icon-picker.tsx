@@ -83,7 +83,7 @@ export const IconPicker = ({
     <Modal
       title={translations.title}
       isOpen={opened}
-      onChange={() => onVisible?.(!opened)}
+      onChange={nextOpen => onVisible?.(nextOpen)}
       className='w-[420px] max-h-[480px]'
     >
       <Tabs defaultValue='outline' className='space-y-4'>

@@ -168,7 +168,9 @@ export const WorkflowListPage = () => {
         title='Delete Workflow'
         description={`Delete "${deleteDialog?.name || ''}"? This cannot be undone.`}
         isOpen={!!deleteDialog}
-        onChange={() => setDeleteDialog(null)}
+        onChange={nextOpen => {
+          if (!nextOpen) setDeleteDialog(null);
+        }}
         cancelText='Cancel'
         confirmText='Delete'
         onCancel={() => setDeleteDialog(null)}

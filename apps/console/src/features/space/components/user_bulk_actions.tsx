@@ -210,7 +210,7 @@ export const SpaceUserBulkActions: React.FC<SpaceUserBulkActionsProps> = ({
           count: selectedUsers.length
         })}
         isOpen={confirmDialog.open}
-        onChange={() => setConfirmDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setConfirmDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel')}
         confirmText={t(`actions.${confirmDialog.action}`)}
         onCancel={() => setConfirmDialog({ open: false, action: '' })}

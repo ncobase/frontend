@@ -298,7 +298,7 @@ export const EmployeeManagement: React.FC<{
           title={t('employee.delete_confirm_title')}
           description={t('employee.delete_confirm_description')}
           isOpen={deleteDialog.open}
-          onChange={() => setDeleteDialog(prev => ({ ...prev, open: !prev.open }))}
+          onChange={nextOpen => setDeleteDialog(prev => ({ ...prev, open: nextOpen }))}
           cancelText={t('actions.cancel')}
           confirmText={t('actions.delete')}
           onCancel={() => setDeleteDialog({ open: false, employee: null })}

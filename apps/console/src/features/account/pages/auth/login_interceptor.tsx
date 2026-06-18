@@ -158,7 +158,7 @@ export const LoginInterceptorProvider = ({ children }: { children?: React.ReactN
       <Modal
         title={t('interceptor.account.title', 'Session Expired')}
         isOpen={opened}
-        onChange={() => handleModalChange(opened)}
+        onChange={handleModalChange}
         description={t('interceptor.account.description', 'Please login to continue')}
       >
         <LoginForm onSuccess={handleLoginSuccess} hideRegister hideForgetPassword />

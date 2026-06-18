@@ -79,6 +79,7 @@ export class Request {
   private readonly defaultHeaders: Record<string, string | undefined>;
   private pendingRequests = new Map<string, Promise<any>>();
   private isRefreshingToken = false;
+  private pendingRedirects = new Map<string, ReturnType<typeof setTimeout>>();
 
   static baseConfig: FetchOptions = {
     baseURL:
@@ -279,23 +280,31 @@ export class Request {
       CircuitBreaker.recordFailure(endpoint);
     }
 
-    // Create enhanced error object
-    const enhancedError = Object.assign(error, {
+    // Handle redirects (skip auth endpoints)
+    let handledByRequest = false;
+    if (!skipRedirect && !this.isAuthEndpoint(url)) {
+      handledByRequest = this.handleRedirects(status, message);
+    }
+
+    // Emit events after local session cleanup so auth state listeners see the latest storage state.
+    this.emitEvents(status, message, endpoint, data);
+
+    // Create an enhanced error without mutating Response or FetchError instances with readonly fields.
+    const enhancedError = new Error(message);
+    enhancedError.name = error?.name || 'RequestError';
+    if (error instanceof Error && error.stack) {
+      enhancedError.stack = error.stack;
+    }
+    Object.assign(enhancedError, {
+      originalError: error,
       status,
       message,
       endpoint,
       method,
       data,
+      handledByRequest,
       timestamp: Date.now()
     });
-
-    // Emit events for error handling
-    this.emitEvents(status, message, endpoint, data);
-
-    // Handle redirects (skip auth endpoints)
-    if (!skipRedirect && !this.isAuthEndpoint(url)) {
-      this.handleRedirects(status, message);
-    }
 
     throw enhancedError;
   }
@@ -308,8 +317,8 @@ export class Request {
   ): void {
     const shouldEmit = EventThrottler.shouldEmit.bind(EventThrottler);
 
-    if (status === 401 && shouldEmit('unauthorized')) {
-      eventEmitter.emit('unauthorized', message);
+    if (status === 401) {
+      eventEmitter.emit('unauthorized', { message, url: endpoint, data });
     } else if (status === 403 && shouldEmit('forbidden')) {
       eventEmitter.emit('forbidden', { url: endpoint, message, data });
     } else if (status === 404 && shouldEmit('not-found')) {
@@ -323,14 +332,36 @@ export class Request {
     }
   }
 
-  private handleRedirects(status: number | undefined, _message?: string): void {
-    if (!isBrowser) return;
+  private clearAuthenticationState(): void {
+    locals.remove(ACCESS_TOKEN_KEY);
+    locals.remove(REFRESH_TOKEN_KEY);
+    locals.remove(TENANT_KEY);
+  }
+
+  private handleRedirects(status: number | undefined, _message?: string): boolean {
+    if (!isBrowser) return false;
 
     const redirectToError = (errorPath: string, delay = 100) => {
-      if (window.location.pathname.startsWith('/error/')) return; // Already on error page
+      const currentPath = window.location.pathname + window.location.search;
+      if (currentPath === errorPath) return false;
+      if (errorPath.startsWith('/error/') && window.location.pathname.startsWith('/error/')) {
+        return false;
+      }
 
-      setTimeout(() => {
+      const existingTimer = this.pendingRedirects.get(errorPath);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      const timer = setTimeout(() => {
+        this.pendingRedirects.delete(errorPath);
         try {
+          const latestPath = window.location.pathname + window.location.search;
+          if (latestPath === errorPath) return;
+          if (errorPath.startsWith('/error/') && window.location.pathname.startsWith('/error/')) {
+            return;
+          }
+
           // Use history API for SPA navigation
           if (window.history?.pushState) {
             window.history.pushState(null, '', errorPath);
@@ -343,43 +374,36 @@ export class Request {
           window.location.href = errorPath;
         }
       }, delay);
+
+      this.pendingRedirects.set(errorPath, timer);
+      return true;
     };
 
     // Handle different error types
     switch (status) {
       case 401:
-        // Clear tokens and redirect to login for protected routes
-        locals.remove(ACCESS_TOKEN_KEY);
-        locals.remove(REFRESH_TOKEN_KEY);
-
-        if (!isPublicRoute(window.location.pathname)) {
-          const currentPath = window.location.pathname + window.location.search;
-          const loginUrl = `/login?redirect=${encodeURIComponent(currentPath)}`;
-          redirectToError(loginUrl, 100);
-        }
-        break;
+        // Clear local credentials and let AuthProvider/Guard perform a single React navigation.
+        this.clearAuthenticationState();
+        return !isPublicRoute(window.location.pathname);
 
       case 403:
         // Delayed redirect for forbidden
-        setTimeout(() => redirectToError('/error/403'), 1500);
-        break;
+        return redirectToError('/error/403', 1500);
 
       case 404:
         // Delayed redirect for not found
-        setTimeout(() => redirectToError('/error/404'), 1500);
-        break;
+        return redirectToError('/error/404', 1500);
 
       case undefined: // Network error
         // Delayed redirect for network issues
-        setTimeout(() => redirectToError('/error/network'), 2000);
-        break;
+        return redirectToError('/error/network', 2000);
 
       default:
         if (status && status >= 500) {
           // Delayed redirect for server errors
-          setTimeout(() => redirectToError('/error/500'), 2000);
+          return redirectToError('/error/500', 2000);
         }
-        break;
+        return false;
     }
   }
 
@@ -502,6 +526,8 @@ export class Request {
   public clearState(): void {
     CircuitBreaker.clearFailures();
     this.pendingRequests.clear();
+    this.pendingRedirects.forEach(timer => clearTimeout(timer));
+    this.pendingRedirects.clear();
   }
 }
 

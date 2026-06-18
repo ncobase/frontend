@@ -251,7 +251,7 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
           user: user.username
         })}
         isOpen={removeDialog.open}
-        onChange={() => setRemoveDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setRemoveDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.remove')}
         onCancel={() => setRemoveDialog({ open: false, roleId: '', roleName: '' })}

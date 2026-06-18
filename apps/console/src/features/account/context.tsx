@@ -14,6 +14,8 @@ import { accountApi } from './apis';
 import { Permission } from './permissions/service';
 import type { TokenPayload } from './token_service';
 
+import { eventEmitter } from '@/lib/events';
+
 export const ACCESS_TOKEN_KEY = 'app.access.token';
 export const REFRESH_TOKEN_KEY = 'app.refresh.token';
 export const TENANT_KEY = 'app.space.id';
@@ -82,38 +84,6 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const isAuthenticated = !!tokenPayload;
   const roles = tokenPayload?.roles || [];
   const permissions = tokenPayload?.permissions || [];
-
-  // Load user data on mount
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (!isAuthenticated) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const userData = await accountApi.getCurrentUser();
-        setUser(userData);
-        Permission.setAccountData(userData);
-
-        // Set space from user data if not set
-        if (!spaceId && userData?.spaces?.[0]) {
-          const defaultSpace = userData.spaces[0];
-          setSpaceId(defaultSpace.id);
-          if (isBrowser) {
-            locals.set(TENANT_KEY, defaultSpace.id);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to load user data:', error);
-        clearSession();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadUserData();
-  }, [isAuthenticated, spaceId]);
 
   const updateTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
     setAccessToken(newAccessToken);
@@ -196,6 +166,65 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     setUser(null);
     Permission.clearAccountData();
   }, [updateTokens]);
+
+  // Keep React authentication state synchronized with request-level session failures.
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      clearSession();
+      setIsLoading(false);
+    };
+
+    eventEmitter.on('unauthorized', handleUnauthorized);
+    return () => {
+      eventEmitter.off('unauthorized', handleUnauthorized);
+    };
+  }, [clearSession]);
+
+  // Load user data on mount and whenever the active space changes.
+  useEffect(() => {
+    let active = true;
+
+    const loadUserData = async () => {
+      if (!isAuthenticated) {
+        if (active) {
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const userData = await accountApi.getCurrentUser();
+        if (!active) return;
+
+        setUser(userData);
+        Permission.setAccountData(userData);
+
+        // Set space from user data if not set
+        if (!spaceId && userData?.spaces?.[0]) {
+          const defaultSpace = userData.spaces[0];
+          setSpaceId(defaultSpace.id);
+          if (isBrowser) {
+            locals.set(TENANT_KEY, defaultSpace.id);
+          }
+        }
+      } catch (error) {
+        if (!active) return;
+
+        console.error('Failed to load user data:', error);
+        clearSession();
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadUserData();
+
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated, spaceId, clearSession]);
 
   const contextValue = useMemo<AuthContextValue>(
     () => ({

@@ -186,7 +186,7 @@ const CasbinPolicyItem = ({ policy, onEdit, t }) => {
         title={t('casbin.delete_confirm_title')}
         description={t('casbin.delete_confirm_description')}
         isOpen={showDeleteDialog}
-        onChange={() => setShowDeleteDialog(!showDeleteDialog)}
+        onChange={setShowDeleteDialog}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.delete')}
         onCancel={() => setShowDeleteDialog(false)}

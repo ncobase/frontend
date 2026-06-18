@@ -114,9 +114,9 @@ export const SpaceSwitcher = ({
     <Modal
       title={t('space_switcher.title')}
       isOpen={opened}
-      onChange={() => {
+      onChange={nextOpen => {
         if (onVisible) {
-          onVisible(!opened);
+          onVisible(nextOpen);
         }
       }}
       className='max-w-80 max-h-40'

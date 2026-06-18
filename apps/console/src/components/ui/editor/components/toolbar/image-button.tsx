@@ -83,7 +83,7 @@ export const ImageButton: React.FC<ImageButtonProps> = ({ editor, uploadFn }) =>
         </Button>
       </Tooltip>
 
-      <Dialog isOpen={dialogOpen} onChange={() => setDialogOpen}>
+      <Dialog isOpen={dialogOpen} onChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('editor.dialog.image.title')}</DialogTitle>

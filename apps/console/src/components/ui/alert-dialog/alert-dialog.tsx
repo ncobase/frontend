@@ -46,9 +46,9 @@ interface AlertDialogProps {
    */
   isOpen?: boolean;
   /**
-   * Callback when alertDialog is open or close
+   * Callback when alertDialog is open or closed
    */
-  onChange?: () => void;
+  onChange?: (_open: boolean) => void;
   /**
    * Cancel button, if footer is not defined it will be displayed
    */
@@ -81,15 +81,21 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
   className,
   children
 }) => {
-  const [open, setOpen] = useState(isOpen);
+  const isControlled = isOpen !== undefined;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(Boolean(isOpen));
+  const open = isControlled ? Boolean(isOpen) : uncontrolledOpen;
 
   useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen]);
+    if (isControlled) {
+      setUncontrolledOpen(Boolean(isOpen));
+    }
+  }, [isControlled, isOpen]);
 
-  const handleChange = () => {
-    setOpen(prevStatus => !prevStatus);
-    onChange?.();
+  const handleChange = (nextOpen: boolean) => {
+    if (!isControlled) {
+      setUncontrolledOpen(nextOpen);
+    }
+    onChange?.(nextOpen);
   };
 
   return (

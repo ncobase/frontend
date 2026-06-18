@@ -228,7 +228,7 @@ export const SpaceUserEditPage = () => {
         title={t('space.users.edit.discard_title', 'Discard changes')}
         description={t('space.users.edit.unsaved_changes_warning')}
         isOpen={discardConfirmOpen}
-        onChange={() => setDiscardConfirmOpen(false)}
+        onChange={setDiscardConfirmOpen}
         cancelText={t('actions.cancel')}
         confirmText={t('actions.discard')}
         onCancel={() => setDiscardConfirmOpen(false)}

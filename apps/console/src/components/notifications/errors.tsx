@@ -2,17 +2,16 @@ import { useEffect, useRef } from 'react';
 
 import { useToastMessage } from '@ncobase/react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
-import { useAuthContext } from '@/features/account/context';
+import { eventEmitter } from '@/lib/events';
+import { isPublicRoute } from '@/router/helpers/utils';
 
 // ErrorNotification component
 export const ErrorNotification = () => {
   const { t } = useTranslation();
   const toast = useToastMessage();
-  const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, updateTokens } = useAuthContext();
 
   // Track last error to prevent duplicates
   const lastErrorRef = useRef<{ type: string; time: number } | null>(null);
@@ -51,26 +50,33 @@ export const ErrorNotification = () => {
       // Check if it's a network or authentication error
       const error = event.reason;
 
-      if (error?.status === 401 && isAuthenticated) {
-        toast.error(t('errors.session_expired'), {
-          description: t('errors.please_login_again')
-        });
+      if (error?.status === 401) {
+        event.preventDefault();
+        if (!error?.handledByRequest) {
+          eventEmitter.emit('unauthorized', {
+            message: error?.message,
+            url: error?.endpoint,
+            data: error?.data
+          });
+        }
 
-        // Clear tokens and redirect after short delay
-        setTimeout(() => {
-          updateTokens();
-          const currentPath = location.pathname + location.search;
-          navigate(`/login?redirect=${encodeURIComponent(currentPath)}`, { replace: true });
-        }, 1000);
+        if (!isPublicRoute(location.pathname)) {
+          toast.error(t('errors.session_expired'), {
+            description: t('errors.please_login_again')
+          });
+        }
       } else if (error?.status === 403) {
+        event.preventDefault();
         toast.error(t('errors.access_denied'), {
           description: t('errors.insufficient_permissions')
         });
       } else if (error?.status >= 500) {
+        event.preventDefault();
         toast.error(t('errors.server_error'), {
           description: t('errors.server_unavailable')
         });
       } else if (!error?.status) {
+        event.preventDefault();
         toast.error(t('errors.network_error'), {
           description: t('errors.check_connection')
         });
@@ -85,7 +91,7 @@ export const ErrorNotification = () => {
       window.removeEventListener('error', handleGlobalError);
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
-  }, [t, toast, navigate, location, isAuthenticated, updateTokens]);
+  }, [t, toast, location.pathname]);
 
   return null;
 };

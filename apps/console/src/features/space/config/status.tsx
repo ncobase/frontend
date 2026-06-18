@@ -69,7 +69,7 @@ export const useSpaceStatusToggle = (onSuccess, onError) => {
             )
       }
       isOpen={confirmDialog.open}
-      onChange={() => setConfirmDialog(prev => ({ ...prev, open: !prev.open }))}
+      onChange={nextOpen => setConfirmDialog(prev => ({ ...prev, open: nextOpen }))}
       cancelText='Discard'
       confirmText='Save'
       onCancel={() => setConfirmDialog(prev => ({ ...prev, open: false }))}

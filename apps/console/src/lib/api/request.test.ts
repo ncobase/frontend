@@ -1,13 +1,20 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Request } from './request';
 
-vi.mock('@ncobase/utils', () => ({
+const utilsMock = vi.hoisted(() => ({
   isBrowser: false,
   locals: {
     get: vi.fn(),
     remove: vi.fn()
   }
+}));
+
+vi.mock('@ncobase/utils', () => ({
+  get isBrowser() {
+    return utilsMock.isBrowser;
+  },
+  locals: utilsMock.locals
 }));
 
 vi.mock('@/features/account/context', () => ({
@@ -38,6 +45,12 @@ vi.mock('@/router/helpers/utils', () => ({
 describe('Request', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    utilsMock.isBrowser = false;
+    utilsMock.locals.get.mockReturnValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   const createFetcher = () => vi.fn(async (_url: string, _options: any) => ({ ok: true }));
@@ -93,5 +106,40 @@ describe('Request', () => {
     ]);
 
     expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it('clears browser credentials once for protected 401 responses without manual navigation', async () => {
+    utilsMock.isBrowser = true;
+    const pushState = vi.fn();
+    const dispatchEvent = vi.fn();
+
+    vi.stubGlobal('window', {
+      location: {
+        pathname: '/account/profile',
+        search: '?tab=security',
+        href: ''
+      },
+      history: {
+        pushState
+      },
+      dispatchEvent
+    });
+
+    const response = new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401 });
+    const fetcher = vi.fn(async () => {
+      throw response;
+    });
+    const client = new Request(fetcher as any);
+
+    await expect(client.get('/account', { timestamp: false })).rejects.toMatchObject({
+      status: 401,
+      handledByRequest: true
+    });
+
+    expect(utilsMock.locals.remove).toHaveBeenCalledWith('access-token');
+    expect(utilsMock.locals.remove).toHaveBeenCalledWith('refresh-token');
+    expect(utilsMock.locals.remove).toHaveBeenCalledWith('space-id');
+    expect(pushState).not.toHaveBeenCalled();
+    expect(dispatchEvent).not.toHaveBeenCalled();
   });
 });

@@ -205,7 +205,7 @@ export const SessionPage = () => {
           {/* Deactivate all confirmation modal */}
           <Modal
             isOpen={showDeactivateModal}
-            onChange={() => setShowDeactivateModal(!showDeactivateModal)}
+            onChange={setShowDeactivateModal}
             title={t('sessions.logout_all_confirm_title')}
             description={t('sessions.logout_all_confirm_description')}
           >

@@ -114,7 +114,7 @@ export const SubscriptionListPage = () => {
           'Are you sure you want to cancel this subscription?'
         )}
         isOpen={cancelDialog.open}
-        onChange={() => setCancelDialog(prev => ({ ...prev, open: !prev.open }))}
+        onChange={nextOpen => setCancelDialog(prev => ({ ...prev, open: nextOpen }))}
         cancelText={t('actions.cancel', 'Cancel')}
         confirmText={t('payment.actions.confirm_cancel', 'Confirm Cancel')}
         onCancel={() => setCancelDialog({ open: false, item: null })}
