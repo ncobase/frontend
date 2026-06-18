@@ -3,17 +3,28 @@ import { useCallback, useMemo, useState } from 'react';
 import { useToastMessage } from '@ncobase/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FetchError } from 'ofetch';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { LoginProps } from './account';
-import { accountApi, loginAccount, logoutAccount, registerAccount } from './apis';
+import { ChangePasswordPayload, LoginProps } from './account';
+import {
+  accountApi,
+  loginAccount,
+  logoutAccount,
+  registerAccount,
+  sendAuthCode,
+  verifyAuthCode
+} from './apis';
 import { useAuthContext } from './context';
+import { normalizePasswordPolicy } from './password_policy';
 import { clearTokens } from './token_service';
 
 // Query keys
 export const accountKeys = {
   login: ['accountService', 'login'],
   register: ['accountService', 'register'],
+  passwordPolicy: ['accountService', 'passwordPolicy'],
+  changePassword: ['accountService', 'changePassword'],
   currentUser: ['accountService', 'currentUser'],
   spaces: (params = {}) => ['accountService', 'spaces', params],
   space: (params = {}) => ['accountService', 'space', params]
@@ -77,24 +88,114 @@ export const useRegisterAccount = (options?: {
 }) => {
   const { updateTokens } = useAuthContext();
   const toast = useToastMessage();
+  const { t } = useTranslation();
 
   return useMutation({
     mutationFn: registerAccount,
     onSuccess: data => {
-      toast.success('Registration Successful', {
-        description: 'Welcome! Your account has been created successfully.'
+      toast.success(t('account.register.success_title', 'Registration Successful'), {
+        description: t(
+          'account.register.success_description',
+          'Welcome! Your account has been created successfully.'
+        )
       });
 
       updateTokens(data?.access_token, data?.refresh_token);
       options?.onSuccess?.();
     },
     onError: (error: FetchError) => {
-      const errorMessage = error?.data?.message || 'Registration failed. Please try again.';
-      toast.error('Registration Failed', {
+      const errorMessage =
+        error?.data?.message ||
+        t('account.register.failed_description', 'Registration failed. Please try again.');
+      toast.error(t('account.register.failed_title', 'Registration Failed'), {
         description: errorMessage,
         duration: 6000
       });
 
+      options?.onError?.(error);
+    }
+  });
+};
+
+export const usePasswordPolicy = () => {
+  return useQuery({
+    queryKey: accountKeys.passwordPolicy,
+    queryFn: accountApi.getPasswordPolicy,
+    select: normalizePasswordPolicy,
+    staleTime: 1000 * 60 * 30
+  });
+};
+
+export const useSendRegisterCode = () => {
+  const toast = useToastMessage();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: sendAuthCode,
+    onSuccess: data => {
+      if (data?.registered) {
+        toast.warning(t('account.register.email_registered_title', 'Email Already Registered'), {
+          description: t(
+            'account.register.email_registered_description',
+            'Use login or password recovery for this email address.'
+          )
+        });
+        return;
+      }
+
+      toast.success(t('account.register.code_sent_title', 'Verification Code Sent'), {
+        description: t(
+          'account.register.code_sent_description',
+          'Check your email and enter the verification code to finish registration.'
+        )
+      });
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.register.code_failed_title', 'Verification Code Failed'), {
+        description:
+          error?.data?.message ||
+          t('account.register.code_failed_description', 'Failed to send verification code.')
+      });
+    }
+  });
+};
+
+export const useVerifyRegisterCode = () => {
+  return useMutation({
+    mutationFn: verifyAuthCode
+  });
+};
+
+export const useChangePassword = (options?: {
+  onSuccess?: () => void;
+  onError?: (_error: any) => void;
+}) => {
+  const toast = useToastMessage();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationKey: accountKeys.changePassword,
+    mutationFn: (payload: ChangePasswordPayload) => accountApi.changePassword(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.currentUser });
+      toast.success(t('account.security.update_success_title', 'Password Updated'), {
+        description: t(
+          'account.security.update_success_description',
+          'Your password has been changed successfully.'
+        )
+      });
+      options?.onSuccess?.();
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.security.update_failed_title', 'Password Update Failed'), {
+        description:
+          error?.data?.message ||
+          t(
+            'account.security.update_failed_description',
+            'Please check your current password and try again.'
+          )
+      });
       options?.onError?.(error);
     }
   });

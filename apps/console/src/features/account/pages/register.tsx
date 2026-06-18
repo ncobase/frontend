@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { Button, CheckboxField, Form, InputField } from '@ncobase/react';
+import { Button, CheckboxField, Form, Icons, InputField, useToastMessage } from '@ncobase/react';
 import { ExplicitAny } from '@ncobase/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
@@ -8,14 +8,45 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { RegisterProps } from '../account';
+import {
+  getPasswordPolicyIssues,
+  normalizePasswordPolicy,
+  PasswordPolicyIssue
+} from '../password_policy';
 
 import { Footer } from '@/components/footer/footer';
 import { LanguageSwitcher } from '@/components/language_switcher';
 import { Page } from '@/components/layout';
 import { Logo } from '@/components/logo';
 import { useNotificationService } from '@/components/notifications/notification.service';
-import { useRegisterAccount } from '@/features/account/service';
+import {
+  usePasswordPolicy,
+  useRegisterAccount,
+  useSendRegisterCode,
+  useVerifyRegisterCode
+} from '@/features/account/service';
 import { useRedirectFromUrl } from '@/router';
+
+const passwordIssueMessage = (
+  issue: PasswordPolicyIssue,
+  minLength: number,
+  t: ReturnType<typeof useTranslation>['t']
+) => {
+  switch (issue) {
+    case 'min_length':
+      return t('fields.password.too_short', { count: minLength });
+    case 'require_uppercase':
+      return t('fields.password.missing_uppercase');
+    case 'require_lowercase':
+      return t('fields.password.missing_lowercase');
+    case 'require_numbers':
+      return t('fields.password.missing_number');
+    case 'require_symbols':
+      return t('fields.password.missing_symbol');
+    default:
+      return t('fields.password.invalid', 'Password does not meet the policy.');
+  }
+};
 
 export const Register = () => {
   const { t } = useTranslation();
@@ -23,10 +54,15 @@ export const Register = () => {
   const redirect = useRedirectFromUrl();
   const queryClient = useQueryClient();
   const { addNotification } = useNotificationService();
+  const toast = useToastMessage();
+  const { data: loadedPasswordPolicy } = usePasswordPolicy();
+  const passwordPolicy = normalizePasswordPolicy(loadedPasswordPolicy);
 
   const {
     control,
     watch,
+    getValues,
+    trigger,
     handleSubmit,
     formState: { errors }
   } = useForm<RegisterProps>();
@@ -40,19 +76,65 @@ export const Register = () => {
     });
   };
 
-  const { mutate: onRegisterAccount } = useRegisterAccount({
+  const { mutate: onRegisterAccount, isPending: isRegistering } = useRegisterAccount({
     onSuccess: () => {
       queryClient.clear();
       redirect();
     },
     onError
   });
+  const sendCode = useSendRegisterCode();
+  const verifyCode = useVerifyRegisterCode();
+
+  const handleSendCode = useCallback(async () => {
+    const emailValid = await trigger('email');
+    if (!emailValid) return;
+
+    const email = getValues('email')?.trim();
+    if (!email) return;
+
+    sendCode.mutate(email);
+  }, [getValues, sendCode, trigger]);
 
   const onSubmit = handleSubmit(
-    useCallback(async (values: RegisterProps) => {
-      onRegisterAccount(values);
-    }, [])
+    useCallback(
+      async (values: RegisterProps) => {
+        try {
+          const verification = await verifyCode.mutateAsync(values.verification_code.trim());
+          const registerToken = verification?.register_token || verification?.access_token;
+
+          if (!registerToken || verification?.token_type !== 'Register') {
+            toast.error(t('account.register.verify_failed_title', 'Verification Failed'), {
+              description: t(
+                'account.register.verify_failed_description',
+                'The verification code is not valid for creating a new account.'
+              )
+            });
+            return;
+          }
+
+          onRegisterAccount({
+            username: values.username.trim(),
+            display_name: values.username.trim(),
+            email: values.email.trim(),
+            password: values.password,
+            confirm_password: values.confirm_password,
+            register_token: registerToken
+          });
+        } catch (error) {
+          toast.error(t('account.register.verify_failed_title', 'Verification Failed'), {
+            description:
+              error?.['data']?.message ||
+              error?.['message'] ||
+              t('account.register.verify_failed_description')
+          });
+        }
+      },
+      [onRegisterAccount, t, toast, verifyCode]
+    )
   );
+
+  const isSubmitting = isRegistering || verifyCode.isPending;
 
   return (
     <Page title={t('account.register.title')} layout={false}>
@@ -117,6 +199,50 @@ export const Register = () => {
                 />
               )}
             />
+            <div className='-mt-4 flex justify-end'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleSendCode}
+                disabled={sendCode.isPending}
+                className='min-w-36'
+              >
+                {sendCode.isPending && (
+                  <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+                )}
+                {t('account.register.send_code', 'Send Code')}
+              </Button>
+            </div>
+            <Controller
+              name='verification_code'
+              control={control}
+              defaultValue=''
+              rules={{
+                required: t(
+                  'account.register.verification_code_required',
+                  'Verification code is required'
+                ),
+                validate: value => {
+                  if (value && !/^[A-Za-z0-9]{4,12}$/.test(value.trim())) {
+                    return t(
+                      'account.register.verification_code_invalid',
+                      'Enter a valid verification code'
+                    );
+                  }
+                }
+              }}
+              render={({ field }) => (
+                <InputField
+                  label={t('account.register.verification_code', 'Verification code')}
+                  placeholder={t(
+                    'account.register.verification_code_placeholder',
+                    'Enter the code from your email'
+                  )}
+                  error={errors.verification_code}
+                  {...field}
+                />
+              )}
+            />
             <Controller
               name='password'
               control={control}
@@ -124,18 +250,11 @@ export const Register = () => {
               rules={{
                 required: t('fields.password.required'),
                 validate: value => {
-                  if (value && value.length < 8) {
-                    return t('fields.password.too_short', { count: 8 });
+                  const issues = getPasswordPolicyIssues(value || '', passwordPolicy);
+                  if (issues.length > 0) {
+                    return passwordIssueMessage(issues[0], passwordPolicy.min_length, t);
                   } else if (value && value.length > 128) {
                     return t('fields.password.too_long', { count: 128 });
-                  } else if (value && !/[A-Z]/.test(value)) {
-                    return t('fields.password.missing_uppercase');
-                  } else if (value && !/[a-z]/.test(value)) {
-                    return t('fields.password.missing_lowercase');
-                  } else if (value && !/[0-9]/.test(value)) {
-                    return t('fields.password.missing_number');
-                  } else if (value && !/[^A-Za-z0-9]/.test(value)) {
-                    return t('fields.password.missing_symbol');
                   }
                 }
               }}
@@ -191,11 +310,15 @@ export const Register = () => {
                 variant='unstyle'
                 className='text-slate-400 hover:text-primary-600/90 hover:bg-transparent -ml-3 gap-x-2'
                 onClick={() => navigate('/login')}
+                disabled={isSubmitting}
               >
                 {t('actions.already_have_an_account')}
                 <strong>{t('actions.login')}</strong>
               </Button>
-              <Button type='submit'>{t('actions.register')}</Button>
+              <Button type='submit' disabled={isSubmitting}>
+                {isSubmitting && <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />}
+                {t('actions.register')}
+              </Button>
             </div>
           </Form>
         </div>

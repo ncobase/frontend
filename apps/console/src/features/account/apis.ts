@@ -1,4 +1,12 @@
-import { Account, LoginProps, LoginReply, RegisterProps } from './account';
+import {
+  Account,
+  ChangePasswordPayload,
+  LoginProps,
+  LoginReply,
+  PasswordPolicy,
+  RegisterAccountPayload,
+  SendCodeReply
+} from './account';
 
 import type { Space } from '@/features/space/space';
 import { request } from '@/lib/api/request';
@@ -24,6 +32,14 @@ export const accountApi = {
   // Get user belonged spaces or related spaces
   getAccountSpaces: async (): Promise<Spaces> => {
     return request.get(`${accountEndpoint}/spaces`);
+  },
+
+  getPasswordPolicy: async (): Promise<PasswordPolicy> => {
+    return request.get('/password-policy');
+  },
+
+  changePassword: async (payload: ChangePasswordPayload): Promise<void> => {
+    return request.put(`${accountEndpoint}/password`, payload);
   }
 
   /**
@@ -33,11 +49,6 @@ export const accountApi = {
   // Update current user profile
   // updateProfile: async (profile: Partial<Account>): Promise<Account> => {
   //   return request.put(`${accountEndpoint}/profile`, profile);
-  // },
-
-  // Change password for current user
-  // changePassword: async (oldPassword: string, newPassword: string): Promise<void> => {
-  //   return request.put(`${accountEndpoint}/password`, { oldPassword, newPassword });
   // },
 
   // Get user notifications
@@ -55,13 +66,21 @@ export const authApi = {
   },
 
   // Register
-  register: async (payload: RegisterProps): Promise<LoginReply> => {
+  register: async (payload: RegisterAccountPayload): Promise<LoginReply> => {
     return request.post(`${authEndpoint}/register`, { ...payload });
   },
 
   // Logout
   logout: async (): Promise<void> => {
     return request.post(`${authEndpoint}/logout`);
+  },
+
+  sendCode: async (email: string): Promise<SendCodeReply> => {
+    return request.post(`${authEndpoint}/authorize/send`, { email });
+  },
+
+  verifyCode: async (code: string): Promise<LoginReply> => {
+    return request.get(`${authEndpoint}/authorize/${encodeURIComponent(code)}`);
   }
 
   /**
@@ -90,3 +109,5 @@ export const getAccountSpaces = accountApi.getAccountSpaces;
 export const loginAccount = authApi.login;
 export const registerAccount = authApi.register;
 export const logoutAccount = authApi.logout;
+export const sendAuthCode = authApi.sendCode;
+export const verifyAuthCode = authApi.verifyCode;

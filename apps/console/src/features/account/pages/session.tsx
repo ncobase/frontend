@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Session } from '../session';
 import { useSessions, useDeleteSession, useDeactivateAllSessions } from '../session.hooks';
 
+import { AccountNavigation } from './components/account_navigation';
+
 import { Page } from '@/components/layout';
 
 const getDeviceIcon = (userAgent?: string, deviceInfo?: Record<string, any>) => {
@@ -158,9 +160,10 @@ export const SessionPage = () => {
   return (
     <Page title={t('sessions.title')}>
       <ScrollView className='py-6'>
-        <Container className='max-w-4xl'>
+        <Container className='max-w-4xl space-y-6'>
+          <AccountNavigation />
           {/* Header */}
-          <div className='mb-6'>
+          <div>
             <div className='flex items-center justify-between'>
               <div>
                 <h1 className='text-2xl font-bold text-gray-900 mb-2'>{t('sessions.title')}</h1>

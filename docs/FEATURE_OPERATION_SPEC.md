@@ -30,6 +30,19 @@ which cross-feature effects they must handle.
   captcha required, network error.
 - Gaps: MFA challenge page and captcha flow are not complete.
 
+### Registration
+
+- Entry: `/register`.
+- Actions: enter username/email/password, request email verification code, enter verification code,
+  accept terms, submit registration.
+- API: `GET /password-policy`, `POST /authorize/send`, `GET /authorize/:code`, `POST /register`.
+- Success effects: verification returns a register token for new email addresses; registration stores
+  tokens, clears stale account/query state, and redirects through the normal auth redirect flow.
+- Failure states: invalid email, already registered email, expired/used verification code, password
+  policy failure, register-token mismatch, network error.
+- Required UX: disable submit while verification/registration is pending; show field validation and
+  toast feedback; never create an account without the backend register token.
+
 ### Token Refresh
 
 - Entry: automatic before protected non-auth requests.
@@ -58,6 +71,19 @@ which cross-feature effects they must handle.
 - Actions: list sessions, delete one session, deactivate all other sessions.
 - API: `/sessions`, `/sessions/:session_id`, `/sessions/deactivate-all`.
 - Required UX: current session must be visually protected; bulk deactivation needs confirmation.
+
+### Account Security
+
+- Entry: `/account/security`.
+- Actions: read backend password policy, enter current password, enter and confirm new password,
+  submit password change.
+- API: `GET /password-policy`, `PUT /account/password`.
+- Success effects: password-changed event is published by the backend; account cache is invalidated;
+  the form resets after success.
+- Failure states: policy load fallback, missing current password, weak new password, confirmation
+  mismatch, wrong current password, network error.
+- Required UX: account navigation links profile/security/sessions; password requirements are visible
+  before submit; the client never sends a target user id for current-account password changes.
 
 ## System Management
 

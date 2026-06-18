@@ -1,148 +1,195 @@
 import { Button, Container, Icons, ScrollView } from '@ncobase/react';
+import { formatRelativeTime } from '@ncobase/utils';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
+
+import { AccountNavigation } from './components/account_navigation';
 
 import { AvatarButton } from '@/components/avatar/avatar_button';
 import { Page } from '@/components/layout';
 import { useAccount } from '@/features/account/service';
 
+const formatOptionalDate = (value?: number) => {
+  if (!value) return '-';
+  return formatRelativeTime(new Date(value));
+};
+
+const joinName = (first?: string, last?: string) => {
+  return [first, last].filter(Boolean).join(' ');
+};
+
 export const Profile = () => {
-  const { user, profile, isLoading } = useAccount();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const {
+    user,
+    profile,
+    roles = [],
+    spaces = [],
+    permissions = [],
+    isLoading,
+    error
+  } = useAccount();
+
+  const displayName =
+    profile?.display_name ||
+    joinName(profile?.first_name, profile?.last_name) ||
+    user?.username ||
+    '-';
+  const fullName = joinName(profile?.first_name, profile?.last_name) || '-';
+
+  if (isLoading) {
+    return (
+      <Page title={t('account.profile.title', 'Profile')}>
+        <Container className='max-w-4xl py-12'>
+          <div className='flex items-center justify-center text-slate-500'>
+            <Icons name='IconLoader2' className='h-5 w-5 animate-spin' />
+            <span className='ml-2'>{t('common.loading', 'Loading')}</span>
+          </div>
+        </Container>
+      </Page>
+    );
+  }
+
+  if (error) {
+    return (
+      <Page title={t('account.profile.title', 'Profile')}>
+        <Container className='max-w-4xl py-12'>
+          <div className='rounded-lg border border-red-200 bg-red-50 p-5 text-red-700'>
+            {t('account.profile.load_error', 'Failed to load account profile.')}
+          </div>
+        </Container>
+      </Page>
+    );
+  }
 
   return (
-    <Page title='Profile' className='p-0'>
-      <ScrollView className='py-4'>
-        <Container className='max-w-7xl'>
-          <div className='p-6 pb-0 mb-6 bg-white rounded-xl shadow-xs'>
-            <div className='flex items-center justify-start gap-x-4'>
-              <div className='relative'>
+    <Page title={t('account.profile.title', 'Profile')} className='p-0'>
+      <ScrollView className='py-6'>
+        <Container className='max-w-4xl space-y-6'>
+          <AccountNavigation />
+
+          <section className='rounded-lg border border-slate-200 bg-white p-5 shadow-xs'>
+            <div className='flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between'>
+              <div className='flex items-center gap-4'>
                 <AvatarButton
                   isLoading={isLoading}
-                  className='rounded-md size-32'
+                  className='h-20 w-20 rounded-md'
                   src={profile?.thumbnail}
-                  title={profile?.display_name || user?.username || ''}
-                  alt={profile?.display_name || user?.username || ''}
+                  title={displayName}
+                  alt={displayName}
                 />
-              </div>
-              <div>
-                <span className='font-bold text-slate-800'>
-                  {profile?.first_name?.concat(' ').concat(profile?.last_name || '')}
-                </span>
-                <div className='flex items-center justify-start gap-x-4 py-1'>
-                  <Button
-                    variant='unstyle'
-                    className='px-0 py-1.5 hover:[&>svg]:stroke-success-500'
-                  >
-                    <Icons name='IconShieldCheck' className='stroke-slate-400/65' />
-                  </Button>
-                  <Button
-                    variant='unstyle'
-                    className='px-0 py-1.5 hover:[&>svg]:stroke-success-400'
-                  >
-                    <Icons name='IconMapPin' className='stroke-slate-400/65' />
-                    <span className='text-slate-400 text-gradient-hover'>{user?.phone}</span>
-                  </Button>
-                  <Button variant='unstyle' className='px-0 py-1.5 hover:[&>svg]:stroke-orange-400'>
-                    <Icons name='IconAt' className='stroke-slate-400/65' />
-                    <span className='text-slate-400 text-gradient-hover'>{user?.email}</span>
-                  </Button>
-                  <Button
-                    variant='unstyle'
-                    className='px-0 py-1.5 hover:[&>svg]:stroke-primary-400'
-                  >
-                    <Icons name='IconPhoneCall' className='stroke-slate-400/65' />
-                    <span className='text-slate-400 text-gradient-hover'>{user?.phone}</span>
-                  </Button>
-                </div>
-                <div className='flex items-center gap-x-4 mt-4'>
-                  <div className='flex flex-col border border-dashed border-slate-300 px-6 py-1 rounded-xl text-slate-400 text-center gap-y-0.5'>
-                    <span className='font-medium'>123</span>
-                    <div>项目</div>
-                  </div>
-                  <div className='flex flex-col border border-dashed border-slate-300 px-6 py-1 rounded-xl text-slate-400 text-center gap-y-0.5'>
-                    <span className='font-medium'>920,233.00</span>
-                    <div>销售额</div>
-                  </div>
-                  <div className='flex flex-col border border-dashed border-slate-300 px-6 py-1 rounded-xl text-slate-400 text-center gap-y-0.5'>
-                    <span className='font-medium'>320,233.00</span>
-                    <div>呆账</div>
-                  </div>
-                  <div className='flex flex-col border border-dashed border-slate-300 px-6 py-1 rounded-xl text-slate-400 text-center gap-y-0.5'>
-                    <span className='font-medium'>89%</span>
-                    <div>成功率</div>
+                <div className='min-w-0'>
+                  <h1 className='truncate text-2xl font-semibold text-slate-900'>{displayName}</h1>
+                  <div className='mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-600'>
+                    {user?.email && (
+                      <span className='inline-flex items-center gap-1'>
+                        <Icons name='IconAt' className='h-4 w-4 text-slate-400' />
+                        {user.email}
+                      </span>
+                    )}
+                    {user?.phone && (
+                      <span className='inline-flex items-center gap-1'>
+                        <Icons name='IconPhone' className='h-4 w-4 text-slate-400' />
+                        {user.phone}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
+
+              <Button variant='outline' onClick={() => navigate('/account/security')}>
+                <Icons name='IconShieldCheck' className='h-4 w-4' />
+                {t('account.profile.manage_security', 'Manage Security')}
+              </Button>
             </div>
-            <div className='mt-10'>
-              <button className='focus:ring-0 py-2 px-3 bg-transparent border-0 border-b-2 border-b-primary-500 text-primary-500 mr-5 hover:text-primary-500 cursor-pointer'>
-                基本信息
-              </button>
-              <button className='focus:ring-0 py-2 px-3 bg-transparent border-0 border-b-2 border-b-transparent text-slate-500 mr-5 hover:text-primary-500 cursor-pointer'>
-                支付信息
-              </button>
-              <button className='focus:ring-0 py-2 px-3 bg-transparent border-0 border-b-2 border-b-transparent text-slate-500 mr-5 hover:text-primary-500 cursor-pointer'>
-                地址信息
-              </button>
-              <button className='focus:ring-0 py-2 px-3 bg-transparent border-0 border-b-2 border-b-transparent text-slate-500 mr-5 hover:text-primary-500 cursor-pointer'>
-                设置
-              </button>
-            </div>
-          </div>
-          <div className='p-6 mb-6 bg-white rounded-xl shadow-xs'>
-            <div className='grid gap-y-2 grid-cols-6 pb-5'>
-              <div className='col-span-full'>
-                <span className='block font-medium leading-6 text-slate-800'>显示名称</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.display_name}
-                </div>
-              </div>
-              <div className='col-span-full'>
-                <span className='block font-medium leading-6 text-slate-800'>简介</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.short_bio}
-                </div>
-              </div>
-              <div className='col-span-3'>
-                <span className='block font-medium leading-6 text-slate-800'>名</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.first_name}
-                </div>
-              </div>
-              <div className='col-span-3'>
-                <span className='block font-medium leading-6 text-slate-800'>姓</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.last_name}
-                </div>
-              </div>
-              {/* Language field commented out - not in UserProfile type
-              <div className='col-span-full'>
-                <span className='block font-medium leading-6 text-slate-800'>语言</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.language}
-                </div>
-              </div>
-              */}
-              <div className='col-span-full'>
-                <span className='block font-medium leading-6 text-slate-800'>关于</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.about || '-'}
-                </div>
-              </div>
-              <div className='col-span-full'>
-                <span className='block font-medium leading-6 text-slate-800'>职称</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.about || '架构师、项目/开发经理'}
-                </div>
-              </div>
-              <div className='col-span-full'>
-                <span className='block font-medium leading-6 text-slate-800'>权限</span>
-                <div className='border-b border-slate-100 pt-2 pb-3 text-slate-600'>
-                  {profile?.about || '日常办公、销售合同、部门人事'}
-                </div>
-              </div>
-            </div>
-          </div>
+          </section>
+
+          <section className='grid gap-4 sm:grid-cols-3'>
+            <SummaryItem
+              icon='IconUsersGroup'
+              label={t('account.profile.roles', 'Roles')}
+              value={roles.length}
+            />
+            <SummaryItem
+              icon='IconBuilding'
+              label={t('account.profile.spaces', 'Spaces')}
+              value={spaces.length}
+            />
+            <SummaryItem
+              icon='IconKey'
+              label={t('account.profile.permissions', 'Permissions')}
+              value={permissions.length}
+            />
+          </section>
+
+          <section className='rounded-lg border border-slate-200 bg-white p-5 shadow-xs'>
+            <h2 className='text-base font-semibold text-slate-900'>
+              {t('account.profile.account_information', 'Account information')}
+            </h2>
+            <dl className='mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2'>
+              <ProfileField label={t('fields.username.label')} value={user?.username} />
+              <ProfileField label={t('common.email')} value={user?.email} />
+              <ProfileField label={t('common.phone', 'Phone')} value={user?.phone} />
+              <ProfileField
+                label={t('common.status')}
+                value={user?.status === 0 ? t('common.active') : t('common.disabled')}
+              />
+              <ProfileField
+                label={t('profile.fields.display_name', 'Display Name')}
+                value={displayName}
+              />
+              <ProfileField label={t('profile.fields.full_name', 'Full Name')} value={fullName} />
+              <ProfileField label={t('profile.fields.title', 'Title')} value={profile?.title} />
+              <ProfileField
+                label={t('common.created.at')}
+                value={formatOptionalDate(user?.created_at)}
+              />
+              <ProfileField
+                className='sm:col-span-2'
+                label={t('profile.fields.short_bio', 'Short Bio')}
+                value={profile?.short_bio}
+              />
+              <ProfileField
+                className='sm:col-span-2'
+                label={t('profile.fields.about', 'About')}
+                value={profile?.about}
+              />
+            </dl>
+          </section>
         </Container>
       </ScrollView>
     </Page>
   );
 };
+
+const SummaryItem = ({ icon, label, value }: { icon: string; label: string; value: number }) => (
+  <div className='rounded-lg border border-slate-200 bg-white p-4 shadow-xs'>
+    <div className='flex items-center gap-3'>
+      <div className='rounded-md bg-slate-100 p-2'>
+        <Icons name={icon} className='h-5 w-5 text-slate-600' />
+      </div>
+      <div>
+        <div className='text-2xl font-semibold text-slate-900'>{value}</div>
+        <div className='text-sm text-slate-500'>{label}</div>
+      </div>
+    </div>
+  </div>
+);
+
+const ProfileField = ({
+  label,
+  value,
+  className
+}: {
+  label: string;
+  value?: string | number;
+  className?: string;
+}) => (
+  <div className={className}>
+    <dt className='text-sm font-medium text-slate-500'>{label}</dt>
+    <dd className='mt-1 min-h-6 break-words border-b border-slate-100 pb-2 text-sm text-slate-900'>
+      {value || '-'}
+    </dd>
+  </div>
+);
