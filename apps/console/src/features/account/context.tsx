@@ -48,6 +48,8 @@ const AuthContext = React.createContext<AuthContextValue>({
   clearSession: () => undefined
 });
 
+const EMPTY_STRING_ARRAY: string[] = [];
+
 // Parse token payload safely
 const parseToken = (token: string) => {
   try {
@@ -82,8 +84,8 @@ export const AuthProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   }, [accessToken]);
 
   const isAuthenticated = !!tokenPayload;
-  const roles = tokenPayload?.roles || [];
-  const permissions = tokenPayload?.permissions || [];
+  const roles = tokenPayload?.roles || EMPTY_STRING_ARRAY;
+  const permissions = tokenPayload?.permissions || EMPTY_STRING_ARRAY;
 
   const updateTokens = useCallback((newAccessToken?: string, newRefreshToken?: string) => {
     setAccessToken(newAccessToken);
