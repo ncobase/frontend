@@ -27,8 +27,10 @@ which cross-feature effects they must handle.
 - Success effects: store access/refresh token, refresh permission state, load `/account`, set default
   space if available, refetch navigation menus.
 - Failure states: invalid credentials, account locked after configured attempts, MFA challenge,
-  captcha required, network error.
-- Gaps: MFA challenge page and captcha flow are not complete.
+  invalid MFA code, captcha required, network error.
+- MFA flow: when `/login` returns `mfa_required`, the console shows an in-place authenticator or
+  recovery-code challenge and only stores tokens after `POST /login/mfa` succeeds.
+- Gaps: captcha flow is not complete.
 
 ### Registration
 
@@ -76,14 +78,20 @@ which cross-feature effects they must handle.
 
 - Entry: `/account/security`.
 - Actions: read backend password policy, enter current password, enter and confirm new password,
-  submit password change.
-- API: `GET /password-policy`, `PUT /account/password`.
+  submit password change, enable authenticator-app 2FA, verify setup QR code, copy recovery codes,
+  regenerate recovery codes, and disable 2FA with password plus authenticator or recovery code.
+- API: `GET /password-policy`, `PUT /account/password`, `/account/2fa/status`,
+  `/account/2fa/setup`, `/account/2fa/verify`, `/account/2fa/disable`,
+  `/account/2fa/backup-codes`, `/account/2fa/backup-codes/regenerate`.
 - Success effects: password-changed event is published by the backend; account cache is invalidated;
-  the form resets after success.
+  the form resets after success; 2FA status is invalidated after enable, disable, and recovery-code
+  regeneration.
 - Failure states: policy load fallback, missing current password, weak new password, confirmation
-  mismatch, wrong current password, network error.
+  mismatch, wrong current password, 2FA status load failure, invalid authenticator code, missing
+  recovery-code storage, network error.
 - Required UX: account navigation links profile/security/sessions; password requirements are visible
-  before submit; the client never sends a target user id for current-account password changes.
+  before submit; the client never sends a target user id for current-account password changes; 2FA
+  recovery codes are shown immediately after generation with a copy action.
 
 ## System Management
 

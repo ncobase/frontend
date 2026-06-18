@@ -1,14 +1,14 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
-import { Button, CheckboxField, Form, InputField } from '@ncobase/react';
+import { Button, CheckboxField, Form, Icons, InputField } from '@ncobase/react';
 import { cn, upperFirst } from '@ncobase/utils';
 import { Controller, useForm, UseFormSetValue } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { LoginProps } from '../../account';
+import { LoginProps, MFALoginPayload, LoginReply } from '../../account';
 
-import { useLogin } from '@/features/account/service';
+import { useLogin, useLoginMFA } from '@/features/account/service';
 
 interface LoginHintProps {
   setValue: UseFormSetValue<LoginProps>;
@@ -54,6 +54,8 @@ export const LoginForm = ({
 }: LoginFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [mfaChallenge, setMfaChallenge] = useState<LoginReply | null>(null);
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
 
   const {
     handleSubmit,
@@ -62,12 +64,31 @@ export const LoginForm = ({
     formState: { errors }
   } = useForm<LoginProps>();
 
-  const { mutate: onLogin } = useLogin({
+  const mfaForm = useForm<MFALoginPayload>({
+    defaultValues: {
+      mfa_token: '',
+      code: '',
+      recovery_code: ''
+    }
+  });
+
+  const { mutate: onLogin, isPending: isLoggingIn } = useLogin({
     onSuccess,
+    onMFA: challenge => {
+      setMfaChallenge(challenge);
+      mfaForm.reset({
+        mfa_token: challenge.mfa_token || '',
+        code: '',
+        recovery_code: ''
+      });
+    },
     onError: error => {
       console.error('Login failed:', error);
       // Error handling is done in the hook
     }
+  });
+  const verifyMFA = useLoginMFA({
+    onSuccess
   });
 
   const onSubmit = handleSubmit(
@@ -78,6 +99,119 @@ export const LoginForm = ({
       [onLogin]
     )
   );
+
+  const onMFASubmit = mfaForm.handleSubmit(values => {
+    verifyMFA.mutate({
+      mfa_token: mfaChallenge?.mfa_token || values.mfa_token,
+      code: useRecoveryCode ? undefined : values.code?.trim(),
+      recovery_code: useRecoveryCode ? values.recovery_code?.trim() : undefined
+    });
+  });
+
+  if (mfaChallenge?.mfa_required) {
+    return (
+      <Form
+        id='login-mfa-form'
+        onSubmit={onMFASubmit}
+        noValidate
+        className='flex flex-col gap-y-6 mt-6'
+      >
+        <div className='rounded-lg border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-800'>
+          <div className='flex items-start gap-2'>
+            <Icons name='IconShieldCheck' className='mt-0.5 h-4 w-4' />
+            <div>
+              <div className='font-medium'>
+                {t('account.mfa.login_required_title', 'Two-Factor Authentication Required')}
+              </div>
+              <div className='mt-1 text-primary-700'>
+                {t(
+                  'account.mfa.login_required_description',
+                  'Enter an authenticator code or a recovery code to finish signing in.'
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {!useRecoveryCode ? (
+          <Controller
+            name='code'
+            control={mfaForm.control}
+            rules={{
+              required: t('account.mfa.code_required', 'Authenticator code is required'),
+              validate: value => {
+                if (value && !/^[0-9]{6}$/.test(value.trim())) {
+                  return t('account.mfa.code_invalid', 'Enter the 6-digit authenticator code');
+                }
+              }
+            }}
+            render={({ field }) => (
+              <InputField
+                label={t('account.mfa.code', 'Authenticator code')}
+                placeholder='123456'
+                inputMode='numeric'
+                autoComplete='one-time-code'
+                error={mfaForm.formState.errors.code}
+                disabled={verifyMFA.isPending}
+                {...field}
+              />
+            )}
+          />
+        ) : (
+          <Controller
+            name='recovery_code'
+            control={mfaForm.control}
+            rules={{
+              required: t('account.mfa.recovery_code_required', 'Recovery code is required')
+            }}
+            render={({ field }) => (
+              <InputField
+                label={t('account.mfa.recovery_code', 'Recovery code')}
+                placeholder='ABCDE-FGHIJ'
+                autoComplete='one-time-code'
+                error={mfaForm.formState.errors.recovery_code}
+                disabled={verifyMFA.isPending}
+                {...field}
+              />
+            )}
+          />
+        )}
+
+        <div className='flex flex-wrap items-center justify-between gap-3'>
+          <Button
+            type='button'
+            variant='unstyle'
+            className='text-slate-600 hover:text-primary-600/90 hover:bg-transparent'
+            onClick={() => setUseRecoveryCode(value => !value)}
+            disabled={verifyMFA.isPending}
+          >
+            {useRecoveryCode
+              ? t('account.mfa.use_authenticator_code', 'Use authenticator code')
+              : t('account.mfa.use_recovery_code', 'Use recovery code')}
+          </Button>
+
+          <div className='flex gap-2'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                setMfaChallenge(null);
+                setUseRecoveryCode(false);
+                mfaForm.reset();
+              }}
+              disabled={verifyMFA.isPending}
+            >
+              {t('actions.go_back')}
+            </Button>
+            <Button type='submit' disabled={verifyMFA.isPending}>
+              {verifyMFA.isPending && <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />}
+              {t('account.mfa.verify_login', 'Verify and sign in')}
+            </Button>
+          </div>
+        </div>
+      </Form>
+    );
+  }
 
   return (
     <Form id='login-form' onSubmit={onSubmit} noValidate className='flex flex-col gap-y-6 mt-6'>
@@ -152,7 +286,10 @@ export const LoginForm = ({
           </Button>
         )}
 
-        <Button type='submit'>{t('actions.login')}</Button>
+        <Button type='submit' disabled={isLoggingIn}>
+          {isLoggingIn && <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />}
+          {t('actions.login')}
+        </Button>
       </div>
     </Form>
   );

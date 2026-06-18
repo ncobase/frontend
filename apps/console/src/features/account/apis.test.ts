@@ -57,4 +57,40 @@ describe('account APIs', () => {
 
     expect(request.post).toHaveBeenCalledWith('/register', payload);
   });
+
+  it('verifies MFA login challenges through the dedicated login endpoint', async () => {
+    const payload = {
+      mfa_token: 'mfa-token',
+      code: '123456'
+    };
+
+    await authApi.loginMFA(payload);
+
+    expect(request.post).toHaveBeenCalledWith('/login/mfa', payload);
+  });
+
+  it('uses the current account 2FA management endpoints', async () => {
+    await accountApi.getTwoFactorStatus();
+    await accountApi.setupTwoFactor({ method: 'app' });
+    await accountApi.verifyTwoFactor({ method: 'app', code: '123456' });
+    await accountApi.disableTwoFactor({ password: 'StrongPass1', code: '123456' });
+    await accountApi.getTwoFactorBackupCodes();
+    await accountApi.regenerateTwoFactorBackupCodes({ method: 'app', code: '654321' });
+
+    expect(request.get).toHaveBeenCalledWith('/account/2fa/status');
+    expect(request.post).toHaveBeenCalledWith('/account/2fa/setup', { method: 'app' });
+    expect(request.post).toHaveBeenCalledWith('/account/2fa/verify', {
+      method: 'app',
+      code: '123456'
+    });
+    expect(request.post).toHaveBeenCalledWith('/account/2fa/disable', {
+      password: 'StrongPass1',
+      code: '123456'
+    });
+    expect(request.get).toHaveBeenCalledWith('/account/2fa/backup-codes');
+    expect(request.post).toHaveBeenCalledWith('/account/2fa/backup-codes/regenerate', {
+      method: 'app',
+      code: '654321'
+    });
+  });
 });

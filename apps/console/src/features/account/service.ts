@@ -6,10 +6,18 @@ import { FetchError } from 'ofetch';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { ChangePasswordPayload, LoginProps } from './account';
+import {
+  ChangePasswordPayload,
+  LoginProps,
+  LoginReply,
+  MFALoginPayload,
+  TwoFactorDisablePayload,
+  TwoFactorVerifyPayload
+} from './account';
 import {
   accountApi,
   loginAccount,
+  loginMFAAccount,
   logoutAccount,
   registerAccount,
   sendAuthCode,
@@ -23,6 +31,8 @@ import { clearTokens } from './token_service';
 export const accountKeys = {
   login: ['accountService', 'login'],
   register: ['accountService', 'register'],
+  loginMFA: ['accountService', 'loginMFA'],
+  twoFactor: ['accountService', 'twoFactor'],
   passwordPolicy: ['accountService', 'passwordPolicy'],
   changePassword: ['accountService', 'changePassword'],
   currentUser: ['accountService', 'currentUser'],
@@ -31,9 +41,14 @@ export const accountKeys = {
 };
 
 // Login hook
-export const useLogin = (options?: { onSuccess?: () => void; onError?: (_error: any) => void }) => {
+export const useLogin = (options?: {
+  onSuccess?: () => void;
+  onError?: (_error: any) => void;
+  onMFA?: (_challenge: LoginReply) => void;
+}) => {
   const { updateTokens } = useAuthContext();
   const toast = useToastMessage();
+  const { t } = useTranslation();
   const [loginAttempts, setLoginAttempts] = useState(0);
   const MAX_ATTEMPTS = 5;
 
@@ -50,11 +65,23 @@ export const useLogin = (options?: { onSuccess?: () => void; onError?: (_error: 
         setLoginAttempts(0);
         sessionStorage.removeItem('login_attempts');
 
+        if (result.mfa_required) {
+          toast.info(t('account.mfa.login_required_title', 'Two-Factor Authentication Required'), {
+            description: t(
+              'account.mfa.login_required_description',
+              'Enter an authenticator code or a recovery code to finish signing in.'
+            )
+          });
+          options?.onMFA?.(result);
+          return result;
+        }
+
         toast.success('Welcome Back', {
           description: 'You have successfully logged in.'
         });
 
         updateTokens(result.access_token, result.refresh_token);
+        options?.onSuccess?.();
         return result;
       } catch (error) {
         const newAttempts = loginAttempts + 1;
@@ -76,8 +103,39 @@ export const useLogin = (options?: { onSuccess?: () => void; onError?: (_error: 
         throw error;
       }
     },
-    onSuccess: options?.onSuccess,
     onError: options?.onError
+  });
+};
+
+export const useLoginMFA = (options?: {
+  onSuccess?: () => void;
+  onError?: (_error: any) => void;
+}) => {
+  const { updateTokens } = useAuthContext();
+  const toast = useToastMessage();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationKey: accountKeys.loginMFA,
+    mutationFn: (payload: MFALoginPayload) => loginMFAAccount(payload),
+    onSuccess: data => {
+      updateTokens(data.access_token, data.refresh_token);
+      toast.success(t('account.mfa.login_success_title', 'Verification Complete'), {
+        description: t(
+          'account.mfa.login_success_description',
+          'Your second factor was verified successfully.'
+        )
+      });
+      options?.onSuccess?.();
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.mfa.login_failed_title', 'Verification Failed'), {
+        description:
+          error?.data?.message ||
+          t('account.mfa.login_failed_description', 'Check the code and try again.')
+      });
+      options?.onError?.(error);
+    }
   });
 };
 
@@ -195,6 +253,139 @@ export const useChangePassword = (options?: {
             'account.security.update_failed_description',
             'Please check your current password and try again.'
           )
+      });
+      options?.onError?.(error);
+    }
+  });
+};
+
+export const useTwoFactorStatus = () => {
+  return useQuery({
+    queryKey: accountKeys.twoFactor,
+    queryFn: accountApi.getTwoFactorStatus,
+    staleTime: 1000 * 60
+  });
+};
+
+export const useSetupTwoFactor = (options?: {
+  onSuccess?: (_data: Awaited<ReturnType<typeof accountApi.setupTwoFactor>>) => void;
+  onError?: (_error: any) => void;
+}) => {
+  const toast = useToastMessage();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: () => accountApi.setupTwoFactor({ method: 'app' }),
+    onSuccess: data => {
+      toast.success(t('account.mfa.setup_started_title', 'Authenticator Setup Started'), {
+        description: t(
+          'account.mfa.setup_started_description',
+          'Scan the QR code and enter the generated code to enable 2FA.'
+        )
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.mfa.setup_failed_title', 'Setup Failed'), {
+        description:
+          error?.data?.message ||
+          t('account.mfa.setup_failed_description', 'Could not start authenticator setup.')
+      });
+      options?.onError?.(error);
+    }
+  });
+};
+
+export const useVerifyTwoFactor = (options?: {
+  onSuccess?: (_data: Awaited<ReturnType<typeof accountApi.verifyTwoFactor>>) => void;
+  onError?: (_error: any) => void;
+}) => {
+  const toast = useToastMessage();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: (payload: TwoFactorVerifyPayload) => accountApi.verifyTwoFactor(payload),
+    onSuccess: data => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.twoFactor });
+      toast.success(t('account.mfa.enabled_title', 'Two-Factor Authentication Enabled'), {
+        description: t(
+          'account.mfa.enabled_description',
+          'Store the recovery codes now. They are only shown immediately after generation.'
+        )
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.mfa.verify_failed_title', 'Verification Failed'), {
+        description:
+          error?.data?.message ||
+          t('account.mfa.verify_failed_description', 'Enter the latest authenticator code.')
+      });
+      options?.onError?.(error);
+    }
+  });
+};
+
+export const useDisableTwoFactor = (options?: {
+  onSuccess?: () => void;
+  onError?: (_error: any) => void;
+}) => {
+  const toast = useToastMessage();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: (payload: TwoFactorDisablePayload) => accountApi.disableTwoFactor(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.twoFactor });
+      toast.success(t('account.mfa.disabled_title', 'Two-Factor Authentication Disabled'), {
+        description: t(
+          'account.mfa.disabled_description',
+          'Your account no longer requires a second factor at login.'
+        )
+      });
+      options?.onSuccess?.();
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.mfa.disable_failed_title', 'Disable Failed'), {
+        description:
+          error?.data?.message ||
+          t('account.mfa.disable_failed_description', 'Check your password and code, then retry.')
+      });
+      options?.onError?.(error);
+    }
+  });
+};
+
+export const useRegenerateRecoveryCodes = (options?: {
+  onSuccess?: (
+    _data: Awaited<ReturnType<typeof accountApi.regenerateTwoFactorBackupCodes>>
+  ) => void;
+  onError?: (_error: any) => void;
+}) => {
+  const toast = useToastMessage();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation({
+    mutationFn: (payload: TwoFactorVerifyPayload) =>
+      accountApi.regenerateTwoFactorBackupCodes(payload),
+    onSuccess: data => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.twoFactor });
+      toast.success(t('account.mfa.recovery_regenerated_title', 'Recovery Codes Regenerated'), {
+        description: t(
+          'account.mfa.recovery_regenerated_description',
+          'Store the new recovery codes. Previous recovery codes are no longer valid.'
+        )
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: (error: FetchError) => {
+      toast.error(t('account.mfa.recovery_failed_title', 'Recovery Code Update Failed'), {
+        description:
+          error?.data?.message ||
+          t('account.mfa.recovery_failed_description', 'Enter a valid authenticator code.')
       });
       options?.onError?.(error);
     }

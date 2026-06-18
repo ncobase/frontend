@@ -1,16 +1,32 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
-import { Button, Container, Form, Icons, InputField, ScrollView } from '@ncobase/react';
+import {
+  Button,
+  Container,
+  Form,
+  Icons,
+  InputField,
+  ScrollView,
+  useToastMessage
+} from '@ncobase/react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { ChangePasswordPayload } from '../account';
+import { ChangePasswordPayload, RecoveryCodesReply, TwoFactorSetupReply } from '../account';
 import {
   getPasswordPolicyIssues,
   normalizePasswordPolicy,
   PasswordPolicyIssue
 } from '../password_policy';
-import { useChangePassword, usePasswordPolicy } from '../service';
+import {
+  useChangePassword,
+  useDisableTwoFactor,
+  usePasswordPolicy,
+  useRegenerateRecoveryCodes,
+  useSetupTwoFactor,
+  useTwoFactorStatus,
+  useVerifyTwoFactor
+} from '../service';
 
 import { AccountNavigation } from './components/account_navigation';
 
@@ -24,10 +40,24 @@ const ruleKeys: PasswordPolicyIssue[] = [
   'require_symbols'
 ];
 
+type TwoFactorCodeForm = {
+  code: string;
+};
+
+type TwoFactorDisableForm = {
+  password: string;
+  code: string;
+  recovery_code: string;
+};
+
 export const SecurityPage = () => {
   const { t } = useTranslation();
+  const toast = useToastMessage();
   const { data: loadedPolicy, isError: policyError } = usePasswordPolicy();
+  const twoFactor = useTwoFactorStatus();
   const policy = normalizePasswordPolicy(loadedPolicy);
+  const [setupData, setSetupData] = useState<TwoFactorSetupReply | null>(null);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
 
   const {
     control,
@@ -53,6 +83,66 @@ export const SecurityPage = () => {
   const changePassword = useChangePassword({
     onSuccess: () => reset()
   });
+  const setupCodeForm = useForm<TwoFactorCodeForm>({
+    defaultValues: { code: '' }
+  });
+  const regenerateCodeForm = useForm<TwoFactorCodeForm>({
+    defaultValues: { code: '' }
+  });
+  const disableForm = useForm<TwoFactorDisableForm>({
+    defaultValues: {
+      password: '',
+      code: '',
+      recovery_code: ''
+    }
+  });
+  const setupTwoFactor = useSetupTwoFactor({
+    onSuccess: data => {
+      setSetupData(data);
+      setRecoveryCodes([]);
+      setupCodeForm.reset({ code: '' });
+    }
+  });
+  const verifyTwoFactor = useVerifyTwoFactor({
+    onSuccess: (data: RecoveryCodesReply) => {
+      setSetupData(null);
+      setRecoveryCodes(data.recovery_codes || []);
+      setupCodeForm.reset({ code: '' });
+    }
+  });
+  const disableTwoFactor = useDisableTwoFactor({
+    onSuccess: () => {
+      setSetupData(null);
+      setRecoveryCodes([]);
+      disableForm.reset();
+    }
+  });
+  const regenerateRecoveryCodes = useRegenerateRecoveryCodes({
+    onSuccess: (data: RecoveryCodesReply) => {
+      setRecoveryCodes(data.recovery_codes || []);
+      regenerateCodeForm.reset({ code: '' });
+    }
+  });
+
+  const copyRecoveryCodes = async () => {
+    if (recoveryCodes.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(recoveryCodes.join('\n'));
+      toast.success(t('account.mfa.recovery_copied_title', 'Recovery Codes Copied'), {
+        description: t(
+          'account.mfa.recovery_copied_description',
+          'The recovery codes were copied to your clipboard.'
+        )
+      });
+    } catch {
+      toast.error(t('account.mfa.recovery_copy_failed_title', 'Copy Failed'), {
+        description: t(
+          'account.mfa.recovery_copy_failed_description',
+          'Copy the recovery codes manually.'
+        )
+      });
+    }
+  };
 
   const passwordRuleMessage = (issue: PasswordPolicyIssue) => {
     switch (issue) {
@@ -81,6 +171,19 @@ export const SecurityPage = () => {
 
   const onSubmit = handleSubmit(values => {
     changePassword.mutate(values);
+  });
+  const onSetupVerifySubmit = setupCodeForm.handleSubmit(values => {
+    verifyTwoFactor.mutate({ method: 'app', code: values.code.trim() });
+  });
+  const onRegenerateSubmit = regenerateCodeForm.handleSubmit(values => {
+    regenerateRecoveryCodes.mutate({ method: 'app', code: values.code.trim() });
+  });
+  const onDisableSubmit = disableForm.handleSubmit(values => {
+    disableTwoFactor.mutate({
+      password: values.password,
+      code: values.code?.trim() || undefined,
+      recovery_code: values.recovery_code?.trim() || undefined
+    });
   });
 
   return (
@@ -240,6 +343,307 @@ export const SecurityPage = () => {
               </ul>
             </aside>
           </div>
+
+          <section className='rounded-lg border border-slate-200 bg-white p-5 shadow-xs'>
+            <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
+              <div>
+                <h2 className='text-base font-semibold text-slate-900'>
+                  {t('account.mfa.title', 'Two-Factor Authentication')}
+                </h2>
+                <p className='mt-1 text-sm text-slate-600'>
+                  {t(
+                    'account.mfa.description',
+                    'Require an authenticator code or recovery code after password login.'
+                  )}
+                </p>
+              </div>
+              <span
+                className={
+                  twoFactor.data?.enabled
+                    ? 'inline-flex rounded-full bg-success-50 px-3 py-1 text-sm font-medium text-success-700'
+                    : 'inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-600'
+                }
+              >
+                {twoFactor.data?.enabled
+                  ? t('account.mfa.enabled', 'Enabled')
+                  : t('account.mfa.disabled', 'Disabled')}
+              </span>
+            </div>
+
+            {twoFactor.isLoading && (
+              <div className='mt-5 flex items-center gap-2 text-sm text-slate-500'>
+                <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+                {t('common.loading', 'Loading')}
+              </div>
+            )}
+
+            {twoFactor.isError && (
+              <div className='mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
+                <div>{t('account.mfa.status_error', 'Failed to load 2FA status.')}</div>
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='outline'
+                  className='mt-3'
+                  onClick={() => twoFactor.refetch()}
+                >
+                  {t('actions.retry', 'Retry')}
+                </Button>
+              </div>
+            )}
+
+            {!twoFactor.isLoading && !twoFactor.isError && !twoFactor.data?.enabled && (
+              <div className='mt-5 space-y-5'>
+                {!setupData ? (
+                  <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                    <div className='text-sm text-slate-600'>
+                      {t(
+                        'account.mfa.disabled_description',
+                        'Set up an authenticator app before enabling 2FA.'
+                      )}
+                    </div>
+                    <Button
+                      type='button'
+                      onClick={() => setupTwoFactor.mutate()}
+                      disabled={setupTwoFactor.isPending}
+                    >
+                      {setupTwoFactor.isPending && (
+                        <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+                      )}
+                      {t('account.mfa.start_setup', 'Start setup')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className='grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]'>
+                    <div className='rounded-md border border-slate-200 bg-slate-50 p-4'>
+                      {setupData.qr_png ? (
+                        <img
+                          src={`data:image/png;base64,${setupData.qr_png}`}
+                          alt={t('account.mfa.qr_alt', 'Authenticator setup QR code')}
+                          className='mx-auto h-44 w-44 rounded bg-white p-2'
+                        />
+                      ) : (
+                        <div className='flex h-44 w-full items-center justify-center text-sm text-slate-500'>
+                          {t('account.mfa.qr_unavailable', 'QR code unavailable')}
+                        </div>
+                      )}
+                    </div>
+                    <div className='space-y-5'>
+                      <div>
+                        <div className='text-sm font-medium text-slate-700'>
+                          {t('account.mfa.secret', 'Setup secret')}
+                        </div>
+                        <div className='mt-2 break-all rounded-md bg-slate-100 px-3 py-2 font-mono text-sm text-slate-800'>
+                          {setupData.secret}
+                        </div>
+                      </div>
+                      <Form id='account-2fa-verify-form' onSubmit={onSetupVerifySubmit} noValidate>
+                        <div className='flex flex-col gap-4 sm:flex-row sm:items-end'>
+                          <Controller
+                            name='code'
+                            control={setupCodeForm.control}
+                            rules={{
+                              required: t('account.mfa.code_required'),
+                              validate: value => {
+                                if (value && !/^[0-9]{6}$/.test(value.trim())) {
+                                  return t('account.mfa.code_invalid');
+                                }
+                              }
+                            }}
+                            render={({ field }) => (
+                              <InputField
+                                label={t('account.mfa.code', 'Authenticator code')}
+                                placeholder='123456'
+                                inputMode='numeric'
+                                autoComplete='one-time-code'
+                                error={setupCodeForm.formState.errors.code}
+                                disabled={verifyTwoFactor.isPending}
+                                {...field}
+                              />
+                            )}
+                          />
+                          <div className='flex gap-2'>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              onClick={() => {
+                                setSetupData(null);
+                                setupCodeForm.reset({ code: '' });
+                              }}
+                              disabled={verifyTwoFactor.isPending}
+                            >
+                              {t('actions.cancel')}
+                            </Button>
+                            <Button type='submit' disabled={verifyTwoFactor.isPending}>
+                              {verifyTwoFactor.isPending && (
+                                <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+                              )}
+                              {t('account.mfa.enable', 'Enable 2FA')}
+                            </Button>
+                          </div>
+                        </div>
+                      </Form>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!twoFactor.isLoading && !twoFactor.isError && twoFactor.data?.enabled && (
+              <div className='mt-5 grid gap-6 lg:grid-cols-2'>
+                <div className='space-y-5'>
+                  <div className='rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700'>
+                    <div className='font-medium text-slate-900'>
+                      {t('account.mfa.current_method', 'Current method')}
+                    </div>
+                    <div className='mt-1'>
+                      {twoFactor.data.method ||
+                        t('account.mfa.authenticator_app', 'Authenticator app')}
+                    </div>
+                    <div className='mt-4 font-medium text-slate-900'>
+                      {t('account.mfa.recovery_remaining', 'Recovery codes remaining')}
+                    </div>
+                    <div className='mt-1'>{twoFactor.data.recovery_codes_remaining ?? 0}</div>
+                  </div>
+
+                  <Form id='account-2fa-regenerate-form' onSubmit={onRegenerateSubmit} noValidate>
+                    <div className='space-y-3'>
+                      <Controller
+                        name='code'
+                        control={regenerateCodeForm.control}
+                        rules={{
+                          required: t('account.mfa.code_required'),
+                          validate: value => {
+                            if (value && !/^[0-9]{6}$/.test(value.trim())) {
+                              return t('account.mfa.code_invalid');
+                            }
+                          }
+                        }}
+                        render={({ field }) => (
+                          <InputField
+                            label={t(
+                              'account.mfa.regenerate_code',
+                              'Authenticator code for new recovery codes'
+                            )}
+                            placeholder='123456'
+                            inputMode='numeric'
+                            autoComplete='one-time-code'
+                            error={regenerateCodeForm.formState.errors.code}
+                            disabled={regenerateRecoveryCodes.isPending}
+                            {...field}
+                          />
+                        )}
+                      />
+                      <Button type='submit' disabled={regenerateRecoveryCodes.isPending}>
+                        {regenerateRecoveryCodes.isPending && (
+                          <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+                        )}
+                        {t('account.mfa.regenerate_recovery_codes', 'Regenerate recovery codes')}
+                      </Button>
+                    </div>
+                  </Form>
+                </div>
+
+                <Form id='account-2fa-disable-form' onSubmit={onDisableSubmit} noValidate>
+                  <div className='space-y-4 rounded-md border border-red-200 bg-red-50 p-4'>
+                    <div>
+                      <h3 className='text-sm font-semibold text-red-800'>
+                        {t('account.mfa.disable_title', 'Disable 2FA')}
+                      </h3>
+                      <p className='mt-1 text-sm text-red-700'>
+                        {t(
+                          'account.mfa.disable_description',
+                          'Confirm your password and an authenticator or recovery code.'
+                        )}
+                      </p>
+                    </div>
+                    <Controller
+                      name='password'
+                      control={disableForm.control}
+                      rules={{ required: t('account.security.current_password_required') }}
+                      render={({ field }) => (
+                        <InputField
+                          type='password'
+                          autoComplete='current-password'
+                          label={t('account.security.current_password', 'Current password')}
+                          error={disableForm.formState.errors.password}
+                          disabled={disableTwoFactor.isPending}
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name='code'
+                      control={disableForm.control}
+                      render={({ field }) => (
+                        <InputField
+                          label={t('account.mfa.code', 'Authenticator code')}
+                          placeholder='123456'
+                          inputMode='numeric'
+                          autoComplete='one-time-code'
+                          error={disableForm.formState.errors.code}
+                          disabled={disableTwoFactor.isPending}
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name='recovery_code'
+                      control={disableForm.control}
+                      render={({ field }) => (
+                        <InputField
+                          label={t('account.mfa.recovery_code', 'Recovery code')}
+                          placeholder='ABCDE-FGHIJ'
+                          autoComplete='one-time-code'
+                          error={disableForm.formState.errors.recovery_code}
+                          disabled={disableTwoFactor.isPending}
+                          {...field}
+                        />
+                      )}
+                    />
+                    <Button type='submit' variant='danger' disabled={disableTwoFactor.isPending}>
+                      {disableTwoFactor.isPending && (
+                        <Icons name='IconLoader2' className='h-4 w-4 animate-spin' />
+                      )}
+                      {t('account.mfa.disable', 'Disable 2FA')}
+                    </Button>
+                  </div>
+                </Form>
+              </div>
+            )}
+
+            {recoveryCodes.length > 0 && (
+              <div className='mt-6 rounded-md border border-amber-200 bg-amber-50 p-4'>
+                <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+                  <div>
+                    <h3 className='text-sm font-semibold text-amber-900'>
+                      {t('account.mfa.recovery_codes_title', 'Store these recovery codes')}
+                    </h3>
+                    <p className='mt-1 text-sm text-amber-800'>
+                      {t(
+                        'account.mfa.recovery_codes_description',
+                        'Each code can be used once if you lose access to your authenticator app.'
+                      )}
+                    </p>
+                  </div>
+                  <Button type='button' variant='outline' onClick={copyRecoveryCodes}>
+                    <Icons name='IconCopy' className='h-4 w-4' />
+                    {t('actions.copy', 'Copy')}
+                  </Button>
+                </div>
+                <div className='mt-4 grid gap-2 sm:grid-cols-2'>
+                  {recoveryCodes.map(code => (
+                    <code
+                      key={code}
+                      className='rounded bg-white px-3 py-2 font-mono text-sm text-slate-800'
+                    >
+                      {code}
+                    </code>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
         </Container>
       </ScrollView>
     </Page>

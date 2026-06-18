@@ -35,6 +35,9 @@ export interface LoginReply {
   refresh_token?: string;
   register_token?: string;
   token_type?: string;
+  mfa_required?: boolean;
+  mfa_token?: string;
+  mfa_methods?: string[];
 }
 
 export interface ForgetPasswordProps {
@@ -57,4 +60,42 @@ export interface ChangePasswordPayload {
 
 export interface SendCodeReply {
   registered?: boolean;
+}
+
+export interface MFALoginPayload {
+  mfa_token: string;
+  code?: string;
+  recovery_code?: string;
+}
+
+export interface TwoFactorStatus {
+  enabled: boolean;
+  method?: string;
+  recovery_codes_remaining?: number;
+}
+
+export interface TwoFactorSetupPayload {
+  method: 'app';
+}
+
+export interface TwoFactorSetupReply {
+  method: string;
+  secret: string;
+  otpauth_uri: string;
+  qr_png: string;
+}
+
+export interface TwoFactorVerifyPayload {
+  code: string;
+  method: 'app';
+}
+
+export interface TwoFactorDisablePayload {
+  password: string;
+  code?: string;
+  recovery_code?: string;
+}
+
+export interface RecoveryCodesReply {
+  recovery_codes: string[];
 }
