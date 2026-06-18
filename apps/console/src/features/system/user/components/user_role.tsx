@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import {
   Modal,
@@ -22,19 +22,46 @@ import {
   useQueryUserSpaceRoles
 } from '../service';
 
+import { useAddUserToSpaceRole, useRemoveUserFromSpaceRole } from '@/features/space/service';
+
 interface UserRoleProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  user?: any;
   currentSpaceId?: string;
+  canReadSpaceRoles?: boolean;
+  canManageSpaceRoles?: boolean;
   onSuccess?: () => void;
 }
+
+const EMPTY_ROLE_IDS: string[] = [];
+
+const extractRoleIds = (roles: any): string[] => {
+  if (!roles) return EMPTY_ROLE_IDS;
+  if (Array.isArray(roles)) {
+    return roles
+      .map(role => {
+        if (typeof role === 'string') return role;
+        return role?.id || role?.role_id;
+      })
+      .filter(Boolean);
+  }
+  if (Array.isArray(roles.role_ids)) return roles.role_ids.filter(Boolean);
+  return EMPTY_ROLE_IDS;
+};
+
+const areRoleIdsEqual = (left: string[], right: string[]) => {
+  if (left.length !== right.length) return false;
+  return left.every((roleId, index) => roleId === right[index]);
+};
 
 export const UserRole: React.FC<UserRoleProps> = ({
   isOpen,
   onClose,
   user,
   currentSpaceId,
+  canReadSpaceRoles = !!currentSpaceId,
+  canManageSpaceRoles = !!currentSpaceId,
   onSuccess
 }) => {
   const { t } = useTranslation();
@@ -42,6 +69,8 @@ export const UserRole: React.FC<UserRoleProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('system');
+  const targetUserId = user?.id || user?.user_id;
+  const targetUserName = user?.username || user?.email || targetUserId || '';
 
   // Fetch available roles
   const { data: rolesData, isLoading: rolesLoading } = useListRoles({
@@ -50,26 +79,36 @@ export const UserRole: React.FC<UserRoleProps> = ({
   });
 
   // Fetch user's current system roles
-  const { data: userRoles, isLoading: userRolesLoading } = useQueryUserRoles(user?.id);
+  const { data: userRoles, isLoading: userRolesLoading } = useQueryUserRoles(targetUserId);
 
   // Fetch user's space-specific roles if space is selected
   const { data: userSpaceRoles, isLoading: spaceRolesLoading } = useQueryUserSpaceRoles(
-    user?.id,
+    targetUserId,
     currentSpaceId,
-    { enabled: !!currentSpaceId }
+    {
+      enabled: isOpen && activeTab === 'space' && canReadSpaceRoles
+    }
   );
 
   const assignRolesMutation = useAssignRoles();
   const removeRolesMutation = useRemoveRoles();
+  const addSpaceRoleMutation = useAddUserToSpaceRole();
+  const removeSpaceRoleMutation = useRemoveUserFromSpaceRole();
 
   const roles = rolesData?.items || [];
-  const currentUserRoles = activeTab === 'system' ? userRoles || [] : userSpaceRoles || [];
+  const systemRoleIds = useMemo(() => extractRoleIds(userRoles), [userRoles]);
+  const spaceRoleIds = useMemo(() => extractRoleIds(userSpaceRoles), [userSpaceRoles]);
+  const currentRoleIds = activeTab === 'system' ? systemRoleIds : spaceRoleIds;
 
   useEffect(() => {
-    if (currentUserRoles && currentUserRoles.length > 0) {
-      setSelectedRoles(currentUserRoles.map(role => role.id));
+    if ((!currentSpaceId || !canReadSpaceRoles) && activeTab === 'space') {
+      setActiveTab('system');
     }
-  }, [currentUserRoles]);
+  }, [activeTab, canReadSpaceRoles, currentSpaceId]);
+
+  useEffect(() => {
+    setSelectedRoles(prev => (areRoleIdsEqual(prev, currentRoleIds) ? prev : [...currentRoleIds]));
+  }, [currentRoleIds]);
 
   const filteredRoles = roles.filter(
     role =>
@@ -84,29 +123,58 @@ export const UserRole: React.FC<UserRoleProps> = ({
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (!user?.id) return;
+    if (!targetUserId) {
+      toast.error(t('messages.error'), {
+        description: t('user.roles.missing_user', 'User ID is required before roles can be saved.')
+      });
+      return;
+    }
 
-    const currentRoleIds = currentUserRoles.map(role => role.id);
+    if (activeTab === 'space' && (!currentSpaceId || !canManageSpaceRoles)) {
+      toast.error(t('messages.error'), {
+        description: t(
+          'user.roles.missing_space',
+          'A manageable space must be selected before space roles can be saved.'
+        )
+      });
+      return;
+    }
+
     const toAdd = selectedRoles.filter(id => !currentRoleIds.includes(id));
     const toRemove = currentRoleIds.filter(id => !selectedRoles.includes(id));
 
     try {
-      // Add new roles
-      if (toAdd.length > 0) {
-        await assignRolesMutation.mutateAsync({
-          userId: user.id,
-          roleIds: toAdd
-          // spaceId: activeTab === 'space' ? currentSpaceId : undefined
-        });
-      }
+      if (activeTab === 'space') {
+        await Promise.all([
+          ...toAdd.map(roleId =>
+            addSpaceRoleMutation.mutateAsync({
+              spaceId: currentSpaceId!,
+              user_id: targetUserId,
+              role_id: roleId
+            })
+          ),
+          ...toRemove.map(roleId =>
+            removeSpaceRoleMutation.mutateAsync({
+              spaceId: currentSpaceId!,
+              userId: targetUserId,
+              roleId
+            })
+          )
+        ]);
+      } else {
+        if (toAdd.length > 0) {
+          await assignRolesMutation.mutateAsync({
+            userId: targetUserId,
+            roleIds: toAdd
+          });
+        }
 
-      // Remove old roles
-      if (toRemove.length > 0) {
-        await removeRolesMutation.mutateAsync({
-          userId: user.id,
-          roleIds: toRemove
-          // spaceId: activeTab === 'space' ? currentSpaceId : undefined
-        });
+        if (toRemove.length > 0) {
+          await removeRolesMutation.mutateAsync({
+            userId: targetUserId,
+            roleIds: toRemove
+          });
+        }
       }
 
       toast.success(t('messages.success'), {
@@ -121,20 +189,34 @@ export const UserRole: React.FC<UserRoleProps> = ({
       });
     }
   }, [
-    user?.id,
-    currentUserRoles,
+    targetUserId,
+    currentRoleIds,
     selectedRoles,
-    assignRolesMutation,
-    removeRolesMutation,
     activeTab,
     currentSpaceId,
+    canManageSpaceRoles,
+    assignRolesMutation,
+    removeRolesMutation,
+    addSpaceRoleMutation,
+    removeSpaceRoleMutation,
     toast,
     t,
     onSuccess,
     onClose
   ]);
 
-  const isLoading = rolesLoading || userRolesLoading || spaceRolesLoading;
+  const isLoading = rolesLoading || (activeTab === 'system' ? userRolesLoading : spaceRolesLoading);
+  const isSaving =
+    assignRolesMutation.isPending ||
+    removeRolesMutation.isPending ||
+    addSpaceRoleMutation.isPending ||
+    removeSpaceRoleMutation.isPending;
+  const cannotManageSelectedSpace = activeTab === 'space' && !canManageSpaceRoles;
+  const saveDisabled =
+    !targetUserId ||
+    isLoading ||
+    isSaving ||
+    (activeTab === 'space' && (!currentSpaceId || !canManageSpaceRoles));
 
   if (!user) return null;
 
@@ -143,9 +225,11 @@ export const UserRole: React.FC<UserRoleProps> = ({
       isOpen={isOpen}
       onCancel={onClose}
       title={t('user.roles.manage_title')}
-      description={`${t('user.roles.manage_description')} "${user.username}"`}
+      description={`${t('user.roles.manage_description')} "${targetUserName}"`}
       confirmText={t('actions.save')}
       onConfirm={handleSave}
+      confirmDisabled={saveDisabled}
+      loading={isSaving}
       className='max-w-3xl'
     >
       <div className='space-y-4'>
@@ -165,7 +249,7 @@ export const UserRole: React.FC<UserRoleProps> = ({
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value='system'>{t('user.roles.system_roles')}</TabsTrigger>
-            {currentSpaceId && (
+            {currentSpaceId && canReadSpaceRoles && (
               <TabsTrigger value='space'>{t('user.roles.space_roles')}</TabsTrigger>
             )}
           </TabsList>
@@ -178,15 +262,26 @@ export const UserRole: React.FC<UserRoleProps> = ({
               selectedRoles={selectedRoles}
               onRoleToggle={handleRoleToggle}
               isLoading={isLoading}
+              disabled={isSaving || !targetUserId}
               t={t}
             />
           </TabsContent>
 
-          {currentSpaceId && (
+          {currentSpaceId && canReadSpaceRoles && (
             <TabsContent value='space' className='space-y-4'>
               <div className='bg-blue-50 p-3 rounded-lg mb-4'>
                 <div className='text-blue-800 text-sm'>{t('user.roles.space_context_info')}</div>
               </div>
+              {cannotManageSelectedSpace && (
+                <div className='bg-amber-50 p-3 rounded-lg mb-4'>
+                  <div className='text-amber-800 text-sm'>
+                    {t(
+                      'user.roles.space_readonly_info',
+                      'You can review these space roles, but manage:spaces is required to change them.'
+                    )}
+                  </div>
+                </div>
+              )}
               <RoleManagementContent
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
@@ -194,6 +289,7 @@ export const UserRole: React.FC<UserRoleProps> = ({
                 selectedRoles={selectedRoles}
                 onRoleToggle={handleRoleToggle}
                 isLoading={isLoading}
+                disabled={isSaving || !targetUserId || !currentSpaceId || !canManageSpaceRoles}
                 t={t}
               />
             </TabsContent>
@@ -212,6 +308,7 @@ const RoleManagementContent = ({
   selectedRoles,
   onRoleToggle,
   isLoading,
+  disabled,
   t
 }) => (
   <>
@@ -241,7 +338,7 @@ const RoleManagementContent = ({
               <Checkbox
                 checked={selectedRoles.includes(role.id)}
                 onChange={() => onRoleToggle(role.id)}
-                disabled={role.disabled}
+                disabled={disabled || role.disabled}
               />
               <div className='flex-1'>
                 <div className='flex items-center space-x-2'>

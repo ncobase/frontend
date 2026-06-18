@@ -28,6 +28,8 @@ import {
 import { QueryFormParams } from './config/query';
 import { CreateApiKeyRequest, EmployeeBody, User } from './user';
 
+import { propagateRbacChange } from '@/features/account/session_propagation';
+
 interface UserKeys {
   create: ['userService', 'create'];
   get: (_options?: { user?: string }) => ['userService', 'user', { user?: string }];
@@ -165,12 +167,16 @@ export const useAssignRoles = () => {
   return useMutation({
     mutationFn: ({ userId, roleIds }: { userId: string; roleIds: string[] }) =>
       assignRoles(userId, roleIds),
-    onSuccess: (_, { userId }) => {
+    onSuccess: async (_, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: userKeys.roles({ user: userId })
       });
       queryClient.invalidateQueries({
         queryKey: userKeys.meshes({ user: userId })
+      });
+      await propagateRbacChange(queryClient, {
+        reason: 'user-roles-assigned',
+        affectedUserIds: userId ? [userId] : []
       });
     },
     onError: error => {
@@ -186,12 +192,16 @@ export const useRemoveRoles = () => {
   return useMutation({
     mutationFn: ({ userId, roleIds }: { userId: string; roleIds: string[] }) =>
       removeRoles(userId, roleIds),
-    onSuccess: (_, { userId }) => {
+    onSuccess: async (_, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: userKeys.roles({ user: userId })
       });
       queryClient.invalidateQueries({
         queryKey: userKeys.meshes({ user: userId })
+      });
+      await propagateRbacChange(queryClient, {
+        reason: 'user-roles-removed',
+        affectedUserIds: userId ? [userId] : []
       });
     },
     onError: error => {
@@ -346,8 +356,8 @@ export const useQueryUserSpaceRoles = (
   useQuery({
     queryKey: ['userService', 'userSpaceRoles', { userId, spaceId }],
     queryFn: () => getUserSpaceRoles(userId, spaceId!),
-    enabled: !!userId && !!spaceId && options?.enabled !== false,
-    ...options
+    ...options,
+    enabled: !!userId && !!spaceId && options?.enabled !== false
   });
 
 export const useUpdateStatus = () => {

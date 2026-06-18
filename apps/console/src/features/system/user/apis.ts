@@ -11,10 +11,17 @@ import {
 
 import { ApiContext, createApi } from '@/lib/api/factory';
 
+const assertRequiredId = (value: string | undefined, label: string) => {
+  if (!value) {
+    throw new Error(`${label} is required`);
+  }
+  return value;
+};
+
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // User meshes and profiles
   getUserMeshes: async (id: string): Promise<UserMeshes> => {
-    return request.get(`${endpoint}/${id}/meshes`);
+    return request.get(`${endpoint}/${assertRequiredId(id, 'User ID')}/meshes`);
   },
 
   createUserWithProfile: async (payload: CreateUserPayload): Promise<UserMeshes> => {
@@ -27,7 +34,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Password management
   changePassword: async (id: string, payload: UserPasswordPayload): Promise<void> => {
-    return request.put(`${endpoint}/${id}/password`, payload);
+    return request.put(`${endpoint}/${assertRequiredId(id, 'User ID')}/password`, payload);
   },
 
   resetPassword: async (payload: { username: string; email: string }): Promise<void> => {
@@ -36,15 +43,17 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Role management
   getUserRoles: async (id: string): Promise<string[]> => {
-    return request.get(`${endpoint}/${id}/roles`);
+    return request.get(`${endpoint}/${assertRequiredId(id, 'User ID')}/roles`);
   },
 
   assignRoles: async (id: string, roleIds: string[]): Promise<void> => {
-    return request.post(`${endpoint}/${id}/roles`, { roleIds });
+    return request.post(`${endpoint}/${assertRequiredId(id, 'User ID')}/roles`, { roleIds });
   },
 
   removeRoles: async (id: string, roleIds: string[]): Promise<void> => {
-    return request.delete(`${endpoint}/${id}/roles`, { body: { roleIds } });
+    return request.delete(`${endpoint}/${assertRequiredId(id, 'User ID')}/roles`, {
+      body: { roleIds }
+    });
   },
 
   // Status management
@@ -119,7 +128,7 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // API Key management
   getUserApiKeys: async (userId: string): Promise<ApiKey[]> => {
-    return request.get(`${endpoint}/${userId}/api-keys`);
+    return request.get(`${endpoint}/${assertRequiredId(userId, 'User ID')}/api-keys`);
   },
 
   getMyApiKeys: async (): Promise<ApiKey[]> => {
@@ -140,7 +149,9 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
 
   // Space relationships
   getUserSpaceRoles: async (userId: string, spaceId: string) => {
-    return request.get(`${endpoint}/${userId}/spaces/${spaceId}/roles`);
+    return request.get(
+      `${endpoint}/${assertRequiredId(userId, 'User ID')}/spaces/${assertRequiredId(spaceId, 'Space ID')}/roles`
+    );
   }
 });
 

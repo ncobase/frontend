@@ -39,9 +39,11 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
   const toast = useToastMessage();
   const [showAddRole, setShowAddRole] = useState(false);
   const [removeDialog, setRemoveDialog] = useState({ open: false, roleId: '', roleName: '' });
+  const targetUserId = user?.user_id || user?.id;
+  const targetUserName = user?.username || user?.email || targetUserId || '';
 
-  const { data: userRoles, isLoading, refetch } = useQueryUserSpaceRoles(spaceId, user?.user_id);
-  const { data: rolesData } = useListRoles({ limit: 100 });
+  const { data: userRoles, isLoading, refetch } = useQueryUserSpaceRoles(spaceId, targetUserId);
+  const { data: rolesData, isLoading: rolesLoading } = useListRoles({ limit: 100 });
   const addRoleMutation = useAddUserToSpaceRole();
   const removeRoleMutation = useRemoveUserFromSpaceRole();
 
@@ -55,12 +57,24 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
   const roles = rolesData?.items || [];
   const assignedRoleIds = userRoles?.role_ids || [];
   const availableRoles = roles.filter(role => !assignedRoleIds.includes(role.id));
+  const isSaving = addRoleMutation.isPending || removeRoleMutation.isPending;
+  const canAddRole = !!targetUserId && !!spaceId && availableRoles.length > 0 && !isSaving;
 
   const handleAddRole = async (data: any) => {
+    if (!targetUserId) {
+      toast.error(t('messages.error'), {
+        description: t(
+          'space.users.roles.missing_user',
+          'User ID is required before roles can be changed.'
+        )
+      });
+      return;
+    }
+
     try {
       await addRoleMutation.mutateAsync({
         spaceId,
-        user_id: user.user_id,
+        user_id: targetUserId,
         role_id: data.role_id
       });
 
@@ -80,12 +94,12 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
   };
 
   const handleRemoveRole = async () => {
-    if (!removeDialog.roleId) return;
+    if (!removeDialog.roleId || !targetUserId) return;
 
     try {
       await removeRoleMutation.mutateAsync({
         spaceId,
-        userId: user.user_id,
+        userId: targetUserId,
         roleId: removeDialog.roleId
       });
 
@@ -111,22 +125,23 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
         isOpen={isOpen}
         onCancel={onClose}
         title={t('space.users.roles.manage_title')}
-        description={`${t('space.users.roles.manage_description')} "${user.username}"`}
+        description={`${t('space.users.roles.manage_description')} "${targetUserName}"`}
         className='max-w-4xl'
-        onConfirm={showAddRole ? () => setShowAddRole(true) : undefined}
-        // footer={
-        //   <div className='flex items-center justify-between'>
-        //     <Button
-        //       variant='outline-primary'
-        //       onClick={() => setShowAddRole(true)}
-        //       disabled={availableRoles.length === 0}
-        //     >
-        //       <Icons name='IconPlus' className='mr-2' />
-        //       {t('space.users.roles.add_role')}
-        //     </Button>
-        //     <Button onClick={onClose}>{t('actions.close')}</Button>
-        //   </div>
-        // }
+        footer={
+          <div className='flex w-full items-center justify-between gap-3'>
+            <Button
+              variant='outline-primary'
+              onClick={() => setShowAddRole(true)}
+              disabled={!canAddRole || rolesLoading}
+            >
+              <Icons name='IconPlus' className='mr-2' />
+              {t('space.users.roles.add_role')}
+            </Button>
+            <Button onClick={onClose} disabled={isSaving}>
+              {t('actions.close')}
+            </Button>
+          </div>
+        }
       >
         <div className='space-y-6'>
           {/* User Info Banner */}
@@ -149,10 +164,18 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
           <div>
             <h3 className='text-lg font-medium mb-4'>{t('space.users.roles.current_roles')}</h3>
 
-            {isLoading ? (
+            {isLoading || rolesLoading ? (
               <div className='text-center py-8'>
                 <Icons name='IconLoader' className='animate-spin mx-auto mb-4' />
                 {t('common.loading')}
+              </div>
+            ) : !targetUserId ? (
+              <div className='text-center py-8 text-amber-700'>
+                <Icons name='IconAlertTriangle' className='w-12 h-12 mx-auto mb-4 text-amber-400' />
+                {t(
+                  'space.users.roles.missing_user',
+                  'User ID is required before roles can be changed.'
+                )}
               </div>
             ) : assignedRoleIds.length === 0 ? (
               <div className='text-center py-8 text-slate-500'>
@@ -210,6 +233,8 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
         title={t('space.users.roles.add_role_title')}
         confirmText={t('actions.add')}
         onConfirm={handleSubmit(handleAddRole)}
+        confirmDisabled={!canAddRole}
+        loading={addRoleMutation.isPending}
       >
         <div className='space-y-4'>
           <div className='bg-blue-50 p-3 rounded-lg'>
@@ -248,14 +273,28 @@ export const SpaceUserRoleManagement: React.FC<SpaceUserRoleManagementProps> = (
         title={t('space.users.roles.remove_confirm_title')}
         description={t('space.users.roles.remove_confirm_description', {
           role: removeDialog.roleName,
-          user: user.username
+          user: targetUserName
         })}
         isOpen={removeDialog.open}
         onChange={nextOpen => setRemoveDialog(prev => ({ ...prev, open: nextOpen }))}
-        cancelText={t('actions.cancel')}
-        confirmText={t('actions.remove')}
-        onCancel={() => setRemoveDialog({ open: false, roleId: '', roleName: '' })}
-        onConfirm={handleRemoveRole}
+        footer={
+          <div className='flex w-full justify-end gap-3'>
+            <Button
+              variant='slate'
+              onClick={() => setRemoveDialog({ open: false, roleId: '', roleName: '' })}
+              disabled={removeRoleMutation.isPending}
+            >
+              {t('actions.cancel')}
+            </Button>
+            <Button
+              variant='outline-danger'
+              onClick={handleRemoveRole}
+              disabled={removeRoleMutation.isPending || !targetUserId}
+            >
+              {removeRoleMutation.isPending ? t('common.loading') : t('actions.remove')}
+            </Button>
+          </div>
+        }
       />
     </>
   );

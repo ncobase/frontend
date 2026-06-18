@@ -39,6 +39,8 @@ export const UserListPage = () => {
   const canDelete = hasPermission('delete:users') || hasPermission('manage:users');
   const canReadUsers = hasPermission('read:users') || hasPermission('manage:users');
   const canManageRoles = hasPermission('manage:roles');
+  const canReadSpaces = hasPermission('read:spaces') || hasPermission('manage:spaces');
+  const canManageSpaces = hasPermission('manage:spaces');
   const canReadApiKeys = canReadUsers;
   const canDeleteAnyApiKeys = hasPermission('delete:users') || hasPermission('manage:users');
   const canManageOwnApiKeys =
@@ -302,6 +304,8 @@ export const UserListPage = () => {
           onClose={() => setRoleManagementModal({ open: false, user: null })}
           user={roleManagementModal.user}
           currentSpaceId={space_id}
+          canReadSpaceRoles={canReadSpaces}
+          canManageSpaceRoles={canManageSpaces}
           onSuccess={() => {
             setRoleManagementModal({ open: false, user: null });
             refetch();

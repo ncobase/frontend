@@ -15,6 +15,13 @@ import {
 
 import { ApiContext, createApi } from '@/lib/api/factory';
 
+const assertRequiredId = (value: string | undefined, label: string) => {
+  if (!value) {
+    throw new Error(`${label} is required`);
+  }
+  return value;
+};
+
 const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   // Basic CRUD operations
   getSpaceBySlug: async (slug: string): Promise<Space> => {
@@ -122,35 +129,55 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
   getSpaceUsers: async (spaceId: string, params?: any) => {
     const searchParams = new URLSearchParams(params || {});
     const query = searchParams.toString();
-    return request.get(`${endpoint}/${spaceId}/users${query ? `?${query}` : ''}`);
+    return request.get(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users${query ? `?${query}` : ''}`
+    );
   },
 
   addUserToSpaceRole: async (spaceId: string, payload: AddUserToSpaceRoleRequest) => {
-    return request.post(`${endpoint}/${spaceId}/users/roles`, payload);
+    return request.post(`${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/roles`, {
+      ...payload,
+      user_id: assertRequiredId(payload.user_id, 'User ID'),
+      role_id: assertRequiredId(payload.role_id, 'Role ID')
+    });
   },
 
   getUserSpaceRoles: async (spaceId: string, userId: string) => {
-    return request.get(`${endpoint}/${spaceId}/users/${userId}/roles`);
+    return request.get(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles`
+    );
   },
 
   updateUserSpaceRole: async (spaceId: string, userId: string, payload: any) => {
-    return request.put(`${endpoint}/${spaceId}/users/${userId}/roles`, payload);
+    return request.put(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles`,
+      payload
+    );
   },
 
   removeUserFromSpaceRole: async (spaceId: string, userId: string, roleId: string) => {
-    return request.delete(`${endpoint}/${spaceId}/users/${userId}/roles/${roleId}`);
+    return request.delete(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles/${assertRequiredId(roleId, 'Role ID')}`
+    );
   },
 
   checkUserSpaceRole: async (spaceId: string, userId: string, roleId: string) => {
-    return request.get(`${endpoint}/${spaceId}/users/${userId}/roles/${roleId}/check`);
+    return request.get(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/${assertRequiredId(userId, 'User ID')}/roles/${assertRequiredId(roleId, 'Role ID')}/check`
+    );
   },
 
   getSpaceUsersByRole: async (spaceId: string, roleId: string) => {
-    return request.get(`${endpoint}/${spaceId}/roles/${roleId}/users`);
+    return request.get(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/roles/${assertRequiredId(roleId, 'Role ID')}/users`
+    );
   },
 
   bulkUpdateUserSpaceRoles: async (spaceId: string, payload: BulkUpdateUserSpaceRolesRequest) => {
-    return request.put(`${endpoint}/${spaceId}/users/roles/bulk`, payload);
+    return request.put(
+      `${endpoint}/${assertRequiredId(spaceId, 'Space ID')}/users/roles/bulk`,
+      payload
+    );
   },
 
   // Space-Group Management
