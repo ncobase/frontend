@@ -201,8 +201,10 @@ which cross-feature effects they must handle.
     immediately through topic-media sync.
   - The manager supports upload, gallery selection, duplicate movement between featured/gallery/
     attachment, remove, reorder, loading/error/disabled states, and save feedback.
+- Current browser coverage: mocked Playwright verifies topic media upload, existing resource reuse,
+  ordering, failed sync feedback, and retry.
 - Required UX: settle id/slug display and route usage; show taxonomy validation errors inline; add
-  browser integration coverage for create staging, edit immediate save, ordering, and failure states.
+  real-backend smoke coverage for create staging and edit immediate save.
 
 ### Media and Resource Picker
 
@@ -242,9 +244,11 @@ which cross-feature effects they must handle.
 - Cross-effects: media references resource files through `resource_id`; resource deletion must keep
   CMS media and topic-media relations intact by refusing to delete referenced files until the
   dependent records are removed or changed.
-- Required next UX: per-file transfer progress and browser integration coverage for media upload
-  retry, protected preview states, resource delete impact loading, blocking, navigation, and
-  successful clear-state deletion.
+- Current browser coverage: mocked Playwright verifies topic media upload/reuse/sort/retry and
+  resource delete impact blocking, media navigation, and successful clear-state deletion.
+- Required next UX: per-file transfer progress, real-backend smoke coverage for media upload retry
+  and protected preview states, and dedicated backend aggregation for resource reference impact when
+  request volume becomes material.
 
 ### Channels and Distributions
 
@@ -313,8 +317,10 @@ Current frontend closure from the feature/UI pass:
   partial or failed batch deletes keep the dialog open with deleted/failed/unknown item details and
   allow retrying only unresolved items; resource detail shows CMS media references and can open a
   filtered `/content/media?resource_id=...` list.
-- Required next UX: per-file transfer progress, browser integration tests for delete impact review
-  and upload/delete failure recovery, and version restore/delete UI after backend endpoints exist.
+- Current browser coverage: mocked Playwright verifies delete impact review, referenced-file block,
+  linked-media navigation, and clear-state deletion.
+- Required next UX: per-file transfer progress, real-backend smoke for upload/delete failure
+  recovery, and version restore/delete UI after backend endpoints exist.
 
 ## AI Gateway
 
@@ -342,9 +348,11 @@ Current frontend closure from the feature/UI pass:
 - Failure states: disabled runtime, missing provider secrets, policy rejection, prompt size limits,
   malformed action context JSON, permission denial, provider error, stream interruption, and run
   lookup ownership denial.
-- Required next UX: admin option editor for AI policy/provider options, browser tests for
-  playground/actions/streaming, and explicit apply flows only after each target domain has a backend
-  mutation contract and validation behavior.
+- Current browser coverage: mocked Playwright verifies playground completion, run detail navigation,
+  and governed action execution.
+- Required next UX: admin option editor for AI policy/provider options, real-backend smoke for
+  status/actions/runs and streaming, and explicit apply flows only after each target domain has a
+  backend mutation contract and validation behavior.
 
 ## Spaces
 
@@ -370,8 +378,10 @@ Current frontend closure from the feature/UI pass:
   edit, space-user create, and space-user edit subroutes require `manage:spaces`. List and member
   pages hide write buttons, destructive dropdown items, row selection, and bulk actions when only
   read access is present.
-- Required UX: add browser/e2e coverage for selected-space token refresh, read-only route retention,
-  navigation refresh, and stale domain cache cleanup.
+- Current browser coverage: mocked Playwright verifies selected-space token refresh headers,
+  account/navigation refresh, and active-space local storage update.
+- Required UX: add real-backend smoke coverage for selected-space token refresh, read-only route
+  retention, navigation refresh, and stale domain cache cleanup.
 
 ## Payment
 

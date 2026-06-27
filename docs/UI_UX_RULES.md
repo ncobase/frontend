@@ -59,8 +59,8 @@ These rules apply to `frontend/apps/console`. Shared, long-term UI primitives sh
 - Rejected files must show specific rejection reasons.
 - Upload progress and batch partial failures must be visible.
 - Share/public/access changes must show the resulting access scope.
-- Delete must query CMS media references before removal and warn when a file is referenced. Topic
-  references must be shown once the resource -> topic reverse lookup exists.
+- Delete must query CMS media and topic references before removal, show linked records, and block
+  removal when references exist or reference checks are incomplete.
 
 ## Dangerous Operations
 
