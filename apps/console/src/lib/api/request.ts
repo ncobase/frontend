@@ -12,6 +12,7 @@ type RequestOptions = FetchOptions & {
   timestamp?: boolean;
   dedupe?: boolean;
   skipRedirect?: boolean;
+  skipGlobalError?: boolean;
 };
 
 // Circuit breaker for failed endpoints
@@ -249,7 +250,13 @@ export class Request {
     );
   }
 
-  private handleError(error: any, method: string, url: string, skipRedirect = false): never {
+  private handleError(
+    error: any,
+    method: string,
+    url: string,
+    skipRedirect = false,
+    skipGlobalError = false
+  ): never {
     const endpoint = this.getEndpointKey(url);
     let status: number | undefined;
     let message = 'Request failed';
@@ -287,7 +294,9 @@ export class Request {
     }
 
     // Emit events after local session cleanup so auth state listeners see the latest storage state.
-    this.emitEvents(status, message, endpoint, data);
+    if (!skipGlobalError) {
+      this.emitEvents(status, message, endpoint, data);
+    }
 
     // Create an enhanced error without mutating Response or FetchError instances with readonly fields.
     const enhancedError = new Error(message);
@@ -417,6 +426,7 @@ export class Request {
       timestamp,
       dedupe: _dedupe,
       skipRedirect,
+      skipGlobalError,
       headers: optionHeaders,
       ...optionOverrides
     } = options || {};
@@ -472,7 +482,7 @@ export class Request {
       CircuitBreaker.clearFailures(endpoint);
       return response;
     } catch (error) {
-      this.handleError(error, method, finalUrl, skipRedirect);
+      this.handleError(error, method, finalUrl, skipRedirect, skipGlobalError);
     }
   }
 

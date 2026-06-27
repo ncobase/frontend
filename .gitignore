@@ -16,5 +16,7 @@ version.json
 .version.json
 .turbo
 .eslintcache
+playwright-report
+test-results
 package-lock.json
 yarn.lock

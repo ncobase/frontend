@@ -191,7 +191,7 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
     const canAddMore = !meta.maxItems || mediaList.length < meta.maxItems;
 
     return (
-      <div key={type} className='space-y-3'>
+      <div key={type} className='space-y-3' data-testid={`topic-media-section-${type}`}>
         <div className='flex flex-wrap items-center justify-between gap-3'>
           <div>
             <h4 className='font-medium text-gray-900'>{meta.title}</h4>
@@ -255,6 +255,7 @@ export const TopicMediaManager: React.FC<TopicMediaManagerProps> = ({
                     className={`bg-gray-100 rounded-lg overflow-hidden ${
                       type === 'featured' ? 'aspect-video' : 'aspect-square'
                     }`}
+                    data-testid={`topic-media-item-${mediaId}`}
                   >
                     {media?.type === 'image' && previewUrl ? (
                       <img
@@ -431,7 +432,10 @@ export const TopicMediaField: React.FC<TopicMediaFieldProps> = ({
   };
 
   return (
-    <div className='col-span-full space-y-4 rounded-lg border border-slate-200 bg-slate-50/60 p-4'>
+    <div
+      className='col-span-full space-y-4 rounded-lg border border-slate-200 bg-slate-50/60 p-4'
+      data-testid='topic-media-field'
+    >
       <div className='flex flex-wrap items-start justify-between gap-3'>
         <div>
           <h3 className='text-sm font-medium text-slate-900'>

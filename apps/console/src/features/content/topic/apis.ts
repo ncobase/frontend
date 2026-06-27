@@ -6,6 +6,19 @@ import { assertRequiredApiValue } from '@/lib/api/guards';
 
 export const topicApi = createApi<Topic>('/cms/topics');
 export const topicMediaApi = createApi<TopicMedia>('/cms/topic-media', {
+  create: (payload, { request, endpoint }) =>
+    request.post(endpoint, { ...payload }, { skipRedirect: true, skipGlobalError: true }),
+  update: (payload, { request, endpoint }) =>
+    request.put(
+      `${endpoint}/${assertRequiredApiValue(payload.id, 'Topic media ID')}`,
+      { ...payload },
+      { skipRedirect: true, skipGlobalError: true }
+    ),
+  delete: (id, { request, endpoint }) =>
+    request.delete(`${endpoint}/${assertRequiredApiValue(id, 'Topic media ID')}`, {
+      skipRedirect: true,
+      skipGlobalError: true
+    }),
   extensions: ({ request, endpoint }) => ({
     listByTopic: (topicId: string, params: Record<string, any> = {}) => {
       const query = new URLSearchParams(

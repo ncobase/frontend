@@ -139,6 +139,7 @@ export const ResourceMediaPicker: React.FC<ResourceMediaPickerProps> = ({
       <button
         key={resource.id}
         type='button'
+        data-testid={`resource-media-picker-item-${resource.id}`}
         onClick={() => toggleResource(resource)}
         className={`min-w-0 rounded-lg border p-2 text-left transition-colors ${
           selected ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'

@@ -7,6 +7,7 @@ const ResourceViewPage = lazyNamed(() => import('./pages/view'), 'ResourceViewPa
 
 export const ResourceRoutes = () => {
   const routes = [
+    { path: '', element: <ResourceListPage /> },
     { path: '/', element: <ResourceListPage /> },
     {
       path: '/admin',

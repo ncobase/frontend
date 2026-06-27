@@ -27,6 +27,8 @@ export default [
       '**/dist',
       '**/dist-ssr',
       '**/dev-dist',
+      '**/playwright-report',
+      '**/test-results',
       '**/*.local',
       '**/cypress*',
       '**/vite.config.mts',

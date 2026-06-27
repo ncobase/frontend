@@ -464,6 +464,11 @@ type FileInputProps = React.HTMLAttributes<HTMLDivElement>;
 export const FileInput: React.FC<FileInputProps> = ({ className, children, ...props }) => {
   const { dropzoneState, isFileTooBig, isLOF } = useFileUpload();
   const rootProps = isLOF ? {} : dropzoneState.getRootProps();
+  const inputProps = dropzoneState.getInputProps({
+    disabled: isLOF,
+    'data-testid': 'file-uploader-input',
+    className: `${isLOF ? 'cursor-not-allowed' : ''} rounded-none outline-hidden w-full focus:outline-hidden focus:ring-0 hidden`
+  });
 
   return (
     <div
@@ -488,13 +493,7 @@ export const FileInput: React.FC<FileInputProps> = ({ className, children, ...pr
       >
         {children}
       </div>
-      {/* @ts-ignore */}
-      <input
-        ref={dropzoneState.inputRef}
-        disabled={isLOF}
-        {...{}}
-        className={`${isLOF ? 'cursor-not-allowed' : ''} rounded-none outline-hidden w-full focus:outline-hidden focus:ring-0 hidden`}
-      />
+      <input {...inputProps} />
     </div>
   );
 };
