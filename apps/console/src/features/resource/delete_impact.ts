@@ -1,25 +1,13 @@
-import type { ResourceFile } from './resource';
+import { getBatchDeleteImpact } from './apis';
+import type {
+  ResourceDeleteImpact as ApiResourceDeleteImpact,
+  ResourceDeleteImpactResponse,
+  ResourceFile
+} from './resource';
 
-import { getMediaList } from '@/features/content/media/apis';
 import type { Media } from '@/features/content/media/media';
-import { getTopic, getTopicMediaList } from '@/features/content/topic/apis';
 import type { Topic } from '@/features/content/topic/topic';
 import type { TopicMedia } from '@/features/content/topic/topic_media';
-
-type ListParams = Record<string, unknown>;
-
-interface ListResponse<T> {
-  items?: T[];
-  total?: number;
-  next_cursor?: string;
-  has_next?: boolean;
-}
-
-interface FetchAllPagesResult<T> {
-  items: T[];
-  total: number;
-  complete: boolean;
-}
 
 export interface ResourceTopicReference {
   media: Media;
@@ -48,116 +36,110 @@ export interface ResourceDeleteImpactSummary {
 }
 
 export interface ResourceDeleteImpactFetchers {
-  listMedia: (_params: ListParams) => Promise<ListResponse<Media> | Media[]>;
-  listTopicMedia: (_params: ListParams) => Promise<ListResponse<TopicMedia> | TopicMedia[]>;
-  getTopic: (_topicId: string) => Promise<Topic>;
+  getDeleteImpacts: (_ids: string[]) => Promise<ResourceDeleteImpactResponse>;
 }
 
 const defaultFetchers: ResourceDeleteImpactFetchers = {
-  listMedia: getMediaList as ResourceDeleteImpactFetchers['listMedia'],
-  listTopicMedia: getTopicMediaList as ResourceDeleteImpactFetchers['listTopicMedia'],
-  getTopic
+  getDeleteImpacts: getBatchDeleteImpact
 };
 
-const PAGE_SIZE = 100;
-const MAX_PAGES = 20;
+const byFileId = (files: ResourceFile[]) =>
+  files.reduce<Record<string, ResourceFile>>((acc, file) => {
+    if (file.id) acc[file.id] = file;
+    return acc;
+  }, {});
 
-const asListResponse = <T>(response: ListResponse<T> | T[]): ListResponse<T> => {
-  if (Array.isArray(response)) {
-    return {
-      items: response,
-      total: response.length,
-      has_next: false
-    };
-  }
-  return response || {};
-};
+const toMedia = (media: ApiResourceDeleteImpact['media_references'][number]): Media => ({
+  id: media.id,
+  title: media.title,
+  type: media.type as Media['type'],
+  url: media.url,
+  resource_id: media.resource_id,
+  path: media.path,
+  mime_type: media.mime_type,
+  size: media.size,
+  description: media.description,
+  alt: media.alt,
+  metadata: media.metadata,
+  space_id: media.space_id,
+  owner_id: media.owner_id,
+  created_by: media.created_by,
+  created_at: media.created_at ? String(media.created_at) : undefined,
+  updated_by: media.updated_by,
+  updated_at: media.updated_at ? String(media.updated_at) : undefined
+});
 
-const fetchAllPages = async <T>(
-  fetchPage: (_params: ListParams) => Promise<ListResponse<T> | T[]>,
-  baseParams: ListParams
-): Promise<FetchAllPagesResult<T>> => {
-  const items: T[] = [];
-  let cursor = typeof baseParams.cursor === 'string' ? baseParams.cursor : '';
-  let total = 0;
+const toTopicMedia = (
+  relation?: ApiResourceDeleteImpact['topic_references'][number]['relation']
+): TopicMedia => ({
+  id: relation?.id,
+  topic_id: relation?.topic_id,
+  media_id: relation?.media_id,
+  type: relation?.type as TopicMedia['type'],
+  order: relation?.order,
+  created_by: relation?.created_by,
+  created_at: relation?.created_at ? String(relation.created_at) : undefined,
+  updated_by: relation?.updated_by,
+  updated_at: relation?.updated_at ? String(relation.updated_at) : undefined
+});
 
-  for (let page = 0; page < MAX_PAGES; page += 1) {
-    const response = asListResponse(
-      await fetchPage({
-        ...baseParams,
-        cursor,
-        limit: baseParams.limit || PAGE_SIZE
-      })
-    );
+const toTopic = (
+  topic?: ApiResourceDeleteImpact['topic_references'][number]['topic']
+): Topic | undefined =>
+  topic
+    ? {
+        id: topic.id,
+        name: topic.name,
+        title: topic.title,
+        slug: topic.slug,
+        content_type: topic.content_type,
+        status: topic.status,
+        featured_media: topic.featured_media,
+        tags: topic.tags,
+        space_id: topic.space_id,
+        created_by: topic.created_by,
+        created_at: topic.created_at ? String(topic.created_at) : undefined,
+        updated_by: topic.updated_by,
+        updated_at: topic.updated_at ? String(topic.updated_at) : undefined
+      }
+    : undefined;
 
-    const pageItems = Array.isArray(response.items) ? response.items : [];
-    items.push(...pageItems);
-    total = Math.max(total, response.total ?? items.length);
-
-    if (!response.has_next) {
-      return {
-        items,
-        total: total || items.length,
-        complete: true
-      };
-    }
-
-    if (!response.next_cursor) {
-      return {
-        items,
-        total: total || items.length,
-        complete: false
-      };
-    }
-
-    cursor = response.next_cursor;
-  }
+const normalizeImpact = (
+  impact: ApiResourceDeleteImpact,
+  originalFiles: Record<string, ResourceFile>
+): ResourceDeleteImpact => {
+  const file = impact.file || originalFiles[impact.file?.id || ''];
+  const mediaReferences = (impact.media_references || []).map(toMedia);
+  const mediaById = mediaReferences.reduce<Record<string, Media>>((acc, media) => {
+    if (media.id) acc[media.id] = media;
+    return acc;
+  }, {});
 
   return {
-    items,
-    total: total || items.length,
-    complete: false
+    file,
+    mediaReferences,
+    topicReferences: (impact.topic_references || []).map(reference => {
+      const relation = toTopicMedia(reference.relation);
+      const media =
+        reference.media?.id && mediaById[reference.media.id]
+          ? mediaById[reference.media.id]
+          : reference.media
+            ? toMedia(reference.media)
+            : mediaById[relation.media_id || ''] || ({} as Media);
+
+      return {
+        media,
+        relation,
+        topic: toTopic(reference.topic)
+      };
+    }),
+    mediaReferenceTotal: impact.media_reference_total || 0,
+    topicReferenceTotal: impact.topic_reference_total || 0,
+    mediaReferencesComplete: impact.media_references_complete,
+    topicReferencesComplete: impact.topic_references_complete,
+    errors: impact.errors || []
   };
 };
-
-const uniqueTopicIds = (impacts: ResourceDeleteImpact[]) =>
-  Array.from(
-    new Set(
-      impacts
-        .flatMap(impact => impact.topicReferences.map(reference => reference.relation.topic_id))
-        .filter((topicId): topicId is string => !!topicId)
-    )
-  );
-
-const loadTopicMap = async (
-  topicIds: string[],
-  fetchers: ResourceDeleteImpactFetchers
-): Promise<Map<string, Topic>> => {
-  const topicMap = new Map<string, Topic>();
-  const results = await Promise.allSettled(
-    topicIds.map(async topicId => ({
-      topicId,
-      topic: await fetchers.getTopic(topicId)
-    }))
-  );
-
-  results.forEach(result => {
-    if (result.status === 'fulfilled' && result.value.topic) {
-      topicMap.set(result.value.topicId, result.value.topic);
-    }
-  });
-
-  return topicMap;
-};
-
-const attachTopics = (impacts: ResourceDeleteImpact[], topicMap: Map<string, Topic>) =>
-  impacts.map(impact => ({
-    ...impact,
-    topicReferences: impact.topicReferences.map(reference => ({
-      ...reference,
-      topic: reference.relation.topic_id ? topicMap.get(reference.relation.topic_id) : undefined
-    }))
-  }));
 
 export const getResourceDisplayName = (file: ResourceFile) =>
   file.original_name || file.name || file.id;
@@ -176,85 +158,12 @@ export const fetchResourceDeleteImpact = async (
   files: ResourceFile[],
   fetchers: ResourceDeleteImpactFetchers = defaultFetchers
 ): Promise<ResourceDeleteImpact[]> => {
-  const impacts = await Promise.all(
-    files.map(async file => {
-      const impact: ResourceDeleteImpact = {
-        file,
-        mediaReferences: [],
-        topicReferences: [],
-        mediaReferenceTotal: 0,
-        topicReferenceTotal: 0,
-        mediaReferencesComplete: true,
-        topicReferencesComplete: true,
-        errors: []
-      };
+  const ids = files.map(file => file.id).filter(Boolean);
+  if (ids.length === 0) return [];
 
-      try {
-        const mediaPage = await fetchAllPages<Media>(fetchers.listMedia, {
-          resource_id: file.id
-        });
-        impact.mediaReferences = mediaPage.items;
-        impact.mediaReferenceTotal = mediaPage.total;
-        impact.mediaReferencesComplete = mediaPage.complete;
-        if (!mediaPage.complete) {
-          impact.errors.push('Media reference pagination did not complete.');
-        }
-      } catch (error) {
-        impact.mediaReferencesComplete = false;
-        impact.errors.push(
-          error instanceof Error ? error.message : 'Failed to load media references.'
-        );
-        return impact;
-      }
-
-      const topicReferenceResults = await Promise.all(
-        impact.mediaReferences
-          .filter((media): media is Media & { id: string } => !!media.id)
-          .map(async media => {
-            try {
-              const topicMediaPage = await fetchAllPages<TopicMedia>(fetchers.listTopicMedia, {
-                media_id: media.id
-              });
-              return {
-                media,
-                items: topicMediaPage.items,
-                total: topicMediaPage.total,
-                complete: topicMediaPage.complete,
-                error: ''
-              };
-            } catch (error) {
-              return {
-                media,
-                items: [] as TopicMedia[],
-                total: 0,
-                complete: false,
-                error:
-                  error instanceof Error ? error.message : 'Failed to load topic media references.'
-              };
-            }
-          })
-      );
-
-      topicReferenceResults.forEach(result => {
-        impact.topicReferenceTotal += result.total;
-        impact.topicReferences.push(
-          ...result.items.map(relation => ({
-            media: result.media,
-            relation
-          }))
-        );
-        if (!result.complete) {
-          impact.topicReferencesComplete = false;
-          impact.errors.push(result.error || 'Topic reference pagination did not complete.');
-        }
-      });
-
-      return impact;
-    })
-  );
-
-  const topicMap = await loadTopicMap(uniqueTopicIds(impacts), fetchers);
-  return attachTopics(impacts, topicMap);
+  const response = await fetchers.getDeleteImpacts(ids);
+  const originals = byFileId(files);
+  return (response.impacts || []).map(impact => normalizeImpact(impact, originals));
 };
 
 export const summarizeResourceDeleteImpacts = (

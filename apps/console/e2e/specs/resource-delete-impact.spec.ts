@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { setupConsolePage, clickRowAction, dialogByTitle } from '../support/page';
 
 test('blocks resource deletion when CMS media and topic references exist', async ({ page }) => {
-  await setupConsolePage(page);
+  const server = await setupConsolePage(page);
 
   await page.goto('/res');
   const row = page.getByRole('row').filter({ hasText: 'Referenced Image.jpg' });
@@ -14,6 +14,11 @@ test('blocks resource deletion when CMS media and topic references exist', async
   await expect(dialog).toContainText('Referenced CMS Image');
   await expect(dialog).toContainText('Referenced Topic');
   await expect(dialog.getByRole('button', { name: 'Delete' })).toBeDisabled();
+  await expect
+    .poll(() =>
+      server.requests.some(item => item.method === 'POST' && item.path === '/res/delete-impact')
+    )
+    .toBe(true);
 
   await dialog.getByRole('button', { name: 'Referenced CMS Image' }).click();
   await expect(page).toHaveURL(/\/content\/media\/media-referenced$/);

@@ -237,18 +237,17 @@ which cross-feature effects they must handle.
     protected `/res/:id/download` API instead of relying only on direct URLs.
   - Resource detail queries `/cms/media?resource_id=...` and links back to each CMS media record.
   - Media list accepts `?resource_id=...` so resource references can open a filtered CMS media view.
-  - Resource single and batch delete confirmations run a delete-impact review before enabling the
-    destructive action. The review queries all CMS media references for each `resource_id`, follows
-    topic usage through `/cms/topic-media?media_id=...`, links to the referenced media and topic
-    records, and blocks deletion when references or incomplete reference checks exist.
+  - Resource single and batch delete confirmations run a backend delete-impact review before enabling
+    the destructive action. The console calls `/res/:slug/delete-impact` or `/res/delete-impact`,
+    links to the returned CMS media and topic records, and blocks deletion when references or
+    incomplete reference checks exist.
 - Cross-effects: media references resource files through `resource_id`; resource deletion must keep
   CMS media and topic-media relations intact by refusing to delete referenced files until the
   dependent records are removed or changed.
 - Current browser coverage: mocked Playwright verifies topic media upload/reuse/sort/retry and
   resource delete impact blocking, media navigation, and successful clear-state deletion.
-- Required next UX: per-file transfer progress, real-backend smoke coverage for media upload retry
-  and protected preview states, and dedicated backend aggregation for resource reference impact when
-  request volume becomes material.
+- Required next UX: per-file transfer progress and real-backend smoke coverage for media upload
+  retry, protected preview states, and resource delete-impact contracts.
 
 ### Channels and Distributions
 
@@ -311,12 +310,12 @@ Current frontend closure from the feature/UI pass:
   checks for size/type/quota before submitting, and supports version download plus historical
   version resource navigation.
 - Current sharing/delete/reference UX: table actions expose share link generation with public/shared
-  scope and expiration; delete confirmation checks CMS media and topic usage before single or batch
-  deletion, shows per-file impact details, links to referenced media and topics, blocks deletion on
-  references or reference-check failures, and only enables delete after a complete clear-state review;
-  partial or failed batch deletes keep the dialog open with deleted/failed/unknown item details and
-  allow retrying only unresolved items; resource detail shows CMS media references and can open a
-  filtered `/content/media?resource_id=...` list.
+  scope and expiration; delete confirmation calls backend delete-impact endpoints before single or
+  batch deletion, shows per-file impact details, links to referenced media and topics, blocks
+  deletion on references or reference-check failures, and only enables delete after a complete
+  clear-state review; partial or failed batch deletes keep the dialog open with
+  deleted/failed/unknown item details and allow retrying only unresolved items; resource detail shows
+  CMS media references and can open a filtered `/content/media?resource_id=...` list.
 - Current browser coverage: mocked Playwright verifies delete impact review, referenced-file block,
   linked-media navigation, and clear-state deletion.
 - Required next UX: per-file transfer progress, real-backend smoke for upload/delete failure

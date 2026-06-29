@@ -30,6 +30,86 @@ export interface ResourceFile {
 
 export type ResourceFileListResponse = PaginationResult<ResourceFile>;
 
+export interface ResourceDeleteImpactMedia {
+  id: string;
+  title?: string;
+  type?: 'image' | 'video' | 'audio' | 'file' | string;
+  resource_id?: string;
+  url?: string;
+  path?: string;
+  mime_type?: string;
+  size?: number;
+  description?: string;
+  alt?: string;
+  space_id?: string;
+  owner_id?: string;
+  metadata?: Record<string, any>;
+  created_by?: string;
+  created_at?: number;
+  updated_by?: string;
+  updated_at?: number;
+}
+
+export interface ResourceDeleteImpactTopicMedia {
+  id: string;
+  topic_id?: string;
+  media_id?: string;
+  type?: 'featured' | 'gallery' | 'attachment' | string;
+  order?: number;
+  created_by?: string;
+  created_at?: number;
+  updated_by?: string;
+  updated_at?: number;
+}
+
+export interface ResourceDeleteImpactTopic {
+  id?: string;
+  name?: string;
+  title?: string;
+  slug?: string;
+  content_type?: string;
+  status?: number;
+  featured_media?: string;
+  tags?: string[];
+  space_id?: string;
+  created_by?: string;
+  created_at?: number;
+  updated_by?: string;
+  updated_at?: number;
+}
+
+export interface ResourceDeleteImpactTopicReference {
+  media?: ResourceDeleteImpactMedia;
+  relation?: ResourceDeleteImpactTopicMedia;
+  topic?: ResourceDeleteImpactTopic;
+}
+
+export interface ResourceDeleteImpact {
+  file: ResourceFile;
+  media_references: ResourceDeleteImpactMedia[];
+  topic_references: ResourceDeleteImpactTopicReference[];
+  media_reference_total: number;
+  topic_reference_total: number;
+  media_references_complete: boolean;
+  topic_references_complete: boolean;
+  errors: string[];
+  can_delete: boolean;
+}
+
+export interface ResourceDeleteImpactSummary {
+  file_count: number;
+  referenced_file_count: number;
+  media_reference_count: number;
+  topic_reference_count: number;
+  error_count: number;
+  can_delete: boolean;
+}
+
+export interface ResourceDeleteImpactResponse {
+  impacts: ResourceDeleteImpact[];
+  summary: ResourceDeleteImpactSummary;
+}
+
 export interface ResourceQuota {
   quota: number;
 }

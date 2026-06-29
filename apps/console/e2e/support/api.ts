@@ -61,6 +61,16 @@ const arrayBody = (postData?: string | null): string[] => {
   }
 };
 
+const idsBody = (postData?: string | null): string[] => {
+  if (!postData) return [];
+  try {
+    const parsed = JSON.parse(postData);
+    return Array.isArray(parsed?.ids) ? parsed.ids.map((item: unknown) => String(item)) : [];
+  } catch {
+    return [];
+  }
+};
+
 const mediaByResource = (resourceId: string | null) => {
   if (!resourceId) return Object.values(mediaItems);
   return Object.values(mediaItems).filter(media => media.resource_id === resourceId);
@@ -69,6 +79,63 @@ const mediaByResource = (resourceId: string | null) => {
 const topicMediaByMedia = (mediaId: string | null) => {
   if (!mediaId) return Object.values(topicMedia);
   return Object.values(topicMedia).filter(item => item.media_id === mediaId);
+};
+
+const topicById = (topicId?: string) => Object.values(topics).find(topic => topic.id === topicId);
+
+const deleteImpactForResources = (ids: string[]) => {
+  const impacts = ids.map(id => {
+    const file = Object.values(resourceFiles).find(resource => resource.id === id) || {
+      id,
+      name: id,
+      path: ''
+    };
+    const mediaReferences = mediaByResource(id);
+    const topicReferences = mediaReferences.flatMap(media =>
+      topicMediaByMedia(media.id).map(relation => ({
+        media,
+        relation,
+        topic: topicById(relation.topic_id)
+      }))
+    );
+
+    return {
+      file,
+      media_references: mediaReferences,
+      topic_references: topicReferences,
+      media_reference_total: mediaReferences.length,
+      topic_reference_total: topicReferences.length,
+      media_references_complete: true,
+      topic_references_complete: true,
+      errors: [],
+      can_delete: mediaReferences.length === 0 && topicReferences.length === 0
+    };
+  });
+
+  const mediaReferenceCount = impacts.reduce(
+    (sum, impact) => sum + impact.media_reference_total,
+    0
+  );
+  const topicReferenceCount = impacts.reduce(
+    (sum, impact) => sum + impact.topic_reference_total,
+    0
+  );
+  const errorCount = impacts.reduce((sum, impact) => sum + impact.errors.length, 0);
+  const referencedFileCount = impacts.filter(
+    impact => impact.media_reference_total > 0 || impact.topic_reference_total > 0
+  ).length;
+
+  return {
+    impacts,
+    summary: {
+      file_count: impacts.length,
+      referenced_file_count: referencedFileCount,
+      media_reference_count: mediaReferenceCount,
+      topic_reference_count: topicReferenceCount,
+      error_count: errorCount,
+      can_delete: referencedFileCount === 0 && errorCount === 0
+    }
+  };
 };
 
 const routePath = (route: Route) => {
@@ -162,6 +229,9 @@ export const installConsoleApiMocks = async (
 
     if (path === '/res' && method === 'GET') {
       return json(route, listResponse([resourceFiles.referenced, resourceFiles.clear]));
+    }
+    if (path === '/res/delete-impact' && method === 'POST') {
+      return json(route, deleteImpactForResources(idsBody(postData)));
     }
     if (path === '/res/usage' && method === 'GET') {
       return json(route, {

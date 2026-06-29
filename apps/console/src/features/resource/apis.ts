@@ -4,6 +4,8 @@ import {
   ResourceBatchUploadResult,
   ResourceBatchDeleteResult,
   ResourceBatchStatus,
+  ResourceDeleteImpact,
+  ResourceDeleteImpactResponse,
   ResourceFile,
   StorageStats,
   StorageHealth,
@@ -146,6 +148,18 @@ const extensionMethods = ({ request, endpoint }: ApiContext) => ({
     return request.get(`${endpoint}/status/${assertRequiredApiValue(jobId, 'Batch job ID')}`);
   },
 
+  getDeleteImpact: (slug: string): Promise<ResourceDeleteImpact> => {
+    return request.get(
+      `${endpoint}/${assertRequiredApiValue(slug, 'Resource slug')}/delete-impact`
+    );
+  },
+
+  getBatchDeleteImpact: (ids: string[]): Promise<ResourceDeleteImpactResponse> => {
+    return request.post(`${endpoint}/delete-impact`, {
+      ids: assertRequiredApiArray(ids, 'Resource IDs')
+    });
+  },
+
   // Quota
   getQuota: (): Promise<ResourceQuota> => {
     return request.get(`${endpoint}/quota`);
@@ -244,6 +258,8 @@ export const {
   batchProcess,
   batchDelete,
   getBatchStatus,
+  getDeleteImpact,
+  getBatchDeleteImpact,
   getQuota,
   getUsage,
   getAdminFiles,
